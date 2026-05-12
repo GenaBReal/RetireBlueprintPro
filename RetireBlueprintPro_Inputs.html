@@ -227,12 +227,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       </div>
       <div class="field">
         <label>Legacy Target ($)</label>
-        <input type="number" id="f-B8" value="250000" oninput="markDirty()">
+        <input type="number" id="f-B8" value="250000" oninput="markDirty()" style="width:100%">
         <span class="hint">Ending balance goal</span>
       </div>
       <div class="field">
         <label>Safety Floor ($)</label>
-        <input type="number" id="f-B9" value="250000" oninput="markDirty()">
+        <input type="number" id="f-B9" value="250000" oninput="markDirty()" style="width:100%">
         <span class="hint">Never go below this</span>
       </div>
       <div class="field">
@@ -369,7 +369,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Annual Salary ($)</label>
-            <input type="number" id="f-B37" value="72300" oninput="markDirty()">
+            <input type="number" id="f-B37" value="0" oninput="markDirty()" style="width:100%">
           </div>
           <div class="field">
             <label>Salary End Date</label>
@@ -471,7 +471,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Annual Salary ($)</label>
-            <input type="number" id="f-D37" value="80230" oninput="markDirty()">
+            <input type="number" id="f-D37" value="0" oninput="markDirty()" style="width:100%">
           </div>
           <div class="field">
             <label>Salary End Date</label>
@@ -1110,11 +1110,16 @@ function populateFromData(d) {
 function setVal(id, val) {
   var el = document.getElementById(id);
   if (!el || val === undefined || val === null) return;
-  // Strip currency formatting ($, commas) for number inputs
-  if (el.type === 'number' && typeof val === 'string') {
-    val = parseFloat(val.replace(/[$,%]/g, '').replace(/,/g, '')) || 0;
+  // Always strip currency formatting before setting value
+  if (typeof val === 'string') {
+    val = val.replace(/[$,%]/g,'').replace(/,/g,'').trim();
   }
-  el.value = val;
+  if (el.type === 'number') {
+    var n = parseFloat(val);
+    el.value = isNaN(n) ? '' : n;
+  } else {
+    el.value = val;
+  }
 }
 function setTxt(id, val) { var el=document.getElementById(id); if(el) el.textContent=val; }
 function fmt(n) {
@@ -1297,49 +1302,15 @@ function updateRothTotal(yr) {
   if (el) el.textContent = total > 0 ? '$' + total.toLocaleString() : '$0';
 }
 
-// ── CURRENCY FORMATTING ──────────────────────────────────────
-function formatCurrency(input) {
-  // Remove everything except digits
-  var raw = input.value.replace(/[^0-9]/g, '');
-  if (raw === '') { input.value = ''; return; }
-  // Format with commas
-  var num = parseInt(raw, 10);
-  input.value = num.toLocaleString('en-US');
-  // Store raw value as data attribute
-  input.setAttribute('data-raw', raw);
-}
-
+// Currency formatting removed — plain number inputs only
 function getRaw(input) {
-  return parseInt(input.getAttribute('data-raw') || input.value.replace(/[^0-9]/g, '') || '0', 10);
+  if (!input) return 0;
+  var v = parseFloat(String(input.value).replace(/[^0-9.]/g,''));
+  return isNaN(v) ? 0 : v;
 }
 
 // Apply currency formatting to all account balance inputs
-function initCurrencyFields() {
-  var currencyFields = document.querySelectorAll(
-    'input[id^="acct-bal-"], input[id^="f-B8"], input[id^="f-B9"], ' +
-    'input[id^="f-B37"], input[id^="f-D37"], input[id^="f-B43"], input[id^="f-D43"], ' +
-    'input[id^="f-B46"], input[id^="f-D46"]'
-  );
-  currencyFields.forEach(function(field) {
-    // Format on blur
-    field.addEventListener('blur', function() { formatCurrency(this); });
-    // Allow only numbers while typing
-    field.addEventListener('input', function() {
-      var pos = this.selectionStart;
-      var raw = this.value.replace(/[^0-9]/g, '');
-      if (raw !== '') {
-        var formatted = parseInt(raw).toLocaleString('en-US');
-        this.value = formatted;
-        this.setAttribute('data-raw', raw);
-      }
-    });
-    // Show raw on focus for easy editing
-    field.addEventListener('focus', function() {
-      var raw = this.getAttribute('data-raw') || this.value.replace(/[^0-9]/g, '');
-      if (raw) this.value = raw;
-    });
-  });
-}
+function initCurrencyFields() { /* disabled */ }
 
 // ── INIT ─────────────────────────────────────────────────────
 buildAccountsTable();
