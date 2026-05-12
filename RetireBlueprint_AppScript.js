@@ -1,18 +1,20 @@
 // RetireBlueprint Pro — Complete Apps Script (READ + WRITE)
-// Paste this entire file into your Apps Script editor
 // Deploy as Web App: Execute as Me, Who has access: Anyone
+// This ONE deployment serves ALL customers — each passes their own Sheet ID
 
-var SHEET_ID = '1wWzDjO2VtKb5EEQ0xolKdd1Je961TCqGDI8i-ab3Dfc';
+var FALLBACK_SHEET_ID = '1wWzDjO2VtKb5EEQ0xolKdd1Je961TCqGDI8i-ab3Dfc'; // Your master template
 
 function doGet(e) {
   var callback = e.parameter.callback || 'callback';
   var action   = e.parameter.action   || 'read';
+  // Accept sheet ID from the request — falls back to your master if not provided
+  var sheetId  = e.parameter.sheetId  || FALLBACK_SHEET_ID;
   try {
     if (action === 'save') {
       var data = JSON.parse(decodeURIComponent(e.parameter.data || '{}'));
-      return jsonp(callback, writeInputs(data));
+      return jsonp(callback, writeInputs(data, sheetId));
     }
-    return jsonp(callback, readAll());
+    return jsonp(callback, readAll(sheetId));
   } catch(err) {
     return jsonp(callback, {error: err.toString()});
   }
@@ -23,8 +25,8 @@ function jsonp(cb, data) {
     .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
 
-function readAll() {
-  var ss  = SpreadsheetApp.openById(SHEET_ID);
+function readAll(sheetId) {
+  var ss  = SpreadsheetApp.openById(sheetId);
   var inp = ss.getSheetByName('Inputs');
   var mst = ss.getSheetByName('Master');
   var chk = ss.getSheetByName('Annual Check-In');
@@ -52,7 +54,6 @@ function readAll() {
     otherIncome:Number(v('D49')), theme:String(v('D34')),
   };
 
-  // Accounts rows 105-116, cols A-H
   var acctRows = inp.getRange('A105:H116').getValues();
   var accounts = [], total = 0;
   acctRows.forEach(function(row) {
@@ -66,8 +67,6 @@ function readAll() {
     });
   });
 
-  // Master projections cols: A=year(0), O=income(14), X=exp(23),
-  // AM=taxes(38), AN=withdrawal(39), BP=c401k(67), BQ=roth(68), BR=brok(69), BS=gena401k(70(?)),  BX=total(75)
   var mdata = mst.getRange('A8:BX83').getValues();
   var years=[],endLiq=[],preTax=[],roth=[],taxable=[],hsa=[],income=[],wd=[];
   mdata.forEach(function(row){
@@ -84,7 +83,6 @@ function readAll() {
   var peakVal=0,peakYear=planYear;
   endLiq.forEach(function(v,i){if(v>peakVal){peakVal=v;peakYear=years[i];}});
 
-  // Annual check-in
   var checkIn=[];
   try {
     chk.getRange('A8:F57').getValues().forEach(function(row){
@@ -94,7 +92,6 @@ function readAll() {
     });
   } catch(e){}
 
-  // Tax brackets
   var brackets=[];
   try { tax.getRange('C8:D14').getValues().forEach(function(r){brackets.push({max:Number(r[0]),rate:Number(r[1])});}); } catch(e){}
 
@@ -126,9 +123,9 @@ function readAll() {
   };
 }
 
-function writeInputs(data) {
+function writeInputs(data, sheetId) {
   try {
-    var ss  = SpreadsheetApp.openById(SHEET_ID);
+    var ss  = SpreadsheetApp.openById(sheetId);
     var inp = ss.getSheetByName('Inputs');
     function set(cell, val) { if(val!==undefined && val!==null && val!=='') inp.getRange(cell).setValue(val); }
     function setN(cell,val) { if(val!==undefined) inp.getRange(cell).setValue(Number(val)||0); }

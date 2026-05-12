@@ -873,6 +873,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 // ── CONFIG ───────────────────────────────────────────────────
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 
+// Get customer's sheet ID from URL or localStorage
+var SHEET_ID = (function() {
+  var p = new URLSearchParams(window.location.search);
+  var id = p.get('sheetId') || localStorage.getItem('rbp_sheet_id') || '';
+  if (id) localStorage.setItem('rbp_sheet_id', id);
+  return id;
+})();
+
+function scriptUrl(action) {
+  var url = SCRIPT_URL + '?action=' + action;
+  if (SHEET_ID) url += '&sheetId=' + encodeURIComponent(SHEET_ID);
+  return url;
+}
+
 // ── ACCOUNTS DATA ────────────────────────────────────────────
 var accountsData = [
   {inc:'Yes', name:'401k / 403b',         owner:'Craig', type:'Pretax (Deferred)',       bal:450000, ret:7.0, status:'Use for Withdrawals', dash:'Yes'},
@@ -1051,7 +1065,7 @@ function loadLiveData() {
     delete window[callbackName];
   };
   var s = document.createElement('script');
-  s.src = SCRIPT_URL + '?callback=' + callbackName;
+  s.src = scriptUrl('read') + '&callback=' + callbackName;
   s.onerror = function() { setStatus('Using demo data -- connect your sheet to see live values', ''); };
   setTimeout(function() { if(window[callbackName]) { delete window[callbackName]; setStatus('Using demo data', ''); } }, 8000);
   document.head.appendChild(s);
@@ -1136,6 +1150,11 @@ function setStatus(msg, type) {
 
 // ── SAVE TO GOOGLE SHEET ──────────────────────────────────────
 function saveAll() {
+  if (!SHEET_ID) {
+    setStatus('⚠️ No sheet connected — please complete Setup Guide first.', 'error');
+    window.open('https://retireblueprintpro.netlify.app/setup.html', '_blank');
+    return;
+  }
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('save-btn').disabled = true;
 
@@ -1155,7 +1174,7 @@ function saveAll() {
   };
 
   var s = document.createElement('script');
-  s.src = SCRIPT_URL + '?action=save&callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(payload));
+  s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(payload));
   s.onerror = function() {
     document.getElementById('loading').style.display = 'none';
     setStatus('Connection error -- update your Apps Script with the write endpoint first.', 'error');
