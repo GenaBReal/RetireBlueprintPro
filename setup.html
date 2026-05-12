@@ -6,7 +6,7 @@
 <title>RetireBlueprint Pro — Setup</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--navy:#041E2F;--n2:#0A3145;--teal:#1CC7D0;--t2:#147a82;--orange:#f4b86a;--o2:#c8904a;--border:#1a3a52;--muted:#6a8a9a;--white:#fff;--text:#d8eaf5;--bg:#020e18;--green:#2E7032;}
+:root{--navy:#041E2F;--n2:#0A3145;--teal:#1CC7D0;--t2:#147a82;--orange:#f4b86a;--o2:#c8904a;--border:#1a3a52;--muted:#6a8a9a;--white:#fff;--text:#d8eaf5;--bg:#020e18;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--text);min-height:100vh;}
 nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:flex;align-items:center;position:sticky;top:0;z-index:100;}
 .nav-logo{height:30px;padding:10px 20px;border-right:1px solid var(--border);}
@@ -14,61 +14,59 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
 .nav-link{padding:14px 16px;font-size:11px;font-weight:700;color:var(--teal);text-decoration:none;text-transform:uppercase;letter-spacing:1px;border-right:1px solid var(--border);white-space:nowrap;transition:all .2s;}
 .nav-link:hover{background:var(--n2);color:var(--white);}
 .nav-link.act{color:var(--orange);}
-.page{max-width:680px;margin:0 auto;padding:40px 20px 60px;}
-.hero{text-align:center;margin-bottom:40px;}
-.hero-title{font-size:clamp(22px,4vw,32px);font-weight:800;color:var(--white);margin-bottom:10px;line-height:1.2;}
+.page{max-width:700px;margin:0 auto;padding:36px 20px 60px;}
+.hero{text-align:center;margin-bottom:36px;}
+.hero-title{font-size:clamp(22px,4vw,30px);font-weight:800;color:var(--white);margin-bottom:10px;line-height:1.2;}
 .hero-title em{color:var(--teal);font-style:normal;}
-.hero-sub{font-size:14px;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto;}
-
-/* STEPS */
-.step{background:var(--n2);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;display:flex;gap:20px;align-items:flex-start;}
-.step-num{background:var(--teal);color:var(--navy);font-size:18px;font-weight:800;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.step-num.done{background:var(--green);color:var(--white);}
-.step-content{flex:1;}
-.step-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;}
-.step-body{font-size:13px;color:var(--muted);line-height:1.8;}
+.hero-sub{font-size:14px;color:var(--muted);line-height:1.8;}
+.step{background:var(--n2);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;}
+.step-header{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+.step-num{background:var(--teal);color:var(--navy);font-size:16px;font-weight:800;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;}
+.step-num.done{background:var(--orange);color:var(--navy);}
+.step-title{font-size:16px;font-weight:800;color:var(--white);}
+.step-body{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:16px;}
 .step-body strong{color:var(--text);}
-.btn-action{display:inline-block;background:var(--teal);color:var(--navy);font-size:14px;font-weight:800;padding:13px 28px;border-radius:8px;text-decoration:none;margin-top:14px;transition:all .2s;border:none;cursor:pointer;font-family:inherit;}
-.btn-action:hover{background:var(--t2);}
-.btn-action.orange{background:var(--orange);}
-.btn-action.orange:hover{background:var(--o2);}
 
-/* SHEET ID INPUT */
-.sheet-id-wrap{margin-top:14px;}
+/* BROWSER MOCKUP showing where Sheet ID is */
+.browser-mock{background:#1a1a2e;border-radius:10px;overflow:hidden;margin:16px 0;border:1px solid var(--border);}
+.browser-bar{background:#2a2a3e;padding:8px 12px;display:flex;align-items:center;gap:8px;}
+.b-dots{display:flex;gap:4px;}
+.b-dot{width:9px;height:9px;border-radius:50%;}
+.b-url{background:#3a3a5e;border-radius:20px;padding:5px 14px;font-size:11px;font-family:monospace;color:#777;flex:1;white-space:nowrap;overflow:hidden;line-height:1.4;}
+.b-url .dim{color:#555;}
+.b-url .highlight{color:var(--teal);font-weight:700;background:rgba(28,199,208,.15);padding:1px 3px;border-radius:3px;}
+.browser-label{padding:10px 14px;font-size:11px;color:var(--muted);background:rgba(244,184,106,.06);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.browser-label .arrow{color:var(--orange);font-size:16px;}
+.browser-label strong{color:var(--orange);}
+
+.btn{display:inline-block;font-size:14px;font-weight:800;padding:14px 32px;border-radius:8px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;width:100%;display:block;}
+.btn-teal{background:var(--teal);color:var(--navy);}
+.btn-teal:hover{background:var(--t2);}
+.sheet-id-wrap{margin:16px 0;}
 .sheet-id-wrap label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
 .sheet-id-row{display:flex;gap:8px;}
 .sheet-id-input{flex:1;padding:12px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);color:var(--white);font-size:13px;font-family:monospace;transition:border-color .2s;}
 .sheet-id-input:focus{outline:none;border-color:var(--teal);}
-.sheet-id-input::placeholder{color:#2a4a60;font-family:'Segoe UI',system-ui,sans-serif;}
+.sheet-id-input::placeholder{color:#2a4a60;font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;}
 .btn-connect{background:var(--teal);color:var(--navy);font-size:13px;font-weight:800;padding:12px 20px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s;}
 .btn-connect:hover{background:var(--t2);}
-
-/* CONNECTED STATE */
-.connected-box{background:rgba(46,112,50,.15);border:1px solid rgba(46,112,50,.4);border-radius:8px;padding:14px 16px;margin-top:12px;display:none;}
-.connected-box.show{display:flex;align-items:center;gap:10px;}
-.connected-icon{font-size:20px;}
-.connected-text{font-size:13px;color:#90ee90;}
-.connected-text span{font-size:11px;color:var(--muted);display:block;margin-top:2px;font-family:monospace;}
-
-/* HOW TO FIND */
-.find-url{background:#041E2F;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:12px;font-size:12px;color:var(--muted);line-height:1.8;}
-.find-url .url-example{font-family:monospace;font-size:11px;background:rgba(28,199,208,.08);border:1px solid var(--border);border-radius:4px;padding:8px 10px;margin:8px 0;word-break:break-all;color:var(--text);}
-.find-url .url-highlight{color:var(--teal);font-weight:700;}
-
-/* SUCCESS */
-.success-box{background:var(--n2);border:2px solid var(--teal);border-radius:12px;padding:32px;text-align:center;margin-top:24px;display:none;}
-.success-box.show{display:block;}
-.success-icon{font-size:52px;margin-bottom:16px;}
+.connected-box{background:rgba(244,184,106,.1);border:1px solid rgba(244,184,106,.3);border-radius:8px;padding:14px 16px;margin-top:12px;display:none;align-items:center;gap:10px;}
+.connected-box.show{display:flex;}
+.connected-text{font-size:13px;color:var(--orange);font-weight:700;}
+.connected-id{font-size:11px;color:var(--muted);display:block;margin-top:2px;font-family:monospace;word-break:break-all;}
+.success-box{background:var(--n2);border:2px solid var(--teal);border-radius:12px;padding:32px;text-align:center;margin-top:20px;display:none;}
+.success-box.show{display:block;animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.success-icon{font-size:52px;margin-bottom:12px;}
 .success-title{font-size:24px;font-weight:800;color:var(--white);margin-bottom:8px;}
 .success-sub{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:24px;}
-.btn-dashboard{display:inline-block;background:var(--teal);color:var(--navy);font-size:16px;font-weight:800;padding:16px 40px;border-radius:10px;text-decoration:none;transition:all .2s;}
-.btn-dashboard:hover{background:var(--t2);transform:translateY(-1px);}
-
+.btn-go{display:inline-block;background:var(--teal);color:var(--navy);font-size:16px;font-weight:800;padding:16px 40px;border-radius:10px;text-decoration:none;transition:all .2s;}
+.btn-go:hover{background:var(--t2);transform:translateY(-1px);}
+.btn-go2{display:block;font-size:13px;color:var(--teal);text-decoration:none;margin-top:14px;}
 .legal{font-size:10px;color:#1a3a52;text-align:center;padding:20px 0;}
 </style>
 </head>
 <body>
-
 <nav>
   <img src="data:image/png;base64,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" class="nav-logo" alt="RetireBlueprint Pro">
   <div class="nav-links">
@@ -77,67 +75,74 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     <a href="https://retireblueprintpro.netlify.app/RetireBlueprintPro_Inputs.html" class="nav-link" id="nav-inputs">Inputs</a>
     <a href="https://retireblueprintpro.netlify.app/RetireBlueprintPro_AnnualCheckIn.html" class="nav-link">Annual Check-In</a>
     <a href="https://retireblueprintpro.netlify.app/RetireBlueprintPro_TaxEngine.html" class="nav-link">Tax Engine</a>
-    <a href="https://retireblueprintpro.netlify.app/RetireBlueprintPro_SetupGuide.html" class="nav-link act">Setup Guide</a>
-    <a href="https://retireblueprintpro.netlify.app/sheet.html" class="nav-link" id="nav-sheet">Master Sheet</a>
+    <a href="https://retireblueprintpro.netlify.app/setup.html" class="nav-link act">Setup Guide</a>
+    <a href="#" class="nav-link" id="nav-sheet">Master Sheet</a>
   </div>
 </nav>
 
 <div class="page">
-
   <div class="hero">
     <div class="hero-title">Get Started in<br><em>Two Simple Steps</em></div>
-    <div class="hero-sub">No technical knowledge needed. This takes about 3 minutes and you'll never have to do it again.</div>
+    <div class="hero-sub">No technical knowledge needed. Takes about 3 minutes and you never have to do this again.</div>
   </div>
 
   <!-- STEP 1 -->
   <div class="step">
-    <div class="step-num" id="step1-num">1</div>
-    <div class="step-content">
-      <div class="step-title">Make a Copy of Your Retirement Sheet</div>
-      <div class="step-body">
-        Click the button below. Google will ask you to sign in if you're not already. 
-        Then click <strong>Make a copy</strong> — that's it. Your personal copy opens automatically.
-        <br><br>
-        <strong>Don't change anything yet</strong> — just let it open.
-      </div>
-      <a href="https://docs.google.com/spreadsheets/d/1wWzDjO2VtKb5EEQ0xolKdd1Je961TCqGDI8i-ab3Dfc/copy" target="_blank" class="btn-action" onclick="markStep1Done()">
-        📋 &nbsp;Make My Copy of the Sheet
-      </a>
+    <div class="step-header">
+      <div class="step-num" id="n1">1</div>
+      <div class="step-title">Make Your Personal Copy of the Sheet</div>
     </div>
+    <div class="step-body">
+      Click the button below. Google will show a box that says <strong>"Make a copy"</strong> — click the blue button. Your personal retirement sheet opens in a new tab.<br><br>
+      <strong>Keep that tab open</strong> — you'll need it for Step 2!
+    </div>
+    <a href="https://docs.google.com/spreadsheets/d/1wWzDjO2VtKb5EEQ0xolKdd1Je961TCqGDI8i-ab3Dfc/copy" target="_blank" class="btn btn-teal" onclick="step1done()">
+      📋 &nbsp;Make My Personal Copy of the Sheet
+    </a>
   </div>
 
   <!-- STEP 2 -->
   <div class="step">
-    <div class="step-num" id="step2-num">2</div>
-    <div class="step-content">
+    <div class="step-header">
+      <div class="step-num" id="n2">2</div>
       <div class="step-title">Connect Your Sheet to Your Dashboard</div>
-      <div class="step-body">
-        Once your sheet is open, look at the address bar in your browser. 
-        Copy the long ID from the URL and paste it below — then click Connect.
-      </div>
+    </div>
+    <div class="step-body">
+      Go to your new sheet tab. Look at the address bar at the very top of your browser — it's the long bar that shows the web address. Find the long string of letters and numbers between <strong>/d/</strong> and <strong>/edit</strong> — that's your personal Sheet ID. Copy it and paste it below.
+    </div>
 
-      <div class="find-url">
-        <strong style="color:var(--text);">How to find your Sheet ID:</strong><br>
-        Look at the URL in your browser when your sheet is open. It looks like this:
-        <div class="url-example">docs.google.com/spreadsheets/d/<span class="url-highlight">1aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789</span>/edit</div>
-        Copy just the highlighted part — that's your Sheet ID. It's about 44 characters long.
-      </div>
-
-      <div class="sheet-id-wrap">
-        <label>Paste Your Sheet ID Here</label>
-        <div class="sheet-id-row">
-          <input type="text" class="sheet-id-input" id="sheet-id-input" 
-            placeholder="e.g. 1aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789">
-          <button class="btn-connect" onclick="connect()">Connect →</button>
+    <!-- BROWSER MOCKUP -->
+    <div class="browser-mock">
+      <div class="browser-bar">
+        <div class="b-dots">
+          <div class="b-dot" style="background:#ff5f57;"></div>
+          <div class="b-dot" style="background:#febc2e;"></div>
+          <div class="b-dot" style="background:#28c840;"></div>
+        </div>
+        <div class="b-url">
+          <span class="dim">docs.google.com/spreadsheets/d/</span><span class="highlight">1aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567</span><span class="dim">/edit</span>
         </div>
       </div>
+      <div class="browser-label">
+        <span class="arrow">👆</span>
+        <span><strong>Copy the highlighted part</strong> — the long string between /d/ and /edit. It's about 44 characters. You can paste the whole URL too — we'll find it automatically!</span>
+      </div>
+    </div>
 
-      <div class="connected-box" id="connected-box">
-        <div class="connected-icon">✅</div>
-        <div class="connected-text">
-          Your sheet is connected!
-          <span id="connected-id"></span>
-        </div>
+    <div class="sheet-id-wrap">
+      <label>Paste Your Sheet ID or Full URL Here</label>
+      <div class="sheet-id-row">
+        <input type="text" class="sheet-id-input" id="sheet-id-input"
+          placeholder="Paste your Sheet ID or the full URL from your browser">
+        <button class="btn-connect" onclick="connect()">Connect →</button>
+      </div>
+    </div>
+
+    <div class="connected-box" id="connected-box">
+      <span style="font-size:20px;">🎯</span>
+      <div>
+        <div class="connected-text">✔ Sheet connected!</div>
+        <span class="connected-id" id="connected-id"></span>
       </div>
     </div>
   </div>
@@ -147,15 +152,11 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     <div class="success-icon">🎉</div>
     <div class="success-title">You're All Set!</div>
     <div class="success-sub">
-      Your personal retirement sheet is connected. Every number you enter in the Inputs page 
-      goes directly into YOUR sheet and updates YOUR Master plan instantly.<br><br>
-      You'll never need to do this again — your Sheet ID is saved.
+      Your personal retirement sheet is connected. Every number you enter in the Inputs page goes directly into YOUR sheet and updates YOUR retirement plan instantly.<br><br>
+      You'll never need to do this again — your connection is saved.
     </div>
-    <a href="#" id="go-dashboard" class="btn-dashboard">📊 &nbsp;Go to My Dashboard</a>
-    <br><br>
-    <a href="#" id="go-inputs" style="color:var(--teal);font-size:13px;text-decoration:none;">
-      Or go straight to Inputs to enter my numbers →
-    </a>
+    <a href="#" id="go-inputs" class="btn-go">📝 &nbsp;Enter My Numbers Now</a>
+    <a href="#" id="go-dashboard" class="btn-go2">Or go to My Dashboard →</a>
   </div>
 
   <div class="legal">Not financial advice · For personal planning purposes only · © 2026 RetireBlueprint Pro</div>
@@ -164,60 +165,52 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
 <script>
 var NETLIFY = 'https://retireblueprintpro.netlify.app';
 
-// Load saved sheet ID on page open
 (function(){
   var saved = localStorage.getItem('rbp_sheet_id');
   if (saved) {
     document.getElementById('sheet-id-input').value = saved;
     showConnected(saved);
+    updateLinks(saved);
   }
-  updateNavLinks(saved);
 })();
 
-function markStep1Done() {
-  document.getElementById('step1-num').textContent = '✓';
-  document.getElementById('step1-num').classList.add('done');
+function step1done(){
+  document.getElementById('n1').textContent = '✓';
+  document.getElementById('n1').classList.add('done');
 }
 
-function connect() {
+function connect(){
   var raw = document.getElementById('sheet-id-input').value.trim();
-  
-  // Handle if they pasted the full URL instead of just the ID
-  var match = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})/)
+  // Handle full URL pasted
+  var match = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})/);
   if (match) raw = match[1];
-  
-  if (!raw || raw.length < 20) {
-    alert('That doesn\'t look right — please paste your Sheet ID from the URL. It\'s about 44 characters long.');
+  if (!raw || raw.length < 20){
+    alert("That doesn't look right — please paste your Sheet ID or the full URL from your browser address bar.");
     return;
   }
-  
-  // Save to localStorage
   localStorage.setItem('rbp_sheet_id', raw);
-  
-  // Mark step 2 done
-  document.getElementById('step2-num').textContent = '✓';
-  document.getElementById('step2-num').classList.add('done');
-  
+  document.getElementById('n2').textContent = '✓';
+  document.getElementById('n2').classList.add('done');
   showConnected(raw);
-  updateNavLinks(raw);
+  updateLinks(raw);
   document.getElementById('success-box').classList.add('show');
   document.getElementById('success-box').scrollIntoView({behavior:'smooth'});
 }
 
-function showConnected(id) {
+function showConnected(id){
   var box = document.getElementById('connected-box');
   box.classList.add('show');
-  document.getElementById('connected-id').textContent = id.substring(0,20) + '...';
+  document.getElementById('connected-id').textContent = 'Sheet ID: ' + id;
 }
 
-function updateNavLinks(sheetId) {
-  if (!sheetId) return;
-  var qs = '?sheetId=' + encodeURIComponent(sheetId);
+function updateLinks(id){
+  if(!id) return;
+  var qs = '?sheetId=' + encodeURIComponent(id);
   document.getElementById('nav-dash').href    = NETLIFY + '/RetireBlueprintPro_CRAIG_AND_GENA_Personal.html' + qs;
   document.getElementById('nav-inputs').href  = NETLIFY + '/RetireBlueprintPro_Inputs.html' + qs;
-  document.getElementById('nav-sheet').href   = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/edit';
-  document.getElementById('go-dashboard').href = NETLIFY + '/RetireBlueprintPro_CRAIG_AND_GENA_Personal.html' + qs;
+  document.getElementById('nav-sheet').href   = 'https://docs.google.com/spreadsheets/d/' + id + '/edit';
   document.getElementById('go-inputs').href   = NETLIFY + '/RetireBlueprintPro_Inputs.html' + qs;
+  document.getElementById('go-dashboard').href = NETLIFY + '/RetireBlueprintPro_CRAIG_AND_GENA_Personal.html' + qs;
 }
 </script>
 </body>
