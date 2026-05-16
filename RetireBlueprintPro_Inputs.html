@@ -227,12 +227,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       </div>
       <div class="field">
         <label>Legacy Target ($)</label>
-        <input type="number" id="f-B8" value="250000" oninput="markDirty()" style="width:100%">
+        <input type="number" id="f-B8" value="0" oninput="markDirty()" style="width:100%">
         <span class="hint">Ending balance goal</span>
       </div>
       <div class="field">
         <label>Safety Floor ($)</label>
-        <input type="number" id="f-B9" value="250000" oninput="markDirty()" style="width:100%">
+        <input type="number" id="f-B9" value="0" oninput="markDirty()" style="width:100%">
         <span class="hint">Never go below this</span>
       </div>
       <div class="field">
@@ -250,7 +250,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       </div>
       <div class="field">
         <label>State Tax Rate (%)</label>
-        <input type="number" id="f-B26" value="7.5" min="0" max="15" step="0.1">
+        <input type="number" id="f-B26" value="0" min="0" max="15" step="0.1">
       </div>
       <div class="field">
         <label>Healthcare Inflation (%)</label>
@@ -356,16 +356,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Date of Birth</label>
-            <input type="date" id="f-B32" value="1963-01-28">
+            <input type="date" id="f-B32" value="">
           </div>
           <div class="field">
             <label>Current Age</label>
-            <input type="number" id="f-B33" value="63" readonly>
+            <input type="number" id="f-B33" value="" readonly>
             <span class="hint">Auto-calculated</span>
           </div>
           <div class="field">
             <label>Projected Age of Death</label>
-            <input type="number" id="f-B35" value="92" min="70" max="120">
+            <input type="number" id="f-B35" value="" min="70" max="120">
           </div>
           <div class="field">
             <label>Annual Salary ($)</label>
@@ -373,20 +373,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Salary End Date</label>
-            <input type="date" id="f-B39" value="2026-06-30">
+            <input type="date" id="f-B39" value="">
             <span class="hint">Retirement date</span>
           </div>
           <div class="field">
             <label>Other Income/yr ($)</label>
-            <input type="number" id="f-B49" value="20000">
+            <input type="number" id="f-B49" value="0">
           </div>
           <div class="field">
             <label>Other Income Start</label>
-            <input type="date" id="f-B50" value="2026-07-01">
+            <input type="date" id="f-B50" value="">
           </div>
           <div class="field">
             <label>Other Income End</label>
-            <input type="date" id="f-B51" value="2028-12-31">
+            <input type="date" id="f-B51" value="">
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
@@ -394,7 +394,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>SS Base Benefit (at FRA)</label>
-              <input type="number" id="f-B40" value="3300">
+              <input type="number" id="f-B40" value="0">
             </div>
             <div class="field">
               <label>Full Retirement Age</label>
@@ -402,12 +402,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
-              <input type="number" id="f-B43" value="2543.75">
+              <input type="number" id="f-B43" value="0">
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
               <label>SS Start Date</label>
-              <input type="date" id="f-B44" value="2026-07-01">
+              <input type="date" id="f-B44" value="">
             </div>
           </div>
         </div>
@@ -416,11 +416,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Monthly Pension ($)</label>
-              <input type="number" id="f-B46" value="480">
+              <input type="number" id="f-B46" value="0">
             </div>
             <div class="field">
               <label>Pension Start Date</label>
-              <input type="date" id="f-B47" value="2026-07-01">
+              <input type="date" id="f-B47" value="">
             </div>
           </div>
         </div>
@@ -429,11 +429,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
-              <input type="number" id="f-B52" value="3000">
+              <input type="number" id="f-B52" value="0">
             </div>
             <div class="field">
               <label>Medicare Annual ($)</label>
-              <input type="number" id="f-B53" value="3000">
+              <input type="number" id="f-B53" value="0">
             </div>
           </div>
         </div>
@@ -458,16 +458,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Date of Birth</label>
-            <input type="date" id="f-D32" value="1970-10-24">
+            <input type="date" id="f-D32" value="">
           </div>
           <div class="field">
             <label>Current Age</label>
-            <input type="number" id="f-D33" value="55" readonly>
+            <input type="number" id="f-D33" value="" readonly>
             <span class="hint">Auto-calculated</span>
           </div>
           <div class="field">
             <label>Projected Age of Death</label>
-            <input type="number" id="f-D35" value="105" min="70" max="120">
+            <input type="number" id="f-D35" value="" min="70" max="120">
           </div>
           <div class="field">
             <label>Annual Salary ($)</label>
@@ -475,20 +475,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Salary End Date</label>
-            <input type="date" id="f-D39" value="2028-06-30">
+            <input type="date" id="f-D39" value="">
             <span class="hint">Retirement date</span>
           </div>
           <div class="field">
             <label>Other Income/yr ($)</label>
-            <input type="number" id="f-D49" value="24000">
+            <input type="number" id="f-D49" value="0">
           </div>
           <div class="field">
             <label>Other Income Start</label>
-            <input type="date" id="f-D50" value="2028-07-01">
+            <input type="date" id="f-D50" value="">
           </div>
           <div class="field">
             <label>Other Income End</label>
-            <input type="date" id="f-D51" value="2033-12-31">
+            <input type="date" id="f-D51" value="">
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
@@ -496,7 +496,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>SS Base Benefit (at FRA)</label>
-              <input type="number" id="f-D40" value="2886">
+              <input type="number" id="f-D40" value="0">
             </div>
             <div class="field">
               <label>Full Retirement Age</label>
@@ -504,12 +504,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
-              <input type="number" id="f-D43" value="2116.40">
+              <input type="number" id="f-D43" value="0">
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
               <label>SS Start Date</label>
-              <input type="date" id="f-D44" value="2033-06-30">
+              <input type="date" id="f-D44" value="">
             </div>
           </div>
         </div>
@@ -522,7 +522,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>Pension Start Date</label>
-              <input type="date" id="f-D47" value="2027-07-01">
+              <input type="date" id="f-D47" value="">
             </div>
           </div>
         </div>
@@ -531,7 +531,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
-              <input type="number" id="f-D52" value="3000">
+              <input type="number" id="f-D52" value="0">
             </div>
             <div class="field">
               <label>Medicare Annual ($)</label>
@@ -587,8 +587,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 
         <tr class="expense-total">
           <td>TOTAL MONTHLY</td>
-          <td id="total-monthly">$4,218</td>
-          <td id="total-annual">$50,616</td>
+          <td id="total-monthly">$0</td>
+          <td id="total-annual">$0</td>
           <td></td>
         </tr>
       </tbody>
@@ -613,26 +613,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       </thead>
       <tbody id="debts-body">
         <tr>
-          <td><button class="toggle-yes" onclick="toggleDebt(this)">Yes</button></td>
-          <td><input type="text" value="Mortgage"></td>
-          <td><input type="number" value="2104.83"></td>
-          <td><input type="number" value="25257.96" readonly></td>
-          <td><input type="date" value="2022-01-01"></td>
-          <td><input type="date" value="2052-01-01"></td>
-          <td><input type="number" value="269228"></td>
-        </tr>
-        <tr>
-          <td><button class="toggle-yes" onclick="toggleDebt(this)">Yes</button></td>
-          <td><input type="text" value="RV"></td>
-          <td><input type="number" value="369.63"></td>
-          <td><input type="number" value="4435.56" readonly></td>
-          <td><input type="date" value="2022-01-02"></td>
-          <td><input type="date" value="2030-01-02"></td>
-          <td><input type="number" value="37400"></td>
+          <td><button class="toggle-no" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" value=""></td>
+          <td><input type="number" value="0"></td>
+          <td><input type="number" value="0" readonly></td>
+          <td><input type="date" value=""></td>
+          <td><input type="date" value=""></td>
+          <td><input type="number" value="0"></td>
         </tr>
         <tr>
           <td><button class="toggle-no" onclick="toggleDebt(this)">No</button></td>
-          <td><input type="text" value="Car"></td>
+          <td><input type="text" value=""></td>
+          <td><input type="number" value="0"></td>
+          <td><input type="number" value="0" readonly></td>
+          <td><input type="date" value=""></td>
+          <td><input type="date" value=""></td>
+          <td><input type="number" value="0"></td>
+        </tr>
+        <tr>
+          <td><button class="toggle-no" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" value=""></td>
           <td><input type="number" value="0"></td>
           <td><input type="number" value="0" readonly></td>
           <td><input type="date" value="2026-01-01"></td>
@@ -641,7 +641,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
         </tr>
         <tr>
           <td><button class="toggle-no" onclick="toggleDebt(this)">No</button></td>
-          <td><input type="text" value="Long Term Care"></td>
+          <td><input type="text" value=""></td>
           <td><input type="number" value="0"></td>
           <td><input type="number" value="0" readonly></td>
           <td><input type="date" value="2026-01-01"></td>
@@ -694,35 +694,35 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Suggested Safe Extra</div>
-          <div class="solver-kpi-val" id="s-extra">$20,227</div>
+          <div class="solver-kpi-val" id="s-extra">—</div>
           <div class="solver-kpi-sub">Solver-optimized/yr</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Phase 1 Guidance</div>
-          <div class="solver-kpi-val" id="s-phase1">$23,261</div>
+          <div class="solver-kpi-val" id="s-phase1">—</div>
           <div class="solver-kpi-sub">Early boost (1.15x)</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Phase 2 Guidance</div>
-          <div class="solver-kpi-val" id="s-phase2">$20,227</div>
+          <div class="solver-kpi-val" id="s-phase2">—</div>
           <div class="solver-kpi-sub">Base mid-years (1.0x)</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Phase 3 Guidance</div>
-          <div class="solver-kpi-val" id="s-phase3">$18,204</div>
+          <div class="solver-kpi-val" id="s-phase3">—</div>
           <div class="solver-kpi-sub">Late reduction (0.9x)</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Surplus / Shortfall</div>
-          <div class="solver-kpi-val" id="s-surplus" style="font-size:16px;">–$62</div>
+          <div class="solver-kpi-val" id="s-surplus" style="font-size:16px;">—</div>
           <div class="solver-kpi-sub" id="s-status">ON TRACK ✅</div>
         </div>
       </div>
       <div style="margin-top:10px;display:flex;gap:20px;align-items:center;padding-top:10px;border-top:1px solid #1a3a52;">
         <span style="font-size:10px;color:#8a9ab0;">Ending Liquid Assets:</span>
-        <span style="font-size:14px;font-weight:700;color:var(--teal);" id="s-ending">$249,938</span>
+        <span style="font-size:14px;font-weight:700;color:var(--teal);" id="s-ending">—</span>
         <span style="font-size:10px;color:#8a9ab0;margin-left:8px;">Legacy Goal:</span>
-        <span style="font-size:14px;font-weight:700;color:#fff;" id="s-goal">$250,000</span>
+        <span style="font-size:14px;font-weight:700;color:#fff;" id="s-goal">—</span>
         <span style="font-size:10px;color:#8a9ab0;margin-left:8px;">Solver note:</span>
         <span style="font-size:10px;color:#8a9ab0;font-style:italic;">The solver tests the smile curve after normalizing phase weights. Set a Chosen Amount to override.</span>
       </div>
@@ -753,7 +753,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="number" id="f-E122" value="1.15" min="0.5" max="2.0" step="0.05" style="width:65px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-F122" value="0" min="0" step="100" placeholder="0 = use solver" style="width:120px;" onchange="markDirty()">
               <div style="font-size:8px;color:var(--muted);margin-top:2px;">0 = use solver guidance</div></td>
-          <td><strong id="g-phase1" style="color:var(--teal);">$23,261</strong></td>
+          <td><strong id="g-phase1" style="color:var(--teal);">—</strong></td>
         </tr>
         <tr>
           <td><strong style="color:var(--orange);">Phase 2</strong></td>
@@ -763,7 +763,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="number" id="f-E123" value="1.0" min="0.5" max="2.0" step="0.05" style="width:65px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-F123" value="0" min="0" step="100" placeholder="0 = use solver" style="width:120px;" onchange="markDirty()">
               <div style="font-size:8px;color:var(--muted);margin-top:2px;">0 = use solver guidance</div></td>
-          <td><strong id="g-phase2" style="color:var(--teal);">$20,227</strong></td>
+          <td><strong id="g-phase2" style="color:var(--teal);">—</strong></td>
         </tr>
         <tr>
           <td><strong style="color:var(--orange);">Phase 3</strong></td>
@@ -773,7 +773,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="number" id="f-E124" value="0.9" min="0.5" max="2.0" step="0.05" style="width:65px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-F124" value="0" min="0" step="100" placeholder="0 = use solver" style="width:120px;" onchange="markDirty()">
               <div style="font-size:8px;color:var(--muted);margin-top:2px;">0 = use solver guidance</div></td>
-          <td><strong id="g-phase3" style="color:var(--teal);">$18,204</strong></td>
+          <td><strong id="g-phase3" style="color:var(--teal);">—</strong></td>
         </tr>
       </tbody>
     </table>
@@ -794,7 +794,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
     <div class="form-grid-4" style="margin-bottom:14px;">
       <div class="field">
         <label>Analysis Year</label>
-        <input type="number" id="f-B139" value="2030" min="2026" max="2060" onchange="markDirty()">
+        <input type="number" id="f-B139" value="" min="2026" max="2060" onchange="markDirty()">
         <span class="hint">Which year to analyze</span>
       </div>
       <div class="field">
@@ -809,7 +809,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       </div>
       <div class="field">
         <label>Assumed Future Rate (%)</label>
-        <input type="number" id="f-B145" value="24" min="10" max="40" onchange="markDirty()">
+        <input type="number" id="f-B145" value="" min="10" max="40" onchange="markDirty()">
         <span class="hint">Expected rate when RMDs begin at 73</span>
       </div>
     </div>
@@ -822,22 +822,22 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Est. Taxable Income</div>
-          <div class="solver-kpi-val" id="r-income" style="font-size:16px;">$15,709</div>
+          <div class="solver-kpi-val" id="r-income" style="font-size:16px;">—</div>
           <div class="solver-kpi-sub">Pre-conversion in chosen year</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Optimal Conversion</div>
-          <div class="solver-kpi-val" id="r-optimal">$85,091</div>
+          <div class="solver-kpi-val" id="r-optimal">—</div>
           <div class="solver-kpi-sub">Sweet spot amount</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Marginal Tax on Conversion</div>
-          <div class="solver-kpi-val" id="r-tax-now">$10,211</div>
+          <div class="solver-kpi-val" id="r-tax-now">—</div>
           <div class="solver-kpi-sub">Cost to convert now</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Lifetime Tax Savings</div>
-          <div class="solver-kpi-val" id="r-savings">$10,211</div>
+          <div class="solver-kpi-val" id="r-savings">—</div>
           <div class="solver-kpi-sub">vs. waiting for RMDs</div>
         </div>
       </div>
@@ -856,7 +856,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
         <tr>
           <th>Year</th>
           <th id="roth-p1-hdr">Partner 1's Conversion ($)</th>
-          <th id="roth-p2-hdr">Partner 2's Conversion ($)</th>
+          <th id="roth-p2-hdr">Gena's Conversion ($)</th>
           <th>Total Conversion</th>
           <th>Notes</th>
         </tr>
@@ -889,18 +889,18 @@ function scriptUrl(action) {
 
 // ── ACCOUNTS DATA ────────────────────────────────────────────
 var accountsData = [
-  {inc:'Yes', name:'401k / 403b',         owner:'Craig', type:'Pretax (Deferred)',       bal:450000, ret:7.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'Roth',                owner:'Craig', type:'Roth (Tax Free)',          bal:32000,  ret:8.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'Craig', type:'Taxable (Liquid)',         bal:99000,  ret:7.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'401k / 403b',         owner:'Gena',  type:'Pretax (Deferred)',       bal:357000, ret:7.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'Roth',                owner:'Gena',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'Use for Withdrawals', dash:'No'},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'Gena',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'Use for Withdrawals', dash:'No'},
-  {inc:'Yes', name:'HSA (Health Savings)',owner:'Joint', type:'HSA (Triple Tax Advantage)',bal:5427,  ret:6.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'No',  name:'High-Yield Savings',  owner:'Joint', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'Protected',            dash:'No'},
-  {inc:'No',  name:'Inheritance Fund',    owner:'Joint', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'Protected',            dash:'No'},
-  {inc:'No',  name:'Emergency Fund',      owner:'Joint', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'Protected',            dash:'No'},
-  {inc:'No',  name:'529 College Plan',    owner:'Joint', type:'529 Education (Tax Free)', bal:0,      ret:3.0, status:'Protected',            dash:'No'},
-  {inc:'No',  name:'Crypto Wallet',       owner:'Joint', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'Protected',            dash:'No'},
+  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
+  {inc:'Yes', name:'Roth',                owner:'', type:'Roth (Tax Free)',          bal:0,  ret:8.0, status:'', dash:''},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0,  ret:7.0, status:'', dash:''},
+  {inc:'Yes', name:'401k / 403b',         owner:'',  type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
+  {inc:'Yes', name:'Roth',                owner:'',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'', dash:''},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'', dash:''},
+  {inc:'Yes', name:'HSA (Health Savings)',owner:'', type:'HSA (Triple Tax Advantage)',bal:0,  ret:6.0, status:'', dash:''},
+  {inc:'No',  name:'High-Yield Savings',  owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
+  {inc:'No',  name:'Inheritance Fund',    owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
+  {inc:'No',  name:'Emergency Fund',      owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
+  {inc:'No',  name:'529 College Plan',    owner:'', type:'529 Education (Tax Free)', bal:0,      ret:3.0, status:'',            dash:''},
+  {inc:'No',  name:'Crypto Wallet',       owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
 ];
 
 var ownerOptions = ['Partner 1','Partner 2','Joint'];
