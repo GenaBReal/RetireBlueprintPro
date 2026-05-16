@@ -343,7 +343,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div class="field">
             <label>Name</label>
-            <input type="text" id="f-B31" value="Craig" oninput="updatePartnerNames()">
+            <input type="text" id="f-B31" value="" oninput="updatePartnerNames()">
           </div>
           <div class="field">
             <label>Theme Color</label>
@@ -445,7 +445,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div class="field">
             <label>Name</label>
-            <input type="text" id="f-D31" value="Gena" oninput="updatePartnerNames()">
+            <input type="text" id="f-D31" value="" oninput="updatePartnerNames()">
           </div>
           <div class="field">
             <label>Theme Color</label>
@@ -889,12 +889,12 @@ function scriptUrl(action) {
 
 // ── ACCOUNTS DATA ────────────────────────────────────────────
 var accountsData = [
-  {inc:'Yes', name:'401k / 403b',         owner:'Craig', type:'Pretax (Deferred)',       bal:450000, ret:7.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'Roth',                owner:'Craig', type:'Roth (Tax Free)',          bal:32000,  ret:8.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'Craig', type:'Taxable (Liquid)',         bal:99000,  ret:7.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'401k / 403b',         owner:'Gena',  type:'Pretax (Deferred)',       bal:357000, ret:7.0, status:'Use for Withdrawals', dash:'Yes'},
-  {inc:'Yes', name:'Roth',                owner:'Gena',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'Use for Withdrawals', dash:'No'},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'Gena',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'Use for Withdrawals', dash:'No'},
+  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
+  {inc:'Yes', name:'Roth',                owner:'', type:'Roth (Tax Free)',          bal:0,  ret:8.0, status:'', dash:''},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0,  ret:7.0, status:'', dash:''},
+  {inc:'Yes', name:'401k / 403b',         owner:'',  type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
+  {inc:'Yes', name:'Roth',                owner:'',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'', dash:''},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'', dash:''},
   {inc:'Yes', name:'HSA (Health Savings)',owner:'Joint', type:'HSA (Triple Tax Advantage)',bal:5427,  ret:6.0, status:'Use for Withdrawals', dash:'Yes'},
   {inc:'No',  name:'High-Yield Savings',  owner:'Joint', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'Protected',            dash:'No'},
   {inc:'No',  name:'Inheritance Fund',    owner:'Joint', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'Protected',            dash:'No'},
@@ -903,7 +903,7 @@ var accountsData = [
   {inc:'No',  name:'Crypto Wallet',       owner:'Joint', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'Protected',            dash:'No'},
 ];
 
-var ownerOptions = ['Craig','Gena','Joint'];
+var ownerOptions = ['Partner 1','Partner 2','Joint'];
 var typeOptions  = ['Pretax (Deferred)','Roth (Tax Free)','Taxable (Liquid)',
                     'HSA (Triple Tax Advantage)','529 Education (Tax Free)',
                     'High-Yield Savings (HYSA)','Crypto Wallet'];
@@ -1289,8 +1289,8 @@ function buildRothPlanTable() {
   var tbody = document.getElementById('roth-plan-body');
   if (!tbody) return;
   var html = '';
-  var p1 = document.getElementById('f-B31') ? document.getElementById('f-B31').value : 'Craig';
-  var p2 = document.getElementById('f-D31') ? document.getElementById('f-D31').value : 'Gena';
+  var p1 = document.getElementById('f-B31') ? document.getElementById('f-B31').value : 'Partner 1';
+  var p2 = document.getElementById('f-D31') ? document.getElementById('f-D31').value : 'Partner 2';
   // Update headers
   var h1 = document.getElementById('roth-p1-hdr');
   var h2 = document.getElementById('roth-p2-hdr');
