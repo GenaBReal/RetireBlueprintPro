@@ -1187,7 +1187,9 @@ function saveAll() {
       }
     };
     var s = document.createElement('script');
-    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(chunk));
+    var jsonStr = JSON.stringify(chunk);
+    var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encoded + '&enc=b64';
     s.onerror = function() {
       delete window[callbackName];
       document.getElementById('loading').style.display = 'none';
@@ -1221,7 +1223,9 @@ function saveAll() {
       }
     };
     var s = document.createElement('script');
-    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(chunk));
+    var jsonStr = JSON.stringify(chunk);
+    var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encoded + '&enc=b64';
     s.onerror = function() {
       delete window[callbackName];
       document.getElementById('loading').style.display = 'none';
