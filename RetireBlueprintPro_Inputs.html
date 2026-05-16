@@ -535,7 +535,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>Medicare Annual ($)</label>
-              <input type="number" id="f-D53" value="3000">
+              <input type="number" id="f-D53" value="0">
             </div>
           </div>
         </div>
@@ -1152,7 +1152,6 @@ function setStatus(msg, type) {
 function saveAll() {
   if (!SHEET_ID) {
     setStatus('⚠️ No sheet connected — please complete Setup Guide first.', 'error');
-    window.open('https://retireblueprintpro.netlify.app/setup.html', '_blank');
     return;
   }
   document.getElementById('loading').style.display = 'flex';
@@ -1160,28 +1159,79 @@ function saveAll() {
 
   var payload = buildPayload();
 
-  var callbackName = 'saveCallback_' + Date.now();
-  window[callbackName] = function(result) {
-    document.getElementById('loading').style.display = 'none';
-    if (result && result.success) {
+  // Split into chunks to avoid URL length limits
+  var chunks = [
+    { global: payload.global, partner1: payload.partner1, partner2: payload.partner2, roth: payload.roth, phases: payload.phases },
+    { accounts: payload.accounts },
+  ];
+
+  var chunkIndex = 0;
+
+  function saveNextChunk() {
+    if (chunkIndex >= chunks.size) {
+      document.getElementById('loading').style.display = 'none';
       setStatus('Saved successfully! Your Google Sheet is updating now.', 'success');
       isDirty = false;
-    } else {
-      setStatus('Save failed -- try again or update your sheet directly.', 'error');
-      document.getElementById('save-btn').disabled = false;
+      return;
     }
-    delete window[callbackName];
-  };
+    var chunk = chunks[chunkIndex++];
+    var callbackName = 'saveCallback_' + Date.now();
+    window[callbackName] = function(result) {
+      delete window[callbackName];
+      if (result && result.success) {
+        saveNextChunk();
+      } else {
+        document.getElementById('loading').style.display = 'none';
+        setStatus('Save failed -- please try again.', 'error');
+        document.getElementById('save-btn').disabled = false;
+      }
+    };
+    var s = document.createElement('script');
+    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(chunk));
+    s.onerror = function() {
+      delete window[callbackName];
+      document.getElementById('loading').style.display = 'none';
+      setStatus('Connection error -- please try again.', 'error');
+      document.getElementById('save-btn').disabled = false;
+    };
+    document.head.appendChild(s);
+  }
 
-  var s = document.createElement('script');
-  s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(payload));
-  s.onerror = function() {
-    document.getElementById('loading').style.display = 'none';
-    setStatus('Connection error -- update your Apps Script with the write endpoint first.', 'error');
-    document.getElementById('save-btn').disabled = false;
-    delete window[callbackName];
-  };
-  document.head.appendChild(s);
+  // Fix chunks.size bug
+  chunks.length = chunks.length; // ensure array
+  chunkIndex = 0;
+
+  function saveNextChunkFixed() {
+    if (chunkIndex >= chunks.length) {
+      document.getElementById('loading').style.display = 'none';
+      setStatus('Saved successfully! Your Google Sheet is updating now.', 'success');
+      isDirty = false;
+      return;
+    }
+    var chunk = chunks[chunkIndex++];
+    var callbackName = 'saveCallback_' + Date.now();
+    window[callbackName] = function(result) {
+      delete window[callbackName];
+      if (result && result.success) {
+        saveNextChunkFixed();
+      } else {
+        document.getElementById('loading').style.display = 'none';
+        setStatus('Save failed -- please try again.', 'error');
+        document.getElementById('save-btn').disabled = false;
+      }
+    };
+    var s = document.createElement('script');
+    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(chunk));
+    s.onerror = function() {
+      delete window[callbackName];
+      document.getElementById('loading').style.display = 'none';
+      setStatus('Connection error -- please try again.', 'error');
+      document.getElementById('save-btn').disabled = false;
+    };
+    document.head.appendChild(s);
+  }
+
+  saveNextChunkFixed();
 }
 
 function buildPayload() {
