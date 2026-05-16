@@ -876,7 +876,7 @@ var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2
 // Get customer's sheet ID from URL or localStorage
 var SHEET_ID = (function() {
   var p = new URLSearchParams(window.location.search);
-  var id = p.get('sheetId') || localStorage.getItem('rbp_sheet_id') || '';
+  var id = p.get('sheetId') || localStorage.getItem('rbp_sheet_id') || '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY';
   if (id) localStorage.setItem('rbp_sheet_id', id);
   return id;
 })();
