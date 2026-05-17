@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireBlueprint Pro — Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:1200px;}
+.hero{background:#041E2F;padding:0;display:flex;align-items:stretch;border-bottom:3px solid #f4b86a;}
+.hero-logo{flex:0 0 auto;display:flex;align-items:center;padding:12px 16px;}
+.hero-wordmark{color:#f4b86a;font-size:22px;font-weight:900;letter-spacing:1px;margin-left:12px;}
+.hero-wordmark span{color:#1CC7D0;}
+.hero-right{display:flex;align-items:center;gap:0;margin-left:auto;}
+.hero-stat{text-align:center;padding:16px 20px;border-left:1px solid #0A3145;}
+.hs-label{font-size:9px;color:#1CC7D0;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;}
+.hs-value{font-size:28px;font-weight:800;line-height:1.1;margin-top:2px;color:#fff;}
+.hs-sub{font-size:10px;margin-top:2px;font-weight:600;color:#8a9ab0;}
+.status-pill{display:inline-block;background:#2E7032;color:#a7f3a7;font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:4px;letter-spacing:0.5px;}
+.cmd{background:#0A3145;border-bottom:2px solid #f4b86a;padding:0 16px;display:flex;align-items:stretch;overflow:hidden;}
+.cmd-item{display:flex;flex-direction:column;justify-content:center;padding:8px 14px;border-right:1px solid #1a3a52;white-space:nowrap;}
+.cmd-lbl{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;}
+.cmd-val{font-size:12px;color:#fff;font-weight:600;margin-top:1px;}
+.cmd-btn{margin-left:auto;align-self:center;background:#f4b86a;color:#041E2F;border:none;padding:7px 16px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;flex-shrink:0;}
+.nav-bar{background:#0A3145;padding:0;display:flex;align-items:stretch;border-top:1px solid #1a3a52;}
+.nav-bar a{font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;}
+.nav-bar a.active,.nav-bar a:hover{color:#f4b86a;}
+.section{padding:10px 14px;}
+.acct-grid{display:grid;grid-template-columns:repeat(5,1fr) 200px;gap:8px;margin-bottom:10px;}
+.acct-card{background:#fff;border-radius:6px;padding:10px 12px;border:1px solid #e8eaed;border-left:4px solid #041E2F;}
+.acct-owner{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.acct-name{font-size:10px;font-weight:700;color:#0B2239;margin-top:2px;}
+.acct-type{font-size:8px;color:#5F6368;font-style:italic;margin-top:1px;}
+.acct-bal{font-size:16px;font-weight:800;color:#041E2F;margin-top:5px;}
+.acct-ret{font-size:8px;color:#2E7032;font-weight:600;margin-top:1px;}
+.acct-total{background:#041E2F;border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;}
+.at-lbl{font-size:8px;color:#f4b86a;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.at-val{font-size:22px;font-weight:800;color:#fff;margin-top:3px;line-height:1;}
+.at-sub{font-size:8px;color:#8a9ab0;margin-top:3px;}
+.kpi-grid{display:grid;grid-template-columns:200px repeat(5,1fr);gap:8px;margin-bottom:10px;align-items:start;}
+.plan-health{background:#041E2F;border-radius:6px;padding:12px 14px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;}
+.ph-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#f4b86a;text-transform:uppercase;margin-bottom:4px;}
+.ph-score{font-size:50px;font-weight:800;color:#fff;line-height:1;}
+.ph-sub{font-size:10px;color:#7C9A7C;margin-top:2px;font-weight:600;}
+.ph-bar-bg{background:#0A3145;border-radius:3px;height:7px;margin:10px 0 3px;position:relative;}
+.ph-bar{height:7px;border-radius:3px;background:linear-gradient(90deg,#A03030 0%,#f4b86a 40%,#2E7032 75%);width:98%;}
+.ph-marker{position:absolute;top:-4px;right:2%;width:2px;height:15px;background:#fff;border-radius:1px;}
+.ph-zone{font-size:9px;color:#8a9ab0;text-align:center;}
+.ph-zone span{color:#7C9A7C;font-weight:700;}
+.kpi-card{background:#fff;border-radius:6px;padding:11px 13px;border:1px solid #e8eaed;border-top:3px solid #041E2F;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;}
+.kc-title{font-size:8px;font-weight:700;letter-spacing:1px;color:#37474F;text-transform:uppercase;display:flex;align-items:center;gap:5px;margin-bottom:6px;}
+.kc-dot{width:3px;height:12px;border-radius:2px;background:#1CC7D0;flex-shrink:0;}
+.kc-value{font-size:20px;font-weight:800;color:#0B2239;line-height:1.1;}
+.kc-sub{font-size:8px;color:#5F6368;margin-top:1px;font-style:italic;}
+.kc-delta-up{font-size:9px;color:#2E7032;margin-top:2px;font-weight:600;}
+.kc-delta-watch{font-size:10px;color:#f4b86a;margin-top:4px;font-weight:600;}
+.kc-bar-bg{height:4px;background:#e8eaed;border-radius:2px;margin-top:8px;}
+.kc-bar-fill{height:4px;border-radius:2px;}
+.kc-footer{font-size:8px;color:#5F6368;margin-top:3px;}
+.badge-watch{display:inline-block;background:#fff8e1;color:#f4b86a;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;}
+.engines-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px;}
+.engine{background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8eaed;display:flex;flex-direction:column;}
+.eng-hdr{background:#041E2F;padding:9px 11px;flex-shrink:0;}
+.eng-hdr-title{font-size:9px;font-weight:700;color:#f4b86a;letter-spacing:1px;text-transform:uppercase;}
+.eng-hdr-sub{font-size:8px;color:#1CC7D0;margin-top:2px;}
+.eng-body{padding:9px 11px;flex:1;display:flex;flex-direction:column;justify-content:space-between;}
+.eng-rows{flex:1;}
+.eng-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:0.5px solid #f3f4f6;}
+.eng-row:last-child{border:none;}
+.er-lbl{font-size:9px;color:#455A64;}
+.er-val{font-size:9px;font-weight:700;color:#0B2239;display:flex;align-items:center;gap:3px;}
+.s-go{width:6px;height:6px;border-radius:50%;background:#2E7032;flex-shrink:0;}
+.s-watch{width:6px;height:6px;border-radius:50%;background:#f4b86a;flex-shrink:0;}
+.eng-hl{margin-top:8px;background:#F8F9FA;border-radius:4px;padding:5px 8px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.eh-lbl{font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;}
+.eh-val{font-size:12px;font-weight:800;color:#0B2239;}
+.eh-go{font-size:9px;font-weight:700;color:#2E7032;}
+.eh-watch{font-size:9px;font-weight:700;color:#f4b86a;}
+.chart-card{background:#fff;border-radius:6px;padding:11px 13px;border:1px solid #e8eaed;}
+.chart-title{font-size:9px;font-weight:700;color:#0B2239;text-transform:uppercase;letter-spacing:1px;}
+.chart-sub{font-size:8px;color:#9ca3af;margin-bottom:8px;margin-top:1px;font-style:italic;}
+.chart-area{height:120px;position:relative;}
+.chart-note{font-size:8px;color:#455A64;margin-top:6px;}
+.chart-note strong{color:#0B2239;font-size:11px;}
+.intel{background:#041E2F;border-radius:6px;padding:11px 13px;display:flex;flex-direction:column;height:100%;box-sizing:border-box;}
+.intel-title{font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.intel-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid #0A3145;}
+.intel-row:last-of-type{border:none;}
+.ir-lbl{font-size:10px;color:#fff;font-weight:500;}
+.b-go{font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;background:#14532d;color:#4ade80;}
+.b-watch{font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;background:#3d2f00;color:#f4b86a;}
+.b-teal{font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;background:#003d47;color:#1CC7D0;}
+.intel-kpi{text-align:center;padding:6px 0;border-top:1px solid #1a3a52;margin-top:auto;}
+.ik-lbl{font-size:9px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;}
+.ik-val{font-size:20px;font-weight:800;color:#f4b86a;line-height:1.2;}
+.ik-sub{font-size:9px;color:#1CC7D0;}
+.intel-btn{width:100%;background:#f4b86a;color:#041E2F;border:none;border-radius:4px;padding:8px;font-size:10px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:0.5px;}
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,30,47,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
+.loading-spinner{width:48px;height:48px;border:4px solid #0A3145;border-top:4px solid #f4b86a;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{color:#fff;font-size:14px;font-weight:600;}
+.loading-sub{color:#1CC7D0;font-size:11px;margin-top:6px;}
+.error-banner{background:#A03030;color:#fff;padding:12px 20px;font-size:12px;font-weight:600;display:none;border-bottom:2px solid #f4b86a;}
+.disclaimer{text-align:center;font-size:8px;color:#9ca3af;padding:8px 14px 12px;border-top:1px solid #e8eaed;margin-top:6px;}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading Your Retirement Plan…</div>
+  <div class="loading-sub" id="loading-sub">Reading your personal sheet data</div>
+</div>
+
+<!-- ERROR -->
+<div class="error-banner" id="error-banner"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-logo">
+    <div class="hero-wordmark">RetireBlueprint <span>Pro</span></div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat">
+      <div class="hs-label">Plan Confidence</div>
+      <div class="hs-value" id="val-confidence">—</div>
+      <div style="font-size:10px;color:#1CC7D0;margin-top:2px;font-weight:600;" id="val-conf-label">Loading…</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">Plan Status</div>
+      <div class="hs-value" style="font-size:16px;margin-top:6px;"><span class="status-pill" id="val-status">Loading…</span></div>
+      <div class="hs-sub" id="val-status-sub">—</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">Your Plan</div>
+      <div class="hs-value" style="font-size:18px;" id="val-names">—</div>
+      <div class="hs-sub" id="val-ages">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- CMD STRIP -->
+<div class="cmd">
+  <div class="cmd-item"><div class="cmd-lbl">Plan Year</div><div class="cmd-val" id="val-year">—</div></div>
+  <div class="cmd-item"><div class="cmd-lbl" id="lbl-p1-age">Partner 1 Age</div><div class="cmd-val" id="val-p1-age">—</div></div>
+  <div class="cmd-item"><div class="cmd-lbl" id="lbl-p2-age">Partner 2 Age</div><div class="cmd-val" id="val-p2-age">—</div></div>
+  <div class="cmd-item"><div class="cmd-lbl">Tax Filing</div><div class="cmd-val">Married / Joint</div></div>
+  <div class="cmd-item"><div class="cmd-lbl">Runway</div><div class="cmd-val" id="val-runway">—</div></div>
+  <div class="cmd-item"><div class="cmd-lbl">Inflation</div><div class="cmd-val" id="val-inflation">—</div></div>
+  <div class="cmd-item"><div class="cmd-lbl">SS COLA</div><div class="cmd-val" id="val-ss-cola">—</div></div>
+  <button class="cmd-btn" onclick="window.open('https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html','_blank')">View All Scenarios ›</button>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" class="active">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html">Setup Guide</a>
+  <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;margin-left:auto;"></span>
+</div>
+
+<div class="section">
+
+<!-- ACCOUNTS -->
+<div class="acct-grid" id="acct-container"></div>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+  <div class="plan-health">
+    <div class="ph-label">🛡 Plan Health Score</div>
+    <div>
+      <div class="ph-score" id="kpi-health">—</div>
+      <div class="ph-sub">Retirement Confidence Score</div>
+    </div>
+    <div>
+      <div class="ph-bar-bg">
+        <div class="ph-bar"></div>
+        <div class="ph-marker" id="ph-marker"></div>
+      </div>
+      <div class="ph-zone">You are in the <span id="ph-zone">SAFE ZONE</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot"></span>Safe Spending Capacity</div>
+      <div class="kc-value" id="kpi-spend">—</div>
+      <div class="kc-sub">Base lifestyle · solver-optimized</div>
+      <div class="kc-delta-up" id="kpi-spend-extra">—</div>
+    </div>
+    <div>
+      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-spend-bar" style="background:#2E7032;"></div></div>
+      <div class="kc-footer" id="kpi-spend-foot">—</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Survivor Runway</div>
+      <div class="kc-value" id="kpi-runway">—</div>
+      <div class="kc-sub" id="kpi-runway-sub">—</div>
+      <div class="kc-delta-up" id="kpi-runway-delta">—</div>
+    </div>
+    <div>
+      <div id="runway-dots" style="display:flex;gap:3px;margin-top:6px;flex-wrap:wrap;"></div>
+      <div class="kc-footer">Longest survivor fully funded</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#1CC7D0;"></span>Household Income This Year</div>
+      <div class="kc-value" id="kpi-income">—</div>
+      <div class="kc-sub">Total guaranteed income</div>
+      <div class="kc-delta-watch" id="kpi-income-note">—</div>
+    </div>
+    <div>
+      <span class="badge-watch" id="kpi-income-badge">—</span>
+      <div class="kc-footer" id="kpi-income-foot">—</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#6A4A6D;"></span>Tax Efficiency</div>
+      <div class="kc-value" id="kpi-tax">—</div>
+      <div class="kc-sub">Effective federal rate · MFJ</div>
+      <div class="kc-delta-up" id="kpi-tax-delta">—</div>
+    </div>
+    <div>
+      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-tax-bar" style="background:#1CC7D0;"></div></div>
+      <div class="kc-footer" id="kpi-tax-foot">—</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Legacy Goal</div>
+      <div class="kc-value" id="kpi-legacy">—</div>
+      <div class="kc-sub">Projected ending liquid assets</div>
+      <div class="kc-delta-up" id="kpi-legacy-delta">—</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+      <svg width="55" height="32" viewBox="0 0 55 32">
+        <path d="M5,28 A22,22 0 0,1 50,28" fill="none" stroke="#e8eaed" stroke-width="6" stroke-linecap="round"/>
+        <path d="M5,28 A22,22 0 0,1 50,28" fill="none" stroke="#2E7032" stroke-width="6" stroke-linecap="round" stroke-dasharray="69" id="legacy-arc"/>
+        <text x="27" y="26" text-anchor="middle" fill="#0B2239" font-size="10" font-weight="800" id="legacy-pct-text">—</text>
+      </svg>
+      <div class="kc-footer" id="kpi-legacy-status">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ENGINES -->
+<div class="engines-grid">
+  <div class="engine">
+    <div class="eng-hdr"><div class="eng-hdr-title">Income Engine</div><div class="eng-hdr-sub" id="eng-income-hdr">—</div></div>
+    <div class="eng-body">
+      <div class="eng-rows">
+        <div class="eng-row"><span class="er-lbl" id="lbl-p1-sal">Salary</span><span class="er-val"><span id="eng-p1-sal">—</span><span class="s-watch"></span></span></div>
+        <div class="eng-row"><span class="er-lbl" id="lbl-p1-ss">Social Security</span><span class="er-val"><span id="eng-p1-ss">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl" id="lbl-p1-pen">Pension</span><span class="er-val"><span id="eng-p1-pen">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl" id="lbl-p1-other">Other Income</span><span class="er-val"><span id="eng-p1-other">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl" id="lbl-p2-sal">Partner 2 Salary</span><span class="er-val"><span id="eng-p2-sal">—</span><span class="s-go"></span></span></div>
+      </div>
+      <div class="eng-hl"><div><div class="eh-lbl">Total Income</div><div class="eh-val" id="eng-income-total">—</div></div><div class="eh-go">✓ Strong</div></div>
+    </div>
+  </div>
+
+  <div class="engine">
+    <div class="eng-hdr"><div class="eng-hdr-title">Expense Engine</div><div class="eng-hdr-sub">Smile curve · 3 phases</div></div>
+    <div class="eng-body">
+      <div class="eng-rows">
+        <div class="eng-row"><span class="er-lbl">Base Spend / year</span><span class="er-val"><span id="eng-base-spend">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Extra Spend Phase 1</span><span class="er-val"><span id="eng-p1-extra">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Extra Spend Phase 2</span><span class="er-val"><span id="eng-p2-extra">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Extra Spend Phase 3</span><span class="er-val"><span id="eng-p3-extra">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Inflation Rate</span><span class="er-val"><span id="eng-inflation">—</span><span class="s-watch"></span></span></div>
+      </div>
+      <div class="eng-hl"><div><div class="eh-lbl">Inflation Risk</div><div class="eh-val">Monitor</div></div><div class="eh-watch" id="eng-infl-disp">—</div></div>
+    </div>
+  </div>
+
+  <div class="engine">
+    <div class="eng-hdr"><div class="eng-hdr-title">Tax Engine</div><div class="eng-hdr-sub">MFJ · Roth window open</div></div>
+    <div class="eng-body">
+      <div class="eng-rows">
+        <div class="eng-row"><span class="er-lbl">Effective Federal Rate</span><span class="er-val"><span id="eng-eff-rate">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Standard Deduction</span><span class="er-val"><span id="eng-std-ded">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">State Tax Rate</span><span class="er-val"><span id="eng-state-rate">—</span><span class="s-watch"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Roth Conversion Savings</span><span class="er-val"><span id="eng-roth-save">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">SS COLA</span><span class="er-val"><span id="eng-cola">—</span><span class="s-go"></span></span></div>
+      </div>
+      <div class="eng-hl"><div><div class="eh-lbl">Roth Window</div><div class="eh-val">PRIME</div></div><div class="eh-go">Convert Now</div></div>
+    </div>
+  </div>
+
+  <div class="engine">
+    <div class="eng-hdr"><div class="eng-hdr-title">Social Security</div><div class="eng-hdr-sub" id="eng-ss-hdr">—</div></div>
+    <div class="eng-body">
+      <div class="eng-rows">
+        <div class="eng-row"><span class="er-lbl" id="lbl-p1-ss-mo">SS / month</span><span class="er-val"><span id="eng-p1-ss-mo">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl" id="lbl-p1-ss-start">SS Start</span><span class="er-val"><span id="eng-p1-ss-start">—</span><span class="s-watch"></span></span></div>
+        <div class="eng-row"><span class="er-lbl" id="lbl-p2-ss-mo">SS / month</span><span class="er-val"><span id="eng-p2-ss-mo">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl" id="lbl-p2-ss-start">SS Start</span><span class="er-val"><span id="eng-p2-ss-start">—</span><span class="s-watch"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">COLA Rate</span><span class="er-val"><span id="eng-cola2">—</span><span class="s-go"></span></span></div>
+      </div>
+      <div class="eng-hl"><div><div class="eh-lbl">COLA Rate</div><div class="eh-val" id="eng-cola-disp">—</div></div><div class="eh-go">Inflation Linked</div></div>
+    </div>
+  </div>
+
+  <div class="engine">
+    <div class="eng-hdr"><div class="eng-hdr-title">Portfolio Engine</div><div class="eng-hdr-sub" id="eng-port-hdr">—</div></div>
+    <div class="eng-body">
+      <div class="eng-rows">
+        <div class="eng-row"><span class="er-lbl">Total Starting Assets</span><span class="er-val"><span id="eng-port-total">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Pre-Tax (401k)</span><span class="er-val"><span id="eng-pretax">—</span><span class="s-watch"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Roth (Tax-Free)</span><span class="er-val"><span id="eng-roth">—</span><span class="s-watch"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Taxable / Brokerage</span><span class="er-val"><span id="eng-taxable">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">HSA (Triple Tax)</span><span class="er-val"><span id="eng-hsa">—</span><span class="s-go"></span></span></div>
+      </div>
+      <div class="eng-hl"><div><div class="eh-lbl">End of Year 1</div><div class="eh-val" id="eng-port-end">—</div></div><div class="eh-go">Growing</div></div>
+    </div>
+  </div>
+
+  <div class="engine">
+    <div class="eng-hdr"><div class="eng-hdr-title">Legacy Engine</div><div class="eng-hdr-sub">Solver-optimized</div></div>
+    <div class="eng-body">
+      <div class="eng-rows">
+        <div class="eng-row"><span class="er-lbl">Legacy Goal</span><span class="er-val"><span id="eng-leg-goal">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Projected Ending Balance</span><span class="er-val"><span id="eng-leg-proj">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Variance</span><span class="er-val"><span id="eng-leg-var">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Safety Floor</span><span class="er-val"><span id="eng-leg-floor">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Achievement</span><span class="er-val"><span id="eng-leg-pct">—</span><span class="s-go"></span></span></div>
+      </div>
+      <div class="eng-hl"><div><div class="eh-lbl">Legacy Status</div><div class="eh-val" id="eng-leg-status">—</div></div><div class="eh-go" id="eng-leg-badge">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS + INTEL -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 195px;grid-template-rows:auto auto;gap:8px;margin-bottom:10px;">
+  <div class="chart-card">
+    <div class="chart-title">Portfolio Sustainability</div>
+    <div class="chart-sub" id="c1-sub">Total end-of-year liquid assets</div>
+    <div class="chart-area"><canvas id="c1"></canvas></div>
+    <div class="chart-note" id="c1-note">—</div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Tax Bucket Evolution</div>
+    <div class="chart-sub">Pre-Tax vs Roth vs Taxable over time</div>
+    <div class="chart-area"><canvas id="c2"></canvas></div>
+    <div class="chart-note">Pre-Tax heavy today — <strong>Roth conversion</strong> saves taxes long-term</div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Household Income Bridge</div>
+    <div class="chart-sub" id="c3-sub">Salary → Social Security + Pension</div>
+    <div class="chart-area"><canvas id="c3"></canvas></div>
+    <div class="chart-note" id="c3-note">—</div>
+  </div>
+
+  <div style="grid-column:4;grid-row:1/3;">
+    <div class="intel">
+      <div class="intel-title">🧠 At-a-Glance Intelligence</div>
+      <div class="intel-row"><span class="ir-lbl">Sequence Risk</span><span class="b-go">Low</span></div>
+      <div class="intel-row"><span class="ir-lbl" id="intel-lon-lbl">Longevity Coverage</span><span class="b-go">Covered</span></div>
+      <div class="intel-row"><span class="ir-lbl">Healthcare Inflation</span><span class="b-watch" id="intel-hc">—</span></div>
+      <div class="intel-row"><span class="ir-lbl">Inflation Impact</span><span class="b-watch">Monitor</span></div>
+      <div class="intel-row"><span class="ir-lbl">Roth Conversion Window</span><span class="b-teal">PRIME</span></div>
+      <div class="intel-row"><span class="ir-lbl">Social Security Strategy</span><span class="b-watch" id="intel-ss">—</span></div>
+      <div class="intel-row"><span class="ir-lbl">Legacy Goal</span><span class="b-go" id="intel-legacy">—</span></div>
+      <div class="intel-row"><span class="ir-lbl" id="intel-surv-lbl">Survivor Plan</span><span class="b-go">Funded</span></div>
+      <div class="intel-kpi">
+        <div class="ik-lbl">Roth Conversion Savings</div>
+        <div class="ik-val" id="intel-roth">—</div>
+        <div class="ik-sub">Converting now vs. waiting</div>
+      </div>
+      <button class="intel-btn" onclick="window.open('https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html','_blank')">Full Intelligence Center ›</button>
+    </div>
+  </div>
+
+  <div class="chart-card" style="grid-column:1/2;">
+    <div class="chart-title">Smile Curve Spending Plan</div>
+    <div class="chart-sub">Phase 1 boost · Phase 2 base · Phase 3 reduction</div>
+    <div class="chart-area"><canvas id="c4"></canvas></div>
+    <div class="chart-note" id="c4-note">—</div>
+  </div>
+  <div class="chart-card" style="grid-column:2/4;">
+    <div class="chart-title" id="c5-title">Survivor Plan</div>
+    <div class="chart-sub" id="c5-sub">Joint plan → Survivor plan</div>
+    <div class="chart-area"><canvas id="c5"></canvas></div>
+    <div class="chart-note" id="c5-note">—</div>
+  </div>
+</div>
+
+<div style="background:#F8F9FA;border-top:2px solid #e8eaed;padding:10px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;">
+  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 1</div><div style="font-size:10px;color:#37474F;font-weight:600;">Open Your Inputs</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Update any number in the Inputs tab</div></div>
+  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 2</div><div style="font-size:10px;color:#37474F;font-weight:600;">Sheet Recalculates</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Master &amp; projections update automatically</div></div>
+  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 3</div><div style="font-size:10px;color:#37474F;font-weight:600;">Refresh Dashboard</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Press Cmd+R to reload this page</div></div>
+  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 4</div><div style="font-size:10px;color:#37474F;font-weight:600;">See Your Updated Plan</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">All charts and numbers refresh instantly</div></div>
+</div>
+<div class="disclaimer">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+var navy='#041E2F', teal='#1CC7D0', orange='#f4b86a', green='#2E7032', plum='#6A4A6D';
+var _charts = {};
+
+function $s(id){ return document.getElementById(id); }
+function set(id, val){ var el=$s(id); if(el) el.textContent=(val!==null&&val!==undefined&&val!=='')?val:'—'; }
+
+function fmt(n){
+  if(n===null||n===undefined||isNaN(n)) return '—';
+  if(Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
+  if(Math.abs(n)>=100000)  return '$'+Math.round(n/1000)+'K';
+  return '$'+Math.round(n).toLocaleString();
+}
+function fmtP(n){
+  if(n===null||n===undefined||isNaN(n)) return '—';
+  var v = n<1 ? n*100 : n;
+  return v.toFixed(1)+'%';
+}
+
+function mkChart(id,type,labels,datasets,stacked,legend){
+  if(_charts[id]) _charts[id].destroy();
+  var ctx=$s(id); if(!ctx) return;
+  var sy={ticks:{font:{size:8},color:'#5F6368',callback:function(v){return '$'+v+'K';}},grid:{color:'#f3f4f6'}};
+  if(stacked) sy.stacked=true;
+  var sx={ticks:{font:{size:8},color:'#5F6368'},grid:{display:false}};
+  if(stacked) sx.stacked=true;
+  _charts[id]=new Chart(ctx,{type:type,data:{labels:labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:!!legend,labels:{font:{size:8},color:'#5F6368',boxWidth:10}}},scales:{x:sx,y:sy}}});
+}
+
+function populate(d){
+  var p1 = d.people.craig || d.people.person1 || {};
+  var p2 = d.people.gena  || d.people.person2 || {};
+  var p1n = p1.name||'Partner 1', p2n = p2.name||'Partner 2';
+  var sp = d.spending, leg = d.legacy, tax = d.tax, port = d.portfolio;
+  var proj = d.projections, meta = d.meta;
+
+  // Determine longest-lived person
+  var p1dy = p1.projectedDeathYear||2070, p2dy = p2.projectedDeathYear||2080;
+  var longestP = p1dy > p2dy ? p1 : p2;
+  var longestN = p1dy > p2dy ? p1n : p2n;
+  var otherP   = p1dy > p2dy ? p2 : p1;
+  var otherN   = p1dy > p2dy ? p2n : p1n;
+  var longestYrs = longestP.projectedDeathYear - meta.planYear;
+
+  // HERO
+  var pct = leg.achievedPct||0;
+  set('val-confidence', pct+'%');
+  set('val-conf-label', pct>=90?'✓ Very Strong':pct>=70?'✓ On Track':'⚠ Needs Review');
+  set('val-status', pct>=90?'✅ ON TRACK':'⚠ REVIEW');
+  set('val-status-sub', 'Legacy goal '+(pct>=100?'met':'at '+pct+'%'));
+  set('val-names', p1n+' & '+p2n);
+  set('val-ages', p1n+' age '+p1.age+' · '+p2n+' age '+p2.age);
+
+  // CMD
+  set('val-year', meta.planYear);
+  set('lbl-p1-age', p1n+"'s Age"); set('val-p1-age', p1.age);
+  set('lbl-p2-age', p2n+"'s Age"); set('val-p2-age', p2.age);
+  set('val-runway', longestYrs+' Yrs ('+longestN+')');
+  set('val-inflation', fmtP(tax.inflation)+'/yr');
+  set('val-ss-cola', fmtP(tax.ssCola)+'/yr');
+
+  // ACCOUNTS
+  var ac = $s('acct-container');
+  if(ac){
+    var da = (port.accounts||[]).filter(function(a){return a.showOnDashboard==='Yes';});
+    if(!da.length) da = (port.accounts||[]).slice(0,5);
+    da = da.slice(0,5);
+    var bc={'Craig':'#2E4053','Gena':'#6A4A6D','Joint':'#7C9A7C'};
+    var tc={'Craig':'#456A73','Gena':'#6A4A6D','Joint':'#7C9A7C'};
+    var h='';
+    da.forEach(function(a){
+      h+='<div class="acct-card" style="border-left-color:'+(bc[a.owner]||navy)+';"><div class="acct-owner" style="color:'+(tc[a.owner]||teal)+';">'+a.owner+'</div><div class="acct-name">'+a.name+'</div><div class="acct-type">'+a.type+'</div><div class="acct-bal">'+fmt(a.balance)+'</div><div class="acct-ret">'+fmtP(a.expectedReturn)+' expected return</div></div>';
+    });
+    h+='<div class="acct-total"><div class="at-lbl">Total Investable Assets</div><div class="at-val">'+fmt(port.total)+'</div><div class="at-sub">'+(port.accounts||[]).length+' accounts · '+meta.planYear+'</div></div>';
+    ac.innerHTML=h;
+  }
+
+  // KPIs
+  set('kpi-health', pct+'%');
+  var mk=$s('ph-marker'); if(mk) mk.style.right=Math.max(0,100-pct)+'%';
+
+  set('kpi-spend', fmt(sp.baseAnnual)+'/yr');
+  set('kpi-spend-extra', (sp.safeExtra>0?'+ '+fmt(sp.safeExtra)+'/yr extra available':''));
+  set('kpi-spend-foot', 'Legacy: '+fmt(leg.projectedEnding)+' projected · Goal: '+fmt(leg.goal));
+  var sb=$s('kpi-spend-bar'); if(sb) sb.style.width=Math.min(100,pct)+'%';
+
+  set('kpi-runway', longestYrs+' years');
+  set('kpi-runway-sub', 'Covers '+longestN+' to age '+longestP.projectedDeathAge+' ('+longestP.projectedDeathYear+')');
+  set('kpi-runway-delta', otherN+' covered to age '+otherP.projectedDeathAge+' ('+otherP.projectedDeathYear+')');
+  var rd=$s('runway-dots'); if(rd){var rh='';for(var i=0;i<Math.min(10,longestYrs);i++) rh+='<span style="width:8px;height:8px;border-radius:50%;background:#041E2F;display:inline-block;"></span>';rd.innerHTML=rh;}
+
+  var yr1inc = (proj.income&&proj.income[0]) ? proj.income[0]*1000 : 0;
+  set('kpi-income', fmt(yr1inc));
+  set('kpi-income-note', 'Transition year · verify with your Inputs');
+  set('kpi-income-badge', p1n+' SS starts '+p1.ssStartDate);
+  set('kpi-income-foot', p2n+' salary: '+fmt(p2.salary));
+
+  set('kpi-tax', fmtP(tax.effectiveRate));
+  set('kpi-tax-delta', 'Roth conversion saves '+fmt(tax.rothConversionSavings)+' now vs. later');
+  set('kpi-tax-foot', 'State: '+fmtP(tax.stateRate)+' · Deduction: '+fmt(tax.standardDeduction));
+  var tb=$s('kpi-tax-bar'); if(tb) tb.style.width=Math.min(100,(tax.effectiveRate<1?tax.effectiveRate*100:tax.effectiveRate)*3)+'%';
+
+  set('kpi-legacy', fmt(leg.projectedEnding));
+  set('kpi-legacy-delta', 'Goal: '+fmt(leg.goal)+' · Variance: '+fmt(leg.variance)+' · '+pct+'% achieved');
+  set('kpi-legacy-status', pct>=100?'✅ Legacy Goal Achieved':'⚠ '+pct+'% of goal');
+  var arc=$s('legacy-arc'); if(arc) arc.setAttribute('stroke-dashoffset', 69*(1-Math.min(1,pct/100)));
+  set('legacy-pct-text', pct+'%');
+
+  // ENGINES
+  set('eng-income-hdr', p1n+' & '+p2n+' · Year '+meta.planYear);
+  set('lbl-p1-sal', p1n+' Salary');         set('eng-p1-sal', fmt(p1.salary));
+  set('lbl-p1-ss', p1n+' Social Security'); set('eng-p1-ss', fmt(p1.ssAnnual));
+  set('lbl-p1-pen', p1n+' Pension');        set('eng-p1-pen', fmt((p1.pension||0)*12||p1.pensionAnnual||0));
+  set('lbl-p1-other', p1n+' Other');        set('eng-p1-other', fmt(p1.otherIncome));
+  set('lbl-p2-sal', p2n+' Salary');         set('eng-p2-sal', fmt(p2.salary));
+  set('eng-income-total', fmt(yr1inc));
+
+  set('eng-base-spend', fmt(sp.baseAnnual));
+  set('eng-p1-extra', fmt(sp.phase1Extra));
+  set('eng-p2-extra', fmt(sp.phase2Extra));
+  set('eng-p3-extra', fmt(sp.phase3Extra));
+  var inf=tax.inflation<1?tax.inflation*100:tax.inflation;
+  set('eng-inflation', inf.toFixed(1)+'%');
+  set('eng-infl-disp', inf.toFixed(1)+'%/yr');
+
+  set('eng-eff-rate', fmtP(tax.effectiveRate));
+  set('eng-std-ded', fmt(tax.standardDeduction));
+  set('eng-state-rate', fmtP(tax.stateRate));
+  set('eng-roth-save', fmt(tax.rothConversionSavings));
+  var cola=tax.ssCola<1?tax.ssCola*100:tax.ssCola;
+  set('eng-cola', cola.toFixed(1)+'%');
+
+  set('eng-ss-hdr', p1n+' · '+p2n);
+  set('lbl-p1-ss-mo', p1n+' SS / month');   set('eng-p1-ss-mo', fmt(p1.ssMonthly));
+  set('lbl-p1-ss-start', p1n+' SS Start');  set('eng-p1-ss-start', p1.ssStartDate||'—');
+  set('lbl-p2-ss-mo', p2n+' SS / month');   set('eng-p2-ss-mo', fmt(p2.ssMonthly));
+  set('lbl-p2-ss-start', p2n+' SS Start');  set('eng-p2-ss-start', p2.ssStartDate||'—');
+  set('eng-cola2', cola.toFixed(1)+'%');
+  set('eng-cola-disp', cola.toFixed(1)+'%/yr');
+
+  var yr1pre = (proj.preTax&&proj.preTax[0])?proj.preTax[0]*1000:0;
+  var yr1rth = (proj.roth&&proj.roth[0])?proj.roth[0]*1000:0;
+  var yr1tax = (proj.taxable&&proj.taxable[0])?proj.taxable[0]*1000:0;
+  var yr1hsa = (proj.hsa&&proj.hsa[0])?proj.hsa[0]*1000:0;
+  var yr1end = (proj.endLiquid&&proj.endLiquid[0])?proj.endLiquid[0]*1000:0;
+  set('eng-port-hdr', (port.accounts||[]).length+' accounts · starting values');
+  set('eng-port-total', fmt(port.total));
+  set('eng-pretax', fmt(yr1pre));
+  set('eng-roth', fmt(yr1rth));
+  set('eng-taxable', fmt(yr1tax));
+  set('eng-hsa', fmt(yr1hsa));
+  set('eng-port-end', fmt(yr1end));
+
+  set('eng-leg-goal', fmt(leg.goal));
+  set('eng-leg-proj', fmt(leg.projectedEnding));
+  set('eng-leg-var', fmt(leg.variance));
+  set('eng-leg-floor', fmt(leg.safetyFloor||leg.goal));
+  set('eng-leg-pct', pct+'%');
+  set('eng-leg-status', pct>=100?'✅ ON TRACK':'⚠ REVIEW');
+  set('eng-leg-badge', pct>=100?'Goal Met':'In Progress');
+
+  // INTELLIGENCE
+  set('intel-lon-lbl', 'Longevity ('+longestN+' to '+longestP.projectedDeathAge+')');
+  set('intel-hc', fmtP(tax.healthcareInflation)+'/yr');
+  set('intel-ss', p1n+' start: '+p1.ssStartDate);
+  set('intel-legacy', pct>=100?'✅ Met':pct+'%');
+  set('intel-surv-lbl', 'Survivor Plan ('+longestN+')');
+  set('intel-roth', fmt(tax.rothConversionSavings));
+
+  // CHART NOTES
+  set('c1-sub', 'Total end-of-year liquid assets · '+meta.planYear+'–'+longestP.projectedDeathYear);
+  set('c1-note', 'Peak: '+fmt(port.peakValue)+' ('+port.peakYear+') · Ends: '+fmt(leg.projectedEnding)+' · Goal '+(pct>=100?'met ✅':pct+'%'));
+  set('c3-sub', 'Salary → SS + Pension · '+p2n+' SS starts '+p2.ssStartDate);
+  set('c3-note', p2n+' SS: '+fmt(p2.ssAnnual)+'/yr · '+p1n+' pension: '+fmt((p1.pension||0)*12||p1.pensionAnnual||0)+'/yr');
+  set('c4-note', 'Phase 1: '+fmt((sp.baseAnnual||0)+(sp.phase1Extra||0))+'/yr · Phase 2: '+fmt((sp.baseAnnual||0)+(sp.phase2Extra||0))+'/yr · Phase 3: '+fmt((sp.baseAnnual||0)+(sp.phase3Extra||0))+'/yr');
+  set('c5-title', 'Survivor Plan — '+longestN+" runs to age "+longestP.projectedDeathAge);
+  set('c5-sub', 'Joint '+meta.planYear+'–'+otherP.projectedDeathYear+' · '+longestN+' survivor '+(otherP.projectedDeathYear+1)+'–'+longestP.projectedDeathYear);
+  set('c5-note', 'Handoff at '+fmt(port.peakValue)+' ('+port.peakYear+') · '+longestN+' plan ends at '+fmt(leg.projectedEnding));
+
+  set('load-status', '✓ Plan loaded · '+meta.generated);
+  drawCharts(d, p1, p2, p1n, p2n, longestP, otherP, meta);
+}
+
+function drawCharts(d,p1,p2,p1n,p2n,longestP,otherP,meta){
+  var proj=d.projections, leg=d.legacy, sp=d.spending;
+
+  // Build key year indices — ~10 points across full range
+  var endYr = longestP.projectedDeathYear;
+  var startYr = meta.planYear;
+  var step = Math.ceil((endYr-startYr)/10);
+  var KEY=[]; for(var y=startYr;y<=endYr;y+=step) KEY.push(y);
+  if(KEY[KEY.length-1]!==endYr) KEY.push(endYr);
+
+  var kidx=[];
+  for(var i=0;i<proj.years.length;i++) if(KEY.indexOf(proj.years[i])>-1) kidx.push(i);
+  var yrs     = kidx.map(function(i){return String(proj.years[i]);});
+  var endLiq  = kidx.map(function(i){return proj.endLiquid[i]||0;});
+  var preTax  = kidx.map(function(i){return proj.preTax[i]||0;});
+  var roth    = kidx.map(function(i){return proj.roth[i]||0;});
+  var taxable = kidx.map(function(i){return proj.taxable[i]||0;});
+  var hsa     = kidx.map(function(i){return proj.hsa[i]||0;});
+  var floor   = yrs.map(function(){return Math.round((leg.safetyFloor||leg.goal||0)/1000);});
+
+  mkChart('c1','line',yrs,[
+    {label:'Portfolio',data:endLiq,borderColor:navy,backgroundColor:'rgba(4,30,47,0.07)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
+    {label:'Floor',data:floor,borderColor:orange,borderDash:[5,3],fill:false,pointRadius:0,borderWidth:1.5}
+  ],false,false);
+
+  mkChart('c2','bar',yrs,[
+    {label:'Pre-Tax',data:preTax,backgroundColor:'rgba(4,30,47,0.85)',stack:'a'},
+    {label:'Roth',data:roth,backgroundColor:teal,stack:'a'},
+    {label:'Taxable',data:taxable,backgroundColor:orange,stack:'a'},
+    {label:'HSA',data:hsa,backgroundColor:green,stack:'a'}
+  ],true,true);
+
+  // Income bridge — first 12 years
+  var IY=[],iidx=[];
+  for(var i=0;i<Math.min(proj.years.length,12);i++){IY.push(String(proj.years[i]));iidx.push(i);}
+  mkChart('c3','bar',IY,[
+    {label:'Income',data:iidx.map(function(i){return proj.income[i]||0;}),backgroundColor:teal,borderRadius:2},
+    {label:'Withdrawals',data:iidx.map(function(i){return proj.withdrawals[i]||0;}),backgroundColor:orange,borderRadius:2}
+  ],false,true);
+
+  // Smile curve
+  mkChart('c4','bar',['Phase 1','Phase 2','Phase 3'],[
+    {label:'Base',data:[(sp.baseAnnual||0)/1000,(sp.baseAnnual||0)/1000,(sp.baseAnnual||0)/1000],backgroundColor:'rgba(4,30,47,0.75)',stack:'a',borderRadius:3},
+    {label:'Extra',data:[(sp.phase1Extra||0)/1000,(sp.phase2Extra||0)/1000,(sp.phase3Extra||0)/1000],backgroundColor:orange,stack:'a',borderRadius:3}
+  ],true,true);
+
+  // Survivor split at other person's death year
+  var splitYr = otherP.projectedDeathYear;
+  var jData = endLiq.map(function(v,i){return proj.years[kidx[i]]<=splitYr?v:null;});
+  var sData = endLiq.map(function(v,i){return proj.years[kidx[i]]>=splitYr?v:null;});
+  mkChart('c5','line',yrs,[
+    {label:'Joint Plan',data:jData,borderColor:navy,backgroundColor:'rgba(4,30,47,0.06)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
+    {label:longestN+' Survivor',data:sData,borderColor:plum,borderDash:[5,3],fill:false,tension:0.4,pointRadius:3,borderWidth:2}
+  ],false,true);
+}
+
+// ── LOAD FROM SHEET VIA APPS SCRIPT ────────────────────────────
+function loadData(){
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if(!sheetId){
+    $s('loading-overlay').style.display='none';
+    var b=$s('error-banner');
+    b.style.display='block';
+    b.textContent='⚠ No sheet connected. Please complete Setup first — go to the Setup Guide to connect your personal Google Sheet.';
+    return;
+  }
+
+  $s('loading-sub').textContent='Connecting to your Google Sheet…';
+
+  var cbName = 'rbp_cb_'+Date.now();
+  var timer = setTimeout(function(){
+    $s('loading-overlay').style.display='none';
+    var b=$s('error-banner');
+    b.style.display='block';
+    b.textContent='⚠ Timeout loading your plan. Make sure your sheet is shared with retireblueprintpro@gmail.com as Editor, then refresh.';
+    delete window[cbName];
+  }, 15000);
+
+  window[cbName] = function(data){
+    clearTimeout(timer);
+    delete window[cbName];
+    $s('loading-overlay').style.display='none';
+    if(data.error){
+      var b=$s('error-banner');
+      b.style.display='block';
+      b.textContent='⚠ Error reading your sheet: '+data.error+' — Make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.';
+      return;
+    }
+    try{ populate(data); }
+    catch(e){
+      var b=$s('error-banner');
+      b.style.display='block';
+      b.textContent='⚠ Error displaying data: '+e.message+' — Please fill in your Inputs tab and save, then refresh.';
+      console.error(e);
+    }
+  };
+
+  var s=document.createElement('script');
+  s.src=SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cbName+'&_='+Date.now();
+  s.onerror=function(){
+    clearTimeout(timer);
+    $s('loading-overlay').style.display='none';
+    var b=$s('error-banner');
+    b.style.display='block';
+    b.textContent='⚠ Network error. Check your internet connection and try refreshing.';
+  };
+  document.head.appendChild(s);
+}
+
+window.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>
