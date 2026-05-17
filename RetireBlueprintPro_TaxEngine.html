@@ -156,12 +156,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 <div class="nav">
   <a href="RetireBlueprintPro_Home.html">Home</a>
-  <a href="RetireBlueprintPro_CRAIG_AND_GENA_Personal.html">Dashboard</a>
+  <a href="RetireBlueprintPro_Dashboard.html">Dashboard</a>
   <a href="RetireBlueprintPro_Inputs.html">Inputs</a>
   <a href="RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="RetireBlueprintPro_TaxEngine.html" class="active">Tax Engine</a>
   <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
-  <a href="https://retireblueprintpro.netlify.app/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
   </div>
@@ -264,7 +264,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   <div>
     <div class="explainer orange">
       <div class="explainer-title">💡 The Roth Conversion Opportunity</div>
-      <div class="explainer-body">Between retirement and age 73 (when RMDs begin), your income is temporarily lower. This is your <strong>Roth conversion window</strong>. You can move money from Pre-Tax accounts to Roth at today's lower rate — locking in tax savings before RMDs force withdrawals at a higher rate. Your plan shows <strong>$10,211 in projected lifetime savings</strong> from converting now vs. waiting.</div>
+      <div class="explainer-body">Between retirement and age 73 (when RMDs begin), your income is temporarily lower. This is your <strong>Roth conversion window</strong>. You can move money from Pre-Tax accounts to Roth at today's lower rate — locking in tax savings before RMDs force withdrawals at a higher rate. Your plan shows <strong id="tax-roth-savings-text">significant projected lifetime savings</strong> from converting now vs. waiting.</div>
     </div>
     <div class="explainer slate">
       <div class="explainer-title">💡 Long-Term Capital Gains</div>
@@ -316,7 +316,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
     <div class="card-body">
       <div class="explainer orange" style="margin-bottom:12px;">
         <div class="explainer-title">⚠️ Watch Your MAGI in Conversion Years</div>
-        <div class="explainer-body">IRMAA (Income-Related Monthly Adjustment Amount) adds surcharges to Medicare Part B and D premiums when your MAGI exceeds the thresholds below. A large Roth conversion can accidentally push you into a higher IRMAA tier. Craig qualifies for Medicare at 65 (2028), Gena at 65 (2035). Plan conversions carefully around these thresholds.</div>
+        <div class="explainer-body">IRMAA (Income-Related Monthly Adjustment Amount) adds surcharges to Medicare Part B and D premiums when your MAGI exceeds the thresholds below. A large Roth conversion can accidentally push you into a higher IRMAA tier. <span id="tax-irmaa-note">Partner 1 qualifies for Medicare at 65, Partner 2 at 65. Plan conversions carefully around these thresholds.</span></div>
       </div>
       <table class="irmaa-table">
         <thead>
@@ -392,11 +392,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
       </div>
       <div class="explainer teal" style="margin-bottom:8px;">
         <div class="explainer-title">🔄 Social Security Tax Torpedo <span class="strat-badge strat-watch">Monitor 2033+</span></div>
-        <div class="explainer-body">When Gena's Social Security begins in 2033, combined SS income will be ~$54,722/year. Up to <strong>85% of SS benefits</strong> can become taxable income when combined income exceeds $44,000 (MFJ). Your plan accounts for this in the Master engine's income calculations. Watch effective rates in 2033-2040.</div>
+        <div class="explainer-body">When <span id="tax-p2-ss-note">your partner's</span> Social Security begins, combined SS income will be significant. Up to <strong>85% of SS benefits</strong> can become taxable income when combined income exceeds $44,000 (MFJ). Your plan accounts for this in the Master engine's income calculations. Watch effective rates in 2033-2040.</div>
       </div>
       <div class="explainer orange">
         <div class="explainer-title">⏰ RMD Planning Window <span class="strat-badge strat-prime">Prime Now</span></div>
-        <div class="explainer-body">Craig's RMDs begin at age 75 (~2038), Gena's at 75 (~2045). The years between now and RMD start are your window to reduce pre-tax balances through Roth conversions. <strong>Every $1 converted now</strong> reduces your future RMD obligation and the associated tax spike. The solver targets the 12% bracket ceiling as the optimal conversion threshold.</div>
+        <div class="explainer-body"><span id="tax-rmd-note">Partner 1 RMDs begin at age 75, Partner 2 at 75. The years between now and RMD start are your window to reduce pre-tax balances through Roth conversions. <strong>Every $1 converted now</strong> reduces your future RMD obligation and the associated tax spike.</span></div>
       </div>
     </div>
   </div>
@@ -445,7 +445,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
           </tbody>
         </table>
         <div style="padding:10px 12px;font-size:9px;color:var(--muted);font-style:italic;">
-          Craig RMD start: age 75 (2038) · Gena RMD start: age 75 (2045).<br>
+          <span id="tax-rmd-footer">Partner 1 RMD start: age 75 · Partner 2 RMD start: age 75.</span><br>
           RMD = Prior year-end balance ÷ Distribution Period.
         </div>
       </div>
@@ -457,7 +457,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 </div><!-- end .page -->
 
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTf0jPpdaqNEgkdo5B-RoiVODh2VZ6qDmOtbLXkGHYpZ_2waXaJLjgLout4Ar7QHDo/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 
 // MFJ 2026 federal brackets with muted premium colors
 var BRACKETS = [
@@ -521,7 +521,7 @@ function renderBrackets(taxableIncome) {
 function renderTimeline(proj, tax) {
   if (!proj) return;
   var keyYears = [2026,2028,2030,2033,2035,2040,2045,2050,2055,2060,2070];
-  var events = {2026:'Craig retires',2028:'Gena retires',2033:'Gena SS starts',2035:'',2038:'Craig RMDs',2040:'',2045:'Gena RMDs',2050:'',2055:'Plan arc',2060:'',2070:''};
+  var events = {}; // populated dynamically from sheet data
   var maxInc = 0;
   keyYears.forEach(function(yr){
     var idx=proj.years.indexOf(yr);
@@ -606,7 +606,8 @@ function loadData() {
   var cb='tax_'+Date.now();
   window[cb]=function(data){ delete window[cb]; populate(data); };
   var s=document.createElement('script');
-  s.src=SCRIPT_URL+'?callback='+cb;
+  var _sid=localStorage.getItem('rbp_sheet_id')||'';
+  s.src=SCRIPT_URL+'?callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
   s.onerror=function(){ delete window[cb]; populate({}); document.getElementById('status-msg').textContent='Using embedded data -- connect your sheet for live values'; };
   setTimeout(function(){if(window[cb]){delete window[cb];populate({});} },8000);
   document.head.appendChild(s);

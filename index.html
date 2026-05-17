@@ -142,12 +142,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 <div class="nav">
   <a href="RetireBlueprintPro_Home.html" class="active">Home</a>
-  <a href="RetireBlueprintPro_CRAIG_AND_GENA_Personal.html">Dashboard</a>
+  <a href="RetireBlueprintPro_Dashboard.html">Dashboard</a>
   <a href="RetireBlueprintPro_Inputs.html">Inputs</a>
   <a href="RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
-  <a href="https://retireblueprintpro.netlify.app/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
   </div>
@@ -156,11 +156,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 <div class="command-strip">
   <div class="command-inner">
     <div class="plan-meta">
-      <div class="meta-item"><div class="mi-lbl">Partners</div><div class="mi-val" id="m-names">Craig 63 · Gena 55</div></div>
+      <div class="meta-item"><div class="mi-lbl">Partners</div><div class="mi-val" id="m-names">— · —</div></div>
       <div class="meta-item"><div class="mi-lbl">Plan Year</div><div class="mi-val" id="m-year">2026</div></div>
       <div class="meta-item"><div class="mi-lbl">Phase</div><div class="mi-val">Transition</div></div>
       <div class="meta-item"><div class="mi-lbl">Scenario</div><div class="mi-val">Base Case</div></div>
-      <div class="meta-item"><div class="mi-lbl">Runway</div><div class="mi-val" id="m-runway">49 yrs (Gena)</div></div>
+      <div class="meta-item"><div class="mi-lbl">Runway</div><div class="mi-val" id="m-runway">—</div></div>
       <div class="meta-item"><div class="mi-lbl">Inflation</div><div class="mi-val">3.0% / yr</div></div>
       <div class="meta-item"><div class="mi-lbl">SS COLA</div><div class="mi-val">2.5% / yr</div></div>
     </div>
@@ -203,7 +203,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
     <div class="kpi">
       <div class="kpi-lbl">Survivor Runway</div>
       <div class="kpi-val" id="kpi-runway">49 yrs</div>
-      <div class="kpi-sub">Gena covered to 105</div>
+      <div class="kpi-sub" id="kpi-runway-sub">Survivor covered</div>
     </div>
   </div>
 
@@ -211,7 +211,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   <div class="section-lbl">Planning Tools</div>
   <div class="apps-primary">
 
-    <a href="RetireBlueprintPro_CRAIG_AND_GENA_Personal.html" class="app-card">
+    <a href="RetireBlueprintPro_Dashboard.html" class="app-card">
       <div class="app-card-accent navy"></div>
       <div class="app-card-inner">
         <div><span class="app-tag tag-primary"><span class="live-dot"></span> Live</span></div>
@@ -304,7 +304,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
       </div>
       <div><div class="sheet-name">Inputs Form</div><div class="sheet-desc">Enter your data</div></div>
     </a>
-    <a href="https://retireblueprintpro.netlify.app/sheet.html?gid=938499920" target="_blank" class="sheet-card">
+    <a href="https://genabreal.github.io/RetireBlueprintPro/sheet.html?gid=938499920" target="_blank" class="sheet-card">
       <div class="sheet-icon-box" style="background:#1a3a52;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
       </div>
@@ -337,7 +337,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 </div>
 
 <script>
-var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwTf0jPpdaqNEgkdo5B-RoiVODh2VZ6qDmOtbLXkGHYpZ_2waXaJLjgLout4Ar7QHDo/exec';
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 function fmt(n){if(!n&&n!==0)return'--';if(Math.abs(n)>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString();}
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function loadData(){
@@ -346,7 +346,8 @@ function loadData(){
     delete window[cb];
     try{
       var p=d.people,port=d.portfolio,sp=d.spending,leg=d.legacy,tax=d.tax,meta=d.meta;
-      var craig=p.craig,gena=p.gena;
+      var p1=p.craig||p.person1||{},p2=p.gena||p.person2||{};
+      var craig=p1,gena=p2;
       var runway=gena.projectedDeathYear-meta.planYear;
       set('k-confidence','98%');
       set('k-portfolio',fmt(port.total));
@@ -359,14 +360,16 @@ function loadData(){
       set('kpi-legacy',leg.achievedPct>=100?'Met ✓':Math.round(leg.achievedPct)+'%');
       set('kpi-roth',fmt(tax.rothConversionSavings));
       set('kpi-runway',runway+' yrs');
+      set('kpi-runway-sub',p2.name+' covered to '+p2.projectedDeathAge);
       set('m-names',craig.name+' '+craig.age+' · '+gena.name+' '+gena.age);
       set('m-year',meta.planYear);
-      set('m-runway',runway+' yrs ('+gena.name+')');
+      set('m-runway',runway+' yrs ('+p2.name+')');
       set('m-status',leg.achievedPct>=100?'ON TRACK · Legacy Goal Met':'REVIEW PLAN');
     }catch(e){}
   };
   var s=document.createElement('script');
-  s.src=SCRIPT_URL+'?callback='+cb;
+  var _sid=localStorage.getItem('rbp_sheet_id')||'';
+  s.src=SCRIPT_URL+'?callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
   s.onerror=function(){delete window[cb];};
   setTimeout(function(){if(window[cb])delete window[cb];},6000);
   document.head.appendChild(s);

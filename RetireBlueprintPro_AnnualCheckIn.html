@@ -95,12 +95,12 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
 
 <div class="nav">
   <a href="RetireBlueprintPro_Home.html">Home</a>
-  <a href="RetireBlueprintPro_CRAIG_AND_GENA_Personal.html">Dashboard</a>
+  <a href="RetireBlueprintPro_Dashboard.html">Dashboard</a>
   <a href="RetireBlueprintPro_Inputs.html">Inputs</a>
   <a href="RetireBlueprintPro_AnnualCheckIn.html" class="active">Annual Check-In</a>
   <a href="RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
-  <a href="https://retireblueprintpro.netlify.app/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
   </div>
@@ -164,7 +164,7 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
 </div>
 
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTf0jPpdaqNEgkdo5B-RoiVODh2VZ6qDmOtbLXkGHYpZ_2waXaJLjgLout4Ar7QHDo/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 var checkInData = [];
 var currentYear = new Date().getFullYear();
 
@@ -191,7 +191,8 @@ function loadData() {
     }
   };
   var s = document.createElement('script');
-  s.src = SCRIPT_URL + '?callback=' + cb;
+  var _sid = localStorage.getItem('rbp_sheet_id')||'';
+  s.src = SCRIPT_URL + '?callback=' + cb + '&sheetId=' + encodeURIComponent(_sid) + '&_=' + Date.now();
   s.onerror = function() { delete window[cb]; loadEmbedded(); };
   setTimeout(function() { if(window[cb]) { delete window[cb]; loadEmbedded(); } }, 8000);
   document.head.appendChild(s);
@@ -217,7 +218,7 @@ function loadEmbedded() {
 
 function renderTable(data) {
   var html = '<table><thead><tr>' +
-    '<th>Year</th><th>Craig Age</th><th>Gena Age</th>' +
+    '<th>Year</th><th>' + (window._p1Name||'Partner 1') + ' Age</th><th>' + (window._p2Name||'Partner 2') + ' Age</th>' +
     '<th>Projected Balance</th><th>Actual Balance</th>' +
     '<th>Variance</th><th>Status</th><th>Notes / Life Events</th>' +
     '</tr></thead><tbody>';
@@ -225,8 +226,8 @@ function renderTable(data) {
   checkInData.forEach(function(row, idx) {
     var isCurrent = row.year === currentYear - 1;
     var isPast    = row.year < currentYear;
-    var craigAge  = 63 + (row.year - 2026);
-    var genaAge   = 55 + (row.year - 2026);
+    var craigAge  = (window._p1Age||63) + (row.year - (window._planYear||2026));
+    var genaAge   = (window._p2Age||55) + (row.year - (window._planYear||2026));
 
     var varClass = '';
     var varStr   = '--';
@@ -247,7 +248,7 @@ function renderTable(data) {
 
     html += '<tr' + (isCurrent ? ' class="current-year"' : '') + '>' +
       '<td><strong>' + row.year + '</strong>' + (isCurrent ? ' ← Enter now' : '') + '</td>' +
-      '<td>' + craigAge + (row.year > 2055 ? ' <span style="color:#999;font-size:9px;">(est)</span>' : '') + '</td>' +
+      '<td>' + craigAge + (row.year > (window._p1DeathYear||2055) ? ' <span style="color:#999;font-size:9px;">(est)</span>' : '') + '</td>' +
       '<td>' + genaAge + '</td>' +
       '<td>' + fmt(row.projected) + '</td>' +
       '<td><input type="number" class="' + inputClass + '" id="actual-' + idx +
@@ -357,7 +358,8 @@ function saveCheckIn() {
 
   var payload = { action: 'saveCheckIn', checkIn: updates };
   var s = document.createElement('script');
-  s.src = SCRIPT_URL + '?action=save&callback=' + cb + '&data=' + encodeURIComponent(JSON.stringify(payload));
+  var _sid2 = localStorage.getItem('rbp_sheet_id')||'';
+  s.src = SCRIPT_URL + '?action=save&callback=' + cb + '&sheetId=' + encodeURIComponent(_sid2) + '&data=' + encodeURIComponent(JSON.stringify(payload));
   s.onerror = function() {
     delete window[cb];
     document.getElementById('save-msg').textContent = 'Connection error -- update your Apps Script first.';

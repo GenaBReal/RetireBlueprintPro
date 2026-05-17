@@ -182,12 +182,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 <!-- NAV -->
 <div class="nav">
   <a href="RetireBlueprintPro_Home.html">Home</a>
-  <a href="RetireBlueprintPro_CRAIG_AND_GENA_Personal.html">Dashboard</a>
+  <a href="RetireBlueprintPro_Dashboard.html">Dashboard</a>
   <a href="RetireBlueprintPro_Inputs.html" class="active">Inputs</a>
   <a href="RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
-  <a href="https://retireblueprintpro.netlify.app/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
   </div>
@@ -356,7 +356,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Date of Birth</label>
-            <input type="date" id="f-B32" value="">
+            <input type="date" id="f-B32" value="" onchange="calcAge('f-B32','f-B33','f-B35','f-B36')">
           </div>
           <div class="field">
             <label>Current Age</label>
@@ -365,7 +365,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Projected Age of Death</label>
-            <input type="number" id="f-B35" value="" min="70" max="120">
+            <input type="number" id="f-B35" value="" min="70" max="120" onchange="onDeathAgeChange('f-B33','f-B35','f-B36')">
+          </div>
+          <div class="field">
+            <label>Projected Death Year</label>
+            <input type="number" id="f-B36" value="" readonly>
+            <span class="hint">Auto-calculated</span>
           </div>
           <div class="field">
             <label>Annual Salary ($)</label>
@@ -394,11 +399,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>SS Base Benefit (at FRA)</label>
-              <input type="number" id="f-B40" value="0">
+              <input type="number" id="f-B40" value="0" onchange="calcSSMonthly('f-B40','f-B41','f-B44','f-B33','f-B43')">
             </div>
             <div class="field">
               <label>Full Retirement Age</label>
-              <input type="number" id="f-B41" value="67" min="62" max="72">
+              <input type="number" id="f-B41" value="67" min="62" max="72" onchange="calcSSMonthly('f-B40','f-B41','f-B44','f-B33','f-B43')">
             </div>
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
@@ -407,7 +412,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>SS Start Date</label>
-              <input type="date" id="f-B44" value="">
+              <input type="date" id="f-B44" value="" onchange="calcSSMonthly('f-B40','f-B41','f-B44','f-B33','f-B43')">
             </div>
           </div>
         </div>
@@ -458,7 +463,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Date of Birth</label>
-            <input type="date" id="f-D32" value="">
+            <input type="date" id="f-D32" value="" onchange="calcAge('f-D32','f-D33','f-D35','f-D36')">
           </div>
           <div class="field">
             <label>Current Age</label>
@@ -467,7 +472,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Projected Age of Death</label>
-            <input type="number" id="f-D35" value="" min="70" max="120">
+            <input type="number" id="f-D35" value="" min="70" max="120" onchange="onDeathAgeChange('f-D33','f-D35','f-D36')">
+          </div>
+          <div class="field">
+            <label>Projected Death Year</label>
+            <input type="number" id="f-D36" value="" readonly>
+            <span class="hint">Auto-calculated</span>
           </div>
           <div class="field">
             <label>Annual Salary ($)</label>
@@ -496,11 +506,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>SS Base Benefit (at FRA)</label>
-              <input type="number" id="f-D40" value="0">
+              <input type="number" id="f-D40" value="0" onchange="calcSSMonthly('f-D40','f-D41','f-D44','f-D33','f-D43')">
             </div>
             <div class="field">
               <label>Full Retirement Age</label>
-              <input type="number" id="f-D41" value="67" min="62" max="72">
+              <input type="number" id="f-D41" value="67" min="62" max="72" onchange="calcSSMonthly('f-D40','f-D41','f-D44','f-D33','f-D43')">
             </div>
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
@@ -509,7 +519,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>SS Start Date</label>
-              <input type="date" id="f-D44" value="">
+              <input type="date" id="f-D44" value="" onchange="calcSSMonthly('f-D40','f-D41','f-D44','f-D33','f-D43')">
             </div>
           </div>
         </div>
@@ -990,6 +1000,65 @@ function updateExpenseTotal() {
   document.getElementById('total-annual').textContent = '$' + (total*12).toLocaleString();
 }
 
+// ── AGE, DEATH YEAR & SS CALCULATIONS ────────────────────────
+function calcAge(dobId, ageId, deathAgeId, deathYearId) {
+  var dob = new Date(document.getElementById(dobId).value);
+  var ageEl = document.getElementById(ageId);
+  if (isNaN(dob) || !ageEl) return;
+  var today = new Date();
+  var age = today.getFullYear() - dob.getFullYear();
+  if (today.getMonth() < dob.getMonth() ||
+     (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())) age--;
+  ageEl.value = age;
+  // Recalculate death year if death age is set
+  onDeathAgeChange(ageId, deathAgeId, deathYearId);
+  markDirty();
+}
+
+function onDeathAgeChange(ageId, deathAgeId, deathYearId) {
+  var age = parseInt((document.getElementById(ageId)||{}).value);
+  var deathAge = parseInt((document.getElementById(deathAgeId)||{}).value);
+  var deathYearEl = document.getElementById(deathYearId);
+  if (!deathYearEl || isNaN(age) || isNaN(deathAge)) return;
+  var planYear = parseInt(document.getElementById('f-B6').value) || new Date().getFullYear();
+  deathYearEl.value = planYear + (deathAge - age);
+  markDirty();
+}
+
+function calcSSMonthly(baseId, fraId, startDateId, ageId, monthlyId) {
+  var base = parseFloat((document.getElementById(baseId)||{}).value) || 0;
+  var fra  = parseFloat((document.getElementById(fraId)||{}).value)  || 67;
+  var startDateEl = document.getElementById(startDateId);
+  var ageEl = document.getElementById(ageId);
+  var monthlyEl = document.getElementById(monthlyId);
+  if (!monthlyEl || base <= 0) return;
+  // If no start date, just use base as monthly
+  if (!startDateEl || !startDateEl.value || !ageEl || !ageEl.value) {
+    monthlyEl.value = Math.round(base);
+    markDirty(); return;
+  }
+  var startDate = new Date(startDateEl.value);
+  var currentAge = parseFloat(ageEl.value) || fra;
+  var startAge = currentAge + ((startDate - new Date()) / (1000 * 60 * 60 * 24 * 365.25));
+  // SS adjustment: +8%/yr after FRA (delayed credits), -6.67%/yr before FRA (for first 36 mo), -5%/yr beyond that
+  var monthsDiff = Math.round((startAge - fra) * 12);
+  var adjusted;
+  if (monthsDiff >= 0) {
+    // Delayed — 8% per year credit
+    adjusted = base * (1 + (monthsDiff / 12) * 0.08);
+  } else {
+    // Early reduction
+    var earlyMonths = Math.abs(monthsDiff);
+    if (earlyMonths <= 36) {
+      adjusted = base * (1 - earlyMonths * (5/9/100));
+    } else {
+      adjusted = base * (1 - 36*(5/9/100) - (earlyMonths-36)*(5/12/100));
+    }
+  }
+  monthlyEl.value = Math.max(0, Math.round(adjusted));
+  markDirty();
+}
+
 // ── PARTNER NAMES ────────────────────────────────────────────
 function updatePartnerNames() {
   var p1 = document.getElementById('f-B31').value || 'Partner 1';
@@ -1088,14 +1157,27 @@ function populateFromData(d) {
   setVal('f-B21', (tax.ssCola*100).toFixed(1));
   setVal('f-B26', (tax.stateRate*100).toFixed(1));
 
-  // Craig
+  // Partner 1
+  setVal('f-B32', p.craig.dob || '');
+  setVal('f-B33', p.craig.age);
+  setVal('f-B35', p.craig.projectedDeathAge);
+  setVal('f-B36', p.craig.projectedDeathYear);
   setVal('f-B37', p.craig.salary);
   setVal('f-B43', p.craig.ssMonthly);
+  setVal('f-B44', p.craig.ssStartDate || '');
   setVal('f-B46', p.craig.pension);
+  setVal('f-B49', p.craig.otherIncome);
 
-  // Gena
+  // Partner 2
+  setVal('f-D32', p.gena.dob || '');
+  setVal('f-D33', p.gena.age);
+  setVal('f-D35', p.gena.projectedDeathAge);
+  setVal('f-D36', p.gena.projectedDeathYear);
   setVal('f-D37', p.gena.salary);
   setVal('f-D43', p.gena.ssMonthly);
+  setVal('f-D44', p.gena.ssStartDate || '');
+  setVal('f-D46', p.gena.pension);
+  setVal('f-D49', p.gena.otherIncome);
 
   // Solver
   setTxt('s-extra',  fmt(sp.safeExtra));
@@ -1267,6 +1349,7 @@ function buildPayload() {
       B32: document.getElementById('f-B32').value,
       B34: document.getElementById('f-B34').value,
       B35: document.getElementById('f-B35').value,
+      B36: document.getElementById('f-B36') ? document.getElementById('f-B36').value : '',
       B37: document.getElementById('f-B37').value,
       B39: document.getElementById('f-B39').value,
       B40: document.getElementById('f-B40').value,
@@ -1286,6 +1369,7 @@ function buildPayload() {
       D32: document.getElementById('f-D32').value,
       D34: document.getElementById('f-D34').value,
       D35: document.getElementById('f-D35').value,
+      D36: document.getElementById('f-D36') ? document.getElementById('f-D36').value : '',
       D37: document.getElementById('f-D37').value,
       D39: document.getElementById('f-D39').value,
       D40: document.getElementById('f-D40').value,

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RetireBlueprint Pro — Craig & Gena's Dashboard</title>
+<title>RetireBlueprint Pro — Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:1200px;}
@@ -160,7 +160,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
       Social Security, savings, monthly spending — and your
       50-year projection updates instantly with your actual plan.
     </div>
-    <a href="https://retireblueprintpro.netlify.app/RetireBlueprintPro_Inputs.html" class="rbp-ov-btn">📝 &nbsp;Enter My Real Numbers Now</a>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" class="rbp-ov-btn">📝 &nbsp;Enter My Real Numbers Now</a>
     <button class="rbp-ov-skip" onclick="rbpCloseOverlay()">I'll do this later — show me the demo dashboard</button>
   </div>
 </div>
@@ -185,7 +185,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div class="hero-stat">
       <div class="hs-label">Last Updated</div>
       <div class="hs-value white" style="font-size:18px;" id="val-updated">May 2026</div>
-      <div class="hs-sub muted">Craig 63 · Gena 55</div>
+      <div class="hs-sub muted"></div>
     </div>
   </div>
 </div>
@@ -207,12 +207,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 
 <div style="background:#0A3145;padding:0;display:flex;align-items:stretch;border-top:1px solid #1a3a52;">
   <a href="RetireBlueprintPro_Home.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;">Home</a>
-  <a href="RetireBlueprintPro_CRAIG_AND_GENA_Personal.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#f4b86a;">Dashboard</a>
+  <a href="RetireBlueprintPro_Dashboard.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#f4b86a;">Dashboard</a>
   <a href="RetireBlueprintPro_Inputs.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;">Inputs</a>
   <a href="RetireBlueprintPro_AnnualCheckIn.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;">Annual Check-In</a>
   <a href="RetireBlueprintPro_TaxEngine.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;">Tax Engine</a>
   <a href="RetireBlueprintPro_SetupGuide.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;">Setup Guide</a>
-  <a href="https://retireblueprintpro.netlify.app/sheet.html?gid=938499920" target="_blank" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;">Master Sheet</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/sheet.html?gid=938499920" target="_blank" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;">Master Sheet</a>
   <a href="onboard.html" style="font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;display:flex;align-items:center;color:#f4b86a;">✏️ Update My Plan</a>
   <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;margin-left:auto;"></span>
 </div>
@@ -313,7 +313,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
         <div class="kc-title"><span class="kc-dot" style="background:#1CC7D0;"></span>2026 Household Income</div>
         <div class="kc-value" id="kpi-income-val">$144,523</div>
         <div class="kc-sub" id="kpi-income-sub">Total guaranteed income this year</div>
-        <div class="kc-delta-watch">⚠ Craig retires June 2026 · Transition year</div>
+        <div class="kc-delta-watch">⚠ Transition year · verify with your Inputs</div>
       </div>
       <div>
         <span class="badge-watch">Craig SS starts July 2026</span>
@@ -357,7 +357,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div class="engine">
       <div class="eng-hdr">
         <div class="eng-hdr-title">Income Engine</div>
-        <div class="eng-hdr-sub">Craig retires June 2026 · Gena 2028</div>
+        <div class="eng-hdr-sub">Loading…</div>
       </div>
       <div class="eng-body">
         <div class="eng-rows">
@@ -417,7 +417,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div class="engine">
       <div class="eng-hdr">
         <div class="eng-hdr-title">Social Security Engine</div>
-        <div class="eng-hdr-sub">Craig July 2026 · Gena 2033</div>
+        <div class="eng-hdr-sub">Loading…</div>
       </div>
       <div class="eng-body">
         <div class="eng-rows">
@@ -495,7 +495,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
       <div class="chart-title">Household Income Bridge</div>
       <div class="chart-sub">Salary → Social Security + Pension · Gena Social Security starts 2033</div>
       <div class="chart-area"><canvas id="c3"></canvas></div>
-      <div class="chart-note">Gena Social Security: <strong>$25,397/yr</strong> from 2033 · Craig pension: $5,760/yr</div>
+      <div class="chart-note"></div>
     </div>
     </div>
 
@@ -530,7 +530,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div style="grid-column:2/4;min-width:0;">
       <div class="chart-card">
       <div class="chart-title">Survivor Plan — Gena's Plan Runs to Age 105 (2075)</div>
-      <div class="chart-sub">Joint plan 2026–2055 · Gena survivor plan 2056–2075 · 25% expense reduction after Craig</div>
+      <div class="chart-sub">Joint plan · Survivor plan</div>
       <div class="chart-area"><canvas id="c5"></canvas></div>
       <div class="chart-note">2055 handoff at <strong>$1,589,321</strong> · Gena plan ends at $250,062 · Goal met ✅</div>
     </div>

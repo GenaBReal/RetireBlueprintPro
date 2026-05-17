@@ -216,11 +216,11 @@ function showConnected(id){
 function updateLinks(id){
   if(!id) return;
   var qs = '?sheetId=' + encodeURIComponent(id);
-  document.getElementById('nav-dash').href     = NETLIFY + '/RetireBlueprintPro_CRAIG_AND_GENA_Personal.html' + qs;
+  document.getElementById('nav-dash').href     = NETLIFY + '/RetireBlueprintPro_Dashboard.html' + qs;
   document.getElementById('nav-inputs').href   = NETLIFY + '/RetireBlueprintPro_Inputs.html' + qs;
   document.getElementById('nav-sheet').href    = 'https://docs.google.com/spreadsheets/d/' + id + '/edit';
   document.getElementById('go-inputs').href    = NETLIFY + '/RetireBlueprintPro_Inputs.html' + qs;
-  document.getElementById('go-dashboard').href = NETLIFY + '/RetireBlueprintPro_CRAIG_AND_GENA_Personal.html' + qs;
+  document.getElementById('go-dashboard').href = NETLIFY + '/RetireBlueprintPro_Dashboard.html' + qs;
 }
 </script>
 </body>
