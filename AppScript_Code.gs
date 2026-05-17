@@ -44,18 +44,26 @@ function readAll(sheetId) {
   function dt(val)  { if(!val) return ''; try{var d=new Date(val);return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();}catch(e){return String(val);} }
 
   var craig = {
-    name:v('B31'), age:Number(v('B33')), projectedDeathAge:Number(v('B35')),
+    name:v('B31'), dob:dt(v('B32')), age:Number(v('B33')), projectedDeathAge:Number(v('B35')),
     projectedDeathYear:Number(v('B36')), salary:Number(v('B37')),
+    retirementDate:dt(v('B39')), ssBase:Number(v('B40')), ssFra:Number(v('B41')),
     ssMonthly:Number(v('B43')), ssAnnual:Number(v('B43'))*12,
     ssStartDate:dt(v('B44')), pension:Number(v('B46')), pensionAnnual:Number(v('B46'))*12,
-    otherIncome:Number(v('B49')), theme:String(v('B34')),
+    pensionStart:dt(v('B47')), otherIncome:Number(v('B49')),
+    otherStart:dt(v('B50')), otherEnd:dt(v('B51')),
+    healthPreMedicare:Number(v('B52')), healthMedicare:Number(v('B53')),
+    theme:String(v('B34')),
   };
   var gena = {
-    name:v('D31'), age:Number(v('D33')), projectedDeathAge:Number(v('D35')),
+    name:v('D31'), dob:dt(v('D32')), age:Number(v('D33')), projectedDeathAge:Number(v('D35')),
     projectedDeathYear:Number(v('D36')), salary:Number(v('D37')),
+    retirementDate:dt(v('D39')), ssBase:Number(v('D40')), ssFra:Number(v('D41')),
     ssMonthly:Number(v('D43')), ssAnnual:Number(v('D43'))*12,
-    ssStartDate:dt(v('D44')), pension:Number(v('D46')), pensionAnnual:0,
-    otherIncome:Number(v('D49')), theme:String(v('D34')),
+    ssStartDate:dt(v('D44')), pension:Number(v('D46')), pensionAnnual:Number(v('D46'))*12,
+    pensionStart:dt(v('D47')), otherIncome:Number(v('D49')),
+    otherStart:dt(v('D50')), otherEnd:dt(v('D51')),
+    healthPreMedicare:Number(v('D52')), healthMedicare:Number(v('D53')),
+    theme:String(v('D34')),
   };
 
   var acctRows = inp.getRange('A105:H116').getValues();
@@ -118,6 +126,16 @@ function readAll(sheetId) {
       effectiveRate:Number(v('B22')), stateRate:pct(v('B26')), standardDeduction:Number(v('B25')),
       rothConversionSavings:Number(v('B146')), inflation:Number(v('B20')), ssCola:Number(v('B21')),
       healthcareInflation:pct(v('B28')), brackets:brackets,
+    },
+    global:{
+      planYear:planYear, legacyGoal:Number(v('B8')), safetyFloor:Number(v('B9')),
+      survivorReduction:Number(v('B10')), assumeExtraSpend:String(v('B11')),
+      stressEarly:String(v('B12')), stressEarlyStart:Number(v('B13')),
+      stressEarlyDur:Number(v('B14')), stressEarlyDrag:pct(v('B15')),
+      stressLate:String(v('B16')), stressLateStart:Number(v('B17')),
+      stressLateDur:Number(v('B18')), stressLateDrag:pct(v('B19')),
+      filingStatus:String(v('B24')), standardDeduction:Number(v('B25')),
+      projectionMaxYears:Number(v('B7')),
     },
     roth:{ year:Number(v('B139')), bracket:String(v('B141')),
       optimalAmount:Number(v('B143')), taxSavings:Number(v('B146')) },

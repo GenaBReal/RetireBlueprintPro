@@ -157,6 +157,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 <body>
 
 <!-- HEADER -->
+<div class="data-loading-overlay" id="data-loading-overlay">
+  <div class="dl-spinner"></div>
+  <div class="dl-text">Loading Your Plan Data…</div>
+  <div class="dl-sub" id="dl-sub">Connecting to your Google Sheet</div>
+</div>
+<div class="toast" id="toast"></div>
 <div class="header">
   <div class="header-inner">
     <div class="header-logo">
@@ -1114,6 +1120,13 @@ function markDirty() {
   document.getElementById('status-msg').textContent = 'Unsaved changes — click Save All Changes when ready';
   document.getElementById('status-msg').className = 'status-msg';
 }
+window.addEventListener('beforeunload', function(e) {
+  if (isDirty) {
+    e.preventDefault();
+    e.returnValue = 'You have unsaved changes. Leave without saving?';
+    return e.returnValue;
+  }
+});
 
 document.querySelectorAll('input, select').forEach(function(el) {
   el.addEventListener('change', markDirty);
@@ -1121,65 +1134,147 @@ document.querySelectorAll('input, select').forEach(function(el) {
 });
 
 // ── LOAD LIVE DATA ────────────────────────────────────────────
+function hideLoadingOverlay() {
+  var ov = document.getElementById('data-loading-overlay');
+  if (ov) ov.classList.add('hidden');
+}
+
 function loadLiveData() {
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) {
+    hideLoadingOverlay();
+    setStatus('⚠ No sheet connected — complete Setup Guide first.', 'error');
+    showToast('⚠ No sheet connected — go to Setup Guide first.', 'error');
+    return;
+  }
+  document.getElementById('dl-sub').textContent = 'Reading your Google Sheet…';
   var callbackName = 'inputsCallback_' + Date.now();
   window[callbackName] = function(data) {
+    delete window[callbackName];
+    hideLoadingOverlay();
+    if (data && data.error) {
+      setStatus('⚠ Error loading sheet: ' + data.error, 'error');
+      showToast('⚠ Could not load sheet data. Is it shared with retireblueprintpro@gmail.com?', 'error');
+      return;
+    }
     try {
       populateFromData(data);
-      setStatus('Live data loaded from Google Sheet', 'success');
+      setStatus('Live data loaded from your Google Sheet', 'success');
+      showToast('✅ Plan data loaded from your sheet!', '');
       document.getElementById('save-btn').disabled = false;
     } catch(e) {
-      setStatus('Loaded with demo data', '');
+      setStatus('Data loaded with errors: ' + e.message, '');
     }
-    delete window[callbackName];
   };
   var s = document.createElement('script');
-  s.src = scriptUrl('read') + '&callback=' + callbackName;
-  s.onerror = function() { setStatus('Using demo data -- connect your sheet to see live values', ''); };
-  setTimeout(function() { if(window[callbackName]) { delete window[callbackName]; setStatus('Using demo data', ''); } }, 8000);
+  s.src = scriptUrl('read') + '&callback=' + callbackName + '&_=' + Date.now();
+  s.onerror = function() {
+    hideLoadingOverlay();
+    setStatus('⚠ Connection error — check your internet and try refreshing.', 'error');
+    showToast('⚠ Connection error loading your sheet.', 'error');
+  };
+  setTimeout(function() {
+    if (window[callbackName]) {
+      delete window[callbackName];
+      hideLoadingOverlay();
+      setStatus('⚠ Timeout — make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.', 'error');
+      showToast('⚠ Timed out loading your sheet.', 'error');
+    }
+  }, 15000);
   document.head.appendChild(s);
 }
 
 function populateFromData(d) {
   if (!d || !d.people) return;
   var p = d.people, tax = d.tax, sp = d.spending, leg = d.legacy, meta = d.meta;
+  var gl = d.global || {};
 
-  // Names
-  setVal('f-B31', p.craig.name);
-  setVal('f-D31', p.gena.name);
-  updatePartnerNames();
-
-  // Global
+  // ── Global Settings ──────────────────────────────────
   setVal('f-B6',  meta.planYear);
+  setVal('f-B7',  gl.projectionMaxYears);
   setVal('f-B8',  leg.goal);
   setVal('f-B9',  leg.safetyFloor);
-  setVal('f-B20', (tax.inflation*100).toFixed(1));
-  setVal('f-B21', (tax.ssCola*100).toFixed(1));
-  setVal('f-B26', (tax.stateRate*100).toFixed(1));
+  setVal('f-B10', gl.survivorReduction);
+  setVal('f-B11', gl.assumeExtraSpend);
+  setVal('f-B12', gl.stressEarly);
+  setVal('f-B13', gl.stressEarlyStart);
+  setVal('f-B14', gl.stressEarlyDur);
+  setVal('f-B15', gl.stressEarlyDrag ? (gl.stressEarlyDrag*100).toFixed(1) : '');
+  setVal('f-B16', gl.stressLate);
+  setVal('f-B17', gl.stressLateStart);
+  setVal('f-B18', gl.stressLateDur);
+  setVal('f-B19', gl.stressLateDrag ? (gl.stressLateDrag*100).toFixed(1) : '');
+  setVal('f-B20', tax.inflation ? (tax.inflation*100).toFixed(1) : '');
+  setVal('f-B21', tax.ssCola   ? (tax.ssCola*100).toFixed(1)   : '');
+  setVal('f-B24', gl.filingStatus);
+  setVal('f-B25', gl.standardDeduction || tax.standardDeduction);
+  setVal('f-B26', tax.stateRate ? (tax.stateRate*100).toFixed(1) : '');
+  setVal('f-B28', tax.healthcareInflation ? (tax.healthcareInflation*100).toFixed(1) : '');
 
-  // Partner 1
-  setVal('f-B32', p.craig.dob || '');
+  // ── Partner 1 ─────────────────────────────────────────
+  setVal('f-B31', p.craig.name);
+  setVal('f-B34', p.craig.theme);
+  setDOB('f-B32', p.craig.dob);
   setVal('f-B33', p.craig.age);
   setVal('f-B35', p.craig.projectedDeathAge);
   setVal('f-B36', p.craig.projectedDeathYear);
   setVal('f-B37', p.craig.salary);
+  setDate('f-B39', p.craig.retirementDate);
+  setVal('f-B40', p.craig.ssBase);
+  setVal('f-B41', p.craig.ssFra || 67);
   setVal('f-B43', p.craig.ssMonthly);
-  setVal('f-B44', p.craig.ssStartDate || '');
+  setDate('f-B44', p.craig.ssStartDate);
   setVal('f-B46', p.craig.pension);
+  setDate('f-B47', p.craig.pensionStart);
   setVal('f-B49', p.craig.otherIncome);
+  setDate('f-B50', p.craig.otherStart);
+  setDate('f-B51', p.craig.otherEnd);
+  setVal('f-B52', p.craig.healthPreMedicare);
+  setVal('f-B53', p.craig.healthMedicare);
+  updateTheme(1, p.craig.theme || 'Steel Blue');
 
-  // Partner 2
-  setVal('f-D32', p.gena.dob || '');
+  // ── Partner 2 ─────────────────────────────────────────
+  setVal('f-D31', p.gena.name);
+  setVal('f-D34', p.gena.theme);
+  setDOB('f-D32', p.gena.dob);
   setVal('f-D33', p.gena.age);
   setVal('f-D35', p.gena.projectedDeathAge);
   setVal('f-D36', p.gena.projectedDeathYear);
   setVal('f-D37', p.gena.salary);
+  setDate('f-D39', p.gena.retirementDate);
+  setVal('f-D40', p.gena.ssBase);
+  setVal('f-D41', p.gena.ssFra || 67);
   setVal('f-D43', p.gena.ssMonthly);
-  setVal('f-D44', p.gena.ssStartDate || '');
+  setDate('f-D44', p.gena.ssStartDate);
   setVal('f-D46', p.gena.pension);
+  setDate('f-D47', p.gena.pensionStart);
   setVal('f-D49', p.gena.otherIncome);
+  setDate('f-D50', p.gena.otherStart);
+  setDate('f-D51', p.gena.otherEnd);
+  setVal('f-D52', p.gena.healthPreMedicare);
+  setVal('f-D53', p.gena.healthMedicare);
+  updateTheme(2, p.gena.theme || 'Frost Plum');
 
-  // Solver
+  updatePartnerNames();
+
+  // ── Accounts ──────────────────────────────────────────
+  if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length) {
+    accountsData = d.portfolio.accounts.map(function(a) {
+      return {
+        inc:  a.showInCalc || 'No',
+        name: a.name || '',
+        owner: a.owner || 'Joint',
+        type:  a.type || 'Pretax (Deferred)',
+        bal:   a.balance || 0,
+        ret:   a.expectedReturn || 0,
+        status: a.status || 'Use for Withdrawals',
+        dash:  a.showOnDashboard || 'No'
+      };
+    });
+    buildAccountsTable();
+  }
+
+  // ── Solver ────────────────────────────────────────────
   setTxt('s-extra',  fmt(sp.safeExtra));
   setTxt('s-phase1', fmt(sp.phase1Extra));
   setTxt('s-phase2', fmt(sp.phase2Extra));
@@ -1206,17 +1301,39 @@ function populateFromData(d) {
 function setVal(id, val) {
   var el = document.getElementById(id);
   if (!el || val === undefined || val === null) return;
-  // Always strip currency formatting before setting value
   if (typeof val === 'string') {
     val = val.replace(/[$,%]/g,'').replace(/,/g,'').trim();
   }
   if (el.type === 'number') {
     var n = parseFloat(val);
     el.value = isNaN(n) ? '' : n;
+  } else if (el.tagName === 'SELECT') {
+    // Try to match option value
+    for (var i=0; i<el.options.length; i++) {
+      if (el.options[i].value === val || el.options[i].text === val) {
+        el.selectedIndex = i; break;
+      }
+    }
   } else {
     el.value = val;
   }
 }
+
+// Set a date input from a M/D/YYYY string (Apps Script format)
+function setDate(id, val) {
+  var el = document.getElementById(id);
+  if (!el || !val) return;
+  try {
+    var parts = String(val).split('/');
+    if (parts.length === 3) {
+      var m = parts[0].padStart(2,'0'), d = parts[1].padStart(2,'0'), y = parts[2];
+      el.value = y + '-' + m + '-' + d;
+    }
+  } catch(e) {}
+}
+
+// Set a date-of-birth input — same format
+function setDOB(id, val) { setDate(id, val); }
 function setTxt(id, val) { var el=document.getElementById(id); if(el) el.textContent=val; }
 function fmt(n) {
   if (!n && n!==0) return '--';
@@ -1228,6 +1345,13 @@ function setStatus(msg, type) {
   var el = document.getElementById('status-msg');
   el.textContent = msg;
   el.className = 'status-msg' + (type ? ' '+type : '');
+}
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' '+type : '');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 4000);
 }
 
 // ── SAVE TO GOOGLE SHEET ──────────────────────────────────────
@@ -1253,6 +1377,7 @@ function saveAll() {
     if (chunkIndex >= chunks.size) {
       document.getElementById('loading').style.display = 'none';
       setStatus('Saved successfully! Your Google Sheet is updating now.', 'success');
+      showToast('✅ Saved! Your sheet is updating now.', '');
       isDirty = false;
       return;
     }
@@ -1289,6 +1414,7 @@ function saveAll() {
     if (chunkIndex >= chunks.length) {
       document.getElementById('loading').style.display = 'none';
       setStatus('Saved successfully! Your Google Sheet is updating now.', 'success');
+      showToast('✅ Saved! Your sheet is updating now.', '');
       isDirty = false;
       return;
     }

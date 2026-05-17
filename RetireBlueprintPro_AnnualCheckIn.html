@@ -359,7 +359,9 @@ function saveCheckIn() {
   var payload = { action: 'saveCheckIn', checkIn: updates };
   var s = document.createElement('script');
   var _sid2 = localStorage.getItem('rbp_sheet_id')||'';
-  s.src = SCRIPT_URL + '?action=save&callback=' + cb + '&sheetId=' + encodeURIComponent(_sid2) + '&data=' + encodeURIComponent(JSON.stringify(payload));
+  var _json = JSON.stringify(payload);
+  var _enc  = btoa(unescape(encodeURIComponent(_json)));
+  s.src = SCRIPT_URL + '?action=save&callback=' + cb + '&sheetId=' + encodeURIComponent(_sid2) + '&data=' + _enc + '&enc=b64';
   s.onerror = function() {
     delete window[cb];
     document.getElementById('save-msg').textContent = 'Connection error -- update your Apps Script first.';

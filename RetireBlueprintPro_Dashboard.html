@@ -160,7 +160,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html">Setup Guide</a>
-  <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;margin-left:auto;"></span>
+  <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;"></span>
+  <button onclick="reloadData()" style="margin:4px 8px;background:#0A3145;border:1px solid #1a3a52;color:#1CC7D0;font-size:9px;font-weight:700;padding:4px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.5px;">↺ Refresh Data</button>
 </div>
 
 <div class="section">
@@ -700,6 +701,12 @@ function loadData(){
   document.head.appendChild(s);
 }
 
+function reloadData() {
+  var overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  document.getElementById('loading-sub').textContent = 'Refreshing your plan data…';
+  loadData();
+}
 window.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
