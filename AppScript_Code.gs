@@ -182,12 +182,25 @@ function writeInputs(data, sheetId) {
       setN('D49',p.D49); setD('D50',p.D50); setD('D51',p.D51);
       setN('D52',p.D52); setN('D53',p.D53);
     }
+    // Flush partner names first so dropdown validation updates before writing accounts
+    SpreadsheetApp.flush();
+    // Small pause to let sheet recalculate the owner dropdown list
+    Utilities.sleep(1000);
+
     if (data.accounts && data.accounts.length) {
+      // Get valid owner values from the sheet after recalc
+      var p1name = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
+      var p2name = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
       data.accounts.forEach(function(a,i){
         var r=105+i; if(r>116) return;
         inp.getRange('A'+r).setValue(a.inc||a.showInCalc||'No');
         inp.getRange('B'+r).setValue(a.name||'');
-        inp.getRange('C'+r).setValue(a.owner||'Joint');
+        // Map owner to actual customer name
+        var owner = String(a.owner||a.dash||'Joint').trim();
+        if (owner === 'Partner 1' || owner === 'Craig') owner = p1name || 'Joint';
+        if (owner === 'Partner 2' || owner === 'Gena')  owner = p2name || 'Joint';
+        if (!owner || owner === '') owner = 'Joint';
+        inp.getRange('C'+r).setValue(owner);
         inp.getRange('D'+r).setValue(a.type||'');
         inp.getRange('E'+r).setValue(Number(a.bal||a.balance)||0);
         inp.getRange('F'+r).setValue(Number(a.ret||a.expectedReturn)||0);
