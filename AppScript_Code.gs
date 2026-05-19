@@ -120,14 +120,20 @@ function readAll(sheetId) {
       phase1Total:baseSpend+Number(v('G122')), phase2Total:baseSpend+Number(v('G123')), phase3Total:baseSpend+Number(v('G124')),
     },
     expenses: (function(){
+      // Batch read all expense rows at once — much faster than individual calls
       var rows=[58,59,60,61,62,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
+      // Read columns B, C, T in one batch each
+      var bVals = inp.getRange('B58:B85').getValues();
+      var cVals = inp.getRange('C58:C85').getValues();
+      var tVals = inp.getRange('T58:T85').getValues();
       return rows.map(function(r){
+        var i = r - 58; // index into the arrays
         return {
-          row:r,
-          name:String(inp.getRange('B'+r).getValue()||''),
-          monthly:Number(inp.getRange('C'+r).getValue())||0,
-          annual:Number(inp.getRange('C'+r).getValue()||0)*12,
-          note:String(inp.getRange('T'+r).getValue()||'')
+          row: r,
+          name: String(bVals[i] ? bVals[i][0] : ''),
+          monthly: Number(cVals[i] ? cVals[i][0] : 0)||0,
+          annual: (Number(cVals[i] ? cVals[i][0] : 0)||0)*12,
+          note: String(tVals[i] ? tVals[i][0] : '')
         };
       });
     })(),
@@ -163,7 +169,15 @@ function writeInputs(data, sheetId) {
     var inp = ss.getSheetByName('Inputs');
     function set(cell, val) { if(val!==undefined && val!==null && val!=='') inp.getRange(cell).setValue(val); }
     function setN(cell,val) { if(val!==undefined) inp.getRange(cell).setValue(Number(val)||0); }
-    function setD(cell,val) { if(val) { var d=new Date(val); if(!isNaN(d)) inp.getRange(cell).setValue(d); } }
+    function setD(cell,val) {
+      if(!val || val==='' || val==='0' || val===0) return; // skip empty/zero
+      try {
+        var d=new Date(val);
+        if(!isNaN(d) && d.getFullYear()>1970 && d.getFullYear()<2200) {
+          inp.getRange(cell).setValue(d);
+        }
+      } catch(e){}
+    }
     function setPct(cell,val) { if(val!==undefined) inp.getRange(cell).setValue(Number(val)||0); }
 
     if (data.global) {
@@ -196,7 +210,6 @@ function writeInputs(data, sheetId) {
     }
     // Flush partner names first
     SpreadsheetApp.flush();
-    Utilities.sleep(1500);
 
     if (data.accounts && data.accounts.length) {
       var p1name = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
@@ -233,15 +246,26 @@ function writeInputs(data, sheetId) {
     if (data.roth) {
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
     }
-    // Write expense rows
+    // Write expense rows — batch by column for speed
     if (data.expenses && data.expenses.length) {
+      var bData = [], cData = [], tData = [];
+      // Pre-fill 28 rows (58-85)
+      for (var i=0; i<28; i++) { bData.push([null]); cData.push([null]); tData.push([null]); }
       data.expenses.forEach(function(exp) {
         var r = Number(exp.row);
-        if (!r || r < 58 || r > 100) return;
-        // Name in col B, Monthly in col C, Annual in col Y (=25), Note in col T (=20)
-        try { inp.getRange('B'+r).setValue(exp.name||''); } catch(e){}
-        try { inp.getRange('C'+r).setValue(Number(exp.monthly)||0); } catch(e){}
-        try { inp.getRange('T'+r).setValue(exp.note||''); } catch(e){}
+        if (!r || r < 58 || r > 85) return;
+        var i = r - 58;
+        bData[i] = [exp.name||''];
+        cData[i] = [Number(exp.monthly)||0];
+        tData[i] = [exp.note||''];
+      });
+      // Write only non-null rows
+      data.expenses.forEach(function(exp) {
+        var r = Number(exp.row);
+        if (!r || r < 58 || r > 85) return;
+        inp.getRange('B'+r).setValue(exp.name||'');
+        inp.getRange('C'+r).setValue(Number(exp.monthly)||0);
+        inp.getRange('T'+r).setValue(exp.note||'');
       });
     }
     SpreadsheetApp.flush();
