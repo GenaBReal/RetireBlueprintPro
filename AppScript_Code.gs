@@ -218,22 +218,26 @@ function writeInputs(data, sheetId) {
       // Temporarily remove validation on owner column so any value can be written
       inp.getRange('C105:C116').clearDataValidations();
 
-      data.accounts.forEach(function(a,i){
-        var r=105+i; if(r>116) return;
-        inp.getRange('A'+r).setValue(a.inc||a.showInCalc||'No');
-        inp.getRange('B'+r).setValue(a.name||'');
-        // Map owner to actual customer name
+      // Build batch array for accounts — 1 write instead of 96
+      var acctData = [];
+      for (var ai=0; ai<12; ai++) {
+        var a = data.accounts[ai] || {};
         var owner = String(a.owner||'Joint').trim();
-        if (owner === 'Partner 1' || owner === 'Craig') owner = p1name || 'Joint';
-        if (owner === 'Partner 2' || owner === 'Gena')  owner = p2name || 'Joint';
+        if (owner==='Partner 1'||owner==='Craig') owner = p1name||'Joint';
+        if (owner==='Partner 2'||owner==='Gena')  owner = p2name||'Joint';
         if (!owner) owner = 'Joint';
-        inp.getRange('C'+r).setValue(owner);
-        inp.getRange('D'+r).setValue(a.type||'');
-        inp.getRange('E'+r).setValue(Number(a.bal||a.balance)||0);
-        inp.getRange('F'+r).setValue(Number(a.ret||a.expectedReturn)||0);
-        inp.getRange('G'+r).setValue(a.status||'Use for Withdrawals');
-        inp.getRange('H'+r).setValue(a.dash||a.showOnDashboard||'No');
-      });
+        acctData.push([
+          a.inc||a.showInCalc||'No',
+          a.name||'',
+          owner,
+          a.type||'',
+          Number(a.bal||a.balance)||0,
+          Number(a.ret||a.expectedReturn)||0,
+          a.status||'Use for Withdrawals',
+          a.dash||a.showOnDashboard||'No'
+        ]);
+      }
+      inp.getRange('A105:H116').setValues(acctData);
 
       // Restore validation using the dynamic range from Technical Style Reference
       var ownerValidation = SpreadsheetApp.newDataValidation()
@@ -246,27 +250,25 @@ function writeInputs(data, sheetId) {
     if (data.roth) {
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
     }
-    // Write expense rows — batch by column for speed
+    // Write expense rows — true batch write (3 calls total instead of 78)
     if (data.expenses && data.expenses.length) {
       var bData = [], cData = [], tData = [];
-      // Pre-fill 28 rows (58-85)
-      for (var i=0; i<28; i++) { bData.push([null]); cData.push([null]); tData.push([null]); }
+      for (var i=0; i<28; i++) {
+        bData.push(['']);
+        cData.push([0]);
+        tData.push(['']);
+      }
       data.expenses.forEach(function(exp) {
         var r = Number(exp.row);
         if (!r || r < 58 || r > 85) return;
-        var i = r - 58;
-        bData[i] = [exp.name||''];
-        cData[i] = [Number(exp.monthly)||0];
-        tData[i] = [exp.note||''];
+        var idx = r - 58;
+        bData[idx] = [exp.name||''];
+        cData[idx] = [Number(exp.monthly)||0];
+        tData[idx] = [exp.note||''];
       });
-      // Write only non-null rows
-      data.expenses.forEach(function(exp) {
-        var r = Number(exp.row);
-        if (!r || r < 58 || r > 85) return;
-        inp.getRange('B'+r).setValue(exp.name||'');
-        inp.getRange('C'+r).setValue(Number(exp.monthly)||0);
-        inp.getRange('T'+r).setValue(exp.note||'');
-      });
+      inp.getRange('B58:B85').setValues(bData);
+      inp.getRange('C58:C85').setValues(cData);
+      inp.getRange('T58:T85').setValues(tData);
     }
     SpreadsheetApp.flush();
     return {success:true, timestamp:new Date().toISOString()};
