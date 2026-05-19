@@ -1355,95 +1355,120 @@ function showToast(msg, type) {
 }
 
 // ── SAVE TO GOOGLE SHEET ──────────────────────────────────────
+function gv(id) {
+  // Safe getValue — returns '' if element doesn't exist
+  var el = document.getElementById(id);
+  return el ? el.value : '';
+}
+function gn(id) {
+  // Safe getNumber
+  var el = document.getElementById(id);
+  return el ? (parseFloat(el.value) || 0) : 0;
+}
+function gpct(id) {
+  // Safe getPercent (divide by 100)
+  var el = document.getElementById(id);
+  return el ? ((parseFloat(el.value) || 0) / 100) : 0;
+}
+
 function saveAll() {
-  if (!SHEET_ID) {
-    setStatus('⚠️ No sheet connected — please complete Setup Guide first.', 'error');
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) {
+    setStatus('⚠ No sheet connected — complete Setup Guide first.', 'error');
+    showToast('⚠ No sheet connected.', 'error');
     return;
   }
+
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('save-btn').disabled = true;
+  setStatus('Saving…', '');
 
-  var payload = buildPayload();
-
-  // Split into chunks to avoid URL length limits
   var chunks = [
-    { global: payload.global, partner1: payload.partner1, partner2: payload.partner2, roth: payload.roth, phases: payload.phases },
-    { accounts: payload.accounts },
+    {
+      global: {
+        B6: gv('f-B6'), B7: gn('f-B7'), B8: gn('f-B8'), B9: gn('f-B9'),
+        B10: gpct('f-B10'), B11: gv('f-B11'), B12: gv('f-B12'),
+        B13: gn('f-B13'), B14: gn('f-B14'), B15: gpct('f-B15'),
+        B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gpct('f-B19'),
+        B20: gpct('f-B20'), B21: gpct('f-B21'),
+        B24: gv('f-B24'), B25: gn('f-B25'), B26: gpct('f-B26'), B28: gpct('f-B28'),
+      },
+      partner1: {
+        B31: gv('f-B31'), B32: gv('f-B32'), B33: gn('f-B33'), B34: gv('f-B34'),
+        B35: gn('f-B35'), B36: gn('f-B36'), B37: gn('f-B37'), B39: gv('f-B39'),
+        B40: gn('f-B40'), B41: gn('f-B41'), B43: gn('f-B43'), B44: gv('f-B44'),
+        B46: gn('f-B46'), B47: gv('f-B47'), B49: gn('f-B49'),
+        B50: gv('f-B50'), B51: gv('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'),
+      },
+      partner2: {
+        D31: gv('f-D31'), D32: gv('f-D32'), D33: gn('f-D33'), D34: gv('f-D34'),
+        D35: gn('f-D35'), D36: gn('f-D36'), D37: gn('f-D37'), D39: gv('f-D39'),
+        D40: gn('f-D40'), D41: gn('f-D41'), D43: gn('f-D43'), D44: gv('f-D44'),
+        D46: gn('f-D46'), D47: gv('f-D47'), D49: gn('f-D49'),
+        D50: gv('f-D50'), D51: gv('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),
+      },
+      roth: {
+        B139: gn('f-B139'), B141: gv('f-B141'), B145: gpct('f-B145'),
+      },
+      phases: {
+        C122: gn('f-C122'), D122: gn('f-D122'), E122: gn('f-E122'), F122: gn('f-F122'),
+        C123: gn('f-C123'), D123: gn('f-D123'), E123: gn('f-E123'), F123: gn('f-F123'),
+        C124: gn('f-C124'), D124: gn('f-D124'), E124: gn('f-E124'), F124: gn('f-F124'),
+      },
+    },
+    { accounts: accountsData },
   ];
 
-  var chunkIndex = 0;
-
-  function saveNextChunk() {
-    if (chunkIndex >= chunks.size) {
+  var idx = 0;
+  function saveNext() {
+    if (idx >= chunks.length) {
       document.getElementById('loading').style.display = 'none';
-      setStatus('Saved successfully! Your Google Sheet is updating now.', 'success');
+      setStatus('Saved successfully! Your Google Sheet is updating.', 'success');
       showToast('✅ Saved! Your sheet is updating now.', '');
       isDirty = false;
+      document.getElementById('save-btn').disabled = false;
       return;
     }
-    var chunk = chunks[chunkIndex++];
-    var callbackName = 'saveCallback_' + Date.now();
-    window[callbackName] = function(result) {
-      delete window[callbackName];
+    var chunk = chunks[idx++];
+    var cb = 'rbp_save_' + Date.now();
+    var timer = setTimeout(function() {
+      if (window[cb]) {
+        delete window[cb];
+        document.getElementById('loading').style.display = 'none';
+        setStatus('Save timed out — please try again.', 'error');
+        showToast('⚠ Save timed out.', 'error');
+        document.getElementById('save-btn').disabled = false;
+      }
+    }, 20000);
+    window[cb] = function(result) {
+      clearTimeout(timer);
+      delete window[cb];
       if (result && result.success) {
-        saveNextChunk();
+        saveNext();
       } else {
         document.getElementById('loading').style.display = 'none';
-        setStatus('Save failed -- please try again.', 'error');
+        var msg = (result && result.error) ? result.error : 'Unknown error';
+        setStatus('Save failed: ' + msg, 'error');
+        showToast('⚠ Save failed: ' + msg, 'error');
         document.getElementById('save-btn').disabled = false;
       }
     };
     var s = document.createElement('script');
-    var jsonStr = JSON.stringify(chunk);
-    var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encoded + '&enc=b64';
+    var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(chunk))));
+    var url = SCRIPT_URL + '?action=save&sheetId=' + encodeURIComponent(sheetId)
+              + '&callback=' + cb + '&data=' + encoded + '&enc=b64&_=' + Date.now();
+    s.src = url;
     s.onerror = function() {
-      delete window[callbackName];
+      clearTimeout(timer);
+      delete window[cb];
       document.getElementById('loading').style.display = 'none';
-      setStatus('Connection error -- please try again.', 'error');
+      setStatus('Connection error — check your internet and try again.', 'error');
+      showToast('⚠ Connection error saving.', 'error');
       document.getElementById('save-btn').disabled = false;
     };
     document.head.appendChild(s);
   }
-
-  // Fix chunks.size bug
-  chunks.length = chunks.length; // ensure array
-  chunkIndex = 0;
-
-  function saveNextChunkFixed() {
-    if (chunkIndex >= chunks.length) {
-      document.getElementById('loading').style.display = 'none';
-      setStatus('Saved successfully! Your Google Sheet is updating now.', 'success');
-      showToast('✅ Saved! Your sheet is updating now.', '');
-      isDirty = false;
-      return;
-    }
-    var chunk = chunks[chunkIndex++];
-    var callbackName = 'saveCallback_' + Date.now();
-    window[callbackName] = function(result) {
-      delete window[callbackName];
-      if (result && result.success) {
-        saveNextChunkFixed();
-      } else {
-        document.getElementById('loading').style.display = 'none';
-        setStatus('Save failed -- please try again.', 'error');
-        document.getElementById('save-btn').disabled = false;
-      }
-    };
-    var s = document.createElement('script');
-    var jsonStr = JSON.stringify(chunk);
-    var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-    s.src = scriptUrl('save') + '&callback=' + callbackName + '&data=' + encoded + '&enc=b64';
-    s.onerror = function() {
-      delete window[callbackName];
-      document.getElementById('loading').style.display = 'none';
-      setStatus('Connection error -- please try again.', 'error');
-      document.getElementById('save-btn').disabled = false;
-    };
-    document.head.appendChild(s);
-  }
-
-  saveNextChunkFixed();
+  saveNext();
 }
 
 function buildPayload() {
