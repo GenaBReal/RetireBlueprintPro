@@ -182,24 +182,26 @@ function writeInputs(data, sheetId) {
       setN('D49',p.D49); setD('D50',p.D50); setD('D51',p.D51);
       setN('D52',p.D52); setN('D53',p.D53);
     }
-    // Flush partner names first so dropdown validation updates before writing accounts
+    // Flush partner names first
     SpreadsheetApp.flush();
-    // Small pause to let sheet recalculate the owner dropdown list
-    Utilities.sleep(1000);
+    Utilities.sleep(1500);
 
     if (data.accounts && data.accounts.length) {
-      // Get valid owner values from the sheet after recalc
       var p1name = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
       var p2name = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
+
+      // Temporarily remove validation on owner column so any value can be written
+      inp.getRange('C105:C116').clearDataValidations();
+
       data.accounts.forEach(function(a,i){
         var r=105+i; if(r>116) return;
         inp.getRange('A'+r).setValue(a.inc||a.showInCalc||'No');
         inp.getRange('B'+r).setValue(a.name||'');
         // Map owner to actual customer name
-        var owner = String(a.owner||a.dash||'Joint').trim();
+        var owner = String(a.owner||'Joint').trim();
         if (owner === 'Partner 1' || owner === 'Craig') owner = p1name || 'Joint';
         if (owner === 'Partner 2' || owner === 'Gena')  owner = p2name || 'Joint';
-        if (!owner || owner === '') owner = 'Joint';
+        if (!owner) owner = 'Joint';
         inp.getRange('C'+r).setValue(owner);
         inp.getRange('D'+r).setValue(a.type||'');
         inp.getRange('E'+r).setValue(Number(a.bal||a.balance)||0);
@@ -207,6 +209,14 @@ function writeInputs(data, sheetId) {
         inp.getRange('G'+r).setValue(a.status||'Use for Withdrawals');
         inp.getRange('H'+r).setValue(a.dash||a.showOnDashboard||'No');
       });
+
+      // Restore validation using the dynamic range from Technical Style Reference
+      var ownerValidation = SpreadsheetApp.newDataValidation()
+        .requireValueInRange(
+          ss.getSheetByName('Technical Style Reference').getRange('F6:F8'), true)
+        .setAllowInvalid(false)
+        .build();
+      inp.getRange('C105:C116').setDataValidation(ownerValidation);
     }
     if (data.roth) {
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
