@@ -114,6 +114,20 @@ function readAll(sheetId) {
     meta:{ generated:dt(new Date()), planYear:planYear },
     people:{ craig:craig, gena:gena },
     portfolio:{ total:total, peakValue:peakVal*1000, peakYear:peakYear, accounts:accounts },
+    debts: (function(){
+      var dRows = inp.getRange('A88:G91').getValues();
+      return dRows.map(function(r, i){
+        return {
+          inc:   String(r[0]||'No'),
+          name:  String(r[1]||''),
+          mo:    Number(r[2])||0,
+          ann:   Number(r[3])||0,
+          start: dt(r[4]),
+          end:   dt(r[5]),
+          bal:   Number(r[6])||0,
+        };
+      });
+    })(),
     spending:{
       baseAnnual:baseSpend, safeExtra:safeExtra,
       phase1Extra:Number(v('G122')), phase2Extra:Number(v('G123')), phase3Extra:Number(v('G124')),
@@ -194,7 +208,8 @@ function writeInputs(data, sheetId) {
       var p=data.partner1;
       set('B31',p.B31); setD('B32',p.B32); setN('B33',p.B33); set('B34',p.B34);
       setN('B35',p.B35); setN('B36',p.B36); setN('B37',p.B37); setD('B39',p.B39);
-      setN('B40',p.B40); setN('B41',p.B41); setN('B43',p.B43);
+      setN('B40',p.B40); setN('B41',p.B41);
+      // B43 SS Monthly is a sheet formula — do NOT overwrite
       setD('B44',p.B44); setN('B46',p.B46); setD('B47',p.B47);
       setN('B49',p.B49); setD('B50',p.B50); setD('B51',p.B51);
       setN('B52',p.B52); setN('B53',p.B53);
@@ -203,7 +218,8 @@ function writeInputs(data, sheetId) {
       var p=data.partner2;
       set('D31',p.D31); setD('D32',p.D32); setN('D33',p.D33); set('D34',p.D34);
       setN('D35',p.D35); setN('D36',p.D36); setN('D37',p.D37); setD('D39',p.D39);
-      setN('D40',p.D40); setN('D41',p.D41); setN('D43',p.D43);
+      setN('D40',p.D40); setN('D41',p.D41);
+      // D43 SS Monthly is a sheet formula — do NOT overwrite
       setD('D44',p.D44); setN('D46',p.D46); setD('D47',p.D47);
       setN('D49',p.D49); setD('D50',p.D50); setD('D51',p.D51);
       setN('D52',p.D52); setN('D53',p.D53);
@@ -249,6 +265,23 @@ function writeInputs(data, sheetId) {
     }
     if (data.roth) {
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
+    }
+    // Write debt rows A88:G91
+    if (data.debts && data.debts.length) {
+      var debtData = [];
+      for (var di=0; di<4; di++) {
+        var d = data.debts[di] || {};
+        debtData.push([
+          d.inc||'No',
+          d.name||'',
+          Number(d.mo)||0,
+          Number(d.ann)||0,
+          d.start ? new Date(d.start) : '',
+          d.end   ? new Date(d.end)   : '',
+          Number(d.bal)||0,
+        ]);
+      }
+      inp.getRange('A88:G91').setValues(debtData);
     }
     // Write expense rows — true batch write (3 calls total instead of 78)
     if (data.expenses && data.expenses.length) {
