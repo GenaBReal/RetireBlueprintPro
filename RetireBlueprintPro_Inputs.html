@@ -74,7 +74,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 .field input:focus,.field select:focus{
   outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(28,199,208,0.15);
 }
-.field input[readonly]{background:var(--light);color:var(--muted);cursor:default;}
+.field input[readonly]{background:var(--light);color:var(--muted);cursor:default;border-color:var(--border);}
+.hint{font-size:9px;color:var(--muted);font-style:italic;display:block;margin-top:2px;}
 .field .hint{font-size:8px;color:var(--muted);font-style:italic;margin-top:1px;}
 .field .computed{font-size:11px;color:var(--teal);font-weight:700;margin-top:2px;}
 
@@ -397,7 +398,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Other Income End</label>
-            <input type="date" id="f-B51" value="">
+            <input type="date" id="f-B51" value="" style="color:var(--muted);" placeholder="Optional">
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
@@ -413,7 +414,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
-              <input type="number" id="f-B43" value="0">
+              <input type="number" id="f-B43" value="0" readonly><span class="hint">Auto-calculated from SS base + FRA + start date</span>
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
@@ -504,7 +505,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           </div>
           <div class="field">
             <label>Other Income End</label>
-            <input type="date" id="f-D51" value="">
+            <input type="date" id="f-D51" value="" style="color:var(--muted);" placeholder="Optional">
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
@@ -520,7 +521,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
             </div>
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
-              <input type="number" id="f-D43" value="0">
+              <input type="number" id="f-D43" value="0" readonly><span class="hint">Auto-calculated from SS base + FRA + start date</span>
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
@@ -1018,6 +1019,9 @@ function calcAge(dobId, ageId, deathAgeId, deathYearId) {
   ageEl.value = age;
   // Recalculate death year if death age is set
   onDeathAgeChange(ageId, deathAgeId, deathYearId);
+  // Recalculate SS monthly since age affects the adjustment
+  if (dobId === 'f-B32') calcSSMonthly('f-B40','f-B41','f-B44','f-B33','f-B43');
+  if (dobId === 'f-D32') calcSSMonthly('f-D40','f-D41','f-D44','f-D33','f-D43');
   markDirty();
 }
 
@@ -1025,7 +1029,10 @@ function onDeathAgeChange(ageId, deathAgeId, deathYearId) {
   var age = parseInt((document.getElementById(ageId)||{}).value);
   var deathAge = parseInt((document.getElementById(deathAgeId)||{}).value);
   var deathYearEl = document.getElementById(deathYearId);
-  if (!deathYearEl || isNaN(age) || isNaN(deathAge)) return;
+  if (!deathYearEl || isNaN(age) || isNaN(deathAge) || deathAge <= 0 || age <= 0) {
+    if (deathYearEl) deathYearEl.value = '';
+    return;
+  }
   var planYear = parseInt(document.getElementById('f-B6').value) || new Date().getFullYear();
   deathYearEl.value = planYear + (deathAge - age);
   markDirty();
