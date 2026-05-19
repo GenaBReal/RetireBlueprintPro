@@ -119,6 +119,18 @@ function readAll(sheetId) {
       phase1Extra:Number(v('G122')), phase2Extra:Number(v('G123')), phase3Extra:Number(v('G124')),
       phase1Total:baseSpend+Number(v('G122')), phase2Total:baseSpend+Number(v('G123')), phase3Total:baseSpend+Number(v('G124')),
     },
+    expenses: (function(){
+      var rows=[58,59,60,61,62,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
+      return rows.map(function(r){
+        return {
+          row:r,
+          name:String(inp.getRange('B'+r).getValue()||''),
+          monthly:Number(inp.getRange('C'+r).getValue())||0,
+          annual:Number(inp.getRange('C'+r).getValue()||0)*12,
+          note:String(inp.getRange('T'+r).getValue()||'')
+        };
+      });
+    })(),
     legacy:{ goal:legacyGoal, safetyFloor:safeFloor, projectedEnding:endLiquid,
       variance:endLiquid-legacyGoal, achievedPct:endLiquid>=legacyGoal?100:Math.round(endLiquid/legacyGoal*100),
       status:String(v('B134')) },
@@ -220,6 +232,17 @@ function writeInputs(data, sheetId) {
     }
     if (data.roth) {
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
+    }
+    // Write expense rows
+    if (data.expenses && data.expenses.length) {
+      data.expenses.forEach(function(exp) {
+        var r = Number(exp.row);
+        if (!r || r < 58 || r > 100) return;
+        // Name in col B, Monthly in col C, Annual in col Y (=25), Note in col T (=20)
+        try { inp.getRange('B'+r).setValue(exp.name||''); } catch(e){}
+        try { inp.getRange('C'+r).setValue(Number(exp.monthly)||0); } catch(e){}
+        try { inp.getRange('T'+r).setValue(exp.note||''); } catch(e){}
+      });
     }
     SpreadsheetApp.flush();
     return {success:true, timestamp:new Date().toISOString()};

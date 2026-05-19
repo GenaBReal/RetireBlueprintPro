@@ -1274,6 +1274,19 @@ function populateFromData(d) {
     buildAccountsTable();
   }
 
+  // ── Expenses ─────────────────────────────────────────
+  if (d.expenses && d.expenses.length) {
+    d.expenses.forEach(function(exp) {
+      var r = exp.row;
+      var nel = document.getElementById('e-N'+r);
+      var cel = document.getElementById('e-C'+r);
+      var tel = document.getElementById('e-T'+r);
+      if (nel) nel.value = exp.name || '';
+      if (cel) { cel.value = exp.monthly || 0; calcExpense(cel, 'e-Y'+r); }
+      if (tel) tel.value = exp.note || '';
+    });
+  }
+
   // ── Solver ────────────────────────────────────────────
   setTxt('s-extra',  fmt(sp.safeExtra));
   setTxt('s-phase1', fmt(sp.phase1Extra));
@@ -1416,6 +1429,34 @@ function saveAll() {
         C124: gn('f-C124'), D124: gn('f-D124'), E124: gn('f-E124'), F124: gn('f-F124'),
       },
       accounts: accountsData,
+    expenses: [
+    { row: 58, name: gv('e-N58'), monthly: gn('e-C58'), annual: gn('e-Y58'), note: gv('e-T58') },
+    { row: 59, name: gv('e-N59'), monthly: gn('e-C59'), annual: gn('e-Y59'), note: gv('e-T59') },
+    { row: 60, name: gv('e-N60'), monthly: gn('e-C60'), annual: gn('e-Y60'), note: gv('e-T60') },
+    { row: 61, name: gv('e-N61'), monthly: gn('e-C61'), annual: gn('e-Y61'), note: gv('e-T61') },
+    { row: 62, name: gv('e-N62'), monthly: gn('e-C62'), annual: gn('e-Y62'), note: gv('e-T62') },
+    { row: 63, name: gv('e-N63'), monthly: gn('e-C63'), annual: gn('e-Y63'), note: gv('e-T63') },
+    { row: 64, name: gv('e-N64'), monthly: gn('e-C64'), annual: gn('e-Y64'), note: gv('e-T64') },
+    { row: 65, name: gv('e-N65'), monthly: gn('e-C65'), annual: gn('e-Y65'), note: gv('e-T65') },
+    { row: 66, name: gv('e-N66'), monthly: gn('e-C66'), annual: gn('e-Y66'), note: gv('e-T66') },
+    { row: 67, name: gv('e-N67'), monthly: gn('e-C67'), annual: gn('e-Y67'), note: gv('e-T67') },
+    { row: 68, name: gv('e-N68'), monthly: gn('e-C68'), annual: gn('e-Y68'), note: gv('e-T68') },
+    { row: 69, name: gv('e-N69'), monthly: gn('e-C69'), annual: gn('e-Y69'), note: gv('e-T69') },
+    { row: 71, name: gv('e-N71'), monthly: gn('e-C71'), annual: gn('e-Y71'), note: gv('e-T71') },
+    { row: 72, name: gv('e-N72'), monthly: gn('e-C72'), annual: gn('e-Y72'), note: gv('e-T72') },
+    { row: 73, name: gv('e-N73'), monthly: gn('e-C73'), annual: gn('e-Y73'), note: gv('e-T73') },
+    { row: 74, name: gv('e-N74'), monthly: gn('e-C74'), annual: gn('e-Y74'), note: gv('e-T74') },
+    { row: 75, name: gv('e-N75'), monthly: gn('e-C75'), annual: gn('e-Y75'), note: gv('e-T75') },
+    { row: 76, name: gv('e-N76'), monthly: gn('e-C76'), annual: gn('e-Y76'), note: gv('e-T76') },
+    { row: 77, name: gv('e-N77'), monthly: gn('e-C77'), annual: gn('e-Y77'), note: gv('e-T77') },
+    { row: 78, name: gv('e-N78'), monthly: gn('e-C78'), annual: gn('e-Y78'), note: gv('e-T78') },
+    { row: 79, name: gv('e-N79'), monthly: gn('e-C79'), annual: gn('e-Y79'), note: gv('e-T79') },
+    { row: 80, name: gv('e-N80'), monthly: gn('e-C80'), annual: gn('e-Y80'), note: gv('e-T80') },
+    { row: 81, name: gv('e-N81'), monthly: gn('e-C81'), annual: gn('e-Y81'), note: gv('e-T81') },
+    { row: 83, name: gv('e-N83'), monthly: gn('e-C83'), annual: gn('e-Y83'), note: gv('e-T83') },
+    { row: 84, name: gv('e-N84'), monthly: gn('e-C84'), annual: gn('e-Y84'), note: gv('e-T84') },
+    { row: 85, name: gv('e-N85'), monthly: gn('e-C85'), annual: gn('e-Y85'), note: gv('e-T85') },
+    ],
     },
   ];
 
