@@ -194,7 +194,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
   <a href="RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/sheet.html?gid=938499920" target="_blank">Master Sheet</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;" target="_blank">Master Sheet</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
   </div>
@@ -910,8 +910,13 @@ var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2
 // Get customer's sheet ID from URL or localStorage
 var SHEET_ID = (function() {
   var p = new URLSearchParams(window.location.search);
-  var id = p.get('sheetId') || localStorage.getItem('rbp_sheet_id') || '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY';
-  if (id) localStorage.setItem('rbp_sheet_id', id);
+  var id = p.get('sheetId') || localStorage.getItem('rbp_sheet_id') || '';
+  // NEVER fall back to blank template — that's our master copy
+  if (id && id !== '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
+    localStorage.setItem('rbp_sheet_id', id);
+  } else {
+    id = ''; // Force error state so user goes through setup
+  }
   return id;
 })();
 
