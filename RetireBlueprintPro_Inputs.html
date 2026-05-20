@@ -661,7 +661,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="date" id="d-end-1" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-bal-1" value="0" oninput="markDirty()"></td>
         </tr>
-        <tr>
+        <tr style="display:none">
           <td><button class="toggle-no" id="d-inc-2" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-2" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-mo-2" value="0" oninput="calcDebtAnnual(2);markDirty()"></td>
@@ -670,7 +670,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="date" id="d-end-2" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-bal-2" value="0" oninput="markDirty()"></td>
         </tr>
-        <tr>
+        <tr style="display:none">
           <td><button class="toggle-no" id="d-inc-3" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-3" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-mo-3" value="0" oninput="calcDebtAnnual(3);markDirty()"></td>
@@ -1068,14 +1068,14 @@ function calcDebtAnnual(i) {
 
 function collectDebts() {
   var debts = [];
-  for (var i=0; i<4; i++) {
+  for (var i=0; i<2; i++) { // Only 2 writable debt rows in sheet (rows 88-89)
     debts.push({
       inc:   (document.getElementById('d-inc-'+i)||{}).textContent||'No',
       name:  gv('d-name-'+i),
       mo:    gn('d-mo-'+i),
       ann:   gn('d-ann-'+i),
-      start: gv('d-start-'+i),
-      end:   gv('d-end-'+i),
+      start: gd('d-start-'+i),
+      end:   gd('d-end-'+i),
       bal:   gn('d-bal-'+i),
     });
   }
@@ -1441,9 +1441,14 @@ function showToast(msg, type) {
 
 // ── SAVE TO GOOGLE SHEET ──────────────────────────────────────
 function gv(id) {
-  // Safe getValue — returns '' if element doesn't exist
   var el = document.getElementById(id);
   return el ? el.value : '';
+}
+// Get date value — HTML date inputs return YYYY-MM-DD which Apps Script handles
+function gd(id) {
+  var el = document.getElementById(id);
+  if (!el || !el.value) return '';
+  return el.value; // Already in YYYY-MM-DD format
 }
 function gn(id) {
   // Safe getNumber
@@ -1479,18 +1484,18 @@ function saveAll() {
       B24: gv('f-B24'), B25: gn('f-B25'), B26: gpct('f-B26'), B28: gpct('f-B28'),
     },
     partner1: {
-      B31: gv('f-B31'), B32: gv('f-B32'), B34: gv('f-B34'),
-      B35: gn('f-B35'), B37: gn('f-B37'), B39: gv('f-B39'),
-      B40: gn('f-B40'), B41: gn('f-B41'), B44: gv('f-B44'),
-      B46: gn('f-B46'), B47: gv('f-B47'), B49: gn('f-B49'),
-      B50: gv('f-B50'), B51: gv('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'),
+      B31: gv('f-B31'), B32: gd('f-B32'), B34: gv('f-B34'),
+      B35: gn('f-B35'), B37: gn('f-B37'), B39: gd('f-B39'),
+      B40: gn('f-B40'), B41: gn('f-B41'), B44: gd('f-B44'),
+      B46: gn('f-B46'), B47: gd('f-B47'), B49: gn('f-B49'),
+      B50: gd('f-B50'), B51: gd('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'),
     },
     partner2: {
-      D31: gv('f-D31'), D32: gv('f-D32'), D34: gv('f-D34'),
-      D35: gn('f-D35'), D37: gn('f-D37'), D39: gv('f-D39'),
-      D40: gn('f-D40'), D41: gn('f-D41'), D44: gv('f-D44'),
-      D46: gn('f-D46'), D47: gv('f-D47'), D49: gn('f-D49'),
-      D50: gv('f-D50'), D51: gv('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),
+      D31: gv('f-D31'), D32: gd('f-D32'), D34: gv('f-D34'),
+      D35: gn('f-D35'), D37: gn('f-D37'), D39: gd('f-D39'),
+      D40: gn('f-D40'), D41: gn('f-D41'), D44: gd('f-D44'),
+      D46: gn('f-D46'), D47: gd('f-D47'), D49: gn('f-D49'),
+      D50: gd('f-D50'), D51: gd('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),
     },
     roth: { B139: gn('f-B139'), B141: gv('f-B141'), B145: gpct('f-B145') },
     phases: {
@@ -1501,32 +1506,32 @@ function saveAll() {
     accounts: accountsData,
     debts: collectDebts(),
     expenses: [
-      {row:58,name:gv('e-N58'),monthly:gn('e-C58'),note:gv('e-T58')},
-      {row:59,name:gv('e-N59'),monthly:gn('e-C59'),note:gv('e-T59')},
-      {row:60,name:gv('e-N60'),monthly:gn('e-C60'),note:gv('e-T60')},
-      {row:61,name:gv('e-N61'),monthly:gn('e-C61'),note:gv('e-T61')},
-      {row:62,name:gv('e-N62'),monthly:gn('e-C62'),note:gv('e-T62')},
-      {row:63,name:gv('e-N63'),monthly:gn('e-C63'),note:gv('e-T63')},
-      {row:64,name:gv('e-N64'),monthly:gn('e-C64'),note:gv('e-T64')},
-      {row:65,name:gv('e-N65'),monthly:gn('e-C65'),note:gv('e-T65')},
-      {row:66,name:gv('e-N66'),monthly:gn('e-C66'),note:gv('e-T66')},
-      {row:67,name:gv('e-N67'),monthly:gn('e-C67'),note:gv('e-T67')},
-      {row:68,name:gv('e-N68'),monthly:gn('e-C68'),note:gv('e-T68')},
-      {row:69,name:gv('e-N69'),monthly:gn('e-C69'),note:gv('e-T69')},
-      {row:71,name:gv('e-N71'),monthly:gn('e-C71'),note:gv('e-T71')},
-      {row:72,name:gv('e-N72'),monthly:gn('e-C72'),note:gv('e-T72')},
-      {row:73,name:gv('e-N73'),monthly:gn('e-C73'),note:gv('e-T73')},
-      {row:74,name:gv('e-N74'),monthly:gn('e-C74'),note:gv('e-T74')},
-      {row:75,name:gv('e-N75'),monthly:gn('e-C75'),note:gv('e-T75')},
-      {row:76,name:gv('e-N76'),monthly:gn('e-C76'),note:gv('e-T76')},
-      {row:77,name:gv('e-N77'),monthly:gn('e-C77'),note:gv('e-T77')},
-      {row:78,name:gv('e-N78'),monthly:gn('e-C78'),note:gv('e-T78')},
-      {row:79,name:gv('e-N79'),monthly:gn('e-C79'),note:gv('e-T79')},
-      {row:80,name:gv('e-N80'),monthly:gn('e-C80'),note:gv('e-T80')},
-      {row:81,name:gv('e-N81'),monthly:gn('e-C81'),note:gv('e-T81')},
-      {row:83,name:gv('e-N83'),monthly:gn('e-C83'),note:gv('e-T83')},
-      {row:84,name:gv('e-N84'),monthly:gn('e-C84'),note:gv('e-T84')},
-      {row:85,name:gv('e-N85'),monthly:gn('e-C85'),note:gv('e-T85')},
+      {row:58,name:gv('e-N58'),monthly:Math.max(0,gn('e-C58')),note:gv('e-T58')},
+      {row:59,name:gv('e-N59'),monthly:Math.max(0,gn('e-C59')),note:gv('e-T59')},
+      {row:60,name:gv('e-N60'),monthly:Math.max(0,gn('e-C60')),note:gv('e-T60')},
+      {row:61,name:gv('e-N61'),monthly:Math.max(0,gn('e-C61')),note:gv('e-T61')},
+      {row:62,name:gv('e-N62'),monthly:Math.max(0,gn('e-C62')),note:gv('e-T62')},
+      {row:63,name:gv('e-N63'),monthly:Math.max(0,gn('e-C63')),note:gv('e-T63')},
+      {row:64,name:gv('e-N64'),monthly:Math.max(0,gn('e-C64')),note:gv('e-T64')},
+      {row:65,name:gv('e-N65'),monthly:Math.max(0,gn('e-C65')),note:gv('e-T65')},
+      {row:66,name:gv('e-N66'),monthly:Math.max(0,gn('e-C66')),note:gv('e-T66')},
+      {row:67,name:gv('e-N67'),monthly:Math.max(0,gn('e-C67')),note:gv('e-T67')},
+      {row:68,name:gv('e-N68'),monthly:Math.max(0,gn('e-C68')),note:gv('e-T68')},
+      {row:69,name:gv('e-N69'),monthly:Math.max(0,gn('e-C69')),note:gv('e-T69')},
+      {row:71,name:gv('e-N71'),monthly:Math.max(0,gn('e-C71')),note:gv('e-T71')},
+      {row:72,name:gv('e-N72'),monthly:Math.max(0,gn('e-C72')),note:gv('e-T72')},
+      {row:73,name:gv('e-N73'),monthly:Math.max(0,gn('e-C73')),note:gv('e-T73')},
+      {row:74,name:gv('e-N74'),monthly:Math.max(0,gn('e-C74')),note:gv('e-T74')},
+      {row:75,name:gv('e-N75'),monthly:Math.max(0,gn('e-C75')),note:gv('e-T75')},
+      {row:76,name:gv('e-N76'),monthly:Math.max(0,gn('e-C76')),note:gv('e-T76')},
+      {row:77,name:gv('e-N77'),monthly:Math.max(0,gn('e-C77')),note:gv('e-T77')},
+      {row:78,name:gv('e-N78'),monthly:Math.max(0,gn('e-C78')),note:gv('e-T78')},
+      {row:79,name:gv('e-N79'),monthly:Math.max(0,gn('e-C79')),note:gv('e-T79')},
+      {row:80,name:gv('e-N80'),monthly:Math.max(0,gn('e-C80')),note:gv('e-T80')},
+      {row:81,name:gv('e-N81'),monthly:Math.max(0,gn('e-C81')),note:gv('e-T81')},
+      {row:83,name:gv('e-N83'),monthly:Math.max(0,gn('e-C83')),note:gv('e-T83')},
+      {row:84,name:gv('e-N84'),monthly:Math.max(0,gn('e-C84')),note:gv('e-T84')},
+      {row:85,name:gv('e-N85'),monthly:Math.max(0,gn('e-C85')),note:gv('e-T85')},
     ],
   };
 
