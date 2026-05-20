@@ -902,6 +902,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────
+// Persistent callback registry — prevents garbage collection
+window._rbpCallbacks = window._rbpCallbacks || {};
+
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 
 // Get customer's sheet ID from URL or localStorage
@@ -1208,8 +1211,9 @@ function loadLiveData() {
   }
   document.getElementById('dl-sub').textContent = 'Reading your Google Sheet…';
   var callbackName = 'inputsCallback_' + Date.now();
-  window[callbackName] = function(data) {
-    delete window[callbackName];
+  window._rbpCallbacks[callbackName] = function(data) {
+    delete window._rbpCallbacks[callbackName];
+    window[callbackName] = null;
     hideLoadingOverlay();
     if (data && data.error) {
       setStatus('⚠ Error loading sheet: ' + data.error, 'error');
@@ -1226,6 +1230,7 @@ function loadLiveData() {
     }
   };
   var s = document.createElement('script');
+  window[callbackName] = function(d){ window._rbpCallbacks[callbackName](d); };
   s.src = scriptUrl('read') + '&callback=' + callbackName + '&_=' + Date.now();
   s.onerror = function() {
     hideLoadingOverlay();
@@ -1544,9 +1549,15 @@ function saveAll() {
         document.getElementById('save-btn').disabled = false;
       }
     }, 20000);
-    window[cb] = function(result) {
+    window._rbpCallbacks[cb] = function(result) {
       clearTimeout(timer);
-      delete window[cb];
+      delete window._rbpCallbacks[cb];
+    };
+    window[cb] = function(r){ window._rbpCallbacks[cb] && window._rbpCallbacks[cb](r); };
+    var _origCb = window._rbpCallbacks[cb];
+    window._rbpCallbacks[cb] = function(result) {
+      clearTimeout(timer);
+      delete window._rbpCallbacks[cb];
       if (result && result.success) {
         saveNext();
       } else {
