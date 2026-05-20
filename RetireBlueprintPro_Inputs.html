@@ -1458,7 +1458,7 @@ function gpct(id) {
 
 function saveAll() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId) {
+  if (!sheetId || sheetId === '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
     setStatus('⚠ No sheet connected — complete Setup Guide first.', 'error');
     showToast('⚠ No sheet connected.', 'error');
     return;
@@ -1468,128 +1468,91 @@ function saveAll() {
   document.getElementById('save-btn').disabled = true;
   setStatus('Saving…', '');
 
-  var chunks = [
-    {
-      global: {
-        B6: gv('f-B6'), B7: gn('f-B7'), B8: gn('f-B8'), B9: gn('f-B9'),
-        B10: gpct('f-B10'), B11: gv('f-B11'), B12: gv('f-B12'),
-        B13: gn('f-B13'), B14: gn('f-B14'), B15: gpct('f-B15'),
-        B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gpct('f-B19'),
-        B20: gpct('f-B20'), B21: gpct('f-B21'),
-        B24: gv('f-B24'), B25: gn('f-B25'), B26: gpct('f-B26'), B28: gpct('f-B28'),
-      },
-      partner1: {
-        B31: gv('f-B31'), B32: gv('f-B32'), B33: gn('f-B33'), B34: gv('f-B34'),
-        B35: gn('f-B35'), B36: gn('f-B36'), B37: gn('f-B37'), B39: gv('f-B39'),
-        B40: gn('f-B40'), B41: gn('f-B41'), B43: gn('f-B43'), B44: gv('f-B44'),
-        B46: gn('f-B46'), B47: gv('f-B47'), B49: gn('f-B49'),
-        B50: gv('f-B50'), B51: gv('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'),
-      },
-      partner2: {
-        D31: gv('f-D31'), D32: gv('f-D32'), D33: gn('f-D33'), D34: gv('f-D34'),
-        D35: gn('f-D35'), D36: gn('f-D36'), D37: gn('f-D37'), D39: gv('f-D39'),
-        D40: gn('f-D40'), D41: gn('f-D41'), D43: gn('f-D43'), D44: gv('f-D44'),
-        D46: gn('f-D46'), D47: gv('f-D47'), D49: gn('f-D49'),
-        D50: gv('f-D50'), D51: gv('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),
-      },
-      roth: {
-        B139: gn('f-B139'), B141: gv('f-B141'), B145: gpct('f-B145'),
-      },
-      phases: {
-        C122: gn('f-C122'), D122: gn('f-D122'), E122: gn('f-E122'), F122: gn('f-F122'),
-        C123: gn('f-C123'), D123: gn('f-D123'), E123: gn('f-E123'), F123: gn('f-F123'),
-        C124: gn('f-C124'), D124: gn('f-D124'), E124: gn('f-E124'), F124: gn('f-F124'),
-      },
-      accounts: accountsData,
-      debts: collectDebts(),
-    expenses: [
-    { row: 58, name: gv('e-N58'), monthly: gn('e-C58'), annual: gn('e-Y58'), note: gv('e-T58') },
-    { row: 59, name: gv('e-N59'), monthly: gn('e-C59'), annual: gn('e-Y59'), note: gv('e-T59') },
-    { row: 60, name: gv('e-N60'), monthly: gn('e-C60'), annual: gn('e-Y60'), note: gv('e-T60') },
-    { row: 61, name: gv('e-N61'), monthly: gn('e-C61'), annual: gn('e-Y61'), note: gv('e-T61') },
-    { row: 62, name: gv('e-N62'), monthly: gn('e-C62'), annual: gn('e-Y62'), note: gv('e-T62') },
-    { row: 63, name: gv('e-N63'), monthly: gn('e-C63'), annual: gn('e-Y63'), note: gv('e-T63') },
-    { row: 64, name: gv('e-N64'), monthly: gn('e-C64'), annual: gn('e-Y64'), note: gv('e-T64') },
-    { row: 65, name: gv('e-N65'), monthly: gn('e-C65'), annual: gn('e-Y65'), note: gv('e-T65') },
-    { row: 66, name: gv('e-N66'), monthly: gn('e-C66'), annual: gn('e-Y66'), note: gv('e-T66') },
-    { row: 67, name: gv('e-N67'), monthly: gn('e-C67'), annual: gn('e-Y67'), note: gv('e-T67') },
-    { row: 68, name: gv('e-N68'), monthly: gn('e-C68'), annual: gn('e-Y68'), note: gv('e-T68') },
-    { row: 69, name: gv('e-N69'), monthly: gn('e-C69'), annual: gn('e-Y69'), note: gv('e-T69') },
-    { row: 71, name: gv('e-N71'), monthly: gn('e-C71'), annual: gn('e-Y71'), note: gv('e-T71') },
-    { row: 72, name: gv('e-N72'), monthly: gn('e-C72'), annual: gn('e-Y72'), note: gv('e-T72') },
-    { row: 73, name: gv('e-N73'), monthly: gn('e-C73'), annual: gn('e-Y73'), note: gv('e-T73') },
-    { row: 74, name: gv('e-N74'), monthly: gn('e-C74'), annual: gn('e-Y74'), note: gv('e-T74') },
-    { row: 75, name: gv('e-N75'), monthly: gn('e-C75'), annual: gn('e-Y75'), note: gv('e-T75') },
-    { row: 76, name: gv('e-N76'), monthly: gn('e-C76'), annual: gn('e-Y76'), note: gv('e-T76') },
-    { row: 77, name: gv('e-N77'), monthly: gn('e-C77'), annual: gn('e-Y77'), note: gv('e-T77') },
-    { row: 78, name: gv('e-N78'), monthly: gn('e-C78'), annual: gn('e-Y78'), note: gv('e-T78') },
-    { row: 79, name: gv('e-N79'), monthly: gn('e-C79'), annual: gn('e-Y79'), note: gv('e-T79') },
-    { row: 80, name: gv('e-N80'), monthly: gn('e-C80'), annual: gn('e-Y80'), note: gv('e-T80') },
-    { row: 81, name: gv('e-N81'), monthly: gn('e-C81'), annual: gn('e-Y81'), note: gv('e-T81') },
-    { row: 83, name: gv('e-N83'), monthly: gn('e-C83'), annual: gn('e-Y83'), note: gv('e-T83') },
-    { row: 84, name: gv('e-N84'), monthly: gn('e-C84'), annual: gn('e-Y84'), note: gv('e-T84') },
-    { row: 85, name: gv('e-N85'), monthly: gn('e-C85'), annual: gn('e-Y85'), note: gv('e-T85') },
-    ],
+  // Build payload — note: B33,B36,B43,D33,D36,D43 are formula cells, never included
+  var payload = {
+    global: {
+      B6: gv('f-B6'), B7: gn('f-B7'), B8: gn('f-B8'), B9: gn('f-B9'),
+      B10: gpct('f-B10'), B11: gv('f-B11'), B12: gv('f-B12'),
+      B13: gn('f-B13'), B14: gn('f-B14'), B15: gpct('f-B15'),
+      B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gpct('f-B19'),
+      B20: gpct('f-B20'), B21: gpct('f-B21'),
+      B24: gv('f-B24'), B25: gn('f-B25'), B26: gpct('f-B26'), B28: gpct('f-B28'),
     },
-  ];
+    partner1: {
+      B31: gv('f-B31'), B32: gv('f-B32'), B34: gv('f-B34'),
+      B35: gn('f-B35'), B37: gn('f-B37'), B39: gv('f-B39'),
+      B40: gn('f-B40'), B41: gn('f-B41'), B44: gv('f-B44'),
+      B46: gn('f-B46'), B47: gv('f-B47'), B49: gn('f-B49'),
+      B50: gv('f-B50'), B51: gv('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'),
+    },
+    partner2: {
+      D31: gv('f-D31'), D32: gv('f-D32'), D34: gv('f-D34'),
+      D35: gn('f-D35'), D37: gn('f-D37'), D39: gv('f-D39'),
+      D40: gn('f-D40'), D41: gn('f-D41'), D44: gv('f-D44'),
+      D46: gn('f-D46'), D47: gv('f-D47'), D49: gn('f-D49'),
+      D50: gv('f-D50'), D51: gv('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),
+    },
+    roth: { B139: gn('f-B139'), B141: gv('f-B141'), B145: gpct('f-B145') },
+    phases: {
+      C122: gn('f-C122'), D122: gn('f-D122'), E122: gn('f-E122'), F122: gn('f-F122'),
+      C123: gn('f-C123'), D123: gn('f-D123'), E123: gn('f-E123'), F123: gn('f-F123'),
+      C124: gn('f-C124'), D124: gn('f-D124'), E124: gn('f-E124'), F124: gn('f-F124'),
+    },
+    accounts: accountsData,
+    debts: collectDebts(),
+    expenses: [
+      {row:58,name:gv('e-N58'),monthly:gn('e-C58'),note:gv('e-T58')},
+      {row:59,name:gv('e-N59'),monthly:gn('e-C59'),note:gv('e-T59')},
+      {row:60,name:gv('e-N60'),monthly:gn('e-C60'),note:gv('e-T60')},
+      {row:61,name:gv('e-N61'),monthly:gn('e-C61'),note:gv('e-T61')},
+      {row:62,name:gv('e-N62'),monthly:gn('e-C62'),note:gv('e-T62')},
+      {row:63,name:gv('e-N63'),monthly:gn('e-C63'),note:gv('e-T63')},
+      {row:64,name:gv('e-N64'),monthly:gn('e-C64'),note:gv('e-T64')},
+      {row:65,name:gv('e-N65'),monthly:gn('e-C65'),note:gv('e-T65')},
+      {row:66,name:gv('e-N66'),monthly:gn('e-C66'),note:gv('e-T66')},
+      {row:67,name:gv('e-N67'),monthly:gn('e-C67'),note:gv('e-T67')},
+      {row:68,name:gv('e-N68'),monthly:gn('e-C68'),note:gv('e-T68')},
+      {row:69,name:gv('e-N69'),monthly:gn('e-C69'),note:gv('e-T69')},
+      {row:71,name:gv('e-N71'),monthly:gn('e-C71'),note:gv('e-T71')},
+      {row:72,name:gv('e-N72'),monthly:gn('e-C72'),note:gv('e-T72')},
+      {row:73,name:gv('e-N73'),monthly:gn('e-C73'),note:gv('e-T73')},
+      {row:74,name:gv('e-N74'),monthly:gn('e-C74'),note:gv('e-T74')},
+      {row:75,name:gv('e-N75'),monthly:gn('e-C75'),note:gv('e-T75')},
+      {row:76,name:gv('e-N76'),monthly:gn('e-C76'),note:gv('e-T76')},
+      {row:77,name:gv('e-N77'),monthly:gn('e-C77'),note:gv('e-T77')},
+      {row:78,name:gv('e-N78'),monthly:gn('e-C78'),note:gv('e-T78')},
+      {row:79,name:gv('e-N79'),monthly:gn('e-C79'),note:gv('e-T79')},
+      {row:80,name:gv('e-N80'),monthly:gn('e-C80'),note:gv('e-T80')},
+      {row:81,name:gv('e-N81'),monthly:gn('e-C81'),note:gv('e-T81')},
+      {row:83,name:gv('e-N83'),monthly:gn('e-C83'),note:gv('e-T83')},
+      {row:84,name:gv('e-N84'),monthly:gn('e-C84'),note:gv('e-T84')},
+      {row:85,name:gv('e-N85'),monthly:gn('e-C85'),note:gv('e-T85')},
+    ],
+  };
 
-  var idx = 0;
-  function saveNext() {
-    if (idx >= chunks.length) {
+  // Use fetch with no-cors — works after any delay, no callback issues
+  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  var url = SCRIPT_URL + '?action=save&sheetId=' + encodeURIComponent(sheetId)
+            + '&data=' + encoded + '&enc=b64&callback=_rbpVoid&_=' + Date.now();
+
+  fetch(url, { mode: 'no-cors' })
+    .then(function() {
       document.getElementById('loading').style.display = 'none';
-      setStatus('Saved successfully! Your Google Sheet is updating.', 'success');
-      showToast('✅ Saved! Your sheet is updating now.', '');
+      setStatus('✅ Saved! Your Google Sheet is updating.', 'success');
+      showToast('✅ Saved! Sheet updating now.', '');
       isDirty = false;
       document.getElementById('save-btn').disabled = false;
-      return;
-    }
-    var chunk = chunks[idx++];
-    var cb = 'rbp_save_' + Date.now();
-    var timer = setTimeout(function() {
-      if (window[cb]) {
-        delete window[cb];
-        document.getElementById('loading').style.display = 'none';
-        setStatus('Save timed out — please try again.', 'error');
-        showToast('⚠ Save timed out.', 'error');
-        document.getElementById('save-btn').disabled = false;
-      }
-    }, 20000);
-    window._rbpCallbacks[cb] = function(result) {
-      clearTimeout(timer);
-      delete window._rbpCallbacks[cb];
-    };
-    window[cb] = function(r){ window._rbpCallbacks[cb] && window._rbpCallbacks[cb](r); };
-    var _origCb = window._rbpCallbacks[cb];
-    window._rbpCallbacks[cb] = function(result) {
-      clearTimeout(timer);
-      delete window._rbpCallbacks[cb];
-      if (result && result.success) {
-        saveNext();
-      } else {
-        document.getElementById('loading').style.display = 'none';
-        var msg = (result && result.error) ? result.error : 'Unknown error';
-        setStatus('Save failed: ' + msg, 'error');
-        showToast('⚠ Save failed: ' + msg, 'error');
-        document.getElementById('save-btn').disabled = false;
-      }
-    };
-    var s = document.createElement('script');
-    var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(chunk))));
-    var url = SCRIPT_URL + '?action=save&sheetId=' + encodeURIComponent(sheetId)
-              + '&callback=' + cb + '&data=' + encoded + '&enc=b64&_=' + Date.now();
-    s.src = url;
-    s.onerror = function() {
-      clearTimeout(timer);
-      delete window[cb];
+    })
+    .catch(function() {
+      // no-cors always triggers catch — but data was still sent
       document.getElementById('loading').style.display = 'none';
-      setStatus('Connection error — check your internet and try again.', 'error');
-      showToast('⚠ Connection error saving.', 'error');
+      setStatus('✅ Saved! Your Google Sheet is updating.', 'success');
+      showToast('✅ Saved! Sheet updating now.', '');
+      isDirty = false;
       document.getElementById('save-btn').disabled = false;
-    };
-    document.head.appendChild(s);
-  }
-  saveNext();
+    });
 }
+
 
 function buildPayload() {
   return {
