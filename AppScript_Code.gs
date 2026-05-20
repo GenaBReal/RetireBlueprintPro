@@ -181,12 +181,28 @@ function writeInputs(data, sheetId) {
   try {
     var ss  = SpreadsheetApp.openById(sheetId);
     var inp = ss.getSheetByName('Inputs');
+
+    // FORMULA CELLS — never overwrite these, they are sheet-calculated:
+    // B33,D33 (age), B36,D36 (death year), B42,D42 (claiming age),
+    // B43,D43 (SS monthly), B45,D45 (SS end), B48,D48 (pension end),
+    // B86,B87,B119,B120,B128,B129,B130,B134,B140,B143,B144,B146,B149
+
     function set(cell, val) { if(val!==undefined && val!==null && val!=='') inp.getRange(cell).setValue(val); }
     function setN(cell,val) { if(val!==undefined) inp.getRange(cell).setValue(Number(val)||0); }
     function setD(cell,val) {
-      if(!val || val==='' || val==='0' || val===0) return; // skip empty/zero
+      if(!val || val==='' || val==='0' || val===0) return;
       try {
-        var d=new Date(val);
+        var d;
+        var s = String(val).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          var parts = s.split('-');
+          d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+        } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+          var parts = s.split('/');
+          d = new Date(parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
+        } else {
+          d = new Date(val);
+        }
         if(!isNaN(d) && d.getFullYear()>1970 && d.getFullYear()<2200) {
           inp.getRange(cell).setValue(d);
         }
@@ -206,20 +222,18 @@ function writeInputs(data, sheetId) {
     }
     if (data.partner1) {
       var p=data.partner1;
-      set('B31',p.B31); setD('B32',p.B32); setN('B33',p.B33); set('B34',p.B34);
-      setN('B35',p.B35); setN('B36',p.B36); setN('B37',p.B37); setD('B39',p.B39);
+      set('B31',p.B31); setD('B32',p.B32); set('B34',p.B34);
+      setN('B35',p.B35); setN('B37',p.B37); setD('B39',p.B39);
       setN('B40',p.B40); setN('B41',p.B41);
-      // B43 SS Monthly is a sheet formula — do NOT overwrite
       setD('B44',p.B44); setN('B46',p.B46); setD('B47',p.B47);
       setN('B49',p.B49); setD('B50',p.B50); setD('B51',p.B51);
       setN('B52',p.B52); setN('B53',p.B53);
     }
     if (data.partner2) {
       var p=data.partner2;
-      set('D31',p.D31); setD('D32',p.D32); setN('D33',p.D33); set('D34',p.D34);
-      setN('D35',p.D35); setN('D36',p.D36); setN('D37',p.D37); setD('D39',p.D39);
+      set('D31',p.D31); setD('D32',p.D32); set('D34',p.D34);
+      setN('D35',p.D35); setN('D37',p.D37); setD('D39',p.D39);
       setN('D40',p.D40); setN('D41',p.D41);
-      // D43 SS Monthly is a sheet formula — do NOT overwrite
       setD('D44',p.D44); setN('D46',p.D46); setD('D47',p.D47);
       setN('D49',p.D49); setD('D50',p.D50); setD('D51',p.D51);
       setN('D52',p.D52); setN('D53',p.D53);
@@ -264,6 +278,8 @@ function writeInputs(data, sheetId) {
       inp.getRange('C105:C116').setDataValidation(ownerValidation);
     }
     if (data.roth) {
+      // B139 = Roth year (user input), B141 = bracket (user input), B145 = rate (user input)
+      // B140,B143,B144,B146 are formula cells — do NOT write
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
     }
     // Write debt rows A88:G91
