@@ -2,12 +2,25 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=https://docs.google.com/spreadsheets/d/1wWzDjO2VtKb5EEQ0xolKdd1Je961TCqGDI8i-ab3Dfc/copy">
 <title>RetireBlueprint Pro — Opening Your Sheet...</title>
+<style>
+body{font-family:'Segoe UI',sans-serif;background:#041E2F;color:#fff;text-align:center;padding:60px 20px;}
+.btn{display:inline-block;background:#f4b86a;color:#041E2F;font-weight:700;padding:14px 28px;border-radius:8px;text-decoration:none;margin-top:20px;}
+</style>
 </head>
-<body style="font-family:sans-serif;background:#041E2F;color:#fff;text-align:center;padding:40px;">
-<p style="font-size:16px;">Opening your Google Sheet...<br><br>
-<a href="https://docs.google.com/spreadsheets/d/1wWzDjO2VtKb5EEQ0xolKdd1Je961TCqGDI8i-ab3Dfc/copy" 
-   style="color:#1CC7D0;">Click here if it doesn't open automatically</a></p>
+<body>
+<h2 style="color:#f4b86a;margin-bottom:12px;">Opening Your Sheet...</h2>
+<p style="color:#8a9ab0;margin-bottom:24px;">Redirecting to your personal Google Sheet.</p>
+<script>
+  var sid = localStorage.getItem('rbp_sheet_id');
+  if (sid && sid !== '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
+    window.location.href = 'https://docs.google.com/spreadsheets/d/' + sid + '/edit';
+  } else {
+    document.write('<p style="color:#f4b86a;">No sheet connected yet.</p><a href="https://genabreal.github.io/RetireBlueprintPro/setup.html" class="btn">Go to Setup →</a>');
+  }
+</script>
+<noscript>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html" class="btn">Go to Setup →</a>
+</noscript>
 </body>
 </html>
