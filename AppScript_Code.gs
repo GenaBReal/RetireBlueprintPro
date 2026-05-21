@@ -192,29 +192,48 @@ function writeInputs(data, sheetId) {
     function setD(cell,val) {
       if(!val || val==='' || val==='0' || val===0) return;
       try {
-        var d;
         var s = String(val).trim();
+        var yr, mo, dy;
+        // YYYY-MM-DD (HTML date input format) — most reliable
         if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
           var parts = s.split('-');
-          d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-        } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
-          var parts = s.split('/');
-          d = new Date(parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
-        } else {
-          d = new Date(val);
+          yr = parseInt(parts[0]); mo = parseInt(parts[1])-1; dy = parseInt(parts[2]);
         }
-        if(!isNaN(d) && d.getFullYear()>1970 && d.getFullYear()<2200) {
+        // MM/DD/YYYY or M/D/YYYY
+        else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+          var parts = s.split('/');
+          yr = parseInt(parts[2]); mo = parseInt(parts[0])-1; dy = parseInt(parts[1]);
+        }
+        // MM/DD/YY
+        else if (/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(s)) {
+          var parts = s.split('/');
+          yr = parseInt(parts[2])+2000; mo = parseInt(parts[0])-1; dy = parseInt(parts[1]);
+        }
+        else {
+          var d = new Date(val);
+          if(!isNaN(d)) inp.getRange(cell).setValue(d);
+          return;
+        }
+        if(yr && yr > 1900 && yr < 2200) {
+          // Use explicit year/month/day to avoid timezone issues with pre-1970 dates
+          var d = new Date(yr, mo, dy, 12, 0, 0); // noon to avoid DST shifts
           inp.getRange(cell).setValue(d);
         }
-      } catch(e){}
+      } catch(e) { Logger.log('setD error for ' + cell + ': ' + e); }
     }
     function setPct(cell,val) { if(val!==undefined) inp.getRange(cell).setValue(Number(val)||0); }
 
     if (data.global) {
       var g=data.global;
-      if(g.B6) inp.getRange('B6').setValue(new Date(g.B6+'-01-01'));
+      if(g.B6) {
+        var yr = parseInt(g.B6);
+        if(!isNaN(yr) && yr > 2000) {
+          // Store as Jan 15 to avoid timezone rollback to Dec 31 previous year
+          inp.getRange('B6').setValue(new Date(yr, 0, 15));
+        }
+      }
       setN('B7',g.B7); setN('B8',g.B8); setN('B9',g.B9);
-      setPct('B10',g.B10); set('B11',g.B11); set('B12',g.B12);
+      setN('B10',g.B10); // Survivor reduction stored as decimal e.g. 0.25 set('B11',g.B11); set('B12',g.B12);
       setN('B13',g.B13); setN('B14',g.B14); setPct('B15',g.B15);
       set('B16',g.B16); setN('B17',g.B17); setN('B18',g.B18);
       setPct('B19',g.B19); setPct('B20',g.B20); setPct('B21',g.B21);
@@ -282,42 +301,64 @@ function writeInputs(data, sheetId) {
       // B140,B143,B144,B146 are formula cells — do NOT write
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
     }
-    // Write debt rows A88:G91
+    // Write debt rows A88:G91 — only if any debts entered
     if (data.debts && data.debts.length) {
-      var debtData = [];
-      for (var di=0; di<4; di++) {
-        var d = data.debts[di] || {};
+      var hasDebts = data.debts.some(function(d){ return d.name || d.mo; });
+      if (hasDebts) {
+        var debtData = [];
+        for (var di=0; di<2; di++) { // Only 2 writable debt rows (88-89)
+          var d = data.debts[di] || {};
+          function parseDebtDate(s) {
+          if (!s || s === '') return '';
+          if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+            var p = s.split('-');
+            return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]), 12, 0, 0);
+          }
+          if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+            var p = s.split('/');
+            return new Date(parseInt(p[2]), parseInt(p[0])-1, parseInt(p[1]), 12, 0, 0);
+          }
+          return '';
+        }
         debtData.push([
-          d.inc||'No',
-          d.name||'',
-          Number(d.mo)||0,
-          Number(d.ann)||0,
-          d.start ? new Date(d.start) : '',
-          d.end   ? new Date(d.end)   : '',
-          Number(d.bal)||0,
-        ]);
+            d.inc||'No', d.name||'',
+            Number(d.mo)||0, Number(d.ann)||0,
+            parseDebtDate(d.start),
+            parseDebtDate(d.end),
+            Number(d.bal)||0,
+          ]);
+        }
+        // Only write actual debt rows 88-89 (rows 90-91 are header/label rows in sheet)
+      inp.getRange('A88:G89').setValues(debtData.slice(0,2));
       }
-      inp.getRange('A88:G91').setValues(debtData);
     }
-    // Write expense rows — true batch write (3 calls total instead of 78)
+    // Write expense rows — only rows with data
     if (data.expenses && data.expenses.length) {
-      var bData = [], cData = [], tData = [];
-      for (var i=0; i<28; i++) {
-        bData.push(['']);
-        cData.push([0]);
-        tData.push(['']);
-      }
-      data.expenses.forEach(function(exp) {
-        var r = Number(exp.row);
-        if (!r || r < 58 || r > 85) return;
+      var hasExpenses = data.expenses.some(function(e){ return e.name || e.monthly; });
+      if (hasExpenses) {
+        var bData = [], cData = [], tData = [];
+        for (var i=0; i<28; i++) {
+          bData.push(['']); cData.push([0]); tData.push(['']);
+        }
+        data.expenses.forEach(function(exp) {
+          var r = Number(exp.row);
+          if (!r || r < 58 || r > 85) return;
+          var idx = r - 58;
+          bData[idx] = [exp.name||''];
+          cData[idx] = [Number(exp.monthly)||0];
+          tData[idx] = [exp.note||''];
+        });
+        // B column written row by row below
+        // Write expenses but skip formula rows 62 and 70
+      var expRows = [58,59,60,61,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
+      expRows.forEach(function(r) {
         var idx = r - 58;
-        bData[idx] = [exp.name||''];
-        cData[idx] = [Number(exp.monthly)||0];
-        tData[idx] = [exp.note||''];
+        if(bData[idx][0] !== undefined) inp.getRange('B'+r).setValue(bData[idx][0]);
+        if(cData[idx][0] !== undefined) inp.getRange('C'+r).setValue(cData[idx][0]);
+        if(tData[idx][0] !== undefined) inp.getRange('T'+r).setValue(tData[idx][0]);
       });
-      inp.getRange('B58:B85').setValues(bData);
-      inp.getRange('C58:C85').setValues(cData);
-      inp.getRange('T58:T85').setValues(tData);
+        // T column written row by row below
+      }
     }
     SpreadsheetApp.flush();
     return {success:true, timestamp:new Date().toISOString()};

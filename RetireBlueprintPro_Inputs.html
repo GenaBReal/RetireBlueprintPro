@@ -1477,7 +1477,7 @@ function saveAll() {
   var payload = {
     global: {
       B6: gv('f-B6'), B7: gn('f-B7'), B8: gn('f-B8'), B9: gn('f-B9'),
-      B10: gpct('f-B10'), B11: gv('f-B11'), B12: gv('f-B12'),
+      B10: gn('f-B10')/100, B11: gv('f-B11'), B12: gv('f-B12'),
       B13: gn('f-B13'), B14: gn('f-B14'), B15: gpct('f-B15'),
       B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gpct('f-B19'),
       B20: gpct('f-B20'), B21: gpct('f-B21'),
@@ -1566,7 +1566,7 @@ function buildPayload() {
       B7:  document.getElementById('f-B7').value,
       B8:  document.getElementById('f-B8').value,
       B9:  document.getElementById('f-B9').value,
-      B10: document.getElementById('f-B10').value / 100,
+      B10: document.getElementById('f-B10').value / 100, // legacy
       B11: document.getElementById('f-B11').value,
       B12: document.getElementById('f-B12').value,
       B13: document.getElementById('f-B13').value,
