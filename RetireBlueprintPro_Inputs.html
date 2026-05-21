@@ -254,8 +254,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       </div>
       <div class="field">
         <label>Social Security COLA (%)</label>
-        <input type="number" id="f-B21" value="2.5" min="0" max="5" step="0.1">
-              <span class="hint">Typical: 2–3% · SS COLA averaged 2.6% over last 20 years</span>
+        <input type="number" id="f-B21" value="2.5" min="0" max="5" step="0.1" onchange="markDirty()">
+        <span class="hint">Typical: 2–3% · SS COLA averaged 2.6% over last 20 years</span>
+      </div>
+      <div class="field">
+        <label>Base Tax Rate Adjustment (%)</label>
+        <input type="number" id="f-B22" value="0" step="0.1" min="-10" max="10" onchange="markDirty()">
+        <span class="hint">Optional tweak to your effective federal rate · Use 0 for most people · Positive = expect taxes to rise, Negative = expect to fall</span>
+      </div>
+      <div class="field">
+        <label>Marginal Tax Rate on Extra Spend (%)</label>
+        <input type="number" id="f-B23" value="0" step="0.1" min="0" max="50" onchange="markDirty()">
+        <span class="hint">Tax rate on extra discretionary withdrawals · Typical: 12–22% for most retirees · Use your expected marginal bracket · 0 = solver calculates automatically</span>
       </div>
       <div class="field">
         <label>State Tax Rate (%)</label>
@@ -294,45 +304,58 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
     </div>
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
-      <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Stress Test Settings</div>
+      <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Stress Test Settings</div>
+      <div style="font-size:10px;color:var(--muted);background:rgba(244,184,106,0.08);border-left:3px solid var(--orange);padding:8px 12px;border-radius:4px;margin-bottom:10px;line-height:1.6;">
+        <strong style="color:var(--text);">What is a stress test?</strong> Simulates a market crash during retirement to see if your plan survives.
+        <em>Early Bear</em> = crash right when you retire (worst case). <em>Late Bear</em> = crash later in retirement.
+        Leave both on <strong>Normal Returns</strong> for your base plan. Switch to <strong>Bear Market</strong> to test resilience.
+      </div>
       <div class="form-grid-4">
         <div class="field">
           <label>Early Bear Market?</label>
-          <select id="f-B12">
+          <select id="f-B12" onchange="markDirty()">
             <option value="Normal Returns" selected>Normal Returns</option>
             <option value="Bear Market">Bear Market</option>
           </select>
+          <span class="hint">Switch to "Bear Market" to stress test · Leave Normal for base plan</span>
         </div>
         <div class="field">
           <label>Early Bear Start Year</label>
-          <input type="number" id="f-B13" value="2026">
+          <input type="number" id="f-B13" value="2026" onchange="markDirty()">
+          <span class="hint">Typical: your retirement year · Tests sequence-of-returns risk</span>
         </div>
         <div class="field">
           <label>Early Bear Duration (yrs)</label>
-          <input type="number" id="f-B14" value="6" min="1" max="10">
+          <input type="number" id="f-B14" value="6" min="1" max="10" onchange="markDirty()">
+          <span class="hint">Typical: 2–7 yrs · 2008 crash lasted ~2 yrs · Use 3–5 for realistic test</span>
         </div>
         <div class="field">
           <label>Early Bear Return Drag (%)</label>
-          <input type="number" id="f-B15" value="15" min="0" max="50">
+          <input type="number" id="f-B15" value="15" min="0" max="50" onchange="markDirty()">
+          <span class="hint">Typical: 10–20% · Mild=10%, Moderate=15%, Severe=20–30% · 2008 dropped ~37%</span>
         </div>
         <div class="field">
           <label>Late Bear Market?</label>
-          <select id="f-B16">
+          <select id="f-B16" onchange="markDirty()">
             <option value="Normal Returns" selected>Normal Returns</option>
             <option value="Bear Market">Bear Market</option>
           </select>
+          <span class="hint">Optional second stress test · Tests a downturn later in retirement</span>
         </div>
         <div class="field">
           <label>Late Bear Start Year</label>
-          <input type="number" id="f-B17" value="2045">
+          <input type="number" id="f-B17" value="2045" onchange="markDirty()">
+          <span class="hint">Typical: 15–20 years into retirement · Tests mid-to-late resilience</span>
         </div>
         <div class="field">
           <label>Late Bear Duration (yrs)</label>
-          <input type="number" id="f-B18" value="3" min="1" max="10">
+          <input type="number" id="f-B18" value="3" min="1" max="10" onchange="markDirty()">
+          <span class="hint">Typical: 2–5 yrs · Shorter than early bear is realistic</span>
         </div>
         <div class="field">
           <label>Late Bear Return Drag (%)</label>
-          <input type="number" id="f-B19" value="15" min="0" max="50">
+          <input type="number" id="f-B19" value="15" min="0" max="50" onchange="markDirty()">
+          <span class="hint">Typical: 10–15% · Can use lower than early bear</span>
         </div>
       </div>
     </div>
@@ -1540,6 +1563,7 @@ function saveAll() {
       B13: gn('f-B13'), B14: gn('f-B14'), B15: gpct('f-B15'),
       B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gpct('f-B19'),
       B20: gpct('f-B20'), B21: gpct('f-B21'),
+      B22: gpct('f-B22'), B23: gpct('f-B23'),
       B24: gv('f-B24'), B25: gn('f-B25'), B26: gpct('f-B26'), B28: gpct('f-B28'),
     },
     partner1: {

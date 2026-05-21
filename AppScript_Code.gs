@@ -158,7 +158,8 @@ function readAll(sheetId) {
       variance:endLiquid-legacyGoal, achievedPct:endLiquid>=legacyGoal?100:Math.round(endLiquid/legacyGoal*100),
       status:String(v('B134')) },
     tax:{
-      effectiveRate:Number(v('B22')), stateRate:pct(v('B26')), standardDeduction:Number(v('B25')),
+      effectiveRate:Number(v('B22')), baseTaxAdj:pct(v('B22')), marginalExtra:pct(v('B23')),
+      stateRate:pct(v('B26')), standardDeduction:Number(v('B25')),
       rothConversionSavings:Number(v('B146')), inflation:Number(v('B20')), ssCola:Number(v('B21')),
       healthcareInflation:pct(v('B28')), brackets:brackets,
     },
@@ -240,6 +241,7 @@ function writeInputs(data, sheetId) {
       setN('B13',g.B13); setN('B14',g.B14); setPct('B15',g.B15);
       set('B16',g.B16); setN('B17',g.B17); setN('B18',g.B18);
       setPct('B19',g.B19); setPct('B20',g.B20); setPct('B21',g.B21);
+      setPct('B22',g.B22); setPct('B23',g.B23);
       set('B24',g.B24); setN('B25',g.B25); setPct('B26',g.B26); setPct('B28',g.B28);
     }
     if (data.partner1) {
