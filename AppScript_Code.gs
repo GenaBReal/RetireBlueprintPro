@@ -115,18 +115,21 @@ function readAll(sheetId) {
     people:{ craig:craig, gena:gena },
     portfolio:{ total:total, peakValue:peakVal*1000, peakYear:peakYear, accounts:accounts },
     debts: (function(){
-      var dRows = inp.getRange('A88:G91').getValues();
-      return dRows.map(function(r, i){
-        return {
-          inc:   String(r[0]||'No'),
-          name:  String(r[1]||''),
-          mo:    Number(r[2])||0,
-          ann:   Number(r[3])||0,
-          start: dt(r[4]),
-          end:   dt(r[5]),
-          bal:   Number(r[6])||0,
-        };
+      // Debt rows: 88,89 then 92-101 (rows 90-91 are headers)
+      var rows88 = inp.getRange('A88:G89').getValues();
+      var rows92 = inp.getRange('A92:G101').getValues();
+      var result = [];
+      rows88.forEach(function(r){
+        result.push({inc:String(r[0]||'No'),name:String(r[1]||''),
+          mo:Number(r[2])||0,ann:Number(r[3])||0,
+          start:dt(r[4]),end:dt(r[5]),bal:Number(r[6])||0});
       });
+      rows92.forEach(function(r){
+        result.push({inc:String(r[0]||'No'),name:String(r[1]||''),
+          mo:Number(r[2])||0,ann:Number(r[3])||0,
+          start:dt(r[4]),end:dt(r[5]),bal:Number(r[6])||0});
+      });
+      return result;
     })(),
     spending:{
       baseAnnual:baseSpend, safeExtra:safeExtra,

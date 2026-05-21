@@ -250,22 +250,27 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       <div class="field">
         <label>Base Inflation Rate (%)</label>
         <input type="number" id="f-B20" value="3.0" min="0" max="10" step="0.1">
+              <span class="hint">Typical: 2.5–3.5% · Fed target is 2% · Use 3% for conservative planning</span>
       </div>
       <div class="field">
         <label>Social Security COLA (%)</label>
         <input type="number" id="f-B21" value="2.5" min="0" max="5" step="0.1">
+              <span class="hint">Typical: 2–3% · SS COLA averaged 2.6% over last 20 years</span>
       </div>
       <div class="field">
         <label>State Tax Rate (%)</label>
         <input type="number" id="f-B26" value="0" min="0" max="15" step="0.1">
+              <span class="hint">Find your state rate at tax-rates.org · CA=9.3%, TX=0%, NY=6.85%</span>
       </div>
       <div class="field">
         <label>Healthcare Inflation (%)</label>
         <input type="number" id="f-B28" value="5.3" min="0" max="15" step="0.1">
+              <span class="hint">Typical: 5–7% · Medical inflation runs 2x general inflation</span>
       </div>
       <div class="field">
         <label>Standard Deduction ($)</label>
         <input type="number" id="f-B25" value="30000">
+              <span class="hint">Standard deduction for 2026: $30,000 MFJ · Updates annually with IRS</span>
       </div>
       <div class="field">
         <label>Tax Filing Status</label>
@@ -661,7 +666,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="date" id="d-end-1" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-bal-1" value="0" oninput="markDirty()"></td>
         </tr>
-        <tr style="display:none">
+        <tr>
           <td><button class="toggle-no" id="d-inc-2" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-2" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-mo-2" value="0" oninput="calcDebtAnnual(2);markDirty()"></td>
@@ -670,7 +675,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="date" id="d-end-2" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-bal-2" value="0" oninput="markDirty()"></td>
         </tr>
-        <tr style="display:none">
+        <tr>
           <td><button class="toggle-no" id="d-inc-3" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-3" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-mo-3" value="0" oninput="calcDebtAnnual(3);markDirty()"></td>
@@ -678,6 +683,60 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <td><input type="date" id="d-start-3" value="" oninput="markDirty()"></td>
           <td><input type="date" id="d-end-3" value="" oninput="markDirty()"></td>
           <td><input type="number" id="d-bal-3" value="0" oninput="markDirty()"></td>
+        </tr>
+        <tr>
+          <td><button class="toggle-no" id="d-inc-4" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" id="d-name-4" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-mo-4" value="0" oninput="calcDebtAnnual(4);markDirty()"></td>
+          <td><input type="number" id="d-ann-4" value="0" readonly></td>
+          <td><input type="date" id="d-start-4" value="" oninput="markDirty()"></td>
+          <td><input type="date" id="d-end-4" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-bal-4" value="0" oninput="markDirty()"></td>
+        </tr>
+        <tr>
+          <td><button class="toggle-no" id="d-inc-5" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" id="d-name-5" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-mo-5" value="0" oninput="calcDebtAnnual(5);markDirty()"></td>
+          <td><input type="number" id="d-ann-5" value="0" readonly></td>
+          <td><input type="date" id="d-start-5" value="" oninput="markDirty()"></td>
+          <td><input type="date" id="d-end-5" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-bal-5" value="0" oninput="markDirty()"></td>
+        </tr>
+        <tr>
+          <td><button class="toggle-no" id="d-inc-6" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" id="d-name-6" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-mo-6" value="0" oninput="calcDebtAnnual(6);markDirty()"></td>
+          <td><input type="number" id="d-ann-6" value="0" readonly></td>
+          <td><input type="date" id="d-start-6" value="" oninput="markDirty()"></td>
+          <td><input type="date" id="d-end-6" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-bal-6" value="0" oninput="markDirty()"></td>
+        </tr>
+        <tr>
+          <td><button class="toggle-no" id="d-inc-7" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" id="d-name-7" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-mo-7" value="0" oninput="calcDebtAnnual(7);markDirty()"></td>
+          <td><input type="number" id="d-ann-7" value="0" readonly></td>
+          <td><input type="date" id="d-start-7" value="" oninput="markDirty()"></td>
+          <td><input type="date" id="d-end-7" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-bal-7" value="0" oninput="markDirty()"></td>
+        </tr>
+        <tr>
+          <td><button class="toggle-no" id="d-inc-8" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" id="d-name-8" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-mo-8" value="0" oninput="calcDebtAnnual(8);markDirty()"></td>
+          <td><input type="number" id="d-ann-8" value="0" readonly></td>
+          <td><input type="date" id="d-start-8" value="" oninput="markDirty()"></td>
+          <td><input type="date" id="d-end-8" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-bal-8" value="0" oninput="markDirty()"></td>
+        </tr>
+        <tr>
+          <td><button class="toggle-no" id="d-inc-9" onclick="toggleDebt(this)">No</button></td>
+          <td><input type="text" id="d-name-9" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-mo-9" value="0" oninput="calcDebtAnnual(9);markDirty()"></td>
+          <td><input type="number" id="d-ann-9" value="0" readonly></td>
+          <td><input type="date" id="d-start-9" value="" oninput="markDirty()"></td>
+          <td><input type="date" id="d-end-9" value="" oninput="markDirty()"></td>
+          <td><input type="number" id="d-bal-9" value="0" oninput="markDirty()"></td>
         </tr>
       </tbody>
     </table>
@@ -1068,7 +1127,7 @@ function calcDebtAnnual(i) {
 
 function collectDebts() {
   var debts = [];
-  for (var i=0; i<2; i++) { // Only 2 writable debt rows in sheet (rows 88-89)
+  for (var i=0; i<10; i++) { // 10 debt rows: sheet rows 88,89,92-101
     debts.push({
       inc:   (document.getElementById('d-inc-'+i)||{}).textContent||'No',
       name:  gv('d-name-'+i),
