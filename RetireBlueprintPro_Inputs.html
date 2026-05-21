@@ -76,6 +76,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 }
 .field input[readonly]{background:var(--light);color:var(--muted);cursor:default;border-color:var(--border);}
 .hint{font-size:9px;color:var(--muted);font-style:italic;display:block;margin-top:2px;}
+.currency-wrap{position:relative;display:block;}
+.currency-wrap::before{content:'$';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;z-index:1;}
+.currency-wrap input{padding-left:22px !important;}
+.pct-wrap{position:relative;display:inline-block;width:100%;}
+.pct-wrap::after{content:'%';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;z-index:1;}
+.pct-wrap input{padding-right:28px !important;}
+input.currency{-moz-appearance:textfield;}
+input.currency::-webkit-outer-spin-button,
+input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .field .hint{font-size:8px;color:var(--muted);font-style:italic;margin-top:1px;}
 .field .computed{font-size:11px;color:var(--teal);font-weight:700;margin-top:2px;}
 
@@ -269,8 +278,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
       </div>
       <div class="field">
         <label>State Tax Rate (%)</label>
-        <input type="number" id="f-B26" value="0" min="0" max="15" step="0.1">
-              <span class="hint">Find your state rate at tax-rates.org · CA=9.3%, TX=0%, NY=6.85%</span>
+        <input type="number" id="f-B26" value="0" min="0" max="15" step="0.1" onchange="markDirty()">
+        <span class="hint">Find your state rate at tax-rates.org · CA=9.3%, TX=0%, NY=6.85%</span>
+      </div>
+      <div class="field">
+        <label>Standard Deduction Inflation (%)</label>
+        <input type="number" id="f-B27" value="2.5" step="0.1" min="0" max="10" onchange="markDirty()">
+        <span class="hint">Rate at which the standard deduction grows each year · Typical: 2–3% · IRS adjusts annually for inflation · Use 2.5% as a safe default</span>
       </div>
       <div class="field">
         <label>Healthcare Inflation (%)</label>
@@ -476,11 +490,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
-              <input type="number" id="f-B52" value="0">
+              <input type="number" id="f-B52" value="0" onchange="markDirty()">
+              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr</span>
             </div>
             <div class="field">
               <label>Medicare Annual ($)</label>
-              <input type="number" id="f-B53" value="0">
+              <input type="number" id="f-B53" value="0" onchange="markDirty()">
+              <span class="hint">After Medicare starts · Typical: $4,000–$8,000/yr incl. Part B, D, Medigap</span>
+            </div>
+            <div class="field">
+              <label>Medicare Start Age</label>
+              <input type="number" id="f-B54" value="65" min="65" max="70" onchange="markDirty()">
+              <span class="hint">Almost always 65 · Earlier only if disabled</span>
             </div>
           </div>
         </div>
@@ -590,11 +611,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
-              <input type="number" id="f-D52" value="0">
+              <input type="number" id="f-D52" value="0" onchange="markDirty()">
+              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr</span>
             </div>
             <div class="field">
               <label>Medicare Annual ($)</label>
-              <input type="number" id="f-D53" value="0">
+              <input type="number" id="f-D53" value="0" onchange="markDirty()">
+              <span class="hint">After Medicare starts · Typical: $4,000–$8,000/yr incl. Part B, D, Medigap</span>
+            </div>
+            <div class="field">
+              <label>Medicare Start Age</label>
+              <input type="number" id="f-D54" value="65" min="65" max="70" onchange="markDirty()">
+              <span class="hint">Almost always 65 · Earlier only if disabled</span>
             </div>
           </div>
         </div>
@@ -1036,19 +1064,83 @@ function buildAccountsTable() {
   accountsData.forEach(function(a, idx) {
     var tr = document.createElement('tr');
     var isYes = a.inc === 'Yes';
-    tr.innerHTML =
-      '<td><button class="'+(isYes?'toggle-yes':'toggle-no')+'" onclick="toggleAccount(this,'+idx+')">'+a.inc+'</button></td>' +
-      '<td><input type="text" value="'+a.name+'" onchange="accountsData['+idx+'].name=this.value"></td>' +
-      '<td>'+ownerSel(idx, a.owner)+'</td>' +
-      '<td>'+typeSel(idx, a.type)+'</td>' +
-      '<td><input type="number" value="'+a.bal+'" onchange="accountsData['+idx+'].bal=parseFloat(this.value)||0;updatePortfolioTotal()"></td>' +
-      '<td><input type="number" value="'+a.ret+'" step="0.1" min="0" max="20" onchange="accountsData['+idx+'].ret=parseFloat(this.value)||0"></td>' +
-      '<td>'+statusSel(idx, a.status)+'</td>' +
-      '<td>'+dashSel(idx, a.dash)+'</td>';
+
+    // Col 1: Include toggle
+    var td1 = document.createElement('td');
+    var btn = document.createElement('button');
+    btn.className = isYes ? 'toggle-yes' : 'toggle-no';
+    btn.textContent = a.inc;
+    btn.onclick = function(){ toggleAccount(btn, idx); };
+    td1.appendChild(btn);
+
+    // Col 2: Name
+    var td2 = document.createElement('td');
+    var nameInp = document.createElement('input');
+    nameInp.type = 'text';
+    nameInp.value = a.name || '';
+    nameInp.onchange = function(){ accountsData[idx].name = this.value; markDirty(); };
+    td2.appendChild(nameInp);
+
+    // Col 3: Owner (select)
+    var td3 = document.createElement('td');
+    td3.innerHTML = ownerSel(idx, a.owner);
+
+    // Col 4: Type (select)
+    var td4 = document.createElement('td');
+    td4.innerHTML = typeSel(idx, a.type);
+
+    // Col 5: Balance — currency formatted, whole dollars
+    var td5 = document.createElement('td');
+    var balInp = document.createElement('input');
+    balInp.type = 'text';
+    balInp.inputMode = 'numeric';
+    balInp.style.width = '110px';
+    balInp.value = a.bal ? parseInt(a.bal).toLocaleString() : '';
+    balInp.addEventListener('input', function() {
+      var v = this.value.replace(/[^0-9]/g, '');
+      this.value = v ? parseInt(v).toLocaleString() : '';
+      accountsData[idx].bal = parseInt(v) || 0;
+      updatePortfolioTotal();
+      markDirty();
+    });
+    balInp.addEventListener('blur', function() {
+      var v = this.value.replace(/[^0-9]/g, '');
+      this.value = v ? parseInt(v).toLocaleString() : '';
+    });
+    td5.appendChild(balInp);
+
+    // Col 6: Return % — max 2 decimal places
+    var td6 = document.createElement('td');
+    var retInp = document.createElement('input');
+    retInp.type = 'number';
+    retInp.step = '0.01';
+    retInp.min = '0';
+    retInp.max = '20';
+    retInp.style.paddingRight = '28px';
+    retInp.value = a.ret || 0;
+    retInp.addEventListener('change', function() {
+      var n = parseFloat(this.value);
+      if (!isNaN(n)) this.value = Math.round(n * 100) / 100;
+      accountsData[idx].ret = parseFloat(this.value) || 0;
+      markDirty();
+    });
+    td6.appendChild(retInp);
+
+    // Col 7: Status (select)
+    var td7 = document.createElement('td');
+    td7.innerHTML = statusSel(idx, a.status);
+
+    // Col 8: Dashboard (select)
+    var td8 = document.createElement('td');
+    td8.innerHTML = dashSel(idx, a.dash);
+
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
+    tr.appendChild(td5); tr.appendChild(td6); tr.appendChild(td7); tr.appendChild(td8);
     tbody.appendChild(tr);
   });
   updatePortfolioTotal();
 }
+
 
 function ownerSel(idx, val) {
   var o = '<select onchange="accountsData['+idx+'].owner=this.value">';
@@ -1143,9 +1235,10 @@ function onDeathAgeChange(ageId, deathAgeId, deathYearId) {
 }
 
 function calcDebtAnnual(i) {
-  var mo = parseFloat((document.getElementById('d-mo-'+i)||{}).value)||0;
+  var moEl = document.getElementById('d-mo-'+i);
+  var mo = moEl ? parseInt(String(moEl.value).replace(/[^0-9]/g,''))||0 : 0;
   var ann = document.getElementById('d-ann-'+i);
-  if (ann) ann.value = Math.round(mo * 12);
+  if (ann) ann.value = mo ? (mo*12).toLocaleString() : '';
 }
 
 function collectDebts() {
@@ -1154,11 +1247,11 @@ function collectDebts() {
     debts.push({
       inc:   (document.getElementById('d-inc-'+i)||{}).textContent||'No',
       name:  gv('d-name-'+i),
-      mo:    gn('d-mo-'+i),
+      mo:    parseInt(String(((document.getElementById('d-mo-'+i)||{}).value)||'0').replace(/[^0-9]/g,''))||0,
       ann:   gn('d-ann-'+i),
       start: gd('d-start-'+i),
       end:   gd('d-end-'+i),
-      bal:   gn('d-bal-'+i),
+      bal:   parseInt(String(((document.getElementById('d-bal-'+i)||{}).value)||'0').replace(/[^0-9]/g,''))||0,
     });
   }
   return debts;
@@ -1172,11 +1265,11 @@ function loadDebts(debts) {
     if (btn) { btn.textContent = d.inc||'No'; btn.className = d.inc==='Yes'?'toggle-yes':'toggle-no'; }
     var el;
     el=document.getElementById('d-name-'+i);  if(el) el.value = d.name||'';
-    el=document.getElementById('d-mo-'+i);    if(el) el.value = d.mo||0;
-    el=document.getElementById('d-ann-'+i);   if(el) el.value = d.ann||0;
+    el=document.getElementById('d-mo-'+i);  if(el) el.value = d.mo ? parseInt(d.mo).toLocaleString() : '';
+    el=document.getElementById('d-ann-'+i); if(el) el.value = d.ann ? parseInt(d.ann).toLocaleString() : '';
     el=document.getElementById('d-start-'+i); if(el) el.value = d.start||'';
     el=document.getElementById('d-end-'+i);   if(el) el.value = d.end||'';
-    el=document.getElementById('d-bal-'+i);   if(el) el.value = d.bal||0;
+    el=document.getElementById('d-bal-'+i); if(el) el.value = d.bal ? parseInt(d.bal).toLocaleString() : '';
   });
 }
 
@@ -1436,7 +1529,7 @@ function populateFromData(d) {
       var cel = document.getElementById('e-C'+r);
       var tel = document.getElementById('e-T'+r);
       if (nel) nel.value = exp.name || '';
-      if (cel) { cel.value = exp.monthly || 0; calcExpense(cel, 'e-Y'+r); }
+      if (cel) { var mo=parseInt(exp.monthly)||0; cel.value=mo?mo.toLocaleString():''; calcExpense(cel,'e-Y'+r); }
       if (tel) tel.value = exp.note || '';
     });
   }
@@ -1470,6 +1563,12 @@ function setVal(id, val) {
   if (!el || val === undefined || val === null) return;
   if (typeof val === 'string') {
     val = val.replace(/[$,%]/g,'').replace(/,/g,'').trim();
+  }
+  if (el.classList && el.classList.contains('currency')) {
+    // Currency field — format with commas
+    var n = parseFloat(String(val).replace(/[^0-9.]/g,''));
+    el.value = isNaN(n) ? '' : Math.round(n).toLocaleString();
+    return;
   }
   if (el.type === 'number') {
     var n = parseFloat(val);
@@ -1533,9 +1632,10 @@ function gd(id) {
   return el.value; // Already in YYYY-MM-DD format
 }
 function gn(id) {
-  // Safe getNumber
   var el = document.getElementById(id);
-  return el ? (parseFloat(el.value) || 0) : 0;
+  if (!el) return 0;
+  var val = String(el.value).replace(/[$,%]/g, '').trim();
+  return parseFloat(val) || 0;
 }
 function gpct(id) {
   // Safe getPercent (divide by 100)
@@ -1564,6 +1664,7 @@ function saveAll() {
       B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gpct('f-B19'),
       B20: gpct('f-B20'), B21: gpct('f-B21'),
       B22: gpct('f-B22'), B23: gpct('f-B23'),
+      B27: gpct('f-B27'),
       B24: gv('f-B24'), B25: gn('f-B25'), B26: gpct('f-B26'), B28: gpct('f-B28'),
     },
     partner1: {
@@ -1789,13 +1890,130 @@ function getRaw(input) {
 }
 
 // Apply currency formatting to all account balance inputs
-function initCurrencyFields() { /* disabled */ }
+// ── CURRENCY FORMATTING ─────────────────────────────────────────
+var PCT_IDS = [
+  'f-B10','f-B15','f-B19','f-B20','f-B21',
+  'f-B22','f-B23','f-B26','f-B27','f-B28','f-B145'
+];
+
+var CURRENCY_IDS = [
+  'f-B8','f-B9','f-B37','f-D37','f-B40','f-D40',
+  'f-B46','f-D46','f-B49','f-D49',
+  'f-B52','f-D52','f-B53','f-D53','f-B25',
+  'e-C58',
+  'e-C59',
+  'e-C60',
+  'e-C61',
+  'e-C62',
+  'e-C63',
+  'e-C64',
+  'e-C65',
+  'e-C66',
+  'e-C67',
+  'e-C68',
+  'e-C69',
+  'e-C71',
+  'e-C72',
+  'e-C73',
+  'e-C74',
+  'e-C75',
+  'e-C76',
+  'e-C77',
+  'e-C78',
+  'e-C79',
+  'e-C80',
+  'e-C81',
+  'e-C83',
+  'e-C84',
+  'e-C85',
+  'd-mo-0',
+  'd-mo-1',
+  'd-mo-2',
+  'd-mo-3',
+  'd-mo-4',
+  'd-mo-5',
+  'd-mo-6',
+  'd-mo-7',
+  'd-mo-8',
+  'd-mo-9',
+  'd-bal-0',
+  'd-bal-1',
+  'd-bal-2',
+  'd-bal-3',
+  'd-bal-4',
+  'd-bal-5',
+  'd-bal-6',
+  'd-bal-7',
+  'd-bal-8',
+  'd-bal-9'
+];
+
+function initCurrencyFields() {
+  CURRENCY_IDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    // Wrap in $ prefix div
+    var wrap = document.createElement('div');
+    wrap.className = 'currency-wrap';
+    el.parentNode.insertBefore(wrap, el);
+    wrap.appendChild(el);
+    el.classList.add('currency');
+    el.setAttribute('type', 'text');
+    el.setAttribute('inputmode', 'numeric');
+    // Format existing value
+    var raw = String(el.value).replace(/[^0-9]/g,'');
+    el.value = raw && raw !== '0' ? parseInt(raw).toLocaleString() : '';
+    // Format while typing — whole dollars only
+    el.addEventListener('input', function() {
+      var raw = el.value.replace(/[^0-9]/g,'');
+      el.value = raw ? parseInt(raw).toLocaleString() : '';
+      markDirty();
+    });
+    el.addEventListener('blur', function() {
+      var raw = el.value.replace(/[^0-9]/g,'');
+      el.value = raw ? parseInt(raw).toLocaleString() : '';
+    });
+    el.addEventListener('focus', function() { el.select(); });
+  });
+}
+
+function initPctFields() {
+  PCT_IDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el || el.readOnly) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'pct-wrap';
+    el.parentNode.insertBefore(wrap, el);
+    wrap.appendChild(el);
+    el.addEventListener('focus', function() {
+      el.select();
+    });
+    el.addEventListener('input', function() {
+      // Allow typing — restrict to digits and one decimal point
+      var val = el.value.replace(/[^0-9.\-]/g, '');
+      // Enforce max 2 decimal places
+      var parts = val.split('.');
+      if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+      if (parts[1] && parts[1].length > 2) val = parts[0] + '.' + parts[1].slice(0,2);
+      el.value = val;
+      markDirty();
+    });
+    el.addEventListener('blur', function() {
+      var n = parseFloat(el.value);
+      if (!isNaN(n)) {
+        // Round to max 2 decimal places
+        el.value = Math.round(n * 100) / 100;
+      }
+    });
+  });
+}
 
 // ── INIT ─────────────────────────────────────────────────────
 buildAccountsTable();
 buildRothPlanTable();
 updateExpenseTotal();
 initCurrencyFields();
+initPctFields();
 updatePartnerNames();
 updateTheme(1, 'Steel Blue');
 updateTheme(2, 'Frost Plum');

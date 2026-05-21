@@ -51,7 +51,7 @@ function readAll(sheetId) {
     ssStartDate:dt(v('B44')), pension:Number(v('B46')), pensionAnnual:Number(v('B46'))*12,
     pensionStart:dt(v('B47')), otherIncome:Number(v('B49')),
     otherStart:dt(v('B50')), otherEnd:dt(v('B51')),
-    healthPreMedicare:Number(v('B52')), healthMedicare:Number(v('B53')),
+    healthPreMedicare:Number(v('B52')), healthMedicare:Number(v('B53')), medicareAge:Number(v('B54')),
     theme:String(v('B34')),
   };
   var gena = {
@@ -62,7 +62,7 @@ function readAll(sheetId) {
     ssStartDate:dt(v('D44')), pension:Number(v('D46')), pensionAnnual:Number(v('D46'))*12,
     pensionStart:dt(v('D47')), otherIncome:Number(v('D49')),
     otherStart:dt(v('D50')), otherEnd:dt(v('D51')),
-    healthPreMedicare:Number(v('D52')), healthMedicare:Number(v('D53')),
+    healthPreMedicare:Number(v('D52')), healthMedicare:Number(v('D53')), medicareAge:Number(v('D54')),
     theme:String(v('D34')),
   };
 
@@ -161,7 +161,7 @@ function readAll(sheetId) {
       effectiveRate:Number(v('B22')), baseTaxAdj:pct(v('B22')), marginalExtra:pct(v('B23')),
       stateRate:pct(v('B26')), standardDeduction:Number(v('B25')),
       rothConversionSavings:Number(v('B146')), inflation:Number(v('B20')), ssCola:Number(v('B21')),
-      healthcareInflation:pct(v('B28')), brackets:brackets,
+      healthcareInflation:pct(v('B28')), stdDedInflation:pct(v('B27')), brackets:brackets,
     },
     global:{
       planYear:planYear, legacyGoal:Number(v('B8')), safetyFloor:Number(v('B9')),
@@ -242,7 +242,7 @@ function writeInputs(data, sheetId) {
       set('B16',g.B16); setN('B17',g.B17); setN('B18',g.B18);
       setPct('B19',g.B19); setPct('B20',g.B20); setPct('B21',g.B21);
       setPct('B22',g.B22); setPct('B23',g.B23);
-      set('B24',g.B24); setN('B25',g.B25); setPct('B26',g.B26); setPct('B28',g.B28);
+      set('B24',g.B24); setN('B25',g.B25); setPct('B26',g.B26); setPct('B27',g.B27); setPct('B28',g.B28);
     }
     if (data.partner1) {
       var p=data.partner1;
@@ -251,7 +251,7 @@ function writeInputs(data, sheetId) {
       setN('B40',p.B40); setN('B41',p.B41);
       setD('B44',p.B44); setN('B46',p.B46); setD('B47',p.B47);
       setN('B49',p.B49); setD('B50',p.B50); setD('B51',p.B51);
-      setN('B52',p.B52); setN('B53',p.B53);
+      setN('B52',p.B52); setN('B53',p.B53); setN('B54',p.B54||65);
     }
     if (data.partner2) {
       var p=data.partner2;
@@ -260,7 +260,7 @@ function writeInputs(data, sheetId) {
       setN('D40',p.D40); setN('D41',p.D41);
       setD('D44',p.D44); setN('D46',p.D46); setD('D47',p.D47);
       setN('D49',p.D49); setD('D50',p.D50); setD('D51',p.D51);
-      setN('D52',p.D52); setN('D53',p.D53);
+      setN('D52',p.D52); setN('D53',p.D53); setN('D54',p.D54||65);
     }
     // Flush partner names first
     SpreadsheetApp.flush();
