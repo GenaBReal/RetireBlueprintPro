@@ -589,10 +589,10 @@ function populate(d){
   set('c5-note', 'Handoff at '+fmt(port.peakValue)+' ('+port.peakYear+') · '+longestN+' plan ends at '+fmt(leg.projectedEnding));
 
   set('load-status', '✓ Plan loaded · '+meta.generated);
-  drawCharts(d, p1, p2, p1n, p2n, longestP, otherP, meta);
+  drawCharts(d, p1, p2, p1n, p2n, longestN, longestP, otherP, otherN, meta);
 }
 
-function drawCharts(d,p1,p2,p1n,p2n,longestP,otherP,meta){
+function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   var proj=d.projections, leg=d.legacy, sp=d.spending;
 
   // Build key year indices — ~10 points across full range
