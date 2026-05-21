@@ -79,9 +79,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 .currency-wrap{position:relative;display:block;}
 .currency-wrap::before{content:'$';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;z-index:1;}
 .currency-wrap input{padding-left:22px !important;}
-.pct-wrap{position:relative;display:inline-block;width:100%;}
-.pct-wrap::after{content:'%';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;z-index:1;}
-.pct-wrap input{padding-right:28px !important;}
+.pct-wrap{position:relative;display:block;width:100%;}
+.pct-wrap::after{content:'%';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--dark);font-size:13px;font-weight:600;pointer-events:none;z-index:1;}
+.pct-wrap input{padding-right:30px !important;width:100%;box-sizing:border-box;}
 input.currency{-moz-appearance:textfield;}
 input.currency::-webkit-outer-spin-button,
 input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
