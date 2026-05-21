@@ -1185,7 +1185,7 @@ function updatePortfolioTotal() {
 
 // ── EXPENSES ─────────────────────────────────────────────────
 function calcExpense(inp, annualId) {
-  var monthly = parseFloat(inp.value) || 0;
+  var monthly = parseFloat(String(inp.value).replace(/[$,]/g,'')) || 0;
   document.getElementById(annualId).value = Math.round(monthly * 12);
   updateExpenseTotal();
   markDirty();
@@ -1197,7 +1197,7 @@ function updateExpenseTotal() {
              'C83','C84','C85'];
   var total = ids.reduce(function(s,id){
     var el = document.getElementById('e-'+id);
-    return s + (el ? (parseFloat(el.value)||0) : 0);
+    return s + (el ? (parseFloat(String(el.value).replace(/[$,]/g,''))||0) : 0);
   }, 0);
   document.getElementById('total-monthly').textContent = '$' + total.toLocaleString();
   document.getElementById('total-annual').textContent = '$' + (total*12).toLocaleString();
@@ -1274,7 +1274,8 @@ function loadDebts(debts) {
 }
 
 function calcSSMonthly(baseId, fraId, startDateId, ageId, monthlyId) {
-  var base = parseFloat((document.getElementById(baseId)||{}).value) || 0;
+  var baseEl = document.getElementById(baseId);
+  var base = baseEl ? (parseFloat(String(baseEl.value).replace(/[$,]/g,'')) || 0) : 0;
   var fra  = parseFloat((document.getElementById(fraId)||{}).value)  || 67;
   var startDateEl = document.getElementById(startDateId);
   var ageEl = document.getElementById(ageId);
@@ -1836,8 +1837,8 @@ function buildPayload() {
         var note = document.getElementById('roth-note-'+yr);
         if (p1el || p2el) {
           plan.push({ year: yr,
-            p1: parseFloat((p1el||{}).value)||0,
-            p2: parseFloat((p2el||{}).value)||0,
+            p1: parseFloat(String((p1el||{}).value||'0').replace(/[$,]/g,''))||0,
+            p2: parseFloat(String((p2el||{}).value||'0').replace(/[$,]/g,''))||0,
             note: (note||{}).value||'' });
         }
       }
@@ -1876,8 +1877,8 @@ function buildRothPlanTable() {
 }
 
 function updateRothTotal(yr) {
-  var p1 = parseFloat(document.getElementById('roth-p1-' + yr).value) || 0;
-  var p2 = parseFloat(document.getElementById('roth-p2-' + yr).value) || 0;
+  var p1 = parseFloat(String(document.getElementById('roth-p1-' + yr).value||'0').replace(/[$,]/g,'')) || 0;
+  var p2 = parseFloat(String(document.getElementById('roth-p2-' + yr).value||'0').replace(/[$,]/g,'')) || 0;
   var total = p1 + p2;
   var el = document.getElementById('roth-total-' + yr);
   if (el) el.textContent = total > 0 ? '$' + total.toLocaleString() : '$0';
