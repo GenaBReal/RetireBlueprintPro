@@ -1548,7 +1548,7 @@ function populateFromData(d) {
       var nel = document.getElementById('e-N'+r);
       var cel = document.getElementById('e-C'+r);
       var tel = document.getElementById('e-T'+r);
-      if (nel) nel.value = exp.name || '';
+      if (nel) { nel.value = exp.label || exp.name || ''; nel.readOnly = true; nel.style.background='#f5f7fa'; nel.style.color='#8a9ab0'; }
       if (cel) { var mo=parseInt(exp.monthly)||0; cel.value=mo?mo.toLocaleString():''; calcExpense(cel,'e-Y'+r); }
       if (tel) tel.value = exp.note || '';
     });
@@ -1725,30 +1725,31 @@ function saveAll() {
   // Build payload — note: B33,B36,B43,D33,D36,D43 are formula cells, never included
   var payload = {
     global: {
-      B6: gv('f-B6'), B7: gn('f-B7'), B8: gn('f-B8'), B9: gn('f-B9'),
-      B10: gn('f-B10')/100, B11: gv('f-B11'), B12: gv('f-B12'),
-      B13: gn('f-B13'), B14: gn('f-B14'), B15: gpct('f-B15'),
-      B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gpct('f-B19'),
-      B20: gpct('f-B20'), B21: gpct('f-B21'),
-      B22: gpct('f-B22'), B23: gpct('f-B23'),
-      B27: gpct('f-B27'),
-      B24: gv('f-B24'), B25: gn('f-B25'), B26: gpct('f-B26'), B28: gpct('f-B28'),
+      // B6 is a year number (2026), not a date
+      B6: gn('f-B6'), B7: gn('f-B7'), B8: gn('f-B8'), B9: gn('f-B9'),
+      // Pct fields: send whole numbers (25, 8, 3 etc) — Apps Script divides by 100
+      B10: gn('f-B10'), B11: gv('f-B11'), B12: gv('f-B12'),
+      B13: gn('f-B13'), B14: gn('f-B14'), B15: gn('f-B15'),
+      B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gn('f-B19'),
+      B20: gn('f-B20'), B21: gn('f-B21'),
+      B22: gn('f-B22'), B23: gn('f-B23'), B27: gn('f-B27'),
+      B24: gv('f-B24'), B25: gn('f-B25'), B26: gn('f-B26'), B28: gn('f-B28'),
     },
     partner1: {
       B31: gv('f-B31'), B32: gd('f-B32'), B34: gv('f-B34'),
       B35: gn('f-B35'), B37: gn('f-B37'), B38: gd('f-B38'), B39: gd('f-B39'),
       B40: gn('f-B40'), B41: gn('f-B41'), B44: gd('f-B44'),
       B46: gn('f-B46'), B47: gd('f-B47'), B49: gn('f-B49'),
-      B50: gd('f-B50'), B51: gd('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'),
+      B50: gd('f-B50'), B51: gd('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'), B54: gn('f-B54'),
     },
     partner2: {
       D31: gv('f-D31'), D32: gd('f-D32'), D34: gv('f-D34'),
       D35: gn('f-D35'), D37: gn('f-D37'), D38: gd('f-D38'), D39: gd('f-D39'),
       D40: gn('f-D40'), D41: gn('f-D41'), D44: gd('f-D44'),
       D46: gn('f-D46'), D47: gd('f-D47'), D49: gn('f-D49'),
-      D50: gd('f-D50'), D51: gd('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),
+      D50: gd('f-D50'), D51: gd('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'), D54: gn('f-D54'),
     },
-    roth: { B139: gn('f-B139'), B141: gv('f-B141'), B145: gpct('f-B145') },
+    roth: { B139: gn('f-B139'), B141: gv('f-B141'), B145: gn('f-B145') },
     rothPlan: (function() {
       var plan = [];
       for (var yr=2026; yr<=2045; yr++) {
@@ -1761,9 +1762,9 @@ function saveAll() {
       return plan;
     })(),
     phases: {
-      E122: gn('f-E122'), F122: gn('f-F122'),
-      E123: gn('f-E123'), F123: gn('f-F123'),
-      E124: gn('f-E124'), F124: gn('f-F124'),
+      C122: gv('f-C122'), D122: gv('f-D122'), E122: gn('f-E122'), F122: gn('f-F122'),
+      C123: gv('f-C123'), D123: gv('f-D123'), E123: gn('f-E123'), F123: gn('f-F123'),
+      C124: gv('f-C124'), D124: gv('f-D124'), E124: gn('f-E124'), F124: gn('f-F124'),
     },
     accounts: accountsData,
     debts: collectDebts(),
@@ -1828,22 +1829,22 @@ function buildPayload() {
       B7:  document.getElementById('f-B7').value,
       B8:  document.getElementById('f-B8').value,
       B9:  document.getElementById('f-B9').value,
-      B10: gn('f-B10')/100, // survivor reduction as decimal
+      B10: gn('f-B10'), // whole number — Apps Script divides by 100
       B11: document.getElementById('f-B11').value,
       B12: document.getElementById('f-B12').value,
       B13: document.getElementById('f-B13').value,
       B14: document.getElementById('f-B14').value,
-      B15: gpct('f-B15'),
+      B15: gn('f-B15'), // whole number — Apps Script divides
       B16: document.getElementById('f-B16').value,
       B17: document.getElementById('f-B17').value,
       B18: document.getElementById('f-B18').value,
-      B19: gpct('f-B19'),
-      B20: gpct('f-B20'),
-      B21: gpct('f-B21'),
+      B19: gn('f-B19'), // whole number — Apps Script divides
+      B20: gn('f-B20'), // whole number — Apps Script divides
+      B21: gn('f-B21'), // whole number — Apps Script divides
       B24: document.getElementById('f-B24').value,
       B25: document.getElementById('f-B25').value,
-      B26: gpct('f-B26'),
-      B28: gpct('f-B28'),
+      B26: gn('f-B26'), // whole number — Apps Script divides
+      B28: gn('f-B28'), // whole number — Apps Script divides
     },
     partner1: {
       B31: document.getElementById('f-B31').value,
