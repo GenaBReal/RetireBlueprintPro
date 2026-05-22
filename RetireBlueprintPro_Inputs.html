@@ -426,6 +426,11 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
             <input type="number" id="f-B37" value="0" oninput="markDirty()" style="width:100%">
           </div>
           <div class="field">
+            <label>Salary Start Date</label>
+            <input type="date" id="f-B38" value="" onchange="markDirty()">
+            <span class="hint">Date salary/employment begins</span>
+          </div>
+          <div class="field">
             <label>Salary End Date</label>
             <input type="date" id="f-B39" value="">
             <span class="hint">Retirement date</span>
@@ -547,6 +552,11 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
             <input type="number" id="f-D37" value="0" oninput="markDirty()" style="width:100%">
           </div>
           <div class="field">
+            <label>Salary Start Date</label>
+            <input type="date" id="f-D38" value="" onchange="markDirty()">
+            <span class="hint">Date salary/employment begins</span>
+          </div>
+          <div class="field">
             <label>Salary End Date</label>
             <input type="date" id="f-D39" value="">
             <span class="hint">Retirement date</span>
@@ -643,34 +653,34 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       <thead><tr><th>Expense</th><th>Monthly ($)</th><th>Annual ($)</th><th>Notes</th></tr></thead>
       <tbody>
         <tr class="cat-hdr"><td colspan="4">Fixed Expenses</td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N58" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C58" value="0" oninput="calcExpense(this,'e-Y58')"></td><td><input type="number" id="e-Y58" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T58" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N59" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C59" value="0" oninput="calcExpense(this,'e-Y59')"></td><td><input type="number" id="e-Y59" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T59" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N60" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C60" value="0" oninput="calcExpense(this,'e-Y60')"></td><td><input type="number" id="e-Y60" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T60" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N61" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C61" value="0" oninput="calcExpense(this,'e-Y61')"></td><td><input type="number" id="e-Y61" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T61" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N62" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C62" value="0" oninput="calcExpense(this,'e-Y62')"></td><td><input type="number" id="e-Y62" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T62" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N63" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C63" value="0" oninput="calcExpense(this,'e-Y63')"></td><td><input type="number" id="e-Y63" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T63" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N64" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C64" value="0" oninput="calcExpense(this,'e-Y64')"></td><td><input type="number" id="e-Y64" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T64" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N65" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C65" value="0" oninput="calcExpense(this,'e-Y65')"></td><td><input type="number" id="e-Y65" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T65" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N66" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C66" value="0" oninput="calcExpense(this,'e-Y66')"></td><td><input type="number" id="e-Y66" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T66" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N67" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C67" value="0" oninput="calcExpense(this,'e-Y67')"></td><td><input type="number" id="e-Y67" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T67" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N68" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C68" value="0" oninput="calcExpense(this,'e-Y68')"></td><td><input type="number" id="e-Y68" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T68" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N69" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C69" value="0" oninput="calcExpense(this,'e-Y69')"></td><td><input type="number" id="e-Y69" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T69" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N58" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C58" value="0" oninput="calcExpense(this,'e-Y58')"></td><td><input type="number" id="e-Y58" value="0" readonly style="background:var(--light);color:var(--muted);cursor:default;"></td><td><input type="text" class="expense-note" id="e-T58" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N59" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C59" value="0" oninput="calcExpense(this,'e-Y59')"></td><td><input type="number" id="e-Y59" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T59" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N60" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C60" value="0" oninput="calcExpense(this,'e-Y60')"></td><td><input type="number" id="e-Y60" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T60" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N61" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C61" value="0" oninput="calcExpense(this,'e-Y61')"></td><td><input type="number" id="e-Y61" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T61" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N62" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C62" value="0" oninput="calcExpense(this,'e-Y62')"></td><td><input type="number" id="e-Y62" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T62" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N63" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C63" value="0" oninput="calcExpense(this,'e-Y63')"></td><td><input type="number" id="e-Y63" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T63" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N64" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C64" value="0" oninput="calcExpense(this,'e-Y64')"></td><td><input type="number" id="e-Y64" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T64" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N65" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C65" value="0" oninput="calcExpense(this,'e-Y65')"></td><td><input type="number" id="e-Y65" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T65" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N66" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C66" value="0" oninput="calcExpense(this,'e-Y66')"></td><td><input type="number" id="e-Y66" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T66" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N67" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C67" value="0" oninput="calcExpense(this,'e-Y67')"></td><td><input type="number" id="e-Y67" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T67" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N68" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C68" value="0" oninput="calcExpense(this,'e-Y68')"></td><td><input type="number" id="e-Y68" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T68" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N69" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C69" value="0" oninput="calcExpense(this,'e-Y69')"></td><td><input type="number" id="e-Y69" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T69" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
         <tr class="cat-hdr"><td colspan="4">Variable Expenses</td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N71" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C71" value="0" oninput="calcExpense(this,'e-Y71')"></td><td><input type="number" id="e-Y71" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T71" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N72" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C72" value="0" oninput="calcExpense(this,'e-Y72')"></td><td><input type="number" id="e-Y72" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T72" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N73" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C73" value="0" oninput="calcExpense(this,'e-Y73')"></td><td><input type="number" id="e-Y73" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T73" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N74" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C74" value="0" oninput="calcExpense(this,'e-Y74')"></td><td><input type="number" id="e-Y74" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T74" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N75" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C75" value="0" oninput="calcExpense(this,'e-Y75')"></td><td><input type="number" id="e-Y75" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T75" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N76" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C76" value="0" oninput="calcExpense(this,'e-Y76')"></td><td><input type="number" id="e-Y76" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T76" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N77" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C77" value="0" oninput="calcExpense(this,'e-Y77')"></td><td><input type="number" id="e-Y77" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T77" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N78" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C78" value="0" oninput="calcExpense(this,'e-Y78')"></td><td><input type="number" id="e-Y78" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T78" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N79" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C79" value="0" oninput="calcExpense(this,'e-Y79')"></td><td><input type="number" id="e-Y79" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T79" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N80" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C80" value="0" oninput="calcExpense(this,'e-Y80')"></td><td><input type="number" id="e-Y80" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T80" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N81" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C81" value="0" oninput="calcExpense(this,'e-Y81')"></td><td><input type="number" id="e-Y81" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T81" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N71" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C71" value="0" oninput="calcExpense(this,'e-Y71')"></td><td><input type="number" id="e-Y71" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T71" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N72" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C72" value="0" oninput="calcExpense(this,'e-Y72')"></td><td><input type="number" id="e-Y72" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T72" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N73" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C73" value="0" oninput="calcExpense(this,'e-Y73')"></td><td><input type="number" id="e-Y73" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T73" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N74" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C74" value="0" oninput="calcExpense(this,'e-Y74')"></td><td><input type="number" id="e-Y74" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T74" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N75" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C75" value="0" oninput="calcExpense(this,'e-Y75')"></td><td><input type="number" id="e-Y75" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T75" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N76" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C76" value="0" oninput="calcExpense(this,'e-Y76')"></td><td><input type="number" id="e-Y76" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T76" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N77" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C77" value="0" oninput="calcExpense(this,'e-Y77')"></td><td><input type="number" id="e-Y77" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T77" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N78" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C78" value="0" oninput="calcExpense(this,'e-Y78')"></td><td><input type="number" id="e-Y78" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T78" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N79" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C79" value="0" oninput="calcExpense(this,'e-Y79')"></td><td><input type="number" id="e-Y79" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T79" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N80" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C80" value="0" oninput="calcExpense(this,'e-Y80')"></td><td><input type="number" id="e-Y80" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T80" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N81" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C81" value="0" oninput="calcExpense(this,'e-Y81')"></td><td><input type="number" id="e-Y81" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T81" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
         <tr class="cat-hdr"><td colspan="4">Elite Sinking Funds</td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N83" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C83" value="0" oninput="calcExpense(this,'e-Y83')"></td><td><input type="number" id="e-Y83" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T83" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N84" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C84" value="0" oninput="calcExpense(this,'e-Y84')"></td><td><input type="number" id="e-Y84" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T84" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
-        <tr><td><input type="text" class="expense-name" id="e-N85" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C85" value="0" oninput="calcExpense(this,'e-Y85')"></td><td><input type="number" id="e-Y85" value="0" readonly></td><td><input type="text" class="expense-note" id="e-T85" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N83" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C83" value="0" oninput="calcExpense(this,'e-Y83')"></td><td><input type="number" id="e-Y83" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T83" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N84" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C84" value="0" oninput="calcExpense(this,'e-Y84')"></td><td><input type="number" id="e-Y84" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T84" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
+        <tr><td><input type="text" class="expense-name" id="e-N85" value="" oninput="markDirty()"></td><td><input type="number" class="expense-monthly" id="e-C85" value="0" oninput="calcExpense(this,'e-Y85')"></td><td><input type="number" id="e-Y85" value="0" readonly style="background:var(--light);color:var(--muted);"></td><td><input type="text" class="expense-note" id="e-T85" value="" placeholder="Notes..." oninput="markDirty()"></td></tr>
 
         <tr class="expense-total">
           <td>TOTAL MONTHLY</td>
@@ -1187,7 +1197,9 @@ function updatePortfolioTotal() {
 // ── EXPENSES ─────────────────────────────────────────────────
 function calcExpense(inp, annualId) {
   var monthly = parseFloat(String(inp.value).replace(/[$,]/g,'')) || 0;
-  document.getElementById(annualId).value = Math.round(monthly * 12);
+  var annual = Math.round(monthly * 12);
+  var annEl = document.getElementById(annualId);
+  if (annEl) annEl.value = annual ? annual.toLocaleString() : '0';
   updateExpenseTotal();
   markDirty();
 }
@@ -1452,10 +1464,13 @@ function populateFromData(d) {
   setVal('f-B18', gl.stressLateDur);
   setVal('f-B19', gl.stressLateDrag ? (gl.stressLateDrag*100).toFixed(1) : '');
   setVal('f-B20', tax.inflation ? (tax.inflation*100).toFixed(1) : '');
-  setVal('f-B21', tax.ssCola   ? (tax.ssCola*100).toFixed(1)   : '');
+  setVal('f-B21', tax.ssCola        ? (tax.ssCola*100).toFixed(1)        : '');
+  setVal('f-B22', tax.baseTaxAdj    ? (tax.baseTaxAdj*100).toFixed(1)    : '0');
+  setVal('f-B23', tax.marginalExtra ? (tax.marginalExtra*100).toFixed(1)  : '0');
   setVal('f-B24', gl.filingStatus);
   setVal('f-B25', gl.standardDeduction || tax.standardDeduction);
-  setVal('f-B26', tax.stateRate ? (tax.stateRate*100).toFixed(1) : '');
+  setVal('f-B26', tax.stateRate         ? (tax.stateRate*100).toFixed(1)         : '');
+  setVal('f-B27', tax.stdDedInflation   ? (tax.stdDedInflation*100).toFixed(1)   : '2.5');
   setVal('f-B28', tax.healthcareInflation ? (tax.healthcareInflation*100).toFixed(1) : '');
 
   // ── Partner 1 ─────────────────────────────────────────
@@ -1466,6 +1481,7 @@ function populateFromData(d) {
   setVal('f-B35', p.craig.projectedDeathAge);
   setVal('f-B36', p.craig.projectedDeathYear);
   setVal('f-B37', p.craig.salary);
+  setDate('f-B38', p.craig.salaryStart);
   setDate('f-B39', p.craig.retirementDate);
   setVal('f-B40', p.craig.ssBase);
   setVal('f-B41', p.craig.ssFra || 67);
@@ -1488,6 +1504,7 @@ function populateFromData(d) {
   setVal('f-D35', p.gena.projectedDeathAge);
   setVal('f-D36', p.gena.projectedDeathYear);
   setVal('f-D37', p.gena.salary);
+  setDate('f-D38', p.gena.salaryStart);
   setDate('f-D39', p.gena.retirementDate);
   setVal('f-D40', p.gena.ssBase);
   setVal('f-D41', p.gena.ssFra || 67);
@@ -1537,6 +1554,17 @@ function populateFromData(d) {
     });
   }
 
+  // ── Smile Curve Phases ──────────────────────────────────
+  if (d.spending) {
+    var sp = d.spending;
+    setVal('f-C122', sp.phase1Start || '2026');
+    setVal('f-D122', sp.phase1End   || '2033');
+    setVal('f-C123', sp.phase2Start || '2034');
+    setVal('f-D123', sp.phase2End   || '2044');
+    setVal('f-C124', sp.phase3Start || '2045');
+    setVal('f-D124', sp.phase3End   || '2075');
+  }
+
   // ── Solver ────────────────────────────────────────────
   setTxt('s-extra',  fmt(sp.safeExtra));
   setTxt('s-phase1', fmt(sp.phase1Extra));
@@ -1549,9 +1577,16 @@ function populateFromData(d) {
   statusEl.textContent = leg.status || (leg.achievedPct >= 100 ? 'ON TRACK' : 'CHECK PLAN');
   statusEl.className = leg.achievedPct >= 100 ? 'badge-go' : 'badge-watch';
 
-  // Roth
+  // Roth solver results (read-only display)
   setTxt('r-savings', fmt(tax.rothConversionSavings));
   setTxt('r-tax-now', fmt(tax.rothConversionSavings));
+
+  // Roth solver inputs (user-editable, load from sheet)
+  if (d.roth) {
+    setVal('f-B139', d.roth.year || '');
+    setVal('f-B141', d.roth.bracket || '12%');
+    if (d.roth.assumedRate) setVal('f-B145', (d.roth.assumedRate * 100).toFixed(1));
+  }
 
   // Header
   document.getElementById('hdr-status').textContent = leg.achievedPct >= 100 ? 'ON TRACK' : 'REVIEW';
@@ -1674,14 +1709,14 @@ function saveAll() {
     },
     partner1: {
       B31: gv('f-B31'), B32: gd('f-B32'), B34: gv('f-B34'),
-      B35: gn('f-B35'), B37: gn('f-B37'), B39: gd('f-B39'),
+      B35: gn('f-B35'), B37: gn('f-B37'), B38: gd('f-B38'), B39: gd('f-B39'),
       B40: gn('f-B40'), B41: gn('f-B41'), B44: gd('f-B44'),
       B46: gn('f-B46'), B47: gd('f-B47'), B49: gn('f-B49'),
       B50: gd('f-B50'), B51: gd('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'),
     },
     partner2: {
       D31: gv('f-D31'), D32: gd('f-D32'), D34: gv('f-D34'),
-      D35: gn('f-D35'), D37: gn('f-D37'), D39: gd('f-D39'),
+      D35: gn('f-D35'), D37: gn('f-D37'), D38: gd('f-D38'), D39: gd('f-D39'),
       D40: gn('f-D40'), D41: gn('f-D41'), D44: gd('f-D44'),
       D46: gn('f-D46'), D47: gd('f-D47'), D49: gn('f-D49'),
       D50: gd('f-D50'), D51: gd('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),

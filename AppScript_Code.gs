@@ -46,7 +46,7 @@ function readAll(sheetId) {
   var craig = {
     name:v('B31'), dob:dt(v('B32')), age:Number(v('B33')), projectedDeathAge:Number(v('B35')),
     projectedDeathYear:Number(v('B36')), salary:Number(v('B37')),
-    retirementDate:dt(v('B39')), ssBase:Number(v('B40')), ssFra:Number(v('B41')),
+    salaryStart:dt(v('B38')), retirementDate:dt(v('B39')), ssBase:Number(v('B40')), ssFra:Number(v('B41')),
     ssMonthly:Number(v('B43')), ssAnnual:Number(v('B43'))*12,
     ssStartDate:dt(v('B44')), pension:Number(v('B46')), pensionAnnual:Number(v('B46'))*12,
     pensionStart:dt(v('B47')), otherIncome:Number(v('B49')),
@@ -57,7 +57,7 @@ function readAll(sheetId) {
   var gena = {
     name:v('D31'), dob:dt(v('D32')), age:Number(v('D33')), projectedDeathAge:Number(v('D35')),
     projectedDeathYear:Number(v('D36')), salary:Number(v('D37')),
-    retirementDate:dt(v('D39')), ssBase:Number(v('D40')), ssFra:Number(v('D41')),
+    salaryStart:dt(v('D38')), retirementDate:dt(v('D39')), ssBase:Number(v('D40')), ssFra:Number(v('D41')),
     ssMonthly:Number(v('D43')), ssAnnual:Number(v('D43'))*12,
     ssStartDate:dt(v('D44')), pension:Number(v('D46')), pensionAnnual:Number(v('D46'))*12,
     pensionStart:dt(v('D47')), otherIncome:Number(v('D49')),
@@ -134,6 +134,10 @@ function readAll(sheetId) {
     })(),
     spending:{
       baseAnnual:baseSpend, safeExtra:safeExtra,
+      phase1Start:String(v('C122')), phase1End:String(v('D122')),
+      phase2Start:String(v('C123')), phase2End:String(v('D123')),
+      phase3Start:String(v('C124')), phase3End:String(v('D124')),
+      phase1Weight:Number(v('E122')), phase2Weight:Number(v('E123')), phase3Weight:Number(v('E124')),
       phase1Extra:Number(v('G122')), phase2Extra:Number(v('G123')), phase3Extra:Number(v('G124')),
       phase1Total:baseSpend+Number(v('G122')), phase2Total:baseSpend+Number(v('G123')), phase3Total:baseSpend+Number(v('G124')),
     },
@@ -175,7 +179,7 @@ function readAll(sheetId) {
       projectionMaxYears:Number(v('B7')),
     },
     roth:{ year:Number(v('B139')), bracket:String(v('B141')),
-      optimalAmount:Number(v('B143')), taxSavings:Number(v('B146')) },
+      assumedRate:Number(v('B145')), optimalAmount:Number(v('B143')), taxSavings:Number(v('B146')) },
     projections:{ years:years, endLiquid:endLiq, preTax:preTax, roth:roth,
       taxable:taxable, hsa:hsa, income:income, withdrawals:wd },
     checkIn:checkIn,
@@ -248,7 +252,7 @@ function writeInputs(data, sheetId) {
     if (data.partner1) {
       var p=data.partner1;
       set('B31',p.B31); setD('B32',p.B32); set('B34',p.B34);
-      setN('B35',p.B35); setN('B37',p.B37); setD('B39',p.B39);
+      setN('B35',p.B35); setN('B37',p.B37); setD('B38',p.B38); setD('B39',p.B39);
       setN('B40',p.B40); setN('B41',p.B41);
       setD('B44',p.B44); setN('B46',p.B46); setD('B47',p.B47);
       setN('B49',p.B49); setD('B50',p.B50); setD('B51',p.B51);
@@ -257,7 +261,7 @@ function writeInputs(data, sheetId) {
     if (data.partner2) {
       var p=data.partner2;
       set('D31',p.D31); setD('D32',p.D32); set('D34',p.D34);
-      setN('D35',p.D35); setN('D37',p.D37); setD('D39',p.D39);
+      setN('D35',p.D35); setN('D37',p.D37); setD('D38',p.D38); setD('D39',p.D39);
       setN('D40',p.D40); setN('D41',p.D41);
       setD('D44',p.D44); setN('D46',p.D46); setD('D47',p.D47);
       setN('D49',p.D49); setD('D50',p.D50); setD('D51',p.D51);
@@ -321,6 +325,8 @@ function writeInputs(data, sheetId) {
         if (d.name) inp.getRange('B'+r).setValue(d.name);
         inp.getRange('C'+r).setValue(mo);
         inp.getRange('D'+r).setValue(mo * 12);
+        if (d.start) { try { var ds=d.start.split('-'); if(ds.length===3) inp.getRange('E'+r).setValue(new Date(parseInt(ds[0]),parseInt(ds[1])-1,parseInt(ds[2]),12,0,0)); } catch(e){} }
+        if (d.end)   { try { var de=d.end.split('-');   if(de.length===3) inp.getRange('F'+r).setValue(new Date(parseInt(de[0]),parseInt(de[1])-1,parseInt(de[2]),12,0,0)); } catch(e){} }
         if (bal) inp.getRange('H'+r).setValue(bal);
       });
     }
