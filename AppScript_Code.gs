@@ -180,6 +180,20 @@ function readAll(sheetId) {
     },
     roth:{ year:Number(v('B139')), bracket:String(v('B141')),
       assumedRate:Number(v('B145')), optimalAmount:Number(v('B143')), taxSavings:Number(v('B146')) },
+    rothPlan: (function(){
+      // Roth plan: rows 150-169 = years 2026-2045
+      // A=year formula, B=partner1 conversion, C=partner2 conversion
+      var bVals = inp.getRange('B150:B169').getValues();
+      var cVals = inp.getRange('C150:C169').getValues();
+      var result = [];
+      for (var i=0; i<20; i++) {
+        var yr = 2026 + i;
+        var p1 = Number(bVals[i][0])||0;
+        var p2 = Number(cVals[i][0])||0;
+        if (p1 || p2) result.push({year:yr, p1:p1, p2:p2});
+      }
+      return result;
+    })(),
     projections:{ years:years, endLiquid:endLiq, preTax:preTax, roth:roth,
       taxable:taxable, hsa:hsa, income:income, withdrawals:wd },
     checkIn:checkIn,
@@ -310,6 +324,20 @@ function writeInputs(data, sheetId) {
       // B139 = Roth year (user input), B141 = bracket (user input), B145 = rate (user input)
       // B140,B143,B144,B146 are formula cells — do NOT write
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
+    }
+    // Write Roth conversion plan amounts (rows 150-169 = years 2026-2045)
+    if (data.rothPlan && data.rothPlan.length) {
+      var p1Data = [], p2Data = [];
+      for (var ri=0; ri<20; ri++) { p1Data.push([0]); p2Data.push([0]); }
+      data.rothPlan.forEach(function(row) {
+        var idx = Number(row.year) - 2026;
+        if (idx >= 0 && idx < 20) {
+          p1Data[idx] = [Number(row.p1)||0];
+          p2Data[idx] = [Number(row.p2)||0];
+        }
+      });
+      inp.getRange('B150:B169').setValues(p1Data);
+      inp.getRange('C150:C169').setValues(p2Data);
     }
     // Write debt rows
     // Sheet structure: A=include, B=name, C=monthly, D=annual(=C*12), H=balance

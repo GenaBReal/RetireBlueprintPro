@@ -1587,6 +1587,20 @@ function populateFromData(d) {
     setVal('f-B141', d.roth.bracket || '12%');
     if (d.roth.assumedRate) setVal('f-B145', (d.roth.assumedRate * 100).toFixed(1));
   }
+  // Load Roth conversion plan amounts
+  if (d.rothPlan && d.rothPlan.length) {
+    d.rothPlan.forEach(function(row) {
+      var p1el = document.getElementById('roth-p1-'+row.year);
+      var p2el = document.getElementById('roth-p2-'+row.year);
+      var totEl = document.getElementById('roth-total-'+row.year);
+      if (p1el && row.p1) p1el.value = row.p1;
+      if (p2el && row.p2) p2el.value = row.p2;
+      if (totEl && (row.p1 || row.p2)) {
+        var tot = (row.p1||0) + (row.p2||0);
+        totEl.textContent = '$' + tot.toLocaleString();
+      }
+    });
+  }
 
   // Header
   document.getElementById('hdr-status').textContent = leg.achievedPct >= 100 ? 'ON TRACK' : 'REVIEW';
@@ -1722,6 +1736,17 @@ function saveAll() {
       D50: gd('f-D50'), D51: gd('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'),
     },
     roth: { B139: gn('f-B139'), B141: gv('f-B141'), B145: gpct('f-B145') },
+    rothPlan: (function() {
+      var plan = [];
+      for (var yr=2026; yr<=2045; yr++) {
+        var p1el = document.getElementById('roth-p1-'+yr);
+        var p2el = document.getElementById('roth-p2-'+yr);
+        var p1 = p1el ? (parseFloat(String(p1el.value||'0').replace(/[$,]/g,''))||0) : 0;
+        var p2 = p2el ? (parseFloat(String(p2el.value||'0').replace(/[$,]/g,''))||0) : 0;
+        plan.push({year:yr, p1:p1, p2:p2});
+      }
+      return plan;
+    })(),
     phases: {
       C122: gn('f-C122'), D122: gn('f-D122'), E122: gn('f-E122'), F122: gn('f-F122'),
       C123: gn('f-C123'), D123: gn('f-D123'), E123: gn('f-E123'), F123: gn('f-F123'),
