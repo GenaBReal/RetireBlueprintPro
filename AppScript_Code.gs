@@ -116,18 +116,19 @@ function readAll(sheetId) {
     portfolio:{ total:total, peakValue:peakVal*1000, peakYear:peakYear, accounts:accounts },
     debts: (function(){
       // Debt rows: 88,89 then 92-101 (rows 90-91 are headers)
-      var rows88 = inp.getRange('A88:G89').getValues();
-      var rows92 = inp.getRange('A92:G101').getValues();
+      // Sheet: A=include, B=name, C=monthly, D=annual, H=balance
+      var rows88 = inp.getRange('A88:H89').getValues();
+      var rows92 = inp.getRange('A92:H101').getValues();
       var result = [];
       rows88.forEach(function(r){
         result.push({inc:String(r[0]||'No'),name:String(r[1]||''),
           mo:Number(r[2])||0,ann:Number(r[3])||0,
-          start:dt(r[4]),end:dt(r[5]),bal:Number(r[6])||0});
+          bal:Number(r[7])||0}); // H is index 7
       });
       rows92.forEach(function(r){
         result.push({inc:String(r[0]||'No'),name:String(r[1]||''),
           mo:Number(r[2])||0,ann:Number(r[3])||0,
-          start:dt(r[4]),end:dt(r[5]),bal:Number(r[6])||0});
+          bal:Number(r[7])||0}); // H is index 7
       });
       return result;
     })(),
@@ -137,20 +138,20 @@ function readAll(sheetId) {
       phase1Total:baseSpend+Number(v('G122')), phase2Total:baseSpend+Number(v('G123')), phase3Total:baseSpend+Number(v('G124')),
     },
     expenses: (function(){
-      // Batch read all expense rows at once — much faster than individual calls
+      // Batch read all expense rows at once
+      // Sheet: A=name(editable), B=monthly, C=yearly(formula), D=notes
       var rows=[58,59,60,61,62,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
-      // Read columns B, C, T in one batch each
-      var bVals = inp.getRange('B58:B85').getValues();
-      var cVals = inp.getRange('C58:C85').getValues();
-      var tVals = inp.getRange('T58:T85').getValues();
+      var aVals = inp.getRange('A58:A85').getValues(); // expense name
+      var bVals = inp.getRange('B58:B85').getValues(); // monthly amount
+      var dVals = inp.getRange('D58:D85').getValues(); // notes
       return rows.map(function(r){
         var i = r - 58; // index into the arrays
         return {
           row: r,
-          name: String(bVals[i] ? bVals[i][0] : ''),
-          monthly: Number(cVals[i] ? cVals[i][0] : 0)||0,
-          annual: (Number(cVals[i] ? cVals[i][0] : 0)||0)*12,
-          note: String(tVals[i] ? tVals[i][0] : '')
+          name: String(aVals[i] ? aVals[i][0] : ''),
+          monthly: Number(bVals[i] ? bVals[i][0] : 0)||0,
+          annual: (Number(bVals[i] ? bVals[i][0] : 0)||0)*12,
+          note: String(dVals[i] ? dVals[i][0] : '')
         };
       });
     })(),
@@ -306,42 +307,28 @@ function writeInputs(data, sheetId) {
       // B140,B143,B144,B146 are formula cells — do NOT write
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
     }
-    // Write debt rows A88:G91 — only if any debts entered
+    // Write debt rows
+    // Sheet structure: A=include, B=name, C=monthly, D=annual(=C*12), H=balance
+    // Rows 88-89 are main debt rows, 90-91 are headers, 92-101 are extended debts
     if (data.debts && data.debts.length) {
-      var hasDebts = data.debts.some(function(d){ return d.name || d.mo; });
-      if (hasDebts) {
-        var debtData = [];
-        for (var di=0; di<2; di++) { // Only 2 writable debt rows (88-89)
-          var d = data.debts[di] || {};
-          function parseDebtDate(s) {
-          if (!s || s === '') return '';
-          if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-            var p = s.split('-');
-            return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]), 12, 0, 0);
-          }
-          if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
-            var p = s.split('/');
-            return new Date(parseInt(p[2]), parseInt(p[0])-1, parseInt(p[1]), 12, 0, 0);
-          }
-          return '';
-        }
-        debtData.push([
-            d.inc||'No', d.name||'',
-            Number(d.mo)||0, Number(d.ann)||0,
-            parseDebtDate(d.start),
-            parseDebtDate(d.end),
-            Number(d.bal)||0,
-          ]);
-        }
-        // Only write actual debt rows 88-89 (rows 90-91 are header/label rows in sheet)
-      inp.getRange('A88:G89').setValues(debtData.slice(0,2));
-      }
+      var debtSheetRows = [88, 89, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101];
+      data.debts.forEach(function(d, i) {
+        if (i >= debtSheetRows.length) return;
+        var r = debtSheetRows[i];
+        var mo = Number(d.mo) || 0;
+        var bal = Number(d.bal) || 0;
+        inp.getRange('A'+r).setValue(d.inc || 'No');
+        if (d.name) inp.getRange('B'+r).setValue(d.name);
+        inp.getRange('C'+r).setValue(mo);
+        inp.getRange('D'+r).setValue(mo * 12);
+        if (bal) inp.getRange('H'+r).setValue(bal);
+      });
     }
     // Write expense rows — only rows with data
     if (data.expenses && data.expenses.length) {
       var hasExpenses = data.expenses.some(function(e){ return e.name || e.monthly; });
       if (hasExpenses) {
-        var bData = [], cData = [], tData = [];
+        var bData = [], cData = [], tData = []; // b=name, c=monthly, t=notes
         for (var i=0; i<28; i++) {
           bData.push(['']); cData.push([0]); tData.push(['']);
         }
@@ -354,13 +341,16 @@ function writeInputs(data, sheetId) {
           tData[idx] = [exp.note||''];
         });
         // B column written row by row below
-        // Write expenses but skip formula rows 62 and 70
+        // Write expenses — skip formula rows 62 and 70
+      // Sheet: A=name, B=monthly, C=yearly(formula-never write), D=notes
       var expRows = [58,59,60,61,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
       expRows.forEach(function(r) {
         var idx = r - 58;
-        if(bData[idx][0] !== undefined) inp.getRange('B'+r).setValue(bData[idx][0]);
-        if(cData[idx][0] !== undefined) inp.getRange('C'+r).setValue(cData[idx][0]);
-        if(tData[idx][0] !== undefined) inp.getRange('T'+r).setValue(tData[idx][0]);
+        if(bData[idx][0] !== undefined) inp.getRange('A'+r).setValue(bData[idx][0]); // name → A
+        var mo = Number(cData[idx] ? cData[idx][0] : 0) || 0;
+        inp.getRange('B'+r).setValue(mo); // monthly → B
+        inp.getRange('C'+r).setValue(mo * 12); // yearly → C (in case formula was lost)
+        if(tData[idx][0] !== undefined) inp.getRange('D'+r).setValue(tData[idx][0]); // notes → D
       });
         // T column written row by row below
       }

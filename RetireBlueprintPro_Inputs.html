@@ -1039,9 +1039,9 @@ function scriptUrl(action) {
 
 // ── ACCOUNTS DATA ────────────────────────────────────────────
 var accountsData = [
-  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
-  {inc:'Yes', name:'Roth',                owner:'', type:'Roth (Tax Free)',          bal:0,  ret:8.0, status:'', dash:''},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0,  ret:7.0, status:'', dash:''},
+  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'Use for Withdrawals', dash:'No'},
+  {inc:'Yes', name:'Roth',                owner:'', type:'Roth (Tax Free)',          bal:0, ret:8.0, status:'Use for Withdrawals', dash:'No'},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0, ret:7.0, status:'Use for Withdrawals', dash:'No'},
   {inc:'Yes', name:'401k / 403b',         owner:'',  type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
   {inc:'Yes', name:'Roth',                owner:'',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'', dash:''},
   {inc:'Yes', name:'Brokerage (Taxable)', owner:'',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'', dash:''},
@@ -1268,8 +1268,9 @@ function loadDebts(debts) {
     el=document.getElementById('d-name-'+i);  if(el) el.value = d.name||'';
     el=document.getElementById('d-mo-'+i);  if(el) el.value = d.mo ? parseInt(d.mo).toLocaleString() : '';
     el=document.getElementById('d-ann-'+i); if(el) el.value = d.ann ? parseInt(d.ann).toLocaleString() : '';
-    el=document.getElementById('d-start-'+i); if(el) el.value = d.start||'';
-    el=document.getElementById('d-end-'+i);   if(el) el.value = d.end||'';
+    // start/end dates not used in sheet — skip
+    // el=document.getElementById('d-start-'+i); 
+    // el=document.getElementById('d-end-'+i);
     el=document.getElementById('d-bal-'+i); if(el) el.value = d.bal ? parseInt(d.bal).toLocaleString() : '';
   });
 }
