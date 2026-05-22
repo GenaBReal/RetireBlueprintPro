@@ -6,214 +6,210 @@
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 
 function doGet(e) {
-  var action = e.parameter.action;
-  var sheetId = e.parameter.sheetId;
+  var action   = e.parameter.action;
+  var sheetId  = e.parameter.sheetId;
+  var callback = e.parameter.callback; // JSONP support
 
-  if (!sheetId) return json({error:'No sheetId'});
+  function respond(obj) {
+    var jsonStr = JSON.stringify(obj);
+    if (callback) {
+      // JSONP — wrap in callback function
+      return ContentService
+        .createTextOutput(callback + '(' + jsonStr + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
+    // Plain JSON with CORS headers
+    return ContentService
+      .createTextOutput(jsonStr)
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (!sheetId) return respond({error:'No sheetId'});
 
   try {
-    var ss = SpreadsheetApp.openById(sheetId);
+    var ss  = SpreadsheetApp.openById(sheetId);
     var inp = ss.getSheetByName('Inputs');
-    if (!inp) return json({error:'No Inputs sheet'});
+    if (!inp) return respond({error:'No Inputs sheet'});
 
-    if (action === 'read') return json(readAll(ss, inp));
+    if (action === 'read') return respond(readAll(ss, inp));
+
     if (action === 'save') {
       var enc = e.parameter.enc;
       var raw = enc === 'b64'
         ? Utilities.newBlob(Utilities.base64Decode(e.parameter.data)).getDataAsString()
         : e.parameter.data;
       var data = JSON.parse(raw);
-      return json(writeInputs(ss, inp, data));
+      return respond(writeInputs(ss, inp, data));
     }
-    return json({error:'Unknown action: '+action});
-  } catch(err) {
-    return json({error: err.toString()});
-  }
-}
 
-function json(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
+    return respond({error:'Unknown action: ' + action});
+  } catch(err) {
+    return respond({error: err.toString()});
+  }
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
 function readAll(ss, inp) {
-  function v(cell)  { return inp.getRange(cell).getValue(); }
-  function pct(val) { return Number(val)||0; }           // stored as decimal e.g. 0.07
-  function dt(val)  {
+  // Read entire sheet in ONE batch call — avoids timeout from individual getValue() calls
+  var allData = inp.getDataRange().getValues();
+
+  function r(row, col) {
+    // row/col are 1-based (sheet coordinates)
+    var rowArr = allData[row-1];
+    if (!rowArr) return '';
+    var val = rowArr[col-1];
+    return (val === undefined || val === null) ? '' : val;
+  }
+  function pct(row, col) { return Number(r(row,col))||0; }
+  function dt(row, col) {
+    var val = r(row,col);
     if (!val) return '';
     try {
       var d = new Date(val);
       return isNaN(d) ? '' : (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
     } catch(e) { return ''; }
   }
+  function num(row, col) { return Number(r(row,col))||0; }
+  function str(row, col) { return String(r(row,col)||''); }
 
-  // Partner 1
+  // Partner 1 (col B = col 2)
   var p1 = {
-    name:v('B31'), dob:dt(v('B32')), age:Number(v('B33')),
-    deathAge:Number(v('B35')), theme:String(v('B34')),
-    salary:Number(v('B37')), salaryStart:dt(v('B38')), salaryEnd:dt(v('B39')),
-    ssBase:Number(v('B40')), ssFra:Number(v('B41')),
-    ssMonthly:Number(v('B43')), ssStartDate:dt(v('B44')),
-    pension:Number(v('B46')), pensionStart:dt(v('B47')),
-    otherIncome:Number(v('B49')), otherStart:dt(v('B50')), otherEnd:dt(v('B51')),
-    healthPreMedicare:Number(v('B52')), healthMedicare:Number(v('B53')), medicareAge:Number(v('B54')),
+    name:str(31,2), dob:dt(32,2), age:num(33,2),
+    deathAge:num(35,2), theme:str(34,2),
+    salary:num(37,2), salaryStart:dt(38,2), salaryEnd:dt(39,2),
+    ssBase:num(40,2), ssFra:num(41,2),
+    ssMonthly:num(43,2), ssStartDate:dt(44,2),
+    pension:num(46,2), pensionStart:dt(47,2),
+    otherIncome:num(49,2), otherStart:dt(50,2), otherEnd:dt(51,2),
+    healthPreMedicare:num(52,2), healthMedicare:num(53,2), medicareAge:num(54,2),
   };
 
-  // Partner 2
+  // Partner 2 (col D = col 4)
   var p2 = {
-    name:v('D31'), dob:dt(v('D32')), age:Number(v('D33')),
-    deathAge:Number(v('D35')), theme:String(v('D34')),
-    salary:Number(v('D37')), salaryStart:dt(v('D38')), salaryEnd:dt(v('D39')),
-    ssBase:Number(v('D40')), ssFra:Number(v('D41')),
-    ssMonthly:Number(v('D43')), ssStartDate:dt(v('D44')),
-    pension:Number(v('D46')), pensionStart:dt(v('D47')),
-    otherIncome:Number(v('D49')), otherStart:dt(v('D50')), otherEnd:dt(v('D51')),
-    healthPreMedicare:Number(v('D52')), healthMedicare:Number(v('D53')), medicareAge:Number(v('D54')),
+    name:str(31,4), dob:dt(32,4), age:num(33,4),
+    deathAge:num(35,4), theme:str(34,4),
+    salary:num(37,4), salaryStart:dt(38,4), salaryEnd:dt(39,4),
+    ssBase:num(40,4), ssFra:num(41,4),
+    ssMonthly:num(43,4), ssStartDate:dt(44,4),
+    pension:num(46,4), pensionStart:dt(47,4),
+    otherIncome:num(49,4), otherStart:dt(50,4), otherEnd:dt(51,4),
+    healthPreMedicare:num(52,4), healthMedicare:num(53,4), medicareAge:num(54,4),
   };
 
-  // Global settings
+  // Global (col B = col 2)
   var gl = {
-    planStartYear:dt(v('B6')), projectionYears:Number(v('B7')),
-    legacyGoal:Number(v('B8')), safetyFloor:Number(v('B9')),
-    survivorReduction:pct(v('B10')),
-    assumeExtraSpend:String(v('B11')),
-    stressEarly:String(v('B12')), stressEarlyStart:Number(v('B13')),
-    stressEarlyDur:Number(v('B14')), stressEarlyDrag:pct(v('B15')),
-    stressLate:String(v('B16')), stressLateStart:Number(v('B17')),
-    stressLateDur:Number(v('B18')), stressLateDrag:pct(v('B19')),
-    filingStatus:String(v('B24')), standardDeduction:Number(v('B25')),
+    planStartYear:dt(6,2), projectionYears:num(7,2),
+    legacyGoal:num(8,2), safetyFloor:num(9,2),
+    survivorReduction:pct(10,2),
+    assumeExtraSpend:str(11,2),
+    stressEarly:str(12,2), stressEarlyStart:num(13,2),
+    stressEarlyDur:num(14,2), stressEarlyDrag:pct(15,2),
+    stressLate:str(16,2), stressLateStart:num(17,2),
+    stressLateDur:num(18,2), stressLateDrag:pct(19,2),
+    filingStatus:str(24,2), standardDeduction:num(25,2),
   };
 
   // Tax
   var tax = {
-    inflation:pct(v('B20')), ssCola:pct(v('B21')),
-    baseTaxAdj:pct(v('B22')), marginalExtra:pct(v('B23')),
-    stateRate:pct(v('B26')), stdDedInflation:pct(v('B27')),
-    healthcareInflation:pct(v('B28')),
-    rothConversionSavings:Number(v('B144')),
+    inflation:pct(20,2), ssCola:pct(21,2),
+    baseTaxAdj:pct(22,2), marginalExtra:pct(23,2),
+    stateRate:pct(26,2), stdDedInflation:pct(27,2),
+    healthcareInflation:pct(28,2),
+    rothConversionSavings:num(144,2),
   };
 
-  // Accounts
-  var acctRows = inp.getRange('A105:H116').getValues();
+  // Accounts (rows 105-116, cols A-H = 1-8)
   var accounts = [], portfolioTotal = 0;
-  acctRows.forEach(function(row) {
-    if (!row[1]) return;
-    var bal = Number(row[4])||0;
-    var ret = Number(row[5])||0; // stored as decimal in sheet
-    if (String(row[0]).toLowerCase()==='yes') portfolioTotal += bal;
+  for (var ar=105; ar<=116; ar++) {
+    var aName = str(ar,2);
+    if (!aName) continue;
+    var bal = num(ar,5);
+    var ret = pct(ar,6); // stored as decimal
+    if (str(ar,1).toLowerCase()==='yes') portfolioTotal += bal;
     accounts.push({
-      showInCalc:String(row[0]), name:String(row[1]), owner:String(row[2]),
-      type:String(row[3]), balance:bal,
-      expectedReturn:ret*100, // multiply by 100 for display (0.07 → 7)
-      status:String(row[6]), showOnDashboard:String(row[7])
+      showInCalc:str(ar,1), name:aName, owner:str(ar,3),
+      type:str(ar,4), balance:bal,
+      expectedReturn:ret*100, // *100 for display
+      status:str(ar,7), showOnDashboard:str(ar,8)
     });
-  });
+  }
 
-  // Expenses — A=label, B=monthly, C=yearly(formula), D=notes
+  // Expenses — A=label(col1), B=monthly(col2), D=notes(col4)
   var expRowNums = [58,59,60,61,62,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
-  var aVals = inp.getRange('A58:A85').getValues();
-  var bVals = inp.getRange('B58:B85').getValues();
-  var dVals = inp.getRange('D58:D85').getValues();
-  var expenses = expRowNums.map(function(r) {
-    var i = r - 58;
+  var expenses = expRowNums.map(function(row) {
+    var mo = num(row,2);
     return {
-      row:r,
-      name:String(aVals[i][0]||''),
-      monthly:Number(bVals[i][0])||0,
-      annual:(Number(bVals[i][0])||0)*12,
-      note:String(dVals[i][0]||'')
+      row:row, name:str(row,1),
+      monthly:mo, annual:mo*12, note:str(row,4)
     };
   });
 
-  // Debts — rows 88-89 + 92-101
-  // A=include, B=name, C=monthly, D=annual, E=start, F=end, H=balance
-  var debt88 = inp.getRange('A88:H89').getValues();
-  var debt92 = inp.getRange('A92:H101').getValues();
-  var debts = [];
-  function parseDebt(row) {
-    return {inc:String(row[0]||'No'), name:String(row[1]||''),
-      mo:Number(row[2])||0, ann:Number(row[3])||0,
-      start:dt(row[4]), end:dt(row[5]), bal:Number(row[7])||0};
-  }
-  debt88.forEach(function(r){ debts.push(parseDebt(r)); });
-  debt92.forEach(function(r){ debts.push(parseDebt(r)); });
+  // Debts rows 88-89 + 92-101 (A=1,B=2,C=3,D=4,E=5,F=6,H=8)
+  var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
+  var debts = debtRows.map(function(row) {
+    return {
+      inc:str(row,1), name:str(row,2),
+      mo:num(row,3), ann:num(row,4),
+      start:dt(row,5), end:dt(row,6),
+      bal:num(row,8)
+    };
+  });
 
   // Spending/solver
-  var baseSpend = Number(v('B87'))||0;
-  var safeExtra = Number(v('B119'))||0;
-  function phaseYear(cell) {
-    var val = v(cell);
+  var baseSpend = num(87,2);
+  var safeExtra = num(119,2);
+  function phaseYear(row, col) {
+    var val = r(row,col);
     if (!val) return null;
-    var d = new Date(val);
-    return isNaN(d) ? null : d.getFullYear();
+    try { var d=new Date(val); return isNaN(d)?null:d.getFullYear(); } catch(e){return null;}
   }
   var spending = {
-    baseAnnual:baseSpend, safeExtra:safeExtra,
-    surplus:Number(v('B120'))||0,
-    phase1Start:phaseYear('C122'), phase1End:phaseYear('D122'),
-    phase2Start:phaseYear('C123'), phase2End:phaseYear('D123'),
-    phase3Start:phaseYear('C124'), phase3End:phaseYear('D124'),
-    phase1Weight:Number(v('E122'))||1.15,
-    phase2Weight:Number(v('E123'))||1.0,
-    phase3Weight:Number(v('E124'))||0.9,
-    phase1Override:Number(v('F122'))||0,
-    phase2Override:Number(v('F123'))||0,
-    phase3Override:Number(v('F124'))||0,
-    phase1Extra:Number(v('G122'))||0,
-    phase2Extra:Number(v('G123'))||0,
-    phase3Extra:Number(v('G124'))||0,
+    baseAnnual:baseSpend, safeExtra:safeExtra, surplus:num(120,2),
+    phase1Start:phaseYear(122,3), phase1End:phaseYear(122,4),
+    phase2Start:phaseYear(123,3), phase2End:phaseYear(123,4),
+    phase3Start:phaseYear(124,3), phase3End:phaseYear(124,4),
+    phase1Weight:num(122,5), phase2Weight:num(123,5), phase3Weight:num(124,5),
+    phase1Override:num(122,6), phase2Override:num(123,6), phase3Override:num(124,6),
+    phase1Extra:num(122,7), phase2Extra:num(123,7), phase3Extra:num(124,7),
   };
 
   // Legacy
-  var endLiquid = Number(v('B133'))||0;
-  var legacyGoal = Number(v('B8'))||0;
+  var endLiquid = num(133,2);
+  var legacyGoal = num(8,2);
   var legacy = {
-    goal:legacyGoal, safetyFloor:Number(v('B9')),
+    goal:legacyGoal, safetyFloor:num(9,2),
     projectedEnding:endLiquid,
-    variance:endLiquid - legacyGoal,
-    achievedPct:legacyGoal>0 ? Math.round(endLiquid/legacyGoal*100) : 100,
-    status:String(v('B134')||''),
+    variance:endLiquid-legacyGoal,
+    achievedPct:legacyGoal>0?Math.round(endLiquid/legacyGoal*100):100,
+    status:str(134,2),
   };
 
   // Roth
   var roth = {
-    year:Number(v('B139'))||0,
-    bracket:String(v('B141')||'12%'),
-    taxableIncome:Number(v('B140'))||0,
-    bracketThreshold:Number(v('B142'))||0,
-    optimalAmount:Number(v('B143'))||0,
-    marginalTax:Number(v('B144'))||0,
-    assumedRate:pct(v('B145')),
-    taxSavings:Number(v('B146'))||0,
+    year:num(139,2), bracket:str(141,2),
+    taxableIncome:num(140,2), bracketThreshold:num(142,2),
+    optimalAmount:num(143,2), marginalTax:num(144,2),
+    assumedRate:pct(145,2), taxSavings:num(146,2),
   };
 
-  // Roth plan amounts
-  var rothB = inp.getRange('B150:B169').getValues();
-  var rothC = inp.getRange('C150:C169').getValues();
+  // Roth plan (rows 150-169, B=col2, C=col3)
   var rothPlan = [];
   for (var i=0; i<20; i++) {
-    var p1amt = Number(rothB[i][0])||0;
-    var p2amt = Number(rothC[i][0])||0;
-    rothPlan.push({year:2026+i, p1:p1amt, p2:p2amt});
+    var row = 150+i;
+    rothPlan.push({year:2026+i, p1:num(row,2), p2:num(row,3)});
   }
 
-  // Check-in
-  var checkIn = {
-    actualBalance:Number(v('B149'))||0,
-  };
-
   return {
-    meta:{planYear:new Date().getFullYear(), sheetId:''},
+    meta:{planYear:new Date().getFullYear()},
     people:{craig:p1, gena:p2},
     global:gl, tax:tax,
     portfolio:{accounts:accounts, total:portfolioTotal},
     expenses:expenses, debts:debts,
     spending:spending, legacy:legacy,
     roth:roth, rothPlan:rothPlan,
-    checkIn:checkIn,
   };
 }
+
 
 // ── WRITE ────────────────────────────────────────────────────
 function writeInputs(ss, inp, data) {

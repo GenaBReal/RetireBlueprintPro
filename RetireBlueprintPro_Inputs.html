@@ -1398,49 +1398,95 @@ function hideLoadingOverlay() {
 
 function loadLiveData() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId) {
+  if (!sheetId || sheetId === '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
     hideLoadingOverlay();
-    setStatus('⚠ No sheet connected — complete Setup Guide first.', 'error');
-    showToast('⚠ No sheet connected — go to Setup Guide first.', 'error');
+    setStatus('No sheet connected — complete Setup Guide first.', 'error');
     return;
   }
+
   document.getElementById('dl-sub').textContent = 'Reading your Google Sheet…';
-  var callbackName = 'inputsCallback_' + Date.now();
-  window._rbpCallbacks[callbackName] = function(data) {
-    delete window._rbpCallbacks[callbackName];
-    window[callbackName] = null;
+
+  var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+  var url = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
+
+  fetch(url)
+    .then(function(resp) {
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      return resp.json();
+    })
+    .then(function(data) {
+      hideLoadingOverlay();
+      if (data && data.error) {
+        setStatus('Error loading sheet: ' + data.error, 'error');
+        showToast('Could not load sheet. Is it shared with retireblueprintpro@gmail.com?', 'error');
+        return;
+      }
+      try {
+        populateFromData(data);
+        setStatus('Plan data loaded from your Google Sheet', 'success');
+        showToast('Plan data loaded!', '');
+        var saveBtn = document.getElementById('save-btn');
+        if (saveBtn) saveBtn.disabled = false;
+      } catch(e) {
+        setStatus('Data loaded with errors: ' + e.message, '');
+        console.error('populateFromData error:', e);
+      }
+    })
+    .catch(function(err) {
+      hideLoadingOverlay();
+      // CORS error expected with no-cors — try JSONP fallback
+      loadLiveDataJSONP(sheetId, SCRIPT);
+    });
+}
+
+function loadLiveDataJSONP(sheetId, SCRIPT) {
+  var callbackName = 'rbpCb_' + Date.now();
+  var done = false;
+
+  window[callbackName] = function(data) {
+    done = true;
+    cleanup();
     hideLoadingOverlay();
     if (data && data.error) {
-      setStatus('⚠ Error loading sheet: ' + data.error, 'error');
-      showToast('⚠ Could not load sheet data. Is it shared with retireblueprintpro@gmail.com?', 'error');
+      setStatus('Error: ' + data.error, 'error');
       return;
     }
     try {
       populateFromData(data);
-      setStatus('Live data loaded from your Google Sheet', 'success');
-      showToast('✅ Plan data loaded from your sheet!', '');
-      document.getElementById('save-btn').disabled = false;
+      setStatus('Plan data loaded!', 'success');
+      showToast('Plan data loaded!', '');
+      var saveBtn = document.getElementById('save-btn');
+      if (saveBtn) saveBtn.disabled = false;
     } catch(e) {
       setStatus('Data loaded with errors: ' + e.message, '');
     }
   };
-  var s = document.createElement('script');
-  window[callbackName] = function(d){ window._rbpCallbacks[callbackName](d); };
-  s.src = scriptUrl('read') + '&callback=' + callbackName + '&_=' + Date.now();
-  s.onerror = function() {
-    hideLoadingOverlay();
-    setStatus('⚠ Connection error — check your internet and try refreshing.', 'error');
-    showToast('⚠ Connection error loading your sheet.', 'error');
-  };
-  setTimeout(function() {
-    if (window[callbackName]) {
-      delete window[callbackName];
+
+  function cleanup() {
+    if (script && script.parentNode) script.parentNode.removeChild(script);
+    delete window[callbackName];
+  }
+
+  var script = document.createElement('script');
+  script.src = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + callbackName + '&_=' + Date.now();
+  script.onerror = function() {
+    if (!done) {
+      cleanup();
       hideLoadingOverlay();
-      setStatus('⚠ Timeout — make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.', 'error');
-      showToast('⚠ Timed out loading your sheet.', 'error');
+      setStatus('Connection error — check internet and refresh.', 'error');
     }
-  }, 15000);
-  document.head.appendChild(s);
+  };
+
+  // 25 second timeout — generous for slow sheets
+  setTimeout(function() {
+    if (!done) {
+      cleanup();
+      hideLoadingOverlay();
+      setStatus('Timeout — make sure sheet is shared with retireblueprintpro@gmail.com as Editor.', 'error');
+    }
+  }, 1800000); // 30 minutes
+
+  document.head.appendChild(script);
 }
 
 function populateFromData(d) {
