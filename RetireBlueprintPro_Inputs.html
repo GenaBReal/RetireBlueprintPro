@@ -863,6 +863,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <span style="font-size:10px;color:#8a9ab0;">Ending Liquid Assets:</span>
         <span style="font-size:14px;font-weight:700;color:var(--teal);" id="s-ending">—</span>
         <span style="font-size:10px;color:#8a9ab0;margin-left:8px;">Legacy Goal:</span>
+        <span style="font-size:14px;font-weight:700;color:var(--orange);margin-left:4px;" id="s-leg-goal">—</span>
         <span style="font-size:14px;font-weight:700;color:#fff;" id="s-goal">—</span>
         <span style="font-size:10px;color:#8a9ab0;margin-left:8px;">Solver note:</span>
         <span style="font-size:10px;color:#8a9ab0;font-style:italic;">The solver tests the smile curve after normalizing phase weights. Set a Chosen Amount to override.</span>
@@ -1542,6 +1543,7 @@ function populateFromData(d) {
   setTxt('s-phase3', fmt(sp.phase3Extra));
   setTxt('s-surplus', (leg.variance >= 0 ? '+' : '') + fmt(leg.variance));
   setTxt('s-ending',  fmt(leg.projectedEnding));
+  setTxt('s-leg-goal', fmt(leg.goal));
   var statusEl = document.getElementById('s-status');
   statusEl.textContent = leg.status || (leg.achievedPct >= 100 ? 'ON TRACK' : 'CHECK PLAN');
   statusEl.className = leg.achievedPct >= 100 ? 'badge-go' : 'badge-watch';
@@ -1553,7 +1555,7 @@ function populateFromData(d) {
   // Header
   document.getElementById('hdr-status').textContent = leg.achievedPct >= 100 ? 'ON TRACK' : 'REVIEW';
   document.getElementById('hdr-ending').textContent = fmt(leg.projectedEnding);
-  document.getElementById('hdr-goal').textContent = fmt(leg.goal);
+  document.getElementById('hdr-goal').textContent = leg.goal ? fmt(leg.goal) : '$0';
 
   isDirty = false;
   document.getElementById('save-btn').disabled = false;
@@ -1752,22 +1754,22 @@ function buildPayload() {
       B7:  document.getElementById('f-B7').value,
       B8:  document.getElementById('f-B8').value,
       B9:  document.getElementById('f-B9').value,
-      B10: document.getElementById('f-B10').value / 100, // legacy
+      B10: gn('f-B10')/100, // survivor reduction as decimal
       B11: document.getElementById('f-B11').value,
       B12: document.getElementById('f-B12').value,
       B13: document.getElementById('f-B13').value,
       B14: document.getElementById('f-B14').value,
-      B15: document.getElementById('f-B15').value / 100,
+      B15: gpct('f-B15'),
       B16: document.getElementById('f-B16').value,
       B17: document.getElementById('f-B17').value,
       B18: document.getElementById('f-B18').value,
-      B19: document.getElementById('f-B19').value / 100,
-      B20: document.getElementById('f-B20').value / 100,
-      B21: document.getElementById('f-B21').value / 100,
+      B19: gpct('f-B19'),
+      B20: gpct('f-B20'),
+      B21: gpct('f-B21'),
       B24: document.getElementById('f-B24').value,
       B25: document.getElementById('f-B25').value,
-      B26: document.getElementById('f-B26').value / 100,
-      B28: document.getElementById('f-B28').value / 100,
+      B26: gpct('f-B26'),
+      B28: gpct('f-B28'),
     },
     partner1: {
       B31: document.getElementById('f-B31').value,
@@ -1813,7 +1815,7 @@ function buildPayload() {
     roth: {
       B139: document.getElementById('f-B139').value,
       B141: document.getElementById('f-B141').value,
-      B145: document.getElementById('f-B145').value / 100,
+      B145: document.gpct('f-B145'),
     },
     phases: {
       C122: document.getElementById('f-C122').value,
