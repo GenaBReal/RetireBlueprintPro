@@ -427,7 +427,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           </div>
           <div class="field">
             <label>Salary Start Date</label>
-            <input type="date" id="f-B38" value="" onchange="markDirty()">
+            <input type="date" type="date" id="f-B38" value="" onchange="markDirty()">
             <span class="hint">Date salary/employment begins</span>
           </div>
           <div class="field">
@@ -553,7 +553,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           </div>
           <div class="field">
             <label>Salary Start Date</label>
-            <input type="date" id="f-D38" value="" onchange="markDirty()">
+            <input type="date" type="date" id="f-D38" value="" onchange="markDirty()">
             <span class="hint">Date salary/employment begins</span>
           </div>
           <div class="field">
@@ -1557,12 +1557,25 @@ function populateFromData(d) {
   // ── Smile Curve Phases ──────────────────────────────────
   if (d.spending) {
     var sp = d.spending;
-    setVal('f-C122', sp.phase1Start || '2026');
-    setVal('f-D122', sp.phase1End   || '2033');
-    setVal('f-C123', sp.phase2Start || '2034');
-    setVal('f-D123', sp.phase2End   || '2044');
-    setVal('f-C124', sp.phase3Start || '2045');
-    setVal('f-D124', sp.phase3End   || '2075');
+    // phase start/end are dates from sheet — extract year
+    function phaseYear(s, def) {
+      if (!s) return def;
+      // M/D/YYYY format from dt()
+      var parts = String(s).split('/');
+      if (parts.length === 3) return parts[2];
+      // YYYY-MM-DD format
+      if (/^\d{4}/.test(s)) return s.substring(0,4);
+      return def;
+    }
+    setVal('f-C122', phaseYear(sp.phase1Start, '2026'));
+    setVal('f-D122', phaseYear(sp.phase1End,   '2033'));
+    setVal('f-C123', phaseYear(sp.phase2Start, '2034'));
+    setVal('f-D123', phaseYear(sp.phase2End,   '2044'));
+    setVal('f-C124', phaseYear(sp.phase3Start, '2045'));
+    setVal('f-D124', phaseYear(sp.phase3End,   '2075'));
+    setVal('f-E122', sp.phase1Weight || '1.15');
+    setVal('f-E123', sp.phase2Weight || '1.0');
+    setVal('f-E124', sp.phase3Weight || '0.9');
   }
 
   // ── Solver ────────────────────────────────────────────

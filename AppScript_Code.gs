@@ -145,17 +145,17 @@ function readAll(sheetId) {
       // Batch read all expense rows at once
       // Sheet: A=name(editable), B=monthly, C=yearly(formula), D=notes
       var rows=[58,59,60,61,62,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
-      var aVals = inp.getRange('A58:A85').getValues(); // expense name
-      var bVals = inp.getRange('B58:B85').getValues(); // monthly amount
-      var dVals = inp.getRange('D58:D85').getValues(); // notes
+      var bVals = inp.getRange('B58:B85').getValues(); // custom name (B)
+      var cVals = inp.getRange('C58:C85').getValues(); // monthly amount (C)
+      var dVals = inp.getRange('D58:D85').getValues(); // notes (D)
       return rows.map(function(r){
         var i = r - 58; // index into the arrays
         return {
           row: r,
-          name: String(aVals[i] ? aVals[i][0] : ''),
-          monthly: Number(bVals[i] ? bVals[i][0] : 0)||0,
-          annual: (Number(bVals[i] ? bVals[i][0] : 0)||0)*12,
-          note: String(dVals[i] ? dVals[i][0] : '')
+          name: String(bVals[i] ? bVals[i][0] : ''),   // B = custom name
+          monthly: Number(cVals[i] ? cVals[i][0] : 0)||0, // C = monthly
+          annual: (Number(cVals[i] ? cVals[i][0] : 0)||0)*12,
+          note: String(dVals[i] ? dVals[i][0] : '')    // D = notes
         };
       });
     })(),
@@ -339,7 +339,8 @@ function writeInputs(data, sheetId) {
         inp.getRange('A'+r).setValue(d.inc || 'No');
         if (d.name) inp.getRange('B'+r).setValue(d.name);
         inp.getRange('C'+r).setValue(mo);
-        inp.getRange('D'+r).setValue(mo * 12);
+        inp.getRange('D'+r).setValue(mo * 12); // annual
+        inp.getRange('G'+r).setValue(''); // clear old stale data in G
         if (d.start) { try { var ds=d.start.split('-'); if(ds.length===3) inp.getRange('E'+r).setValue(new Date(parseInt(ds[0]),parseInt(ds[1])-1,parseInt(ds[2]),12,0,0)); } catch(e){} }
         if (d.end)   { try { var de=d.end.split('-');   if(de.length===3) inp.getRange('F'+r).setValue(new Date(parseInt(de[0]),parseInt(de[1])-1,parseInt(de[2]),12,0,0)); } catch(e){} }
         if (bal) inp.getRange('H'+r).setValue(bal);
@@ -357,9 +358,9 @@ function writeInputs(data, sheetId) {
           var r = Number(exp.row);
           if (!r || r < 58 || r > 85) return;
           var idx = r - 58;
-          bData[idx] = [exp.name||''];
-          cData[idx] = [Number(exp.monthly)||0];
-          tData[idx] = [exp.note||''];
+          bData[idx] = [exp.name||''];    // → B (custom name)
+          cData[idx] = [Number(exp.monthly)||0]; // → C (monthly)
+          tData[idx] = [exp.note||''];    // → D (notes)
         });
         // B column written row by row below
         // Write expenses — skip formula rows 62 and 70
@@ -367,10 +368,10 @@ function writeInputs(data, sheetId) {
       var expRows = [58,59,60,61,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
       expRows.forEach(function(r) {
         var idx = r - 58;
-        if(bData[idx][0] !== undefined) inp.getRange('A'+r).setValue(bData[idx][0]); // name → A
+        // Sheet: A=fixed label (never write), B=custom name, C=monthly, D=notes
+        if(bData[idx][0] !== undefined) inp.getRange('B'+r).setValue(bData[idx][0]); // name → B
         var mo = Number(cData[idx] ? cData[idx][0] : 0) || 0;
-        inp.getRange('B'+r).setValue(mo); // monthly → B
-        inp.getRange('C'+r).setValue(mo * 12); // yearly → C (in case formula was lost)
+        inp.getRange('C'+r).setValue(mo); // monthly → C
         if(tData[idx][0] !== undefined) inp.getRange('D'+r).setValue(tData[idx][0]); // notes → D
       });
         // T column written row by row below
