@@ -16,7 +16,9 @@ function doGet(e) {
         rawData = Utilities.newBlob(Utilities.base64Decode(rawData)).getDataAsString();
       }
       var data = JSON.parse(rawData);
-      return jsonp(callback, writeInputs(data, sheetId));
+      var ss2 = SpreadsheetApp.openById(sheetId);
+      var inp2 = ss2.getSheetByName('Inputs');
+      return jsonp(callback, writeInputs(data, ss2, inp2));
     }
     return jsonp(callback, readAll(sheetId));
   } catch(err) {
@@ -74,7 +76,7 @@ function readAll(sheetId) {
     if (String(row[0]).toLowerCase()==='yes') total += bal;
     accounts.push({
       showInCalc:String(row[0]), name:String(row[1]), owner:String(row[2]),
-      type:String(row[3]), balance:bal, expectedReturn:Number(row[5])||0,
+      type:String(row[3]), balance:bal, expectedReturn:(Number(row[5])||0)*100,
       status:String(row[6]), showOnDashboard:String(row[7])
     });
   });
@@ -145,16 +147,16 @@ function readAll(sheetId) {
       // Batch read all expense rows at once
       // Sheet: A=name(editable), B=monthly, C=yearly(formula), D=notes
       var rows=[58,59,60,61,62,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
-      var bVals = inp.getRange('B58:B85').getValues(); // custom name (B)
-      var cVals = inp.getRange('C58:C85').getValues(); // monthly amount (C)
+      var aVals = inp.getRange('A58:A85').getValues(); // fixed label (A) — display only
+      var bVals = inp.getRange('B58:B85').getValues(); // monthly cost (B)
       var dVals = inp.getRange('D58:D85').getValues(); // notes (D)
       return rows.map(function(r){
-        var i = r - 58; // index into the arrays
+        var i = r - 58;
         return {
           row: r,
-          name: String(bVals[i] ? bVals[i][0] : ''),   // B = custom name
-          monthly: Number(cVals[i] ? cVals[i][0] : 0)||0, // C = monthly
-          annual: (Number(cVals[i] ? cVals[i][0] : 0)||0)*12,
+          label: String(aVals[i] ? aVals[i][0] : ''),  // A = fixed label for display
+          monthly: Number(bVals[i] ? bVals[i][0] : 0)||0, // B = monthly
+          annual: (Number(bVals[i] ? bVals[i][0] : 0)||0)*12,
           note: String(dVals[i] ? dVals[i][0] : '')    // D = notes
         };
       });
@@ -200,183 +202,221 @@ function readAll(sheetId) {
   };
 }
 
-function writeInputs(data, sheetId) {
+function writeInputs(data, ss, inp) {
   try {
-    var ss  = SpreadsheetApp.openById(sheetId);
-    var inp = ss.getSheetByName('Inputs');
-
-    // FORMULA CELLS — never overwrite these, they are sheet-calculated:
-    // B33,D33 (age), B36,D36 (death year), B42,D42 (claiming age),
-    // B43,D43 (SS monthly), B45,D45 (SS end), B48,D48 (pension end),
-    // B86,B87,B119,B120,B128,B129,B130,B134,B140,B143,B144,B146,B149
-
-    function set(cell, val) { if(val!==undefined && val!==null && val!=='') inp.getRange(cell).setValue(val); }
-    function setN(cell,val) { if(val!==undefined) inp.getRange(cell).setValue(Number(val)||0); }
+    // ── Helper functions ──────────────────────────────────────
+    function set(cell,val)  { if(val!==undefined&&val!==null&&val!=='') inp.getRange(cell).setValue(val); }
+    function setN(cell,val) { var n=Number(val); if(!isNaN(n)) inp.getRange(cell).setValue(n); }
+    function setPct(cell,val) { var n=Number(val); if(!isNaN(n)) inp.getRange(cell).setValue(n); }
     function setD(cell,val) {
-      if(!val || val==='' || val==='0' || val===0) return;
+      if(!val||val===''||val==='0'||val===0) return;
       try {
-        var s = String(val).trim();
-        var yr, mo, dy;
-        // YYYY-MM-DD (HTML date input format) — most reliable
-        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-          var parts = s.split('-');
-          yr = parseInt(parts[0]); mo = parseInt(parts[1])-1; dy = parseInt(parts[2]);
-        }
-        // MM/DD/YYYY or M/D/YYYY
-        else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
-          var parts = s.split('/');
-          yr = parseInt(parts[2]); mo = parseInt(parts[0])-1; dy = parseInt(parts[1]);
-        }
-        // MM/DD/YY
-        else if (/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(s)) {
-          var parts = s.split('/');
-          yr = parseInt(parts[2])+2000; mo = parseInt(parts[0])-1; dy = parseInt(parts[1]);
-        }
-        else {
-          var d = new Date(val);
-          if(!isNaN(d)) inp.getRange(cell).setValue(d);
-          return;
-        }
-        if(yr && yr > 1900 && yr < 2200) {
-          // Use explicit year/month/day to avoid timezone issues with pre-1970 dates
-          var d = new Date(yr, mo, dy, 12, 0, 0); // noon to avoid DST shifts
-          inp.getRange(cell).setValue(d);
-        }
-      } catch(e) { Logger.log('setD error for ' + cell + ': ' + e); }
+        var s=String(val).trim();
+        var yr,mo,dy;
+        if(/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          var p=s.split('-'); yr=parseInt(p[0]); mo=parseInt(p[1])-1; dy=parseInt(p[2]);
+        } else if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+          var p=s.split('/'); yr=parseInt(p[2]); mo=parseInt(p[0])-1; dy=parseInt(p[1]);
+        } else { var d=new Date(val); if(!isNaN(d)) inp.getRange(cell).setValue(d); return; }
+        if(yr>1900&&yr<2200) inp.getRange(cell).setValue(new Date(yr,mo,dy,12,0,0));
+      } catch(e) { Logger.log('setD error '+cell+': '+e); }
     }
-    function setPct(cell,val) { if(val!==undefined) inp.getRange(cell).setValue(Number(val)||0); }
 
+    // ── GLOBAL SETTINGS ──────────────────────────────────────
     if (data.global) {
-      var g=data.global;
-      if(g.B6) {
-        var yr = parseInt(g.B6);
-        if(!isNaN(yr) && yr > 2000) {
-          // Store as Jan 15 to avoid timezone rollback to Dec 31 previous year
-          inp.getRange('B6').setValue(new Date(yr, 0, 15));
-        }
-      }
-      setN('B7',g.B7); setN('B8',g.B8); setN('B9',g.B9);
-      setN('B10',g.B10); // Survivor reduction stored as decimal e.g. 0.25 set('B11',g.B11); set('B12',g.B12);
-      setN('B13',g.B13); setN('B14',g.B14); setPct('B15',g.B15);
-      set('B16',g.B16); setN('B17',g.B17); setN('B18',g.B18);
-      setPct('B19',g.B19); setPct('B20',g.B20); setPct('B21',g.B21);
-      setPct('B22',g.B22); setPct('B23',g.B23);
-      set('B24',g.B24); setN('B25',g.B25); setPct('B26',g.B26); setPct('B27',g.B27); setPct('B28',g.B28);
+      var g = data.global;
+      // B6: Plan start year — stored as number
+      setN('B6', g.B6);
+      setN('B7', g.B7);
+      setN('B8', g.B8);
+      setN('B9', g.B9);
+      // B10: Survivor reduction — user enters 25 (%), store as 0.25
+      setPct('B10', (Number(g.B10)||0) / 100);
+      set('B11', g.B11);
+      set('B12', g.B12);
+      setN('B13', g.B13);
+      setN('B14', g.B14);
+      setPct('B15', (Number(g.B15)||0) / 100);
+      set('B16', g.B16);
+      setN('B17', g.B17);
+      setN('B18', g.B18);
+      setPct('B19', (Number(g.B19)||0) / 100);
+      setPct('B20', (Number(g.B20)||0) / 100);
+      setPct('B21', (Number(g.B21)||0) / 100);
+      setPct('B22', (Number(g.B22)||0) / 100);
+      setPct('B23', (Number(g.B23)||0) / 100);
+      set('B24', g.B24);
+      setN('B25', g.B25);
+      setPct('B26', (Number(g.B26)||0) / 100);
+      setPct('B27', (Number(g.B27)||0) / 100);
+      setPct('B28', (Number(g.B28)||0) / 100);
     }
+
+    // ── PARTNER 1 ────────────────────────────────────────────
     if (data.partner1) {
-      var p=data.partner1;
-      set('B31',p.B31); setD('B32',p.B32); set('B34',p.B34);
-      setN('B35',p.B35); setN('B37',p.B37); setD('B38',p.B38); setD('B39',p.B39);
-      setN('B40',p.B40); setN('B41',p.B41);
-      setD('B44',p.B44); setN('B46',p.B46); setD('B47',p.B47);
-      setN('B49',p.B49); setD('B50',p.B50); setD('B51',p.B51);
-      setN('B52',p.B52); setN('B53',p.B53); setN('B54',p.B54||65);
+      var p = data.partner1;
+      set('B31', p.B31);
+      setD('B32', p.B32);
+      // B33=formula, B36=formula — never write
+      setN('B35', p.B35);
+      set('B34', p.B34);
+      setN('B37', p.B37);
+      setD('B38', p.B38);
+      setD('B39', p.B39);
+      setN('B40', p.B40);
+      setN('B41', p.B41);
+      // B42=formula, B43=formula, B45=formula, B48=formula — never write
+      setD('B44', p.B44);
+      setN('B46', p.B46);
+      setD('B47', p.B47);
+      setN('B49', p.B49);
+      setD('B50', p.B50);
+      setD('B51', p.B51);
+      setN('B52', p.B52);
+      setN('B53', p.B53);
+      setN('B54', p.B54);
     }
+
+    // ── PARTNER 2 ────────────────────────────────────────────
     if (data.partner2) {
-      var p=data.partner2;
-      set('D31',p.D31); setD('D32',p.D32); set('D34',p.D34);
-      setN('D35',p.D35); setN('D37',p.D37); setD('D38',p.D38); setD('D39',p.D39);
-      setN('D40',p.D40); setN('D41',p.D41);
-      setD('D44',p.D44); setN('D46',p.D46); setD('D47',p.D47);
-      setN('D49',p.D49); setD('D50',p.D50); setD('D51',p.D51);
-      setN('D52',p.D52); setN('D53',p.D53); setN('D54',p.D54||65);
+      var p = data.partner2;
+      set('D31', p.D31);
+      setD('D32', p.D32);
+      setN('D35', p.D35);
+      set('D34', p.D34);
+      setN('D37', p.D37);
+      setD('D38', p.D38);
+      setD('D39', p.D39);
+      setN('D40', p.D40);
+      setN('D41', p.D41);
+      setD('D44', p.D44);
+      setN('D46', p.D46);
+      setD('D47', p.D47);
+      setN('D49', p.D49);
+      setD('D50', p.D50);
+      setD('D51', p.D51);
+      setN('D52', p.D52);
+      setN('D53', p.D53);
+      setN('D54', p.D54);
     }
-    // Flush partner names first
-    SpreadsheetApp.flush();
 
-    if (data.accounts && data.accounts.length) {
-      var p1name = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
-      var p2name = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
-
-      // Temporarily remove validation on owner column so any value can be written
-      inp.getRange('C105:C116').clearDataValidations();
-
-      // Build batch array for accounts — 1 write instead of 96
-      var acctData = [];
-      for (var ai=0; ai<12; ai++) {
-        var a = data.accounts[ai] || {};
-        var owner = String(a.owner||'Joint').trim();
-        if (owner==='Partner 1'||owner==='Craig') owner = p1name||'Joint';
-        if (owner==='Partner 2'||owner==='Gena')  owner = p2name||'Joint';
-        if (!owner) owner = 'Joint';
-        acctData.push([
-          a.inc||a.showInCalc||'No',
-          a.name||'',
-          owner,
-          a.type||'',
-          Number(a.bal||a.balance)||0,
-          Number(a.ret||a.expectedReturn)||0,
-          a.status||'Use for Withdrawals',
-          a.dash||a.showOnDashboard||'No'
-        ]);
-      }
-      inp.getRange('A105:H116').setValues(acctData);
-
-      // Restore validation using the dynamic range from Technical Style Reference
-      var ownerValidation = SpreadsheetApp.newDataValidation()
-        .requireValueInRange(
-          ss.getSheetByName('Technical Style Reference').getRange('F6:F8'), true)
-        .setAllowInvalid(false)
-        .build();
-      inp.getRange('C105:C116').setDataValidation(ownerValidation);
+    // ── EXPENSES ─────────────────────────────────────────────
+    // Sheet structure: A=fixed label (never write), B=monthly amount, C=yearly (formula, never write), D=notes
+    if (data.expenses && data.expenses.length) {
+      var expRows = [58,59,60,61,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
+      data.expenses.forEach(function(exp) {
+        var r = Number(exp.row);
+        if (expRows.indexOf(r) === -1) return;
+        var mo = Number(exp.monthly) || 0;
+        inp.getRange('B'+r).setValue(mo); // monthly → B
+        // A = fixed label (never write), C = yearly formula =B*12 (never write)
+        var note = exp.note || '';
+        inp.getRange('D'+r).setValue(note); // notes → D
+      });
     }
-    if (data.roth) {
-      // B139 = Roth year (user input), B141 = bracket (user input), B145 = rate (user input)
-      // B140,B143,B144,B146 are formula cells — do NOT write
-      setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
-    }
-    // Roth plan write disabled — need to confirm sheet row structure first
-    // Write debt rows
-    // Sheet structure: A=include, B=name, C=monthly, D=annual(=C*12), H=balance
-    // Rows 88-89 are main debt rows, 90-91 are headers, 92-101 are extended debts
+
+    // ── DEBTS ────────────────────────────────────────────────
+    // Sheet: A=include, B=name, C=monthly, D=annual, H=balance
+    // Rows 88-89 = first two debts, rows 92-101 = next ten
     if (data.debts && data.debts.length) {
-      var debtSheetRows = [88, 89, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101];
+      var debtSheetRows = [88,89,92,93,94,95,96,97,98,99,100,101];
       data.debts.forEach(function(d, i) {
         if (i >= debtSheetRows.length) return;
         var r = debtSheetRows[i];
         var mo = Number(d.mo) || 0;
-        var bal = Number(d.bal) || 0;
         inp.getRange('A'+r).setValue(d.inc || 'No');
         if (d.name) inp.getRange('B'+r).setValue(d.name);
         inp.getRange('C'+r).setValue(mo);
-        inp.getRange('D'+r).setValue(mo * 12); // annual
-        inp.getRange('G'+r).setValue(''); // clear old stale data in G
-        if (d.start) { try { var ds=d.start.split('-'); if(ds.length===3) inp.getRange('E'+r).setValue(new Date(parseInt(ds[0]),parseInt(ds[1])-1,parseInt(ds[2]),12,0,0)); } catch(e){} }
-        if (d.end)   { try { var de=d.end.split('-');   if(de.length===3) inp.getRange('F'+r).setValue(new Date(parseInt(de[0]),parseInt(de[1])-1,parseInt(de[2]),12,0,0)); } catch(e){} }
-        if (bal) inp.getRange('H'+r).setValue(bal);
+        inp.getRange('D'+r).setValue(mo * 12);
+        if (d.start) setD('E'+r, d.start);
+        if (d.end)   setD('F'+r, d.end);
+        if (Number(d.bal)) inp.getRange('H'+r).setValue(Number(d.bal));
       });
     }
-    // Write expense rows — only rows with data
-    if (data.expenses && data.expenses.length) {
-      var hasExpenses = data.expenses.some(function(e){ return e.name || e.monthly; });
-      if (hasExpenses) {
-        var bData = [], cData = [], tData = []; // b=name, c=monthly, t=notes
-        for (var i=0; i<28; i++) {
-          bData.push(['']); cData.push([0]); tData.push(['']);
-        }
-        data.expenses.forEach(function(exp) {
-          var r = Number(exp.row);
-          if (!r || r < 58 || r > 85) return;
-          var idx = r - 58;
-          bData[idx] = [exp.name||''];    // → B (custom name)
-          cData[idx] = [Number(exp.monthly)||0]; // → C (monthly)
-          tData[idx] = [exp.note||''];    // → D (notes)
-        });
-        // B column written row by row below
-        // Write expenses — skip formula rows 62 and 70
-      // Sheet: A=name, B=monthly, C=yearly(formula-never write), D=notes
-      var expRows = [58,59,60,61,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
-      expRows.forEach(function(r) {
-        var idx = r - 58;
-        // Sheet: A=fixed label (never write), B=custom name, C=monthly, D=notes
-        if(bData[idx][0] !== undefined) inp.getRange('B'+r).setValue(bData[idx][0]); // name → B
-        var mo = Number(cData[idx] ? cData[idx][0] : 0) || 0;
-        inp.getRange('C'+r).setValue(mo); // monthly → C
-        if(tData[idx][0] !== undefined) inp.getRange('D'+r).setValue(tData[idx][0]); // notes → D
-      });
-        // T column written row by row below
+
+    // ── ACCOUNTS ─────────────────────────────────────────────
+    // Sheet: A=include, B=name, C=owner, D=type, E=balance, F=return(decimal), G=status, H=dashboard
+    if (data.accounts && data.accounts.length) {
+      var p1name = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
+      var p2name = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
+      inp.getRange('C105:C116').clearDataValidations();
+      var acctData = [];
+      for (var ai = 0; ai < 12; ai++) {
+        var a = data.accounts[ai] || {};
+        var owner = String(a.owner||'Joint').trim();
+        if (owner==='Partner 1'||owner===p1name) owner = p1name||owner;
+        if (owner==='Partner 2'||owner===p2name) owner = p2name||owner;
+        // Return: user enters whole number (7), sheet stores decimal (0.07)
+        var ret = Number(a.ret||0);
+        if (ret > 1) ret = ret / 100;
+        acctData.push([
+          a.inc||'No',
+          a.name||'',
+          owner,
+          a.type||'',
+          Number(a.bal||0),
+          ret,
+          a.status||'Use for Withdrawals',
+          a.dash||'No'
+        ]);
       }
+      inp.getRange('A105:H116').setValues(acctData);
+      try {
+        var ownerRule = SpreadsheetApp.newDataValidation()
+          .requireValueInRange(ss.getSheetByName('Technical Style Reference').getRange('F6:F8'), true)
+          .setAllowInvalid(false).build();
+        inp.getRange('C105:C116').setDataValidation(ownerRule);
+      } catch(e) {}
     }
+
+    // ── SMILE CURVE ───────────────────────────────────────────
+    // C122-D124 are DATE values (Jan 1 of year), E=weight, F=chosen override
+    // Never write C/D as plain numbers — must be Date objects
+    if (data.phases) {
+      var ph = data.phases;
+      function yearToDate(yr) {
+        var n = parseInt(yr);
+        return (n > 2000 && n < 2200) ? new Date(n, 0, 1) : null;
+      }
+      var d122 = yearToDate(ph.C122); if(d122) inp.getRange('C122').setValue(d122);
+      var d122e = yearToDate(ph.D122); if(d122e) inp.getRange('D122').setValue(d122e);
+      var d123 = yearToDate(ph.C123); if(d123) inp.getRange('C123').setValue(d123);
+      var d123e = yearToDate(ph.D123); if(d123e) inp.getRange('D123').setValue(d123e);
+      var d124 = yearToDate(ph.C124); if(d124) inp.getRange('C124').setValue(d124);
+      var d124e = yearToDate(ph.D124); if(d124e) inp.getRange('D124').setValue(d124e);
+      if (ph.E122!==undefined) inp.getRange('E122').setValue(Number(ph.E122)||1.15);
+      if (ph.F122!==undefined) inp.getRange('F122').setValue(Number(ph.F122)||0);
+      if (ph.E123!==undefined) inp.getRange('E123').setValue(Number(ph.E123)||1.0);
+      if (ph.F123!==undefined) inp.getRange('F123').setValue(Number(ph.F123)||0);
+      if (ph.E124!==undefined) inp.getRange('E124').setValue(Number(ph.E124)||0.9);
+      if (ph.F124!==undefined) inp.getRange('F124').setValue(Number(ph.F124)||0);
+    }
+
+    // ── ROTH SOLVER ───────────────────────────────────────────
+    // B139=year, B141=bracket, B145=assumed rate (decimal)
+    // B140,B142,B143,B144,B146 = formula cells — NEVER write
+    if (data.roth) {
+      if (Number(data.roth.B139) > 2020) setN('B139', data.roth.B139);
+      set('B141', data.roth.B141);
+      setPct('B145', (Number(data.roth.B145)||0) / 100);
+    }
+
+    // ── ROTH CONVERSION PLAN ──────────────────────────────────
+    // Rows 150-169: A=year(formula), B=partner1 amount, C=partner2 amount
+    if (data.rothPlan && data.rothPlan.length) {
+      var p1Vals = [], p2Vals = [];
+      for (var ri = 0; ri < 20; ri++) { p1Vals.push([0]); p2Vals.push([0]); }
+      data.rothPlan.forEach(function(row) {
+        var idx = Number(row.year) - 2026;
+        if (idx >= 0 && idx < 20) {
+          p1Vals[idx] = [Number(row.p1)||0];
+          p2Vals[idx] = [Number(row.p2)||0];
+        }
+      });
+      inp.getRange('B150:B169').setValues(p1Vals);
+      inp.getRange('C150:C169').setValues(p2Vals);
+    }
+
     SpreadsheetApp.flush();
     return {success:true, timestamp:new Date().toISOString()};
   } catch(err) {
