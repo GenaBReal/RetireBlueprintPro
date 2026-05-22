@@ -1444,163 +1444,244 @@ function loadLiveData() {
 }
 
 function populateFromData(d) {
-  if (!d || !d.people) return;
-  var p = d.people, tax = d.tax, sp = d.spending, leg = d.legacy, meta = d.meta;
+  if (!d) return;
   var gl = d.global || {};
+  var tax = d.tax || {};
+  var p = d.people || {};
+  var craig = p.craig || {};
+  var gena  = p.gena  || {};
+  var leg   = d.legacy  || {};
+  var sp    = d.spending || {};
+  var roth  = d.roth    || {};
 
-  // ── Global Settings ──────────────────────────────────
-  setVal('f-B6',  meta.planYear);
-  setVal('f-B7',  gl.projectionMaxYears);
-  setVal('f-B8',  leg.goal);
-  setVal('f-B9',  leg.safetyFloor);
-  setVal('f-B10', gl.survivorReduction ? Math.round(gl.survivorReduction * 100) : 25);
-  setVal('f-B11', gl.assumeExtraSpend);
-  setVal('f-B12', gl.stressEarly);
-  setVal('f-B13', gl.stressEarlyStart);
-  setVal('f-B14', gl.stressEarlyDur);
-  setVal('f-B15', gl.stressEarlyDrag ? (gl.stressEarlyDrag*100).toFixed(1) : '');
-  setVal('f-B16', gl.stressLate);
-  setVal('f-B17', gl.stressLateStart);
-  setVal('f-B18', gl.stressLateDur);
-  setVal('f-B19', gl.stressLateDrag ? (gl.stressLateDrag*100).toFixed(1) : '');
-  setVal('f-B20', tax.inflation ? (tax.inflation*100).toFixed(1) : '');
-  setVal('f-B21', tax.ssCola        ? (tax.ssCola*100).toFixed(1)        : '');
-  setVal('f-B22', tax.baseTaxAdj    ? (tax.baseTaxAdj*100).toFixed(1)    : '0');
-  setVal('f-B23', tax.marginalExtra ? (tax.marginalExtra*100).toFixed(1)  : '0');
-  setVal('f-B24', gl.filingStatus);
-  setVal('f-B25', gl.standardDeduction || tax.standardDeduction);
-  setVal('f-B26', tax.stateRate         ? (tax.stateRate*100).toFixed(1)         : '');
-  setVal('f-B27', tax.stdDedInflation   ? (tax.stdDedInflation*100).toFixed(1)   : '2.5');
-  setVal('f-B28', tax.healthcareInflation ? (tax.healthcareInflation*100).toFixed(1) : '');
-
-  // ── Partner 1 ─────────────────────────────────────────
-  setVal('f-B31', p.craig.name);
-  setVal('f-B34', p.craig.theme);
-  setDOB('f-B32', p.craig.dob);
-  setVal('f-B33', p.craig.age);
-  setVal('f-B35', p.craig.projectedDeathAge);
-  setVal('f-B36', p.craig.projectedDeathYear);
-  setVal('f-B37', p.craig.salary);
-  setDate('f-B38', p.craig.salaryStart);
-  setDate('f-B39', p.craig.retirementDate);
-  setVal('f-B40', p.craig.ssBase);
-  setVal('f-B41', p.craig.ssFra || 67);
-  setVal('f-B43', p.craig.ssMonthly);
-  setDate('f-B44', p.craig.ssStartDate);
-  setVal('f-B46', p.craig.pension);
-  setDate('f-B47', p.craig.pensionStart);
-  setVal('f-B49', p.craig.otherIncome);
-  setDate('f-B50', p.craig.otherStart);
-  setDate('f-B51', p.craig.otherEnd);
-  setVal('f-B52', p.craig.healthPreMedicare);
-  setVal('f-B53', p.craig.healthMedicare);
-  updateTheme(1, p.craig.theme || 'Steel Blue');
-
-  // ── Partner 2 ─────────────────────────────────────────
-  setVal('f-D31', p.gena.name);
-  setVal('f-D34', p.gena.theme);
-  setDOB('f-D32', p.gena.dob);
-  setVal('f-D33', p.gena.age);
-  setVal('f-D35', p.gena.projectedDeathAge);
-  setVal('f-D36', p.gena.projectedDeathYear);
-  setVal('f-D37', p.gena.salary);
-  setDate('f-D38', p.gena.salaryStart);
-  setDate('f-D39', p.gena.retirementDate);
-  setVal('f-D40', p.gena.ssBase);
-  setVal('f-D41', p.gena.ssFra || 67);
-  setVal('f-D43', p.gena.ssMonthly);
-  setDate('f-D44', p.gena.ssStartDate);
-  setVal('f-D46', p.gena.pension);
-  setDate('f-D47', p.gena.pensionStart);
-  setVal('f-D49', p.gena.otherIncome);
-  setDate('f-D50', p.gena.otherStart);
-  setDate('f-D51', p.gena.otherEnd);
-  setVal('f-D52', p.gena.healthPreMedicare);
-  setVal('f-D53', p.gena.healthMedicare);
-  updateTheme(2, p.gena.theme || 'Frost Plum');
-
-  updatePartnerNames();
-
-  // ── Accounts ──────────────────────────────────────────
-  if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length) {
-    accountsData = d.portfolio.accounts.map(function(a) {
-      return {
-        inc:  a.showInCalc || 'No',
-        name: a.name || '',
-        owner: a.owner || 'Joint',
-        type:  a.type || 'Pretax (Deferred)',
-        bal:   a.balance || 0,
-        ret:   a.expectedReturn || 0,
-        status: a.status || 'Use for Withdrawals',
-        dash:  a.showOnDashboard || 'No'
-      };
-    });
-    buildAccountsTable();
+  function sv(id, val) {
+    var el = document.getElementById(id);
+    if (!el || val === undefined || val === null) return;
+    var s = String(val);
+    if (el.tagName === 'SELECT') { el.value = s; return; }
+    if (el.type === 'checkbox') { el.checked = (s==='true'||s==='Yes'); return; }
+    // Currency fields — format with commas
+    if (el.classList && el.classList.contains('currency')) {
+      var n = parseFloat(s.replace(/[$,]/g,''));
+      el.value = isNaN(n) ? '' : Math.round(n).toLocaleString();
+      return;
+    }
+    el.value = s;
+  }
+  function pv(id, decimal) {
+    // Set percentage field from decimal (0.07 → 7.0)
+    var el = document.getElementById(id);
+    if (!el) return;
+    var n = Number(decimal) || 0;
+    el.value = Math.round(n * 10000) / 100; // e.g. 0.07 → 7.0
+  }
+  function dv(id, dateStr) {
+    var el = document.getElementById(id);
+    if (!el || !dateStr) return;
+    // dateStr is M/D/YYYY from dt() — convert to YYYY-MM-DD for date input
+    var parts = String(dateStr).split('/');
+    if (parts.length === 3) {
+      var m = parts[0].padStart(2,'0');
+      var day = parts[1].padStart(2,'0');
+      el.value = parts[2] + '-' + m + '-' + day;
+    }
   }
 
-  // ── Debts ────────────────────────────────────────────
-  if (d.debts) loadDebts(d.debts);
+  // ── GLOBAL SETTINGS ──────────────────────────────────────
+  dv('f-B6',  gl.planStartYear);
+  sv('f-B7',  gl.projectionYears);
+  sv('f-B8',  gl.legacyGoal);
+  sv('f-B9',  gl.safetyFloor);
+  sv('f-B10', gl.survivorReduction ? Math.round(gl.survivorReduction * 10000)/100 : 25);
+  sv('f-B11', gl.assumeExtraSpend);
+  sv('f-B12', gl.stressEarly);
+  sv('f-B13', gl.stressEarlyStart);
+  sv('f-B14', gl.stressEarlyDur);
+  pv('f-B15', gl.stressEarlyDrag);
+  sv('f-B16', gl.stressLate);
+  sv('f-B17', gl.stressLateStart);
+  sv('f-B18', gl.stressLateDur);
+  pv('f-B19', gl.stressLateDrag);
+  pv('f-B20', tax.inflation);
+  pv('f-B21', tax.ssCola);
+  pv('f-B22', tax.baseTaxAdj);
+  pv('f-B23', tax.marginalExtra);
+  sv('f-B24', gl.filingStatus);
+  sv('f-B25', gl.standardDeduction);
+  pv('f-B26', tax.stateRate);
+  pv('f-B27', tax.stdDedInflation);
+  pv('f-B28', tax.healthcareInflation);
 
-  // ── Expenses ─────────────────────────────────────────
+  // ── PARTNER 1 ──────────────────────────────────────────
+  sv('f-B31', craig.name);
+  dv('f-B32', craig.dob);
+  sv('f-B34', craig.theme);
+  sv('f-B35', craig.deathAge);
+  sv('f-B37', craig.salary);
+  dv('f-B38', craig.salaryStart);
+  dv('f-B39', craig.salaryEnd);
+  sv('f-B40', craig.ssBase);
+  sv('f-B41', craig.ssFra);
+  dv('f-B44', craig.ssStartDate);
+  sv('f-B46', craig.pension);
+  dv('f-B47', craig.pensionStart);
+  sv('f-B49', craig.otherIncome);
+  dv('f-B50', craig.otherStart);
+  dv('f-B51', craig.otherEnd);
+  sv('f-B52', craig.healthPreMedicare);
+  sv('f-B53', craig.healthMedicare);
+  sv('f-B54', craig.medicareAge || 65);
+
+  // ── PARTNER 2 ──────────────────────────────────────────
+  sv('f-D31', gena.name);
+  dv('f-D32', gena.dob);
+  sv('f-D34', gena.theme);
+  sv('f-D35', gena.deathAge);
+  sv('f-D37', gena.salary);
+  dv('f-D38', gena.salaryStart);
+  dv('f-D39', gena.salaryEnd);
+  sv('f-D40', gena.ssBase);
+  sv('f-D41', gena.ssFra);
+  dv('f-D44', gena.ssStartDate);
+  sv('f-D46', gena.pension);
+  dv('f-D47', gena.pensionStart);
+  sv('f-D49', gena.otherIncome);
+  dv('f-D50', gena.otherStart);
+  dv('f-D51', gena.otherEnd);
+  sv('f-D52', gena.healthPreMedicare);
+  sv('f-D53', gena.healthMedicare);
+  sv('f-D54', gena.medicareAge || 65);
+
+  // Auto-calculate ages from DOB
+  calcAge('f-B32', 'f-B33-disp', 'f-B36-disp');
+  calcAge('f-D32', 'f-D33-disp', 'f-D36-disp');
+
+  // Update partner names throughout
+  updatePartnerNames();
+
+  // ── EXPENSES ───────────────────────────────────────────
   if (d.expenses && d.expenses.length) {
     d.expenses.forEach(function(exp) {
       var r = exp.row;
       var nel = document.getElementById('e-N'+r);
       var cel = document.getElementById('e-C'+r);
+      var yel = document.getElementById('e-Y'+r);
       var tel = document.getElementById('e-T'+r);
-      if (nel) { nel.value = exp.label || exp.name || ''; nel.readOnly = true; nel.style.background='#f5f7fa'; nel.style.color='#8a9ab0'; }
-      if (cel) { var mo=parseInt(exp.monthly)||0; cel.value=mo?mo.toLocaleString():''; calcExpense(cel,'e-Y'+r); }
+      if (nel) nel.value = exp.name || '';
+      if (cel) {
+        var mo = parseInt(exp.monthly)||0;
+        cel.value = mo ? mo.toLocaleString() : '';
+        calcExpense(cel, 'e-Y'+r);
+      }
       if (tel) tel.value = exp.note || '';
+    });
+    updateExpenseTotal();
+  }
+
+  // ── DEBTS ─────────────────────────────────────────────
+  if (d.debts && d.debts.length) {
+    d.debts.forEach(function(debt, i) {
+      var incEl  = document.getElementById('d-inc-'+i);
+      var nmEl   = document.getElementById('d-nm-'+i);
+      var moEl   = document.getElementById('d-mo-'+i);
+      var annEl  = document.getElementById('d-ann-'+i);
+      var balEl  = document.getElementById('d-bal-'+i);
+      var stEl   = document.getElementById('d-start-'+i);
+      var enEl   = document.getElementById('d-end-'+i);
+      if (incEl) { incEl.textContent = debt.inc||'No'; incEl.className = debt.inc==='Yes'?'toggle-yes':'toggle-no'; }
+      if (nmEl)  nmEl.value  = debt.name || '';
+      if (moEl)  moEl.value  = debt.mo  ? parseInt(debt.mo).toLocaleString()  : '';
+      if (annEl) annEl.value = debt.ann ? parseInt(debt.ann).toLocaleString() : '';
+      if (balEl) balEl.value = debt.bal ? parseInt(debt.bal).toLocaleString() : '';
+      if (stEl && debt.start) {
+        var p=String(debt.start).split('/');
+        if(p.length===3) stEl.value=p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0');
+      }
+      if (enEl && debt.end) {
+        var p=String(debt.end).split('/');
+        if(p.length===3) enEl.value=p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0');
+      }
     });
   }
 
-  // ── Smile Curve Phases ──────────────────────────────────
-  if (d.spending) {
-    var sp = d.spending;
-    // phase start/end are dates from sheet — extract year
-    function phaseYear(s, def) {
-      if (!s) return def;
-      // M/D/YYYY format from dt()
-      var parts = String(s).split('/');
-      if (parts.length === 3) return parts[2];
-      // YYYY-MM-DD format
-      if (/^\d{4}/.test(s)) return s.substring(0,4);
-      return def;
-    }
-    setVal('f-C122', phaseYear(sp.phase1Start, '2026'));
-    setVal('f-D122', phaseYear(sp.phase1End,   '2033'));
-    setVal('f-C123', phaseYear(sp.phase2Start, '2034'));
-    setVal('f-D123', phaseYear(sp.phase2End,   '2044'));
-    setVal('f-C124', phaseYear(sp.phase3Start, '2045'));
-    setVal('f-D124', phaseYear(sp.phase3End,   '2075'));
-    setVal('f-E122', sp.phase1Weight || '1.15');
-    setVal('f-E123', sp.phase2Weight || '1.0');
-    setVal('f-E124', sp.phase3Weight || '0.9');
+  // ── ACCOUNTS ───────────────────────────────────────────
+  if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length) {
+    accountsData = d.portfolio.accounts.map(function(a) {
+      return {
+        inc:    a.showInCalc || 'No',
+        name:   a.name || '',
+        owner:  a.owner || 'Joint',
+        type:   a.type || '',
+        bal:    a.balance || 0,
+        ret:    a.expectedReturn || 0, // already *100 from readAll
+        status: a.status || 'Use for Withdrawals',
+        dash:   a.showOnDashboard || 'No'
+      };
+    });
+    buildAccountsTable();
+    updatePortfolioTotal();
   }
 
-  // ── Solver ────────────────────────────────────────────
-  setTxt('s-extra',  fmt(sp.safeExtra));
-  setTxt('s-phase1', fmt(sp.phase1Extra));
-  setTxt('s-phase2', fmt(sp.phase2Extra));
-  setTxt('s-phase3', fmt(sp.phase3Extra));
-  setTxt('s-surplus', (leg.variance >= 0 ? '+' : '') + fmt(leg.variance));
+  // ── SMILE CURVE PHASES ─────────────────────────────────
+  function phYear(val, def) {
+    if (!val) return def;
+    return String(val); // already an integer year from readAll
+  }
+  sv('f-C122', phYear(sp.phase1Start, '2026'));
+  sv('f-D122', phYear(sp.phase1End,   '2033'));
+  sv('f-C123', phYear(sp.phase2Start, '2034'));
+  sv('f-D123', phYear(sp.phase2End,   '2044'));
+  sv('f-C124', phYear(sp.phase3Start, '2045'));
+  sv('f-D124', phYear(sp.phase3End,   '2075'));
+  if (sp.phase1Weight) sv('f-E122', sp.phase1Weight);
+  if (sp.phase2Weight) sv('f-E123', sp.phase2Weight);
+  if (sp.phase3Weight) sv('f-E124', sp.phase3Weight);
+  if (sp.phase1Override !== undefined) sv('f-F122', sp.phase1Override);
+  if (sp.phase2Override !== undefined) sv('f-F123', sp.phase2Override);
+  if (sp.phase3Override !== undefined) sv('f-F124', sp.phase3Override);
+
+  // ── SOLVER OUTPUT (read-only display) ─────────────────
+  function fmt(n) {
+    if (!n && n!==0) return '--';
+    if (Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
+    if (Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
+    return '$'+Math.round(n).toLocaleString();
+  }
+  function setTxt(id, val) { var el=document.getElementById(id); if(el) el.textContent=val; }
+  setTxt('s-extra',   fmt(sp.safeExtra));
+  setTxt('s-phase1',  fmt(sp.phase1Extra));
+  setTxt('s-phase2',  fmt(sp.phase2Extra));
+  setTxt('s-phase3',  fmt(sp.phase3Extra));
+  setTxt('s-surplus', (leg.variance>=0?'+':'')+fmt(leg.variance));
   setTxt('s-ending',  fmt(leg.projectedEnding));
   setTxt('s-leg-goal', fmt(leg.goal));
   var statusEl = document.getElementById('s-status');
-  statusEl.textContent = leg.status || (leg.achievedPct >= 100 ? 'ON TRACK' : 'CHECK PLAN');
-  statusEl.className = leg.achievedPct >= 100 ? 'badge-go' : 'badge-watch';
-
-  // Roth solver results (read-only display)
-  setTxt('r-savings', fmt(tax.rothConversionSavings));
-  setTxt('r-tax-now', fmt(tax.rothConversionSavings));
-
-  // Roth solver inputs (user-editable, load from sheet)
-  if (d.roth) {
-    setVal('f-B139', d.roth.year || '');
-    setVal('f-B141', d.roth.bracket || '12%');
-    if (d.roth.assumedRate) setVal('f-B145', (d.roth.assumedRate * 100).toFixed(1));
+  if (statusEl) {
+    statusEl.textContent = leg.status || (leg.achievedPct>=100?'ON TRACK':'CHECK PLAN');
+    statusEl.className = leg.achievedPct>=100 ? 'badge-go' : 'badge-watch';
   }
-  // Load Roth conversion plan amounts
+  setTxt('r-savings', fmt(tax.rothConversionSavings));
+
+  // Header stats
+  var hdrStatus = document.getElementById('hdr-status');
+  if (hdrStatus) hdrStatus.textContent = leg.achievedPct>=100 ? 'ON TRACK' : 'REVIEW';
+  var hdrEnding = document.getElementById('hdr-ending');
+  if (hdrEnding) hdrEnding.textContent = fmt(leg.projectedEnding);
+  var hdrGoal = document.getElementById('hdr-goal');
+  if (hdrGoal) hdrGoal.textContent = leg.goal ? fmt(leg.goal) : '$0';
+
+  // ── ROTH SETTINGS ────────────────────────────────────
+  if (roth.year && roth.year > 2020) sv('f-B139', roth.year);
+  if (roth.bracket) sv('f-B141', roth.bracket);
+  if (roth.assumedRate) sv('f-B145', Math.round(roth.assumedRate*10000)/100);
+
+  // Roth solver results
+  setTxt('r-taxable',   fmt(roth.taxableIncome));
+  setTxt('r-optimal',   fmt(roth.optimalAmount));
+  setTxt('r-marginal',  fmt(roth.marginalTax));
+  setTxt('r-lifetime',  fmt(roth.taxSavings));
+
+  // ── ROTH PLAN AMOUNTS ────────────────────────────────
   if (d.rothPlan && d.rothPlan.length) {
     d.rothPlan.forEach(function(row) {
       var p1el = document.getElementById('roth-p1-'+row.year);
@@ -1608,20 +1689,16 @@ function populateFromData(d) {
       var totEl = document.getElementById('roth-total-'+row.year);
       if (p1el && row.p1) p1el.value = row.p1;
       if (p2el && row.p2) p2el.value = row.p2;
-      if (totEl && (row.p1 || row.p2)) {
-        var tot = (row.p1||0) + (row.p2||0);
-        totEl.textContent = '$' + tot.toLocaleString();
+      if (totEl) {
+        var tot = (row.p1||0)+(row.p2||0);
+        totEl.textContent = tot ? '$'+tot.toLocaleString() : '$0';
       }
     });
   }
 
-  // Header
-  document.getElementById('hdr-status').textContent = leg.achievedPct >= 100 ? 'ON TRACK' : 'REVIEW';
-  document.getElementById('hdr-ending').textContent = fmt(leg.projectedEnding);
-  document.getElementById('hdr-goal').textContent = leg.goal ? fmt(leg.goal) : '$0';
-
   isDirty = false;
-  document.getElementById('save-btn').disabled = false;
+  var saveBtn = document.getElementById('save-btn');
+  if (saveBtn) saveBtn.disabled = false;
 }
 
 function setVal(id, val) {
@@ -1713,110 +1790,127 @@ function gpct(id) {
 function saveAll() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId || sheetId === '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
-    setStatus('⚠ No sheet connected — complete Setup Guide first.', 'error');
-    showToast('⚠ No sheet connected.', 'error');
+    setStatus('No sheet connected — complete Setup first.', 'error');
     return;
   }
-
-  document.getElementById('loading').style.display = 'flex';
   document.getElementById('save-btn').disabled = true;
-  setStatus('Saving…', '');
+  setStatus('Saving...', '');
 
-  // Build payload — note: B33,B36,B43,D33,D36,D43 are formula cells, never included
+  function gv(id) { var el=document.getElementById(id); return el ? el.value.trim() : ''; }
+  function gn(id) {
+    var el=document.getElementById(id);
+    if (!el) return 0;
+    return parseFloat(String(el.value).replace(/[$, ]/g,'').trim()) || 0;
+  }
+  function gd(id) { var el=document.getElementById(id); return (el && el.value) ? el.value : ''; }
+
+  function collectExpenses() {
+    var rows=[58,59,60,61,62,63,64,65,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,83,84,85];
+    return rows.map(function(r) {
+      var mo = parseFloat(String((document.getElementById('e-C'+r)||{value:'0'}).value).replace(/[$,]/g,'')) || 0;
+      return {
+        row: r,
+        name: (document.getElementById('e-N'+r)||{value:''}).value.trim(),
+        monthly: mo,
+        note: (document.getElementById('e-T'+r)||{value:''}).value.trim()
+      };
+    });
+  }
+
+  function collectDebts() {
+    var debts = [];
+    for (var i=0; i<10; i++) {
+      var incEl = document.getElementById('d-inc-'+i);
+      var moEl  = document.getElementById('d-mo-'+i);
+      var balEl = document.getElementById('d-bal-'+i);
+      var nmEl  = document.getElementById('d-nm-'+i);
+      var stEl  = document.getElementById('d-start-'+i);
+      var enEl  = document.getElementById('d-end-'+i);
+      var mo  = moEl  ? parseInt(String(moEl.value).replace(/[^0-9]/g,''))||0 : 0;
+      var bal = balEl ? parseInt(String(balEl.value).replace(/[^0-9]/g,''))||0 : 0;
+      debts.push({
+        inc:  incEl ? incEl.textContent.trim() : 'No',
+        name: nmEl  ? nmEl.value.trim() : '',
+        mo: mo, ann: mo*12,
+        start: stEl ? stEl.value : '',
+        end:   enEl ? enEl.value : '',
+        bal: bal
+      });
+    }
+    return debts;
+  }
+
+  function collectRothPlan() {
+    var plan = [];
+    for (var yr=2026; yr<=2045; yr++) {
+      var p1el = document.getElementById('roth-p1-'+yr);
+      var p2el = document.getElementById('roth-p2-'+yr);
+      plan.push({
+        year: yr,
+        p1: p1el ? parseFloat(String(p1el.value).replace(/[$,]/g,''))||0 : 0,
+        p2: p2el ? parseFloat(String(p2el.value).replace(/[$,]/g,''))||0 : 0
+      });
+    }
+    return plan;
+  }
+
   var payload = {
     global: {
-      // B6 is a year number (2026), not a date
-      B6: gn('f-B6'), B7: gn('f-B7'), B8: gn('f-B8'), B9: gn('f-B9'),
-      // Pct fields: send whole numbers (25, 8, 3 etc) — Apps Script divides by 100
-      B10: gn('f-B10'), B11: gv('f-B11'), B12: gv('f-B12'),
-      B13: gn('f-B13'), B14: gn('f-B14'), B15: gn('f-B15'),
+      B6: gd('f-B6'), B7: gn('f-B7'),
+      B8: gn('f-B8'), B9: gn('f-B9'),
+      B10: gn('f-B10'),
+      B11: gv('f-B11'),
+      B12: gv('f-B12'), B13: gn('f-B13'), B14: gn('f-B14'), B15: gn('f-B15'),
       B16: gv('f-B16'), B17: gn('f-B17'), B18: gn('f-B18'), B19: gn('f-B19'),
       B20: gn('f-B20'), B21: gn('f-B21'),
-      B22: gn('f-B22'), B23: gn('f-B23'), B27: gn('f-B27'),
-      B24: gv('f-B24'), B25: gn('f-B25'), B26: gn('f-B26'), B28: gn('f-B28'),
+      B22: gn('f-B22'), B23: gn('f-B23'),
+      B24: gv('f-B24'), B25: gn('f-B25'),
+      B26: gn('f-B26'), B27: gn('f-B27'), B28: gn('f-B28')
     },
     partner1: {
       B31: gv('f-B31'), B32: gd('f-B32'), B34: gv('f-B34'),
-      B35: gn('f-B35'), B37: gn('f-B37'), B38: gd('f-B38'), B39: gd('f-B39'),
+      B35: gn('f-B35'), B37: gn('f-B37'),
+      B38: gd('f-B38'), B39: gd('f-B39'),
       B40: gn('f-B40'), B41: gn('f-B41'), B44: gd('f-B44'),
-      B46: gn('f-B46'), B47: gd('f-B47'), B49: gn('f-B49'),
-      B50: gd('f-B50'), B51: gd('f-B51'), B52: gn('f-B52'), B53: gn('f-B53'), B54: gn('f-B54'),
+      B46: gn('f-B46'), B47: gd('f-B47'),
+      B49: gn('f-B49'), B50: gd('f-B50'), B51: gd('f-B51'),
+      B52: gn('f-B52'), B53: gn('f-B53'), B54: gn('f-B54')
     },
     partner2: {
       D31: gv('f-D31'), D32: gd('f-D32'), D34: gv('f-D34'),
-      D35: gn('f-D35'), D37: gn('f-D37'), D38: gd('f-D38'), D39: gd('f-D39'),
+      D35: gn('f-D35'), D37: gn('f-D37'),
+      D38: gd('f-D38'), D39: gd('f-D39'),
       D40: gn('f-D40'), D41: gn('f-D41'), D44: gd('f-D44'),
-      D46: gn('f-D46'), D47: gd('f-D47'), D49: gn('f-D49'),
-      D50: gd('f-D50'), D51: gd('f-D51'), D52: gn('f-D52'), D53: gn('f-D53'), D54: gn('f-D54'),
+      D46: gn('f-D46'), D47: gd('f-D47'),
+      D49: gn('f-D49'), D50: gd('f-D50'), D51: gd('f-D51'),
+      D52: gn('f-D52'), D53: gn('f-D53'), D54: gn('f-D54')
     },
-    roth: { B139: gn('f-B139'), B141: gv('f-B141'), B145: gn('f-B145') },
-    rothPlan: (function() {
-      var plan = [];
-      for (var yr=2026; yr<=2045; yr++) {
-        var p1el = document.getElementById('roth-p1-'+yr);
-        var p2el = document.getElementById('roth-p2-'+yr);
-        var p1 = p1el ? (parseFloat(String(p1el.value||'0').replace(/[$,]/g,''))||0) : 0;
-        var p2 = p2el ? (parseFloat(String(p2el.value||'0').replace(/[$,]/g,''))||0) : 0;
-        plan.push({year:yr, p1:p1, p2:p2});
-      }
-      return plan;
-    })(),
+    accounts: accountsData,
+    expenses: collectExpenses(),
+    debts:    collectDebts(),
     phases: {
       C122: gv('f-C122'), D122: gv('f-D122'), E122: gn('f-E122'), F122: gn('f-F122'),
       C123: gv('f-C123'), D123: gv('f-D123'), E123: gn('f-E123'), F123: gn('f-F123'),
-      C124: gv('f-C124'), D124: gv('f-D124'), E124: gn('f-E124'), F124: gn('f-F124'),
+      C124: gv('f-C124'), D124: gv('f-D124'), E124: gn('f-E124'), F124: gn('f-F124')
     },
-    accounts: accountsData,
-    debts: collectDebts(),
-    expenses: [
-      {row:58,name:gv('e-N58'),monthly:Math.max(0,gn('e-C58')),note:gv('e-T58')},
-      {row:59,name:gv('e-N59'),monthly:Math.max(0,gn('e-C59')),note:gv('e-T59')},
-      {row:60,name:gv('e-N60'),monthly:Math.max(0,gn('e-C60')),note:gv('e-T60')},
-      {row:61,name:gv('e-N61'),monthly:Math.max(0,gn('e-C61')),note:gv('e-T61')},
-      {row:62,name:gv('e-N62'),monthly:Math.max(0,gn('e-C62')),note:gv('e-T62')},
-      {row:63,name:gv('e-N63'),monthly:Math.max(0,gn('e-C63')),note:gv('e-T63')},
-      {row:64,name:gv('e-N64'),monthly:Math.max(0,gn('e-C64')),note:gv('e-T64')},
-      {row:65,name:gv('e-N65'),monthly:Math.max(0,gn('e-C65')),note:gv('e-T65')},
-      {row:66,name:gv('e-N66'),monthly:Math.max(0,gn('e-C66')),note:gv('e-T66')},
-      {row:67,name:gv('e-N67'),monthly:Math.max(0,gn('e-C67')),note:gv('e-T67')},
-      {row:68,name:gv('e-N68'),monthly:Math.max(0,gn('e-C68')),note:gv('e-T68')},
-      {row:69,name:gv('e-N69'),monthly:Math.max(0,gn('e-C69')),note:gv('e-T69')},
-      {row:71,name:gv('e-N71'),monthly:Math.max(0,gn('e-C71')),note:gv('e-T71')},
-      {row:72,name:gv('e-N72'),monthly:Math.max(0,gn('e-C72')),note:gv('e-T72')},
-      {row:73,name:gv('e-N73'),monthly:Math.max(0,gn('e-C73')),note:gv('e-T73')},
-      {row:74,name:gv('e-N74'),monthly:Math.max(0,gn('e-C74')),note:gv('e-T74')},
-      {row:75,name:gv('e-N75'),monthly:Math.max(0,gn('e-C75')),note:gv('e-T75')},
-      {row:76,name:gv('e-N76'),monthly:Math.max(0,gn('e-C76')),note:gv('e-T76')},
-      {row:77,name:gv('e-N77'),monthly:Math.max(0,gn('e-C77')),note:gv('e-T77')},
-      {row:78,name:gv('e-N78'),monthly:Math.max(0,gn('e-C78')),note:gv('e-T78')},
-      {row:79,name:gv('e-N79'),monthly:Math.max(0,gn('e-C79')),note:gv('e-T79')},
-      {row:80,name:gv('e-N80'),monthly:Math.max(0,gn('e-C80')),note:gv('e-T80')},
-      {row:81,name:gv('e-N81'),monthly:Math.max(0,gn('e-C81')),note:gv('e-T81')},
-      {row:83,name:gv('e-N83'),monthly:Math.max(0,gn('e-C83')),note:gv('e-T83')},
-      {row:84,name:gv('e-N84'),monthly:Math.max(0,gn('e-C84')),note:gv('e-T84')},
-      {row:85,name:gv('e-N85'),monthly:Math.max(0,gn('e-C85')),note:gv('e-T85')},
-    ],
+    roth: {
+      B139: gn('f-B139'), B141: gv('f-B141'), B145: gn('f-B145')
+    },
+    rothPlan: collectRothPlan()
   };
 
-  // Use fetch with no-cors — works after any delay, no callback issues
-  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  var url = SCRIPT_URL + '?action=save&sheetId=' + encodeURIComponent(sheetId)
-            + '&data=' + encoded + '&enc=b64&callback=_rbpVoid&_=' + Date.now();
-
-  fetch(url, { mode: 'no-cors' })
+  var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+  var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  fetch(SCRIPT + '?action=save&enc=b64&sheetId=' + sheetId + '&data=' + encodeURIComponent(b64), {mode:'no-cors'})
     .then(function() {
-      document.getElementById('loading').style.display = 'none';
-      setStatus('✅ Saved! Your Google Sheet is updating.', 'success');
-      showToast('✅ Saved! Sheet updating now.', '');
-      isDirty = false;
-      document.getElementById('save-btn').disabled = false;
+      setTimeout(function() {
+        setStatus('Saved!', 'success');
+        document.getElementById('save-btn').disabled = false;
+        isDirty = false;
+      }, 2000);
     })
-    .catch(function() {
-      // no-cors always triggers catch — but data was still sent
-      document.getElementById('loading').style.display = 'none';
-      setStatus('✅ Saved! Your Google Sheet is updating.', 'success');
-      showToast('✅ Saved! Sheet updating now.', '');
-      isDirty = false;
+    .catch(function(err) {
+      setStatus('Save failed: ' + err, 'error');
       document.getElementById('save-btn').disabled = false;
     });
 }
