@@ -1453,7 +1453,7 @@ function populateFromData(d) {
   setVal('f-B7',  gl.projectionMaxYears);
   setVal('f-B8',  leg.goal);
   setVal('f-B9',  leg.safetyFloor);
-  setVal('f-B10', gl.survivorReduction);
+  setVal('f-B10', gl.survivorReduction ? Math.round(gl.survivorReduction * 100) : 25);
   setVal('f-B11', gl.assumeExtraSpend);
   setVal('f-B12', gl.stressEarly);
   setVal('f-B13', gl.stressEarlyStart);
@@ -1748,9 +1748,9 @@ function saveAll() {
       return plan;
     })(),
     phases: {
-      C122: gn('f-C122'), D122: gn('f-D122'), E122: gn('f-E122'), F122: gn('f-F122'),
-      C123: gn('f-C123'), D123: gn('f-D123'), E123: gn('f-E123'), F123: gn('f-F123'),
-      C124: gn('f-C124'), D124: gn('f-D124'), E124: gn('f-E124'), F124: gn('f-F124'),
+      E122: gn('f-E122'), F122: gn('f-F122'),
+      E123: gn('f-E123'), F123: gn('f-F123'),
+      E124: gn('f-E124'), F124: gn('f-F124'),
     },
     accounts: accountsData,
     debts: collectDebts(),
@@ -1879,16 +1879,16 @@ function buildPayload() {
       B145: document.gpct('f-B145'),
     },
     phases: {
-      C122: document.getElementById('f-C122').value,
-      D122: document.getElementById('f-D122').value,
+      // C122: not written (sheet formula)
+      // D122: not written (sheet formula)
       E122: document.getElementById('f-E122').value,
       F122: document.getElementById('f-F122').value,
-      C123: document.getElementById('f-C123').value,
-      D123: document.getElementById('f-D123').value,
+      // C123: not written (sheet formula)
+      // D123: not written (sheet formula)
       E123: document.getElementById('f-E123').value,
       F123: document.getElementById('f-F123').value,
-      C124: document.getElementById('f-C124').value,
-      D124: document.getElementById('f-D124').value,
+      // C124: not written (sheet formula)
+      // D124: not written (sheet formula)
       E124: document.getElementById('f-E124').value,
       F124: document.getElementById('f-F124').value,
     },

@@ -325,20 +325,7 @@ function writeInputs(data, sheetId) {
       // B140,B143,B144,B146 are formula cells — do NOT write
       setN('B139',data.roth.B139); set('B141',data.roth.B141); setPct('B145',data.roth.B145);
     }
-    // Write Roth conversion plan amounts (rows 150-169 = years 2026-2045)
-    if (data.rothPlan && data.rothPlan.length) {
-      var p1Data = [], p2Data = [];
-      for (var ri=0; ri<20; ri++) { p1Data.push([0]); p2Data.push([0]); }
-      data.rothPlan.forEach(function(row) {
-        var idx = Number(row.year) - 2026;
-        if (idx >= 0 && idx < 20) {
-          p1Data[idx] = [Number(row.p1)||0];
-          p2Data[idx] = [Number(row.p2)||0];
-        }
-      });
-      inp.getRange('B150:B169').setValues(p1Data);
-      inp.getRange('C150:C169').setValues(p2Data);
-    }
+    // Roth plan write disabled — need to confirm sheet row structure first
     // Write debt rows
     // Sheet structure: A=include, B=name, C=monthly, D=annual(=C*12), H=balance
     // Rows 88-89 are main debt rows, 90-91 are headers, 92-101 are extended debts
