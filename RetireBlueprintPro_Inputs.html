@@ -2765,30 +2765,58 @@ function useCalcValue(p) {
   var p2name = document.getElementById('f-D31') ? document.getElementById('f-D31').value.toLowerCase() : '';
   var targetName = p === 1 ? p1name : p2name;
 
+  // Find matching 401k/403b/pretax account
+  // Match by: 1) owner name contains partner name, OR 2) first pretax account in partner's half
   var updated = false;
+  var matchIdx = -1;
+
   if (typeof accountsData !== 'undefined') {
-    for (var i = 0; i < accountsData.length; i++) {
-      var a = accountsData[i];
-      var ownerLower = (a.owner||'').toLowerCase();
-      var ownerMatch = (targetName && ownerLower.indexOf(targetName) > -1)
-                    || (p===1 && ownerLower.indexOf('joint') === -1 && i < 4)
-                    || (p===2 && ownerLower.indexOf('joint') === -1 && i >= 4 && i < 8);
-      var is401k = a.type && (a.type.toLowerCase().indexOf('pretax') > -1
-                           || a.type.toLowerCase().indexOf('401') > -1
-                           || a.type.toLowerCase().indexOf('403') > -1);
-      if (ownerMatch && is401k && !updated) {
-        accountsData[i].bal    = val;
-        accountsData[i].contrib= annContrib;
-        accountsData[i].match  = empMatch;
-        updated = true;
+    // Pass 1: exact owner name match + pretax type
+    for (var i = 0; i < accountsData.length && matchIdx === -1; i++) {
+      var ownerLower = (accountsData[i].owner||'').toLowerCase();
+      var typeLower  = (accountsData[i].type||'').toLowerCase();
+      var isPretax   = typeLower.indexOf('pretax') > -1 || typeLower.indexOf('deferred') > -1;
+      var nameMatch  = targetName && ownerLower.indexOf(targetName) > -1;
+      if (nameMatch && isPretax) matchIdx = i;
+    }
+
+    // Pass 2: first pretax account overall (if no name match)
+    if (matchIdx === -1) {
+      for (var i = 0; i < accountsData.length && matchIdx === -1; i++) {
+        var typeLower = (accountsData[i].type||'').toLowerCase();
+        if (typeLower.indexOf('pretax') > -1 || typeLower.indexOf('deferred') > -1) {
+          // For partner 1 take first, for partner 2 take second pretax account
+          if (p === 1) { matchIdx = i; }
+          else if (p === 2 && i > 0) { matchIdx = i; }
+        }
       }
     }
+
+    if (matchIdx > -1) {
+      accountsData[matchIdx].bal    = val;
+      accountsData[matchIdx].contrib = annContrib;
+      accountsData[matchIdx].match  = empMatch;
+      updated = true;
+    }
+
     if (updated) {
       buildAccountsTable();
       markDirty();
-      showToast('✅ Balance, contributions & match updated in Named Accounts!', 'success');
+      showToast('✅ Row ' + (matchIdx+1) + ' updated — ' + (accountsData[matchIdx].name||'401k/403b') + ' balance, contributions & match!', 'success');
     } else {
-      showToast('Could not find matching 401k/403b — please update Starting Balance manually below. Value: ' + fmt(val), '');
+      // No pretax account found — ask user which row to update
+      var rowNum = prompt('Could not find a Pretax/Deferred account automatically.\nEnter the account ROW NUMBER (1-12) to update with ' + fmt(val) + ':');
+      if (rowNum) {
+        var idx = parseInt(rowNum) - 1;
+        if (idx >= 0 && idx < accountsData.length) {
+          accountsData[idx].bal    = val;
+          accountsData[idx].contrib = annContrib;
+          accountsData[idx].match  = empMatch;
+          buildAccountsTable();
+          markDirty();
+          showToast('✅ Account ' + rowNum + ' updated!', 'success');
+        }
+      }
     }
   }
 }
