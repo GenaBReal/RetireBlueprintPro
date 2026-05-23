@@ -335,7 +335,7 @@ function writeInputs(ss, inp, data) {
       data.expenses.forEach(function(exp) {
         var r = Number(exp.row);
         if (!r || r<58 || r>85 || skip[r]) return;
-        if (exp.name !== undefined) inp.getRange('A'+r).setValue(String(exp.name));
+        if (exp.name && String(exp.name).trim() !== '') inp.getRange('A'+r).setValue(String(exp.name).trim()); // only write if non-empty — preserves built-in labels
         inp.getRange('B'+r).setValue(Number(exp.monthly)||0);
         // NEVER WRITE C (formula =B*12)
         if (exp.note !== undefined) inp.getRange('D'+r).setValue(String(exp.note||''));
