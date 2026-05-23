@@ -140,6 +140,8 @@ function readAll(ss, inp) {
       showInCalc:str(ar,1), name:aName, owner:str(ar,3),
       type:str(ar,4), balance:bal,
       expectedReturn:ret*100, // *100 for display
+      contrib:num(ar,12),    // L = Annual Contribution
+      match:num(ar,13),      // M = Employer Match
       status:str(ar,7), showOnDashboard:str(ar,8)
     });
   }
@@ -158,13 +160,16 @@ function readAll(ss, inp) {
   var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
   var debts = debtRows.map(function(row) {
     return {
-      inc:str(row,1), name:str(row,2),
-      mo:num(row,3), ann:num(row,4),
-      start:dt(row,5), end:dt(row,6),
-      bal:num(row,8),
-      inflate:str(row,9),           // I = Inflate?
+      // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance, I=Inflate, J=Rate, K=CurrentValue
+      inc:str(row,1), name:str(row,2), pp:num(row,3),
+      mo:num(row,4),                 // D = Monthly Payment
+      ann:num(row,5),                // E = Annual Payment
+      start:dt(row,6),               // F = Start Date
+      end:dt(row,7),                 // G = End Date
+      bal:num(row,8),                // H = Balance/Payoff
+      inflate:str(row,9),            // I = Inflate?
       rate:(num(row,10)||0)*100,     // J = rate as % for display
-      curval:num(row,11)             // K = current value
+      curval:num(row,11)             // K = Current Value
     };
   });
 
@@ -360,19 +365,21 @@ function writeInputs(ss, inp, data) {
       data.debts.forEach(function(d, i) {
         if (i >= debtRows.length) return;
         var r = debtRows[i];
+        // CORRECT COLUMN MAPPING (from sheet screenshot):
+        // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance, I=Inflate, J=Rate, K=CurrentValue
         inp.getRange('A'+r).setValue(d.inc||'No');
         if (d.name) inp.getRange('B'+r).setValue(String(d.name));
+        if (d.pp) inp.getRange('C'+r).setValue(Number(d.pp)); // C = Purchase Price
         var mo = Number(d.mo)||0;
-        inp.getRange('C'+r).setValue(mo);
-        inp.getRange('D'+r).setValue(mo*12);
-        if (d.start) setD('E'+r, d.start);
-        if (d.end)   setD('F'+r, d.end);
+        inp.getRange('D'+r).setValue(mo);           // D = Monthly Payment
+        inp.getRange('E'+r).setValue(mo*12);         // E = Annual Payment (Master reads this!)
+        if (d.start) setD('F'+r, d.start);          // F = Start Date
+        if (d.end)   setD('G'+r, d.end);            // G = End Date
         var bal = Number(d.bal)||0;
-        if (bal) inp.getRange('H'+r).setValue(bal);
-        // I=Inflate, J=Rate%, K=CurrentValue
-        if (d.inflate) inp.getRange('I'+r).setValue(String(d.inflate));
-        if (d.rate) inp.getRange('J'+r).setValue(Number(d.rate)/100);
-        if (d.curval) inp.getRange('K'+r).setValue(Number(d.curval));
+        if (bal) inp.getRange('H'+r).setValue(bal); // H = Balance/Payoff
+        if (d.inflate) inp.getRange('I'+r).setValue(String(d.inflate)); // I = Inflate?
+        if (d.rate) inp.getRange('J'+r).setValue(Number(d.rate)/100);   // J = Rate (as decimal)
+        if (d.curval) inp.getRange('K'+r).setValue(Number(d.curval));   // K = Current Value
       });
     }
 
@@ -403,10 +410,13 @@ function writeInputs(ss, inp, data) {
           Number(a.bal||a.balance)||0, // E = balance
           ret,                         // F = return as decimal
           a.status||'Use for Withdrawals', // G
-          a.dash||a.showOnDashboard||'No'  // H
+          a.dash||a.showOnDashboard||'No', // H
+          '', '', '', '',                  // I, J, K (unused)
+          Number(a.contrib||0),            // L = Annual Contribution
+          Number(a.match||0)               // M = Employer Match
         ]);
       }
-      inp.getRange('A105:H116').setValues(acctData);
+      inp.getRange('A105:M116').setValues(acctData);
 
       // Restore owner validation
       try {

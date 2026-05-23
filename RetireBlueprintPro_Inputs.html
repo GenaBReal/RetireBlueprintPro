@@ -185,6 +185,40 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   border-radius:8px; font-size:15px; font-weight:800; cursor:pointer; width:100%; }
 .welcome-btn:hover { background:#e8a85a; }
 
+
+.calc-partner-card {
+  background:#0A2030;border-radius:12px;padding:24px;border:1px solid #1a3a52;
+}
+.calc-partner-title {
+  font-size:14px;font-weight:800;color:#f4b86a;margin-bottom:16px;
+  padding-bottom:10px;border-bottom:1px solid #1a3a52;
+}
+.calc-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;
+}
+.calc-field label {
+  font-size:10px;font-weight:700;color:#6a8a9a;letter-spacing:1px;
+  text-transform:uppercase;display:block;margin-bottom:4px;
+}
+.calc-results {
+  background:linear-gradient(135deg,#041E2F,#0A3145);
+  border:1px solid #1CC7D0;border-radius:10px;padding:20px;text-align:center;
+}
+.calc-result-title { font-size:11px;color:#8aaabb;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px; }
+.calc-result-main { font-size:36px;font-weight:900;color:#1CC7D0;margin-bottom:12px; }
+.calc-breakdown { font-size:12px;color:#8aaabb;line-height:1.8;margin-bottom:16px; }
+.calc-breakdown span { color:#fff;font-weight:700; }
+.calc-use-btn {
+  background:#f4b86a;color:#041E2F;border:none;padding:10px 24px;
+  border-radius:6px;font-size:13px;font-weight:800;cursor:pointer;width:100%;
+}
+.calc-use-btn:hover { background:#e8a85a; }
+.home-stat-card {
+  background:#0A2030;border:1px solid #1a3a52;border-radius:8px;padding:16px;text-align:center;
+}
+.home-stat-label { font-size:11px;color:#6a8a9a;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px; }
+.home-stat-value { font-size:22px;font-weight:800;color:#fff; }
+
 </style>
 </head>
 <body>
@@ -727,9 +761,9 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     <table class="accounts-table">
       <thead>
         <tr>
-          <th>Include?</th><th>Debt Name</th><th>Monthly ($)</th>
+          <th>Include?</th><th>Debt Name</th><th>Purchase Price ($)</th><th>Monthly ($)</th>
           <th>Annual ($)</th><th>Start Date</th><th>End Date</th><th>Balance ($)</th>
-          <th style="color:#1CC7D0;">Balance Remaining</th>
+          <th style="color:#1CC7D0;">Bal. Remaining</th>
           <th>Inflate?</th><th>Rate (%)</th><th>Current Value ($)</th>
         </tr>
       </thead>
@@ -737,6 +771,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-0" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-0" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-0" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-0" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(0);markDirty();"></td>
           <td><input type="text" id="d-ann-0" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-0" value="" oninput="calcBalRemaining(0);markDirty();"></td>
@@ -750,6 +785,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-1" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-1" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-1" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-1" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(1);markDirty();"></td>
           <td><input type="text" id="d-ann-1" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-1" value="" oninput="calcBalRemaining(1);markDirty();"></td>
@@ -763,6 +799,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-2" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-2" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-2" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-2" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(2);markDirty();"></td>
           <td><input type="text" id="d-ann-2" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-2" value="" oninput="calcBalRemaining(2);markDirty();"></td>
@@ -776,6 +813,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-3" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-3" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-3" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-3" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(3);markDirty();"></td>
           <td><input type="text" id="d-ann-3" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-3" value="" oninput="calcBalRemaining(3);markDirty();"></td>
@@ -789,6 +827,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-4" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-4" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-4" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-4" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(4);markDirty();"></td>
           <td><input type="text" id="d-ann-4" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-4" value="" oninput="calcBalRemaining(4);markDirty();"></td>
@@ -802,6 +841,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-5" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-5" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-5" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-5" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(5);markDirty();"></td>
           <td><input type="text" id="d-ann-5" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-5" value="" oninput="calcBalRemaining(5);markDirty();"></td>
@@ -815,6 +855,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-6" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-6" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-6" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-6" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(6);markDirty();"></td>
           <td><input type="text" id="d-ann-6" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-6" value="" oninput="calcBalRemaining(6);markDirty();"></td>
@@ -828,6 +869,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-7" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-7" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-7" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-7" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(7);markDirty();"></td>
           <td><input type="text" id="d-ann-7" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-7" value="" oninput="calcBalRemaining(7);markDirty();"></td>
@@ -841,6 +883,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-8" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-8" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-8" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-8" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(8);markDirty();"></td>
           <td><input type="text" id="d-ann-8" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-8" value="" oninput="calcBalRemaining(8);markDirty();"></td>
@@ -854,6 +897,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <td><button class="toggle-no" id="d-inc-9" onclick="toggleDebt(this)">No</button></td>
           <td><input type="text" id="d-name-9" value="" oninput="markDirty()"></td>
+          <td><input type="text" inputmode="numeric" id="d-pp-9" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-9" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(9);markDirty();"></td>
           <td><input type="text" id="d-ann-9" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;" placeholder=""></td>
           <td><input type="date" id="d-start-9" value="" oninput="calcBalRemaining(9);markDirty();"></td>
@@ -868,6 +912,185 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     </table>
   </div>
 </div>
+
+
+<!-- PRE-RETIREMENT GROWTH CALCULATOR -->
+<div class="section-card" style="border:2px solid #1CC7D0;">
+  <div class="section-hdr" onclick="toggleSection(this)" style="background:linear-gradient(135deg,#041E2F,#0A3145);">
+    <div style="display:flex;align-items:center;gap:12px;flex:1;">
+      <div style="font-size:24px;">🚀</div>
+      <div>
+        <div class="section-hdr-title" style="color:#1CC7D0;">Pre-Retirement Growth Calculator</div>
+        <div class="section-hdr-sub" style="color:#8aaabb;">For accounts still growing · Calculate what your accounts will be worth AT retirement · Then enter that number as your Starting Balance above</div>
+      </div>
+    </div>
+    <div class="section-hdr-arrow" style="color:#1CC7D0;">▼</div>
+  </div>
+  <div class="section-body" style="display:block;">
+
+    <!-- INFO BANNER -->
+    <div style="background:#0A2030;border-left:4px solid #f4b86a;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px;">
+      <strong style="color:#f4b86a;">💡 How to use this:</strong>
+      <span style="color:#8aaabb;font-size:13px;"> If you or your partner are still working and contributing to retirement accounts, use this calculator to project what those accounts will be worth on your retirement date. Then copy that number into the <strong style="color:#fff;">Starting Balance</strong> field in the Named Accounts section below.</span>
+    </div>
+
+    <!-- CALCULATOR GRID -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+
+      <!-- PARTNER 1 -->
+      <div class="calc-partner-card" id="calc-p1">
+        <div class="calc-partner-title" id="calc-p1-name">Partner 1 — Pre-Retirement Projector</div>
+
+        <div class="calc-grid">
+          <div class="calc-field">
+            <label>Current Account Balance ($)</label>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(1)"></div>
+            <div class="hint">Today's total in this account</div>
+          </div>
+          <div class="calc-field">
+            <label>Annual Contribution ($)</label>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(1)"></div>
+            <div class="hint">Your personal contribution per year</div>
+          </div>
+          <div class="calc-field">
+            <label>Employer Match ($)</label>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(1)"></div>
+            <div class="hint">Annual employer match amount</div>
+          </div>
+          <div class="calc-field">
+            <label>Expected Annual Return (%)</label>
+            <div class="input-wrap"><input type="number" id="c1-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(1)" style="padding-right:28px;"><span class="suffix">%</span></div>
+            <div class="hint">Typical: 6–8% for diversified portfolio</div>
+          </div>
+          <div class="calc-field">
+            <label>Years Until Retirement</label>
+            <div class="input-wrap"><input type="number" id="c1-years" placeholder="20" min="0" max="60" oninput="calcGrowth(1)"></div>
+            <div class="hint">Calculated from salary end date, or enter manually</div>
+          </div>
+          <div class="calc-field">
+            <label>Annual Contribution Growth (%)</label>
+            <div class="input-wrap"><input type="number" id="c1-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(1)" style="padding-right:28px;"><span class="suffix">%</span></div>
+            <div class="hint">Rate contributions increase each year (salary raises)</div>
+          </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="calc-results" id="c1-results" style="display:none;">
+          <div class="calc-result-title">📈 Projected Value at Retirement</div>
+          <div class="calc-result-main" id="c1-fv">$0</div>
+          <div class="calc-breakdown" id="c1-breakdown"></div>
+          <button class="calc-use-btn" onclick="useCalcValue(1)">
+            ✅ Use This as My Starting Balance →
+          </button>
+          <div style="font-size:11px;color:#8aaabb;margin-top:8px;text-align:center;">
+            This will update the matching account's Starting Balance in Named Accounts
+          </div>
+        </div>
+
+        <!-- GROWTH CHART -->
+        <canvas id="c1-chart" width="400" height="200" style="margin-top:16px;display:none;border-radius:8px;"></canvas>
+      </div>
+
+      <!-- PARTNER 2 -->
+      <div class="calc-partner-card" id="calc-p2">
+        <div class="calc-partner-title" id="calc-p2-name">Partner 2 — Pre-Retirement Projector</div>
+
+        <div class="calc-grid">
+          <div class="calc-field">
+            <label>Current Account Balance ($)</label>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(2)"></div>
+          </div>
+          <div class="calc-field">
+            <label>Annual Contribution ($)</label>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(2)"></div>
+          </div>
+          <div class="calc-field">
+            <label>Employer Match ($)</label>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(2)"></div>
+          </div>
+          <div class="calc-field">
+            <label>Expected Annual Return (%)</label>
+            <div class="input-wrap"><input type="number" id="c2-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(2)" style="padding-right:28px;"><span class="suffix">%</span></div>
+          </div>
+          <div class="calc-field">
+            <label>Years Until Retirement</label>
+            <div class="input-wrap"><input type="number" id="c2-years" placeholder="20" min="0" max="60" oninput="calcGrowth(2)"></div>
+          </div>
+          <div class="calc-field">
+            <label>Annual Contribution Growth (%)</label>
+            <div class="input-wrap"><input type="number" id="c2-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(2)" style="padding-right:28px;"><span class="suffix">%</span></div>
+          </div>
+        </div>
+
+        <div class="calc-results" id="c2-results" style="display:none;">
+          <div class="calc-result-title">📈 Projected Value at Retirement</div>
+          <div class="calc-result-main" id="c2-fv">$0</div>
+          <div class="calc-breakdown" id="c2-breakdown"></div>
+          <button class="calc-use-btn" onclick="useCalcValue(2)">
+            ✅ Use This as My Starting Balance →
+          </button>
+          <div style="font-size:11px;color:#8aaabb;margin-top:8px;text-align:center;">
+            This will update the matching account's Starting Balance in Named Accounts
+          </div>
+        </div>
+
+        <canvas id="c2-chart" width="400" height="200" style="margin-top:16px;display:none;border-radius:8px;"></canvas>
+      </div>
+    </div>
+
+    <!-- HOME APPRECIATION CALCULATOR -->
+    <div style="margin-top:32px;border-top:1px solid #1a3a52;padding-top:28px;">
+      <div style="font-size:16px;font-weight:800;color:#f4b86a;margin-bottom:6px;">🏠 Home Appreciation Calculator</div>
+      <div style="font-size:13px;color:#8aaabb;margin-bottom:20px;">Track your home as an asset — see net equity grow as your mortgage shrinks and your home value rises</div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+        <div class="calc-field">
+          <label>Current Home Value ($)</label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-value" placeholder="0" oninput="fmtCalc(this);calcHome()"></div>
+          <div class="hint">Current market value (Zillow, Redfin)</div>
+        </div>
+        <div class="calc-field">
+          <label>Annual Appreciation (%)</label>
+          <div class="input-wrap"><input type="number" id="home-rate" placeholder="3.5" step="0.1" min="0" max="15" oninput="calcHome()" style="padding-right:28px;"><span class="suffix">%</span></div>
+          <div class="hint">Typical: 3–4% nationally</div>
+        </div>
+        <div class="calc-field">
+          <label>Current Mortgage Balance ($)</label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-mortgage" placeholder="0" oninput="fmtCalc(this);calcHome()"></div>
+          <div class="hint">Remaining loan balance</div>
+        </div>
+        <div class="calc-field">
+          <label>Years to Project</label>
+          <div class="input-wrap"><input type="number" id="home-years" placeholder="25" min="1" max="60" oninput="calcHome()"></div>
+          <div class="hint">Years until plan end / retirement</div>
+        </div>
+      </div>
+
+      <div id="home-results" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
+          <div class="home-stat-card">
+            <div class="home-stat-label">Home Value at Year End</div>
+            <div class="home-stat-value" id="home-fv">$0</div>
+          </div>
+          <div class="home-stat-card">
+            <div class="home-stat-label">Mortgage Paid Down (est.)</div>
+            <div class="home-stat-value" id="home-mort-rem">$0</div>
+          </div>
+          <div class="home-stat-card" style="border-color:#1CC7D0;">
+            <div class="home-stat-label" style="color:#1CC7D0;">Net Equity at Year End</div>
+            <div class="home-stat-value" style="color:#1CC7D0;" id="home-equity">$0</div>
+          </div>
+        </div>
+        <canvas id="home-chart" width="800" height="180" style="border-radius:8px;width:100%;"></canvas>
+        <div style="font-size:12px;color:#6a8a9a;margin-top:8px;text-align:center;">
+          💡 Consider adding your projected net equity to your retirement balance for a complete picture
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- SECTION VI: ACCOUNTS -->
 <div class="section-card">
@@ -1114,9 +1337,9 @@ function scriptUrl(action) {
 
 // ── ACCOUNTS DATA ────────────────────────────────────────────
 var accountsData = [
-  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'Use for Withdrawals', dash:'No'},
+  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, contrib:0, match:0, status:'Use for Withdrawals', dash:'No'},
   {inc:'Yes', name:'Roth',                owner:'', type:'Roth (Tax Free)',          bal:0, ret:8.0, status:'Use for Withdrawals', dash:'No'},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0, ret:7.0, status:'Use for Withdrawals', dash:'No'},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0, ret:7.0, contrib:0, match:0, status:'Use for Withdrawals', dash:'No'},
   {inc:'Yes', name:'401k / 403b',         owner:'',  type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
   {inc:'Yes', name:'Roth',                owner:'',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'', dash:''},
   {inc:'Yes', name:'Brokerage (Taxable)', owner:'',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'', dash:''},
@@ -1202,7 +1425,41 @@ function buildAccountsTable() {
     });
     td6.appendChild(retInp);
 
-    // Col 7: Status (select)
+    // Col 7: Annual Contribution
+    var td7c = document.createElement('td');
+    var contribInp = document.createElement('input');
+    contribInp.type = 'text';
+    contribInp.inputMode = 'numeric';
+    contribInp.placeholder = '0';
+    contribInp.style.width = '90px';
+    contribInp.value = a.contrib ? parseInt(a.contrib).toLocaleString() : '';
+    contribInp.addEventListener('input', function() {
+      var v = this.value.replace(/[^0-9]/g,'');
+      this.value = v ? parseInt(v).toLocaleString() : '';
+      accountsData[idx].contrib = parseInt(v)||0;
+      markDirty();
+    });
+    td7c.appendChild(contribInp);
+    tr.appendChild(td7c);
+
+    // Col 8: Employer Match
+    var td8m = document.createElement('td');
+    var matchInp = document.createElement('input');
+    matchInp.type = 'text';
+    matchInp.inputMode = 'numeric';
+    matchInp.placeholder = '0';
+    matchInp.style.width = '90px';
+    matchInp.value = a.match ? parseInt(a.match).toLocaleString() : '';
+    matchInp.addEventListener('input', function() {
+      var v = this.value.replace(/[^0-9]/g,'');
+      this.value = v ? parseInt(v).toLocaleString() : '';
+      accountsData[idx].match = parseInt(v)||0;
+      markDirty();
+    });
+    td8m.appendChild(matchInp);
+    tr.appendChild(td8m);
+
+    // Col 9: Status (select)
     var td7 = document.createElement('td');
     td7.innerHTML = statusSel(idx, a.status);
 
@@ -1735,6 +1992,8 @@ function populateFromData(d) {
       var enEl   = document.getElementById('d-end-'+i);
       if (incEl) { incEl.textContent = debt.inc||'No'; incEl.className = debt.inc==='Yes'?'toggle-yes':'toggle-no'; }
       if (nmEl)  nmEl.value  = debt.name || '';
+    var ppEl = document.getElementById('d-pp-'+i);
+    if (ppEl) ppEl.value = debt.pp ? parseInt(debt.pp).toLocaleString() : '';
       if (moEl)  moEl.value  = debt.mo  ? parseInt(debt.mo).toLocaleString()  : '';
       if (annEl) { var dmo=parseInt(debt.mo)||0; annEl.value = dmo ? '$'+(dmo*12).toLocaleString() : ''; }
       if (balEl) balEl.value = debt.bal ? parseInt(debt.bal).toLocaleString() : '';
@@ -1759,6 +2018,8 @@ function populateFromData(d) {
         type:   a.type || '',
         bal:    a.balance || 0,
         ret:    a.expectedReturn || 0, // already *100 from readAll
+        contrib:a.contrib || 0,
+        match:  a.match || 0,
         status: a.status || 'Use for Withdrawals',
         dash:   a.showOnDashboard || 'No'
       };
@@ -1845,6 +2106,9 @@ function populateFromData(d) {
   var saveBtn = document.getElementById('save-btn');
   if (saveBtn) saveBtn.disabled = false;
   checkShowWelcome(d);
+  updateCalcNames();
+  updateCalcYears();
+  setTimeout(syncCalcFromAccounts, 200);
 }
 
 function setVal(id, val) {
@@ -2031,7 +2295,7 @@ function saveAll() {
       D49: gn('f-D49'), D50: gd('f-D50'), D51: gd('f-D51'),
       D52: gn('f-D52'), D53: gn('f-D53'), D54: gn('f-D54')
     },
-    accounts: accountsData,
+    accounts: accountsData, // includes contrib and match fields
     expenses: collectExpenses(),
     debts:    collectDebts(),
     phases: {
@@ -2126,7 +2390,7 @@ function buildPayload() {
       D52: document.getElementById('f-D52').value,
       D53: document.getElementById('f-D53').value,
     },
-    accounts: accountsData,
+    accounts: accountsData, // includes contrib and match fields
     roth: {
       B139: document.getElementById('f-B139').value,
       B141: document.getElementById('f-B141').value,
@@ -2370,6 +2634,346 @@ function calcBalRemaining(i) {
   if (remaining < 0) remaining = 0;
   remEl.value = remaining > 0 ? '~$' + Math.round(remaining).toLocaleString() : 'Paid Off';
 }
+
+function fmtCalc(el) {
+  var v = String(el.value).replace(/[^0-9]/g,'');
+  el.value = v ? parseInt(v).toLocaleString() : '';
+}
+
+function getNum(id) {
+  var el = document.getElementById(id);
+  if (!el) return 0;
+  return parseFloat(String(el.value).replace(/[^0-9.]/g,'')) || 0;
+}
+
+function fmt(n) {
+  if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
+  if (n >= 1000)    return '$' + Math.round(n/1000) + 'K';
+  return '$' + Math.round(n).toLocaleString();
+}
+
+function calcGrowth(p) {
+  var bal     = getNum('c'+p+'-balance');
+  var contrib = getNum('c'+p+'-contrib');
+  var match   = getNum('c'+p+'-match');
+  var ret     = getNum('c'+p+'-return') / 100 || 0.07;
+  var years   = getNum('c'+p+'-years') || 0;
+  var cgrowth = getNum('c'+p+'-contrib-growth') / 100 || 0;
+
+  if (years <= 0) { document.getElementById('c'+p+'-results').style.display='none'; return; }
+
+  // Future value with growing contributions
+  // FV = PV*(1+r)^n + PMT_total * sum of (1+r)^k for k=1..n
+  var fv = bal;
+  var totalContrib = 0;
+  var totalMatch = 0;
+  var totalGrowth = 0;
+  var annualContrib = contrib + match;
+  var yearlyData = [bal];
+
+  for (var y = 1; y <= years; y++) {
+    var thisContrib = annualContrib * Math.pow(1 + cgrowth, y-1);
+    var growth = fv * ret;
+    fv = fv + growth + thisContrib;
+    totalContrib += contrib * Math.pow(1+cgrowth, y-1);
+    totalMatch   += match   * Math.pow(1+cgrowth, y-1);
+    totalGrowth  += growth;
+    yearlyData.push(Math.round(fv));
+  }
+
+  // Display results
+  document.getElementById('c'+p+'-fv').textContent = fmt(fv);
+  document.getElementById('c'+p+'-breakdown').innerHTML =
+    'Starting Balance: <span>' + fmt(bal) + '</span><br>' +
+    'Your Contributions: <span>' + fmt(totalContrib) + '</span><br>' +
+    'Employer Matching: <span>' + fmt(totalMatch) + '</span><br>' +
+    'Investment Growth: <span>' + fmt(totalGrowth) + '</span>';
+  document.getElementById('c'+p+'-results').style.display = 'block';
+
+  // Draw chart
+  drawGrowthChart('c'+p+'-chart', yearlyData, years);
+}
+
+function drawGrowthChart(canvasId, data, years) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  canvas.style.display = 'block';
+  var ctx = canvas.getContext('2d');
+  var W = canvas.offsetWidth || 400;
+  canvas.width = W;
+  var H = 200;
+  ctx.clearRect(0, 0, W, H);
+
+  var max = Math.max.apply(null, data);
+  var pad = {top:20, right:20, bottom:30, left:60};
+  var chartW = W - pad.left - pad.right;
+  var chartH = H - pad.top - pad.bottom;
+
+  // Background
+  ctx.fillStyle = '#041E2F';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = '#1a3a52';
+  ctx.lineWidth = 1;
+  for (var i = 0; i <= 4; i++) {
+    var y = pad.top + (chartH / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke();
+    var val = max - (max/4)*i;
+    ctx.fillStyle = '#6a8a9a';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(fmt(val), pad.left - 4, y + 3);
+  }
+
+  // Area fill
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top + chartH);
+  for (var i = 0; i < data.length; i++) {
+    var x = pad.left + (i / (data.length-1)) * chartW;
+    var y = pad.top + chartH - (data[i] / max) * chartH;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W - pad.right, pad.top + chartH);
+  ctx.closePath();
+  var grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+  grad.addColorStop(0, 'rgba(28,199,208,0.4)');
+  grad.addColorStop(1, 'rgba(28,199,208,0.02)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = '#1CC7D0';
+  ctx.lineWidth = 2.5;
+  for (var i = 0; i < data.length; i++) {
+    var x = pad.left + (i / (data.length-1)) * chartW;
+    var y = pad.top + chartH - (data[i] / max) * chartH;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Year labels
+  ctx.fillStyle = '#6a8a9a';
+  ctx.font = '10px Arial';
+  ctx.textAlign = 'center';
+  var labelStep = Math.ceil(years / 5);
+  for (var i = 0; i <= years; i += labelStep) {
+    var x = pad.left + (i / years) * chartW;
+    ctx.fillText('Yr ' + i, x, H - 4);
+  }
+}
+
+function useCalcValue(p) {
+  var fvEl = document.getElementById('c'+p+'-fv');
+  if (!fvEl || fvEl.textContent === '$0') { alert('Please fill in the calculator fields first.'); return; }
+
+  // Parse the projected value
+  var raw = fvEl.textContent.replace(/[^0-9.MK]/g,'');
+  var val = 0;
+  if (raw.indexOf('M') > -1) val = parseFloat(raw) * 1000000;
+  else if (raw.indexOf('K') > -1) val = parseFloat(raw) * 1000;
+  else val = parseFloat(raw);
+  val = Math.round(val);
+
+  // Get contribution values from calculator
+  var annContrib = getNum('c'+p+'-contrib');
+  var empMatch   = getNum('c'+p+'-match');
+
+  var p1name = document.getElementById('f-B31') ? document.getElementById('f-B31').value.toLowerCase() : '';
+  var p2name = document.getElementById('f-D31') ? document.getElementById('f-D31').value.toLowerCase() : '';
+  var targetName = p === 1 ? p1name : p2name;
+
+  var updated = false;
+  if (typeof accountsData !== 'undefined') {
+    for (var i = 0; i < accountsData.length; i++) {
+      var a = accountsData[i];
+      var ownerLower = (a.owner||'').toLowerCase();
+      var ownerMatch = (targetName && ownerLower.indexOf(targetName) > -1)
+                    || (p===1 && ownerLower.indexOf('joint') === -1 && i < 4)
+                    || (p===2 && ownerLower.indexOf('joint') === -1 && i >= 4 && i < 8);
+      var is401k = a.type && (a.type.toLowerCase().indexOf('pretax') > -1
+                           || a.type.toLowerCase().indexOf('401') > -1
+                           || a.type.toLowerCase().indexOf('403') > -1);
+      if (ownerMatch && is401k && !updated) {
+        accountsData[i].bal    = val;
+        accountsData[i].contrib= annContrib;
+        accountsData[i].match  = empMatch;
+        updated = true;
+      }
+    }
+    if (updated) {
+      buildAccountsTable();
+      markDirty();
+      showToast('✅ Balance, contributions & match updated in Named Accounts!', 'success');
+    } else {
+      showToast('Could not find matching 401k/403b — please update Starting Balance manually below. Value: ' + fmt(val), '');
+    }
+  }
+}
+
+function calcHome() {
+  var homeVal  = getNum('home-value');
+  var rate     = getNum('home-rate') / 100 || 0.035;
+  var mortgage = getNum('home-mortgage');
+  var years    = getNum('home-years') || 0;
+
+  if (!homeVal || years <= 0) { document.getElementById('home-results').style.display='none'; return; }
+
+  // Projected home value
+  var fv = homeVal * Math.pow(1 + rate, years);
+
+  // Estimated mortgage paydown (simple linear approximation)
+  // Real paydown depends on rate/term, but this gives ballpark
+  var mortRem = Math.max(0, mortgage - (mortgage * 0.03 * years)); // ~3% paydown/year estimate
+
+  var equity = fv - mortRem;
+
+  document.getElementById('home-fv').textContent = fmt(fv);
+  document.getElementById('home-mort-rem').textContent = fmt(mortRem) + ' est.';
+  document.getElementById('home-equity').textContent = fmt(equity);
+  document.getElementById('home-results').style.display = 'block';
+
+  // Draw home chart
+  drawHomeChart(homeVal, rate, mortgage, years);
+}
+
+function drawHomeChart(homeVal, rate, mortgage, years) {
+  var canvas = document.getElementById('home-chart');
+  if (!canvas) return;
+  var W = canvas.offsetWidth || 800;
+  canvas.width = W;
+  var H = 180;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  var homeData = [], equityData = [], mortData = [];
+  for (var y = 0; y <= years; y++) {
+    var hv = homeVal * Math.pow(1 + rate, y);
+    var mv = Math.max(0, mortgage - (mortgage * 0.03 * y));
+    homeData.push(hv);
+    mortData.push(mv);
+    equityData.push(hv - mv);
+  }
+
+  var max = Math.max.apply(null, homeData);
+  var pad = {top:16, right:20, bottom:28, left:60};
+  var chartW = W - pad.left - pad.right;
+  var chartH = H - pad.top - pad.bottom;
+
+  ctx.fillStyle = '#041E2F';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = '#1a3a52'; ctx.lineWidth = 1;
+  for (var i = 0; i <= 3; i++) {
+    var y = pad.top + (chartH/3)*i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke();
+    ctx.fillStyle='#6a8a9a'; ctx.font='10px Arial'; ctx.textAlign='right';
+    ctx.fillText(fmt(max-(max/3)*i), pad.left-4, y+3);
+  }
+
+  function drawLine(data, color, fill) {
+    ctx.beginPath();
+    for (var i = 0; i < data.length; i++) {
+      var x = pad.left + (i/(data.length-1))*chartW;
+      var y = pad.top + chartH - (data[i]/max)*chartH;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    if (fill) {
+      ctx.lineTo(W-pad.right, pad.top+chartH);
+      ctx.lineTo(pad.left, pad.top+chartH);
+      ctx.closePath();
+      var g = ctx.createLinearGradient(0,pad.top,0,pad.top+chartH);
+      g.addColorStop(0, color.replace('1)', '0.3)'));
+      g.addColorStop(1, color.replace('1)', '0.02)'));
+      ctx.fillStyle = g; ctx.fill();
+    } else {
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+    }
+  }
+
+  drawLine(homeData, 'rgba(244,184,106,1)', true);
+  drawLine(equityData, 'rgba(28,199,208,1)', false);
+  drawLine(mortData, 'rgba(248,113,113,1)', false);
+
+  // Legend
+  var items = [['#f4b86a','Home Value'],['#1CC7D0','Net Equity'],['#f87171','Mortgage']];
+  items.forEach(function(item, i) {
+    ctx.fillStyle = item[0];
+    ctx.fillRect(pad.left + i*120, H-14, 12, 8);
+    ctx.fillStyle = '#8aaabb'; ctx.font = '10px Arial'; ctx.textAlign = 'left';
+    ctx.fillText(item[1], pad.left + i*120 + 16, H-6);
+  });
+
+  // Year labels
+  ctx.fillStyle='#6a8a9a'; ctx.textAlign='center';
+  var step = Math.ceil(years/5);
+  for (var i=0; i<=years; i+=step) {
+    var x = pad.left + (i/years)*chartW;
+    ctx.fillText('Yr '+i, x, H-16);
+  }
+}
+
+// Auto-populate years from salary end dates
+function updateCalcYears() {
+  var today = new Date();
+  var p1end = document.getElementById('f-B39') ? document.getElementById('f-B39').value : '';
+  var p2end = document.getElementById('f-D39') ? document.getElementById('f-D39').value : '';
+  if (p1end) {
+    var d = new Date(p1end);
+    if (!isNaN(d)) {
+      var yrs = Math.round((d-today)/(365.25*24*3600*1000));
+      if (yrs > 0) { var el=document.getElementById('c1-years'); if(el&&!el.value) el.value=yrs; }
+    }
+  }
+  if (p2end) {
+    var d = new Date(p2end);
+    if (!isNaN(d)) {
+      var yrs = Math.round((d-today)/(365.25*24*3600*1000));
+      if (yrs > 0) { var el=document.getElementById('c2-years'); if(el&&!el.value) el.value=yrs; }
+    }
+  }
+}
+
+// Update partner names in calculator
+function syncCalcFromAccounts() {
+  // Pre-populate calculator fields from existing account data
+  if (typeof accountsData === 'undefined') return;
+  var p1done = false, p2done = false;
+  accountsData.forEach(function(a) {
+    var owner = (a.owner||'').toLowerCase();
+    var is401 = a.type && (a.type.toLowerCase().indexOf('pretax')>-1 || a.type.toLowerCase().indexOf('401')>-1 || a.type.toLowerCase().indexOf('403')>-1);
+    if (!is401) return;
+    var p1name = (document.getElementById('f-B31')||{value:''}).value.toLowerCase();
+    var p2name = (document.getElementById('f-D31')||{value:''}).value.toLowerCase();
+    var isP1 = p1name && owner.indexOf(p1name)>-1;
+    var isP2 = p2name && owner.indexOf(p2name)>-1;
+    if (isP1 && !p1done) {
+      var el;
+      el=document.getElementById('c1-balance'); if(el&&!el.value&&a.bal) el.value=Math.round(a.bal).toLocaleString();
+      el=document.getElementById('c1-contrib'); if(el&&!el.value&&a.contrib) el.value=Math.round(a.contrib).toLocaleString();
+      el=document.getElementById('c1-match');   if(el&&!el.value&&a.match)   el.value=Math.round(a.match).toLocaleString();
+      el=document.getElementById('c1-return');  if(el&&!el.value&&a.ret)     el.value=(a.ret||7);
+      p1done = true;
+    }
+    if (isP2 && !p2done) {
+      var el;
+      el=document.getElementById('c2-balance'); if(el&&!el.value&&a.bal) el.value=Math.round(a.bal).toLocaleString();
+      el=document.getElementById('c2-contrib'); if(el&&!el.value&&a.contrib) el.value=Math.round(a.contrib).toLocaleString();
+      el=document.getElementById('c2-match');   if(el&&!el.value&&a.match)   el.value=Math.round(a.match).toLocaleString();
+      el=document.getElementById('c2-return');  if(el&&!el.value&&a.ret)     el.value=(a.ret||7);
+      p2done = true;
+    }
+  });
+}
+
+function updateCalcNames() {
+  var p1 = document.getElementById('f-B31');
+  var p2 = document.getElementById('f-D31');
+  if (p1 && p1.value) document.getElementById('calc-p1-name').textContent = p1.value + ' — Pre-Retirement Projector';
+  if (p2 && p2.value) document.getElementById('calc-p2-name').textContent = p2.value + ' — Pre-Retirement Projector';
+}
 </script>
 
 <div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;">Not financial advice. Not legal advice. For personal planning purposes only. Always consult a licensed financial advisor before making major retirement decisions. © 2026 RetireBlueprint Pro</div>
@@ -2395,7 +2999,7 @@ function calcBalRemaining(i) {
       <div class="step-item">
         <div class="step-num">3</div>
         <div class="step-text"><strong>Visit your Dashboard</strong><br>
-          <span>See your full 100-year retirement plan come to life with real numbers!</span></div>
+          <span>See your full lifetime retirement plan come to life with real numbers!</span></div>
       </div>
     </div>
     <button class="welcome-btn" onclick="dismissWelcome()">Got it — Let's Go! 🚀</button>
