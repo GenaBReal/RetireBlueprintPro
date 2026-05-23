@@ -161,7 +161,10 @@ function readAll(ss, inp) {
       inc:str(row,1), name:str(row,2),
       mo:num(row,3), ann:num(row,4),
       start:dt(row,5), end:dt(row,6),
-      bal:num(row,8)
+      bal:num(row,8),
+      inflate:str(row,9),           // I = Inflate?
+      rate:(num(row,10)||0)*100,     // J = rate as % for display
+      curval:num(row,11)             // K = current value
     };
   });
 
@@ -342,9 +345,10 @@ function writeInputs(ss, inp, data) {
       data.expenses.forEach(function(exp) {
         var r = Number(exp.row);
         if (!r || r<58 || r>85 || skip[r]) return;
-        if (exp.name && String(exp.name).trim() !== '') inp.getRange('A'+r).setValue(String(exp.name).trim()); // only write if non-empty — preserves built-in labels
-        inp.getRange('B'+r).setValue(Number(exp.monthly)||0);
-        // NEVER WRITE C (formula =B*12)
+        if (exp.name && String(exp.name).trim() !== '') inp.getRange('A'+r).setValue(String(exp.name).trim());
+        var mo = Number(exp.monthly)||0;
+        inp.getRange('B'+r).setValue(mo);
+        inp.getRange('C'+r).setValue(mo * 12); // yearly = monthly * 12
         if (exp.note !== undefined) inp.getRange('D'+r).setValue(String(exp.note||''));
       });
     }
@@ -365,6 +369,10 @@ function writeInputs(ss, inp, data) {
         if (d.end)   setD('F'+r, d.end);
         var bal = Number(d.bal)||0;
         if (bal) inp.getRange('H'+r).setValue(bal);
+        // I=Inflate, J=Rate%, K=CurrentValue
+        if (d.inflate) inp.getRange('I'+r).setValue(String(d.inflate));
+        if (d.rate) inp.getRange('J'+r).setValue(Number(d.rate)/100);
+        if (d.curval) inp.getRange('K'+r).setValue(Number(d.curval));
       });
     }
 
