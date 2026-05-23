@@ -482,7 +482,7 @@ function populate(d){
   // ── END EMPTY SHEET GUARD ────────────────────────────────
   var p1n = p1.name||'Partner 1', p2n = p2.name||'Partner 2';
   var sp = d.spending, leg = d.legacy, tax = d.tax, port = d.portfolio;
-  var proj = d.projections, meta = d.meta;
+  var proj = d.projections || {}, meta = d.meta || {};
 
   // Determine longest-lived person
   var p1dy = p1.projectedDeathYear||2070, p2dy = p2.projectedDeathYear||2080;
@@ -539,7 +539,7 @@ function populate(d){
   set('kpi-runway-delta', otherN+' covered to age '+otherP.projectedDeathAge+' ('+otherP.projectedDeathYear+')');
   var rd=$s('runway-dots'); if(rd){var rh='';for(var i=0;i<Math.min(10,longestYrs);i++) rh+='<span style="width:8px;height:8px;border-radius:50%;background:#041E2F;display:inline-block;"></span>';rd.innerHTML=rh;}
 
-  var yr1inc = (proj.income&&proj.income[0]) ? proj.income[0]*1000 : 0;
+  var yr1inc = (proj.income&&proj.income.length&&proj.income[0]) ? proj.income[0]*1000 : 0;
   set('kpi-income', fmt(yr1inc));
   set('kpi-income-note', 'Transition year · verify with your Inputs');
   set('kpi-income-badge', p1n+' SS starts '+p1.ssStartDate);
@@ -588,10 +588,10 @@ function populate(d){
   set('eng-cola2', cola.toFixed(1)+'%');
   set('eng-cola-disp', cola.toFixed(1)+'%/yr');
 
-  var yr1pre = (proj.preTax&&proj.preTax[0])?proj.preTax[0]*1000:0;
-  var yr1rth = (proj.roth&&proj.roth[0])?proj.roth[0]*1000:0;
-  var yr1tax = (proj.taxable&&proj.taxable[0])?proj.taxable[0]*1000:0;
-  var yr1hsa = (proj.hsa&&proj.hsa[0])?proj.hsa[0]*1000:0;
+  var yr1pre = (proj.preTax&&proj.preTax.length&&proj.preTax[0])?proj.preTax[0]*1000:0;
+  var yr1rth = (proj.roth&&proj.roth.length&&proj.roth[0])?proj.roth[0]*1000:0;
+  var yr1tax = (proj.taxable&&proj.taxable.length&&proj.taxable[0])?proj.taxable[0]*1000:0;
+  var yr1hsa = (proj.hsa&&proj.hsa.length&&proj.hsa[0])?proj.hsa[0]*1000:0;
   var yr1end = (proj.endLiquid&&proj.endLiquid[0])?proj.endLiquid[0]*1000:0;
   set('eng-port-hdr', (port.accounts||[]).length+' accounts · starting values');
   set('eng-port-total', fmt(port.total));

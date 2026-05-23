@@ -222,6 +222,38 @@ function readAll(ss, inp) {
     rothPlan.push({year:2026+i, p1:num(row,2), p2:num(row,3)});
   }
 
+  // Read Master sheet for year-by-year projection data (charts)
+  var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
+                     preTax:[], roth:[], taxable:[], hsa:[]};
+  try {
+    var masterSheet = ss.getSheetByName('Master');
+    if (masterSheet) {
+      var masterData = masterSheet.getRange('A8:BX200').getValues();
+      masterData.forEach(function(row) {
+        var yr = Number(row[0]); // col A = year
+        if (!yr || yr < 2020 || yr > 2200) return;
+        projections.years.push(yr);
+        projections.income.push(Math.round(Number(row[14])||0));     // O = income
+        projections.withdrawals.push(Math.round(Number(row[39])||0)); // AN = withdrawals
+        projections.endLiquid.push(Math.round(Number(row[75])||0));   // BX = end liquid
+        // Account balances
+        var p1_401k   = Number(row[54])||0;  // BC
+        var p1_roth   = Number(row[55])||0;  // BD
+        var p1_brok   = Number(row[56])||0;  // BE
+        var p2_401k   = Number(row[57])||0;  // BF
+        var p2_roth   = Number(row[58])||0;  // BG
+        var p2_brok   = Number(row[59])||0;  // BH
+        var hsa       = Number(row[60])||0;  // BI
+        projections.preTax.push(Math.round(p1_401k + p2_401k));
+        projections.roth.push(Math.round(p1_roth + p2_roth));
+        projections.taxable.push(Math.round(p1_brok + p2_brok));
+        projections.hsa.push(Math.round(hsa));
+      });
+    }
+  } catch(e) {
+    Logger.log('Master read error: ' + e);
+  }
+
   return {
     meta:{planYear:new Date().getFullYear()},
     people:{craig:p1, gena:p2},
@@ -230,6 +262,7 @@ function readAll(ss, inp) {
     expenses:expenses, debts:debts,
     spending:spending, legacy:legacy,
     roth:roth, rothPlan:rothPlan,
+    projections:projections,
   };
 }
 
