@@ -194,7 +194,7 @@ function loadData() {
   var _sid = localStorage.getItem('rbp_sheet_id')||'';
   s.src = SCRIPT_URL + '?callback=' + cb + '&sheetId=' + encodeURIComponent(_sid) + '&_=' + Date.now();
   s.onerror = function() { delete window[cb]; loadEmbedded(); };
-  setTimeout(function() { if(window[cb]) { delete window[cb]; loadEmbedded(); } }, 8000);
+  setTimeout(function() { if(window[cb]) { delete window[cb]; loadEmbedded(); } }, 1800000) // 30 minutes;
   document.head.appendChild(s);
 }
 

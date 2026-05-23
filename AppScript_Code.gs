@@ -31,7 +31,10 @@ function doGet(e) {
     var inp = ss.getSheetByName('Inputs');
     if (!inp) return respond({error:'No Inputs sheet'});
 
-    if (action === 'read') return respond(readAll(ss, inp));
+    if (action === 'read') {
+      addWelcomeBanner(ss, inp);
+      return respond(readAll(ss, inp));
+    }
 
     if (action === 'save') {
       var enc = e.parameter.enc;
@@ -98,7 +101,7 @@ function readAll(ss, inp) {
 
   // Global (col B = col 2)
   var gl = {
-    planStartYear:dt(6,2), projectionYears:num(7,2),
+    planStartYear:dt(6,2), planYear:(function(){ try{ return new Date(allData[5][1]).getFullYear(); } catch(e){ return new Date().getFullYear(); }})(), projectionYears:num(7,2),
     legacyGoal:num(8,2), safetyFloor:num(9,2),
     survivorReduction:pct(10,2),
     assumeExtraSpend:str(11,2),
@@ -246,7 +249,12 @@ function writeInputs(ss, inp, data) {
     // ── GLOBAL SETTINGS ──────────────────────────────────────
     if (data.global) {
       var g = data.global;
-      if (g.B6)  setD('B6', g.B6);
+      // B6 = Plan Start Year — write as Jan 2 to avoid timezone rollback
+      if (g.B6) {
+        var yr = parseInt(String(g.B6).replace(/[^0-9]/g,''));
+        if (!yr || yr < 2000) yr = new Date().getFullYear();
+        inp.getRange('B6').setValue(new Date(yr, 0, 2, 12, 0, 0)); // Jan 2, noon
+      }
       if (g.B7)  setN('B7', g.B7);
       if (g.B8)  setN('B8', g.B8);
       if (g.B9)  setN('B9', g.B9);
@@ -452,5 +460,27 @@ function writeInputs(ss, inp, data) {
     return {success:true, timestamp:new Date().toISOString()};
   } catch(err) {
     return {success:false, error:err.toString()};
+  }
+}
+
+// ── WELCOME MESSAGE ───────────────────────────────────────────────────────────
+// Called once when a new customer first connects their sheet
+// Adds a friendly banner so they know the blank sheet is normal
+function addWelcomeBanner(ss, inp) {
+  try {
+    // Check if welcome has already been shown
+    var props = PropertiesService.getDocumentProperties();
+    if (props.getProperty('welcomeShown')) return;
+    
+    // Add a note to the sheet letting them know it's blank on purpose
+    var note = inp.getRange('C5');
+    note.setValue('👋 Welcome! This sheet will fill in automatically after you enter your data on the Inputs page of your dashboard and click Save All Changes. The blank cells are completely normal — nothing is missing!');
+    note.setFontColor('#1CC7D0');
+    note.setFontWeight('bold');
+    note.setFontSize(11);
+    
+    props.setProperty('welcomeShown', 'true');
+  } catch(e) {
+    Logger.log('Welcome banner error: ' + e);
   }
 }
