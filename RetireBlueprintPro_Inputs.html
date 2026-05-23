@@ -336,7 +336,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       </div>
       <div class="field">
         <label>Projection Max Years</label>
-        <input type="number" id="f-B7" value="100" min="30" max="120">
+        <input type="number" id="f-B7" value="100" min="30" max="110">
       </div>
     </div>
 
@@ -437,7 +437,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           </div>
           <div class="field">
             <label>Projected Age of Death</label>
-            <input type="number" id="f-B35" value="" min="70" max="120" onchange="onDeathAgeChange('f-B33','f-B35','f-B36')">
+            <input type="number" id="f-B35" value="" min="70" max="110" onchange="onDeathAgeChange('f-B33','f-B35','f-B36')" title="Maximum 110 years">
           </div>
           <div class="field">
             <label>Projected Death Year</label>
@@ -563,7 +563,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           </div>
           <div class="field">
             <label>Projected Age of Death</label>
-            <input type="number" id="f-D35" value="" min="70" max="120" onchange="onDeathAgeChange('f-D33','f-D35','f-D36')">
+            <input type="number" id="f-D35" value="" min="70" max="110" onchange="onDeathAgeChange('f-D33','f-D35','f-D36')" title="Maximum 110 years">
           </div>
           <div class="field">
             <label>Projected Death Year</label>
@@ -1260,11 +1260,17 @@ function calcAge(dobId, ageId, deathAgeId, deathYearId) {
 
 function onDeathAgeChange(ageId, deathAgeId, deathYearId) {
   var age = parseInt((document.getElementById(ageId)||{}).value);
-  var deathAge = parseInt((document.getElementById(deathAgeId)||{}).value);
+  var deathAgeEl = document.getElementById(deathAgeId);
+  var deathAge = parseInt((deathAgeEl||{}).value);
   var deathYearEl = document.getElementById(deathYearId);
   if (!deathYearEl || isNaN(age) || isNaN(deathAge) || deathAge <= 0 || age <= 0) {
     if (deathYearEl) deathYearEl.value = '';
     return;
+  }
+  // Cap death age at 110 — beyond that the master sheet can't project
+  if (deathAge > 110) {
+    deathAge = 110;
+    if (deathAgeEl) deathAgeEl.value = 110;
   }
   var planYear = parseInt(document.getElementById('f-B6').value) || new Date().getFullYear();
   deathYearEl.value = planYear + (deathAge - age);
@@ -2268,6 +2274,31 @@ updatePartnerNames();
 updateTheme(1, 'Steel Blue');
 updateTheme(2, 'Frost Plum');
 loadLiveData();
+
+// ── WELCOME MODAL ─────────────────────────────────────────
+function showWelcomeModal() {
+  var modal = document.getElementById('welcome-modal');
+  if (modal) modal.classList.add('show');
+}
+function dismissWelcome() {
+  var modal = document.getElementById('welcome-modal');
+  if (modal) modal.classList.remove('show');
+  try { localStorage.setItem('rbp_welcomed', '1'); } catch(e) {}
+}
+function checkShowWelcome(data) {
+  var hasData = data && data.people && (
+    (data.people.craig && data.people.craig.name && data.people.craig.name.trim() !== '') ||
+    (data.people.gena  && data.people.gena.name  && data.people.gena.name.trim()  !== '') ||
+    (data.portfolio    && data.portfolio.total > 0)
+  );
+  if (!hasData) {
+    try {
+      if (!localStorage.getItem('rbp_welcomed')) {
+        setTimeout(showWelcomeModal, 800);
+      }
+    } catch(e) {}
+  }
+}
 </script>
 
 <div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;">Not financial advice. Not legal advice. For personal planning purposes only. Always consult a licensed financial advisor before making major retirement decisions. © 2026 RetireBlueprint Pro</div>
