@@ -979,11 +979,36 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div class="calc-result-title">📈 Projected Value at Retirement</div>
           <div class="calc-result-main" id="c1-fv">$0</div>
           <div class="calc-breakdown" id="c1-breakdown"></div>
+
+          <!-- Present Value Back-Calculation -->
+          <div style="background:#0A1F2E;border:1px solid #f4b86a;border-radius:8px;padding:12px;margin:12px 0;text-align:left;">
+            <div style="font-size:10px;color:#f4b86a;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
+              🎯 What to Enter as Starting Balance
+            </div>
+            <div style="font-size:11px;color:#8aaabb;line-height:1.6;">
+              Your plan starts now but you retire in <span style="color:#fff;" id="c1-pv-years">?</span> years.
+              The Master Sheet needs today's equivalent value — it will grow this forward
+              to your retirement amount automatically.
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+              <div>
+                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Enter This Amount</div>
+                <div style="font-size:24px;font-weight:900;color:#f4b86a;" id="c1-pv">$0</div>
+              </div>
+              <div style="font-size:20px;color:#6a8a9a;">→</div>
+              <div>
+                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Master Grows To</div>
+                <div style="font-size:18px;font-weight:700;color:#1CC7D0;" id="c1-fv-small">$0</div>
+                <div style="font-size:9px;color:#6a8a9a;">at your retirement date</div>
+              </div>
+            </div>
+          </div>
+
           <button class="calc-use-btn" onclick="useCalcValue(1)">
-            ✅ Use This as My Starting Balance →
+            ✅ Use Back-Calculated Balance → Named Accounts
           </button>
           <div style="font-size:11px;color:#8aaabb;margin-top:8px;text-align:center;">
-            This will update the matching account's Starting Balance in Named Accounts
+            Enters the today's-equivalent value so Master projects correctly to retirement
           </div>
         </div>
 
@@ -1026,11 +1051,36 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div class="calc-result-title">📈 Projected Value at Retirement</div>
           <div class="calc-result-main" id="c2-fv">$0</div>
           <div class="calc-breakdown" id="c2-breakdown"></div>
+
+          <!-- Present Value Back-Calculation -->
+          <div style="background:#0A1F2E;border:1px solid #f4b86a;border-radius:8px;padding:12px;margin:12px 0;text-align:left;">
+            <div style="font-size:10px;color:#f4b86a;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
+              🎯 What to Enter as Starting Balance
+            </div>
+            <div style="font-size:11px;color:#8aaabb;line-height:1.6;">
+              Your plan starts now but you retire in <span style="color:#fff;" id="c2-pv-years">?</span> years.
+              The Master Sheet needs today's equivalent value — it will grow this forward
+              to your retirement amount automatically.
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+              <div>
+                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Enter This Amount</div>
+                <div style="font-size:24px;font-weight:900;color:#f4b86a;" id="c2-pv">$0</div>
+              </div>
+              <div style="font-size:20px;color:#6a8a9a;">→</div>
+              <div>
+                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Master Grows To</div>
+                <div style="font-size:18px;font-weight:700;color:#1CC7D0;" id="c2-fv-small">$0</div>
+                <div style="font-size:9px;color:#6a8a9a;">at your retirement date</div>
+              </div>
+            </div>
+          </div>
+
           <button class="calc-use-btn" onclick="useCalcValue(2)">
-            ✅ Use This as My Starting Balance →
+            ✅ Use Back-Calculated Balance → Named Accounts
           </button>
           <div style="font-size:11px;color:#8aaabb;margin-top:8px;text-align:center;">
-            This will update the matching account's Starting Balance in Named Accounts
+            Enters the today's-equivalent value so Master projects correctly to retirement
           </div>
         </div>
 
@@ -2669,13 +2719,31 @@ function calcGrowth(p) {
   }
 
   // Display results
+  // Back-calculate Present Value for plan start
+  // PV = FV / (1 + return)^years
+  // This is what to enter as Starting Balance so Master grows it to FV at retirement
+  var pv = fv / Math.pow(1 + ret, years);
+  var planStartYear = parseInt((document.getElementById('f-B6')||{value:'2026'}).value) || 2026;
+  var today = new Date().getFullYear();
+  var yearsFromPlanStart = Math.max(0, years - (today - planStartYear));
+
   document.getElementById('c'+p+'-fv').textContent = fmt(fv);
+  document.getElementById('c'+p+'-pv').textContent = fmt(Math.round(pv));
+  document.getElementById('c'+p+'-pv-years').textContent = years;
   document.getElementById('c'+p+'-breakdown').innerHTML =
-    'Starting Balance: <span>' + fmt(bal) + '</span><br>' +
+    'Starting Balance Today: <span>' + fmt(bal) + '</span><br>' +
     'Your Contributions: <span>' + fmt(totalContrib) + '</span><br>' +
     'Employer Matching: <span>' + fmt(totalMatch) + '</span><br>' +
     'Investment Growth: <span>' + fmt(totalGrowth) + '</span>';
   document.getElementById('c'+p+'-results').style.display = 'block';
+
+  // Store pv for use in useCalcValue
+  window['_calc'+p+'_fv'] = fv;
+  window['_calc'+p+'_pv'] = Math.round(pv);
+  window['_calc'+p+'_years'] = years;
+  // Update small FV display in PV box
+  var fvSmall = document.getElementById('c'+p+'-fv-small');
+  if (fvSmall) fvSmall.textContent = fmt(fv);
 
   // Draw chart
   drawGrowthChart('c'+p+'-chart', yearlyData, years);
@@ -2752,16 +2820,11 @@ function drawGrowthChart(canvasId, data, years) {
 }
 
 function useCalcValue(p) {
-  var fvEl = document.getElementById('c'+p+'-fv');
-  if (!fvEl || fvEl.textContent === '$0') { alert('Please fill in the calculator fields first.'); return; }
-
-  // Parse the projected value
-  var raw = fvEl.textContent.replace(/[^0-9.MK]/g,'');
-  var val = 0;
-  if (raw.indexOf('M') > -1) val = parseFloat(raw) * 1000000;
-  else if (raw.indexOf('K') > -1) val = parseFloat(raw) * 1000;
-  else val = parseFloat(raw);
-  val = Math.round(val);
+  // Use back-calculated PV (not FV) so Master can grow it correctly to retirement
+  var pv = window['_calc'+p+'_pv'];
+  var fv = window['_calc'+p+'_fv'];
+  if (!pv || !fv) { alert('Please fill in the calculator fields first.'); return; }
+  var val = Math.round(pv); // Use PV — Master will grow this to FV at retirement
 
   // Get contribution values from calculator
   var annContrib = getNum('c'+p+'-contrib');

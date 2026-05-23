@@ -159,11 +159,16 @@ function readAll(ss, inp) {
   // Debts rows 88-89 + 92-101 (A=1,B=2,C=3,D=4,E=5,F=6,H=8)
   var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
   var debts = debtRows.map(function(row) {
+    // Smart read: detect old format (C=monthly) vs new format (D=monthly)
+    var colC = num(row,3), colD = num(row,4), colE = num(row,5);
+    var isOldFormat = colC > 0 && colD === colC * 12; // old: D was annual = C*12
+    var monthly = isOldFormat ? colC : colD;
     return {
-      // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance, I=Inflate, J=Rate, K=CurrentValue
-      inc:str(row,1), name:str(row,2), pp:num(row,3),
-      mo:num(row,4),                 // D = Monthly Payment
-      ann:num(row,5),                // E = Annual Payment
+      // A=Include, B=Name, C=PurchasePrice(new)/Monthly(old), D=Monthly(new)/Annual(old), E=Annual(new), F=Start, G=End, H=Balance
+      inc:str(row,1), name:str(row,2),
+      pp: isOldFormat ? 0 : colC,   // C = Purchase Price (new format only)
+      mo: monthly,                   // D = Monthly (or C in old format)
+      ann: monthly * 12,             // Always calculate annual from monthly
       start:dt(row,6),               // F = Start Date
       end:dt(row,7),                 // G = End Date
       bal:num(row,8),                // H = Balance/Payoff
