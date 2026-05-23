@@ -1196,8 +1196,9 @@ function updatePortfolioTotal() {
 
 // ── EXPENSES ─────────────────────────────────────────────────
 function calcExpense(inp, annualId) {
-  var monthly = parseFloat(String(inp.value).replace(/[$,]/g,'')) || 0;
-  var annual = Math.round(monthly * 12);
+  var raw = String(inp.value).replace(/[$, ]/g, '');
+  var monthly = parseInt(raw) || 0;
+  var annual = monthly * 12;
   var annEl = document.getElementById(annualId);
   if (annEl) annEl.value = annual ? '$' + annual.toLocaleString() : '';
   updateExpenseTotal();
@@ -1210,7 +1211,7 @@ function updateExpenseTotal() {
              'C83','C84','C85'];
   var total = ids.reduce(function(s,id){
     var el = document.getElementById('e-'+id);
-    return s + (el ? (parseFloat(String(el.value).replace(/[$,]/g,''))||0) : 0);
+    return s + (el ? (parseInt(String(el.value).replace(/[$, ]/g,''))||0) : 0);
   }, 0);
   document.getElementById('total-monthly').textContent = '$' + total.toLocaleString();
   document.getElementById('total-annual').textContent = '$' + (total*12).toLocaleString();
@@ -1495,6 +1496,8 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
   document.head.appendChild(script);
 }
 
+var EXPENSE_DEFAULTS = {58:'Verizon Wireless',59:'PG&E (Electric/Gas)',60:'Garbage & Water',61:'Car/RV Insurance',62:'Xfinity Internet',63:'Apple/Netflix/Adobe',64:'Misc',65:'Misc',66:'Misc',67:'Misc',68:'Misc',69:'Misc',71:'Groceries / Food',72:'Gas / Vehicle Maint',73:'Personal Care',74:'Giving / Charity',75:'Clothing',76:'Misc',77:'Misc',78:'Misc',79:'Misc',80:'Misc',81:'Misc',83:'Home Maintenance (1%)',84:'Travel / Go-Go Fund',85:'Annual Fees / DMV'};
+
 function populateFromData(d) {
   if (!d) return;
   var gl = d.global || {};
@@ -1540,7 +1543,12 @@ function populateFromData(d) {
   }
 
   // ── GLOBAL SETTINGS ──────────────────────────────────────
-  dv('f-B6',  gl.planStartYear);
+  // f-B6 is a number field — extract just the year
+  if (gl.planStartYear) {
+    var parts = String(gl.planStartYear).split('/');
+    var yr = parts.length === 3 ? parseInt(parts[2]) : parseInt(gl.planStartYear);
+    if (yr > 2000) document.getElementById('f-B6').value = yr;
+  }
   sv('f-B7',  gl.projectionYears);
   sv('f-B8',  gl.legacyGoal);
   sv('f-B9',  gl.safetyFloor);
@@ -1619,7 +1627,7 @@ function populateFromData(d) {
       var cel = document.getElementById('e-C'+r);
       var yel = document.getElementById('e-Y'+r);
       var tel = document.getElementById('e-T'+r);
-      if (nel) nel.value = exp.name || '';
+      if (nel) nel.value = exp.name || EXPENSE_DEFAULTS[r] || '';
       if (cel) {
         var mo = parseInt(exp.monthly)||0;
         cel.value = mo ? mo.toLocaleString() : '';
