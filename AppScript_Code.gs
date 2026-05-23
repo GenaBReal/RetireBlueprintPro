@@ -159,22 +159,32 @@ function readAll(ss, inp) {
   // Debts rows 88-89 + 92-101 (A=1,B=2,C=3,D=4,E=5,F=6,H=8)
   var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
   var debts = debtRows.map(function(row) {
-    // Smart read: detect old format (C=monthly) vs new format (D=monthly)
+    // Smart read: detect old format (C=monthly,D=annual) vs new format (C=pp,D=monthly,E=annual)
     var colC = num(row,3), colD = num(row,4), colE = num(row,5);
-    var isOldFormat = colC > 0 && colD === colC * 12; // old: D was annual = C*12
-    var monthly = isOldFormat ? colC : colD;
+    var monthly, pp;
+    if (colE > 0) {
+      // New format: D=monthly, E=annual
+      monthly = colD; pp = colC;
+    } else if (colC > 0 && colD > 0 && Math.abs(colD - colC*12) < 10) {
+      // Old format: C=monthly, D=annual(=C*12)
+      monthly = colC; pp = 0;
+    } else if (colD > 0 && colC === 0) {
+      // Ambiguous: only D has value - check if it's divisible by 12 (likely annual)
+      // If D is a round multiple of 12, it was probably written as annual (old format)
+      var isLikelyAnnual = colD > 1000 && (colD % 12 === 0 || colD % 100 === 0);
+      monthly = isLikelyAnnual ? Math.round(colD/12) : colD;
+      pp = 0;
+    } else {
+      monthly = colD || colC; pp = 0;
+    }
     return {
-      // A=Include, B=Name, C=PurchasePrice(new)/Monthly(old), D=Monthly(new)/Annual(old), E=Annual(new), F=Start, G=End, H=Balance
-      inc:str(row,1), name:str(row,2),
-      pp: isOldFormat ? 0 : colC,   // C = Purchase Price (new format only)
-      mo: monthly,                   // D = Monthly (or C in old format)
-      ann: monthly * 12,             // Always calculate annual from monthly
-      start:dt(row,6),               // F = Start Date
-      end:dt(row,7),                 // G = End Date
-      bal:num(row,8),                // H = Balance/Payoff
-      inflate:str(row,9),            // I = Inflate?
-      rate:(num(row,10)||0)*100,     // J = rate as % for display
-      curval:num(row,11)             // K = Current Value
+      inc:str(row,1), name:str(row,2), pp:pp,
+      mo:monthly, ann:monthly*12,
+      start:dt(row,6), end:dt(row,7),
+      bal:num(row,8),
+      inflate:str(row,9),
+      rate:(num(row,10)||0)*100,
+      curval:num(row,11)
     };
   });
 
@@ -403,21 +413,27 @@ function writeInputs(ss, inp, data) {
       data.debts.forEach(function(d, i) {
         if (i >= debtRows.length) return;
         var r = debtRows[i];
-        // CORRECT COLUMN MAPPING (from sheet screenshot):
-        // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance, I=Inflate, J=Rate, K=CurrentValue
-        inp.getRange('A'+r).setValue(d.inc||'No');
-        if (d.name) inp.getRange('B'+r).setValue(String(d.name));
-        if (d.pp) inp.getRange('C'+r).setValue(Number(d.pp)); // C = Purchase Price
         var mo = Number(d.mo)||0;
-        inp.getRange('D'+r).setValue(mo);           // D = Monthly Payment
-        inp.getRange('E'+r).setValue(mo*12);         // E = Annual Payment (Master reads this!)
-        if (d.start) setD('F'+r, d.start);          // F = Start Date
-        if (d.end)   setD('G'+r, d.end);            // G = End Date
+        // Only write if row has meaningful data (name OR monthly > 0)
+        // This prevents wiping existing sheet data with blank web rows
+        var hasData = (d.name && String(d.name).trim() !== '') || mo > 0 || Number(d.bal) > 0;
+        if (!hasData && i >= 2) return; // Skip empty extra rows (keep sheet data intact)
+
+        // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance
+        inp.getRange('A'+r).setValue(d.inc||'No');
+        if (d.name && String(d.name).trim()) inp.getRange('B'+r).setValue(String(d.name));
+        if (d.pp) inp.getRange('C'+r).setValue(Number(d.pp));
+        if (mo > 0 || hasData) {
+          inp.getRange('D'+r).setValue(mo);      // D = Monthly
+          inp.getRange('E'+r).setValue(mo*12);   // E = Annual (Master reads this!)
+        }
+        if (d.start) setD('F'+r, d.start);
+        if (d.end)   setD('G'+r, d.end);
         var bal = Number(d.bal)||0;
-        if (bal) inp.getRange('H'+r).setValue(bal); // H = Balance/Payoff
-        if (d.inflate) inp.getRange('I'+r).setValue(String(d.inflate)); // I = Inflate?
-        if (d.rate) inp.getRange('J'+r).setValue(Number(d.rate)/100);   // J = Rate (as decimal)
-        if (d.curval) inp.getRange('K'+r).setValue(Number(d.curval));   // K = Current Value
+        if (bal) inp.getRange('H'+r).setValue(bal);
+        if (d.inflate) inp.getRange('I'+r).setValue(String(d.inflate));
+        if (d.rate) inp.getRange('J'+r).setValue(Number(d.rate)/100);
+        if (d.curval) inp.getRange('K'+r).setValue(Number(d.curval));
       });
     }
 

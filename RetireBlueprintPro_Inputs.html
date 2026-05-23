@@ -769,7 +769,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       </thead>
       <tbody id="debts-body">
         <tr>
-          <td><button class="toggle-no" id="d-inc-0" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-0" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-0" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-0" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-0" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(0);markDirty();"></td>
@@ -783,7 +783,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" inputmode="numeric" id="d-curval-0" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-1" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-1" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-1" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-1" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-1" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(1);markDirty();"></td>
