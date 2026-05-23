@@ -944,32 +944,32 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <div class="calc-grid">
           <div class="calc-field">
             <label>Current Account Balance ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(1)"></div>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
             <div class="hint">Today's total in this account</div>
           </div>
           <div class="calc-field">
             <label>Annual Contribution ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(1)"></div>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
             <div class="hint">Your personal contribution per year</div>
           </div>
           <div class="calc-field">
             <label>Employer Match ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(1)"></div>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
             <div class="hint">Annual employer match amount</div>
           </div>
           <div class="calc-field">
             <label>Expected Annual Return (%)</label>
-            <div class="input-wrap"><input type="number" id="c1-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(1)" style="padding-right:28px;"><span class="suffix">%</span></div>
+            <div class="input-wrap"><input type="number" id="c1-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(1);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
             <div class="hint">Typical: 6–8% for diversified portfolio</div>
           </div>
           <div class="calc-field">
             <label>Years Until Retirement</label>
-            <div class="input-wrap"><input type="number" id="c1-years" placeholder="20" min="0" max="60" oninput="calcGrowth(1)"></div>
+            <div class="input-wrap"><input type="number" id="c1-years" placeholder="20" min="0" max="60" oninput="calcGrowth(1);saveCalcToStorage();"></div>
             <div class="hint">Calculated from salary end date, or enter manually</div>
           </div>
           <div class="calc-field">
             <label>Annual Contribution Growth (%)</label>
-            <div class="input-wrap"><input type="number" id="c1-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(1)" style="padding-right:28px;"><span class="suffix">%</span></div>
+            <div class="input-wrap"><input type="number" id="c1-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(1);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
             <div class="hint">Rate contributions increase each year (salary raises)</div>
           </div>
         </div>
@@ -998,27 +998,27 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <div class="calc-grid">
           <div class="calc-field">
             <label>Current Account Balance ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(2)"></div>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(2);saveCalcToStorage();"></div>
           </div>
           <div class="calc-field">
             <label>Annual Contribution ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(2)"></div>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(2);saveCalcToStorage();"></div>
           </div>
           <div class="calc-field">
             <label>Employer Match ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(2)"></div>
+            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(2);saveCalcToStorage();"></div>
           </div>
           <div class="calc-field">
             <label>Expected Annual Return (%)</label>
-            <div class="input-wrap"><input type="number" id="c2-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(2)" style="padding-right:28px;"><span class="suffix">%</span></div>
+            <div class="input-wrap"><input type="number" id="c2-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(2);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
           </div>
           <div class="calc-field">
             <label>Years Until Retirement</label>
-            <div class="input-wrap"><input type="number" id="c2-years" placeholder="20" min="0" max="60" oninput="calcGrowth(2)"></div>
+            <div class="input-wrap"><input type="number" id="c2-years" placeholder="20" min="0" max="60" oninput="calcGrowth(2);saveCalcToStorage();"></div>
           </div>
           <div class="calc-field">
             <label>Annual Contribution Growth (%)</label>
-            <div class="input-wrap"><input type="number" id="c2-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(2)" style="padding-right:28px;"><span class="suffix">%</span></div>
+            <div class="input-wrap"><input type="number" id="c2-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(2);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
           </div>
         </div>
 
@@ -1046,22 +1046,22 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
         <div class="calc-field">
           <label>Current Home Value ($)</label>
-          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-value" placeholder="0" oninput="fmtCalc(this);calcHome()"></div>
+          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-value" placeholder="0" oninput="fmtCalc(this);calcHome();saveCalcToStorage();"></div>
           <div class="hint">Current market value (Zillow, Redfin)</div>
         </div>
         <div class="calc-field">
           <label>Annual Appreciation (%)</label>
-          <div class="input-wrap"><input type="number" id="home-rate" placeholder="3.5" step="0.1" min="0" max="15" oninput="calcHome()" style="padding-right:28px;"><span class="suffix">%</span></div>
+          <div class="input-wrap"><input type="number" id="home-rate" placeholder="3.5" step="0.1" min="0" max="15" oninput="calcHome();saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
           <div class="hint">Typical: 3–4% nationally</div>
         </div>
         <div class="calc-field">
           <label>Current Mortgage Balance ($)</label>
-          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-mortgage" placeholder="0" oninput="fmtCalc(this);calcHome()"></div>
+          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-mortgage" placeholder="0" oninput="fmtCalc(this);calcHome();saveCalcToStorage();"></div>
           <div class="hint">Remaining loan balance</div>
         </div>
         <div class="calc-field">
           <label>Years to Project</label>
-          <div class="input-wrap"><input type="number" id="home-years" placeholder="25" min="1" max="60" oninput="calcHome()"></div>
+          <div class="input-wrap"><input type="number" id="home-years" placeholder="25" min="1" max="60" oninput="calcHome();saveCalcToStorage();"></div>
           <div class="hint">Years until plan end / retirement</div>
         </div>
       </div>
@@ -1104,7 +1104,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       <thead>
         <tr>
           <th>Include?</th><th>Account Name</th><th>Owner</th><th>Type</th>
-          <th>Balance ($)</th><th>Return (%)</th><th>Status</th><th>Dashboard?</th>
+          <th>Balance ($)</th><th>Return (%)</th><th>Ann. Contrib ($)</th><th>Emp. Match ($)</th><th>Status</th><th>Dashboard?</th>
         </tr>
       </thead>
       <tbody id="accounts-body">
@@ -2069,13 +2069,15 @@ function populateFromData(d) {
   setTxt('r-lifetime',  fmt(roth.taxSavings));
 
   // ── ROTH PLAN AMOUNTS ────────────────────────────────
+  // Rebuild table first to ensure fields exist, then populate
+  buildRothPlanTable();
   if (d.rothPlan && d.rothPlan.length) {
     d.rothPlan.forEach(function(row) {
       var p1el = document.getElementById('roth-p1-'+row.year);
       var p2el = document.getElementById('roth-p2-'+row.year);
       var totEl = document.getElementById('roth-total-'+row.year);
-      if (p1el && row.p1) p1el.value = row.p1;
-      if (p2el && row.p2) p2el.value = row.p2;
+      if (p1el) p1el.value = row.p1 || 0;
+      if (p2el) p2el.value = row.p2 || 0;
       if (totEl) {
         var tot = (row.p1||0)+(row.p2||0);
         totEl.textContent = tot ? '$'+tot.toLocaleString() : '$0';
@@ -2562,6 +2564,7 @@ function initPctFields() {
 // ── INIT ─────────────────────────────────────────────────────
 buildAccountsTable();
 buildRothPlanTable();
+loadCalcFromStorage();
 updateExpenseTotal();
 initCurrencyFields();
 initPctFields();
@@ -2982,6 +2985,52 @@ function updateCalcNames() {
   var p2 = document.getElementById('f-D31');
   if (p1 && p1.value) document.getElementById('calc-p1-name').textContent = p1.value + ' — Pre-Retirement Projector';
   if (p2 && p2.value) document.getElementById('calc-p2-name').textContent = p2.value + ' — Pre-Retirement Projector';
+}
+
+// ── CALCULATOR PERSISTENCE ────────────────────────────────
+function saveCalcToStorage() {
+  try {
+    var calcData = {
+      c1_balance: document.getElementById('c1-balance') ? document.getElementById('c1-balance').value : '',
+      c1_contrib: document.getElementById('c1-contrib') ? document.getElementById('c1-contrib').value : '',
+      c1_match:   document.getElementById('c1-match')   ? document.getElementById('c1-match').value   : '',
+      c1_return:  document.getElementById('c1-return')  ? document.getElementById('c1-return').value  : '',
+      c1_years:   document.getElementById('c1-years')   ? document.getElementById('c1-years').value   : '',
+      c1_cgrowth: document.getElementById('c1-contrib-growth') ? document.getElementById('c1-contrib-growth').value : '',
+      c2_balance: document.getElementById('c2-balance') ? document.getElementById('c2-balance').value : '',
+      c2_contrib: document.getElementById('c2-contrib') ? document.getElementById('c2-contrib').value : '',
+      c2_match:   document.getElementById('c2-match')   ? document.getElementById('c2-match').value   : '',
+      c2_return:  document.getElementById('c2-return')  ? document.getElementById('c2-return').value  : '',
+      c2_years:   document.getElementById('c2-years')   ? document.getElementById('c2-years').value   : '',
+      c2_cgrowth: document.getElementById('c2-contrib-growth') ? document.getElementById('c2-contrib-growth').value : '',
+      home_value:   document.getElementById('home-value')    ? document.getElementById('home-value').value    : '',
+      home_rate:    document.getElementById('home-rate')     ? document.getElementById('home-rate').value     : '',
+      home_mortgage:document.getElementById('home-mortgage') ? document.getElementById('home-mortgage').value : '',
+      home_years:   document.getElementById('home-years')    ? document.getElementById('home-years').value    : '',
+    };
+    localStorage.setItem('rbp_calc_data', JSON.stringify(calcData));
+  } catch(e) {}
+}
+
+function loadCalcFromStorage() {
+  try {
+    var raw = localStorage.getItem('rbp_calc_data');
+    if (!raw) return;
+    var d = JSON.parse(raw);
+    function setEl(id, val) { var el=document.getElementById(id); if(el && val) el.value=val; }
+    setEl('c1-balance', d.c1_balance); setEl('c1-contrib', d.c1_contrib);
+    setEl('c1-match',   d.c1_match);   setEl('c1-return',  d.c1_return);
+    setEl('c1-years',   d.c1_years);   setEl('c1-contrib-growth', d.c1_cgrowth);
+    setEl('c2-balance', d.c2_balance); setEl('c2-contrib', d.c2_contrib);
+    setEl('c2-match',   d.c2_match);   setEl('c2-return',  d.c2_return);
+    setEl('c2-years',   d.c2_years);   setEl('c2-contrib-growth', d.c2_cgrowth);
+    setEl('home-value',    d.home_value);    setEl('home-rate',     d.home_rate);
+    setEl('home-mortgage', d.home_mortgage); setEl('home-years',    d.home_years);
+    // Recalculate after loading
+    setTimeout(function() {
+      calcGrowth(1); calcGrowth(2); calcHome();
+    }, 100);
+  } catch(e) {}
 }
 </script>
 

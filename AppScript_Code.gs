@@ -468,17 +468,18 @@ function writeInputs(ss, inp, data) {
     // ── ROTH CONVERSION PLAN ──────────────────────────────────
     // B150:B169 = partner1 amounts, C150:C169 = partner2 amounts (rows = 2026-2045)
     if (data.rothPlan && data.rothPlan.length) {
-      var p1arr = [], p2arr = [];
-      for (var i=0; i<20; i++) { p1arr.push([0]); p2arr.push([0]); }
-      data.rothPlan.forEach(function(row) {
-        var idx = Number(row.year) - 2026;
-        if (idx>=0 && idx<20) {
-          p1arr[idx] = [Number(row.p1)||0];
-          p2arr[idx] = [Number(row.p2)||0];
-        }
-      });
-      inp.getRange('B150:B169').setValues(p1arr);
-      inp.getRange('C150:C169').setValues(p2arr);
+      // Write year, p1 amount, p2 amount to A:C rows 150-169
+      // Master VLOOKUP uses col A for year lookup: VLOOKUP(year, A136:C157, 2, FALSE)
+      var allArr = [];
+      for (var i=0; i<20; i++) {
+        var yr = 2026 + i;
+        var p1 = 0, p2 = 0;
+        data.rothPlan.forEach(function(row) {
+          if (Number(row.year) === yr) { p1=Number(row.p1)||0; p2=Number(row.p2)||0; }
+        });
+        allArr.push([yr, p1, p2]); // A=year, B=p1, C=p2
+      }
+      inp.getRange('A150:C169').setValues(allArr);
     }
 
     SpreadsheetApp.flush();
