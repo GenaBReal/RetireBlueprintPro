@@ -104,6 +104,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 .disclaimer{text-align:center;font-size:8px;color:#9ca3af;padding:8px 14px 12px;border-top:1px solid #e8eaed;margin-top:6px;}
 
 
+
+.welcome-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;}
+.welcome-modal-overlay.show{display:flex;}
+.welcome-modal{background:#041E2F;border-radius:16px;border:2px solid #1CC7D0;max-width:500px;width:90%;padding:32px;text-align:center;}
+.welcome-modal h2{color:#f4b86a;font-size:20px;margin:14px 0 10px;}
+.welcome-modal p{color:#8aaabb;font-size:13px;line-height:1.8;margin-bottom:14px;}
+.welcome-modal .wsteps{text-align:left;margin:14px 0 20px;}
+.welcome-modal .wstep{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;}
+.welcome-modal .wnum{background:#f4b86a;color:#041E2F;font-weight:800;font-size:12px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.welcome-modal .wtxt{color:#fff;font-size:13px;line-height:1.5;}
+.welcome-modal .wtxt span{color:#8aaabb;}
+.welcome-btn-dash{background:#f4b86a;color:#041E2F;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;width:100%;}
+
 </style>
 </head>
 <body>
@@ -463,6 +476,8 @@ function populate(d){
       banner.innerHTML = '👋 &nbsp;<strong>Welcome! Feel free to explore.</strong> &nbsp;Some panels may show placeholders or zeros until you enter your data. When ready, head to <a href="RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:bold;text-decoration:underline;">Inputs</a>, fill in your information, and click <strong>Save All Changes</strong> — everything will populate with your real numbers automatically.';
     }
     // Continue to render dashboard with blanks/dashes
+    // Show welcome modal if first visit
+    try { if (!localStorage.getItem('rbp_dash_welcomed')) setTimeout(showDashWelcome, 800); } catch(e){}
   }
   // ── END EMPTY SHEET GUARD ────────────────────────────────
   var p1n = p1.name||'Partner 1', p2n = p2.name||'Partner 2';
@@ -758,6 +773,32 @@ function reloadData() {
   loadData();
 }
 window.addEventListener('DOMContentLoaded', loadData);
+
+function showDashWelcome() {
+  var modal = document.getElementById('dash-welcome-modal');
+  if (modal) modal.classList.add('show');
+}
+function dismissDashWelcome() {
+  var modal = document.getElementById('dash-welcome-modal');
+  if (modal) modal.classList.remove('show');
+  try { localStorage.setItem('rbp_dash_welcomed', '1'); } catch(e) {}
+}
 </script>
+
+<div class="welcome-modal-overlay" id="dash-welcome-modal">
+  <div class="welcome-modal">
+    <div style="font-size:44px;">👋</div>
+    <h2>Welcome to Your Dashboard!</h2>
+    <p><strong style="color:#fff;">Feel free to look around!</strong> Some panels may show placeholders or zeros until you enter your data — that's completely normal.</p>
+    <p>When you're ready, here's how it works:</p>
+    <div class="wsteps">
+      <div class="wstep"><div class="wnum">1</div><div class="wtxt"><strong>Go to Inputs</strong><br><span>Fill in your personal information, accounts, income, and expenses.</span></div></div>
+      <div class="wstep"><div class="wnum">2</div><div class="wtxt"><strong>Click 💾 Save All Changes</strong><br><span>Your data saves to your private Google Sheet instantly.</span></div></div>
+      <div class="wstep"><div class="wnum">3</div><div class="wtxt"><strong>Come back here</strong><br><span>Your full 100-year retirement plan populates automatically!</span></div></div>
+    </div>
+    <button class="welcome-btn-dash" onclick="dismissDashWelcome()">Got it — Let's Go! 🚀</button>
+  </div>
+</div>
+
 </body>
 </html>

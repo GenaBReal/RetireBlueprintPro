@@ -76,9 +76,13 @@ function readAll(ss, inp) {
   function str(row, col) { return String(r(row,col)||''); }
 
   // Partner 1 (col B = col 2)
+  var currentYear = new Date().getFullYear();
+  var p1Age = num(33,2);
+  var p1DeathAge = num(35,2);
   var p1 = {
-    name:str(31,2), dob:dt(32,2), age:num(33,2),
-    deathAge:num(35,2), theme:str(34,2),
+    name:str(31,2), dob:dt(32,2), age:p1Age,
+    deathAge:p1DeathAge, theme:str(34,2),
+    projectedDeathYear: p1Age > 0 && p1DeathAge > 0 ? currentYear + (p1DeathAge - p1Age) : 0,
     salary:num(37,2), salaryStart:dt(38,2), salaryEnd:dt(39,2),
     ssBase:num(40,2), ssFra:num(41,2),
     ssMonthly:num(43,2), ssStartDate:dt(44,2),
@@ -88,9 +92,12 @@ function readAll(ss, inp) {
   };
 
   // Partner 2 (col D = col 4)
+  var p2Age = num(33,4);
+  var p2DeathAge = num(35,4);
   var p2 = {
-    name:str(31,4), dob:dt(32,4), age:num(33,4),
-    deathAge:num(35,4), theme:str(34,4),
+    name:str(31,4), dob:dt(32,4), age:p2Age,
+    deathAge:p2DeathAge, theme:str(34,4),
+    projectedDeathYear: p2Age > 0 && p2DeathAge > 0 ? currentYear + (p2DeathAge - p2Age) : 0,
     salary:num(37,4), salaryStart:dt(38,4), salaryEnd:dt(39,4),
     ssBase:num(40,4), ssFra:num(41,4),
     ssMonthly:num(43,4), ssStartDate:dt(44,4),
