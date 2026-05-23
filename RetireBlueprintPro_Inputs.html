@@ -35,11 +35,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 .nav-right{margin-left:auto;display:flex;align-items:stretch;}
 
 /* ── STATUS BAR ── */
-.status-bar{background:var(--navy);padding:6px 20px;display:flex;justify-content:space-between;align-items:center;}
+.status-bar{background:var(--navy);padding:8px 20px;display:flex;justify-content:flex-start;align-items:center;gap:16px;}
 .status-msg{font-size:10px;color:#8a9ab0;}
 .status-msg.success{color:var(--teal);}
 .status-msg.error{color:#f87171;}
-.save-btn{background:var(--orange);color:var(--navy);border:none;padding:7px 20px;border-radius:4px;
+.save-btn{background:var(--orange);color:var(--navy);border:none;padding:10px 28px;border-radius:6px;font-size:14px;font-weight:800;letter-spacing:0.3px;
           font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;transition:opacity 0.2s;}
 .save-btn:hover{opacity:0.85;}
 .save-btn:disabled{opacity:0.5;cursor:not-allowed;}
@@ -212,8 +212,8 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
 <!-- STATUS BAR -->
 <div class="status-bar">
+  <button class="save-btn" id="save-btn" onclick="saveAll()" disabled>💾 Save All Changes</button>
   <span class="status-msg" id="status-msg">Loading your plan data...</span>
-  <button class="save-btn" id="save-btn" onclick="saveAll()" disabled>Save All Changes</button>
 </div>
 
 <!-- LOADING OVERLAY -->
