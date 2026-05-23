@@ -1605,8 +1605,8 @@ function populateFromData(d) {
   sv('f-D54', gena.medicareAge || 65);
 
   // Auto-calculate ages from DOB
-  calcAge('f-B32', 'f-B33-disp', 'f-B36-disp');
-  calcAge('f-D32', 'f-D33-disp', 'f-D36-disp');
+  calcAge('f-B32', 'f-B33', 'f-B35', 'f-B36');
+  calcAge('f-D32', 'f-D33', 'f-D35', 'f-D36');
 
   // Update partner names throughout
   updatePartnerNames();
