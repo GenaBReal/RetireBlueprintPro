@@ -411,7 +411,7 @@ function writeInputs(ss, inp, data) {
           ret,                         // F = return as decimal
           a.status||'Use for Withdrawals', // G
           a.dash||a.showOnDashboard||'No', // H
-          '', '', '', '',                  // I, J, K (unused)
+          '', '', '',                    // I, J, K (unused)
           Number(a.contrib||0),            // L = Annual Contribution
           Number(a.match||0)               // M = Employer Match
         ]);

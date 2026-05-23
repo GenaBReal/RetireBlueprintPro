@@ -2091,7 +2091,11 @@ function populateFromData(d) {
   checkShowWelcome(d);
   updateCalcNames();
   updateCalcYears();
-  setTimeout(syncCalcFromAccounts, 200);
+  setTimeout(function() {
+    syncCalcFromAccounts();
+    // Load saved calculator values AFTER sync (storage takes priority)
+    loadCalcFromStorage();
+  }, 300);
 }
 
 function setVal(id, val) {
@@ -2564,7 +2568,6 @@ function initPctFields() {
 // ── INIT ─────────────────────────────────────────────────────
 buildAccountsTable();
 buildRothPlanTable();
-loadCalcFromStorage();
 updateExpenseTotal();
 initCurrencyFields();
 initPctFields();
@@ -3017,7 +3020,12 @@ function loadCalcFromStorage() {
     var raw = localStorage.getItem('rbp_calc_data');
     if (!raw) return;
     var d = JSON.parse(raw);
-    function setEl(id, val) { var el=document.getElementById(id); if(el && val) el.value=val; }
+    // Only restore if we have meaningful data (not all zeros)
+    var hasData = d.c1_balance && d.c1_balance !== '0' && d.c1_balance !== '';
+    var hasData2 = d.c2_balance && d.c2_balance !== '0' && d.c2_balance !== '';
+    var hasHome = d.home_value && d.home_value !== '0' && d.home_value !== '';
+    if (!hasData && !hasData2 && !hasHome) return;
+    function setEl(id, val) { var el=document.getElementById(id); if(el && val && val!=='0') el.value=val; }
     setEl('c1-balance', d.c1_balance); setEl('c1-contrib', d.c1_contrib);
     setEl('c1-match',   d.c1_match);   setEl('c1-return',  d.c1_return);
     setEl('c1-years',   d.c1_years);   setEl('c1-contrib-growth', d.c1_cgrowth);
