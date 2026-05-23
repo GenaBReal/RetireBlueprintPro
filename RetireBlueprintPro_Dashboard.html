@@ -443,6 +443,28 @@ function mkChart(id,type,labels,datasets,stacked,legend){
 function populate(d){
   var p1 = d.people.craig || d.people.person1 || {};
   var p2 = d.people.gena  || d.people.person2 || {};
+
+  // ── EMPTY SHEET GUARD ────────────────────────────────────
+  // If no names and no portfolio data, show setup prompt instead
+  var hasData = (p1.name && p1.name.trim() !== '') || 
+                (p2.name && p2.name.trim() !== '') ||
+                (d.portfolio && d.portfolio.total > 0) ||
+                (d.spending && d.spending.safeExtra > 0);
+
+  if (!hasData) {
+    // Show friendly banner but let dashboard render with blanks
+    var banner = document.getElementById('error-banner');
+    if (banner) {
+      banner.style.display = 'block';
+      banner.style.background = '#0A3145';
+      banner.style.borderLeft = '4px solid #f4b86a';
+      banner.style.color = '#f4b86a';
+      banner.style.padding = '14px 24px';
+      banner.innerHTML = '👋 &nbsp;<strong>Welcome! Feel free to explore.</strong> &nbsp;Some panels may show placeholders or zeros until you enter your data. When ready, head to <a href="RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:bold;text-decoration:underline;">Inputs</a>, fill in your information, and click <strong>Save All Changes</strong> — everything will populate with your real numbers automatically.';
+    }
+    // Continue to render dashboard with blanks/dashes
+  }
+  // ── END EMPTY SHEET GUARD ────────────────────────────────
   var p1n = p1.name||'Partner 1', p2n = p2.name||'Partner 2';
   var sp = d.spending, leg = d.legacy, tax = d.tax, port = d.portfolio;
   var proj = d.projections, meta = d.meta;
@@ -653,52 +675,78 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
 // ── LOAD FROM SHEET VIA APPS SCRIPT ────────────────────────────
 function loadData(){
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if(!sheetId){
-    $s('loading-overlay').style.display='none';
-    var b=$s('error-banner');
-    b.style.display='block';
-    b.textContent='⚠ No sheet connected. Please complete Setup first — go to the Setup Guide to connect your personal Google Sheet.';
+  if (!sheetId) {
+    $s('loading-overlay').style.display = 'none';
+    var b = $s('error-banner');
+    b.style.display = 'block';
+    b.textContent = '⚠ No sheet connected. Please complete Setup first.';
     return;
   }
 
-  $s('loading-sub').textContent='Connecting to your Google Sheet…';
+  $s('loading-sub').textContent = 'Connecting to your Google Sheet…';
 
-  var cbName = 'rbp_cb_'+Date.now();
-  var timer = setTimeout(function(){
-    $s('loading-overlay').style.display='none';
-    var b=$s('error-banner');
-    b.style.display='block';
-    b.textContent='⚠ Timeout loading your plan. Make sure your sheet is shared with retireblueprintpro@gmail.com as Editor, then refresh.';
+  var url = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec?action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
+
+  fetch(url)
+    .then(function(resp) { return resp.json(); })
+    .then(function(data) {
+      $s('loading-overlay').style.display = 'none';
+      if (data.error) {
+        var b = $s('error-banner');
+        b.style.display = 'block';
+        b.textContent = '⚠ Error reading sheet: ' + data.error;
+        return;
+      }
+      try { populate(data); }
+      catch(e) {
+        var b = $s('error-banner');
+        b.style.display = 'block';
+        b.textContent = '⚠ Error displaying data: ' + e.message;
+        console.error(e);
+      }
+    })
+    .catch(function() {
+      // Fallback to JSONP
+      loadViaJSONP(sheetId);
+    });
+}
+
+function loadViaJSONP(sheetId) {
+  var cbName = 'rbp_cb_' + Date.now();
+  var timer = setTimeout(function() {
+    $s('loading-overlay').style.display = 'none';
+    var b = $s('error-banner');
+    b.style.display = 'block';
+    b.textContent = '⚠ Timeout — make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.';
     delete window[cbName];
-  }, 15000);
+  }, 30000);
 
-  window[cbName] = function(data){
+  window[cbName] = function(data) {
     clearTimeout(timer);
     delete window[cbName];
-    $s('loading-overlay').style.display='none';
-    if(data.error){
-      var b=$s('error-banner');
-      b.style.display='block';
-      b.textContent='⚠ Error reading your sheet: '+data.error+' — Make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.';
+    $s('loading-overlay').style.display = 'none';
+    if (data.error) {
+      var b = $s('error-banner');
+      b.style.display = 'block';
+      b.textContent = '⚠ ' + data.error;
       return;
     }
-    try{ populate(data); }
-    catch(e){
-      var b=$s('error-banner');
-      b.style.display='block';
-      b.textContent='⚠ Error displaying data: '+e.message+' — Please fill in your Inputs tab and save, then refresh.';
-      console.error(e);
+    try { populate(data); }
+    catch(e) {
+      var b = $s('error-banner');
+      b.style.display = 'block';
+      b.textContent = '⚠ Error displaying data: ' + e.message;
     }
   };
 
-  var s=document.createElement('script');
-  s.src=SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cbName+'&_='+Date.now();
-  s.onerror=function(){
+  var s = document.createElement('script');
+  s.src = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
+  s.onerror = function() {
     clearTimeout(timer);
-    $s('loading-overlay').style.display='none';
-    var b=$s('error-banner');
-    b.style.display='block';
-    b.textContent='⚠ Network error. Check your internet connection and try refreshing.';
+    $s('loading-overlay').style.display = 'none';
+    var b = $s('error-banner');
+    b.style.display = 'block';
+    b.textContent = '⚠ Network error. Check your connection and refresh.';
   };
   document.head.appendChild(s);
 }
