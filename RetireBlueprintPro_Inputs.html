@@ -1388,87 +1388,68 @@ function buildAccountsTable() {
     var td4 = document.createElement('td');
     td4.innerHTML = typeSel(idx, a.type);
 
-    // Col 5: Balance — currency formatted, whole dollars
+    // Col 5: Balance
     var td5 = document.createElement('td');
     var balInp = document.createElement('input');
-    balInp.type = 'text';
-    balInp.inputMode = 'numeric';
-    balInp.style.width = '110px';
+    balInp.type = 'text'; balInp.inputMode = 'numeric'; balInp.style.width = '110px';
     balInp.value = a.bal ? parseInt(a.bal).toLocaleString() : '';
     balInp.addEventListener('input', function() {
-      var v = this.value.replace(/[^0-9]/g, '');
+      var v = this.value.replace(/[^0-9]/g,'');
       this.value = v ? parseInt(v).toLocaleString() : '';
-      accountsData[idx].bal = parseInt(v) || 0;
-      updatePortfolioTotal();
-      markDirty();
-    });
-    balInp.addEventListener('blur', function() {
-      var v = this.value.replace(/[^0-9]/g, '');
-      this.value = v ? parseInt(v).toLocaleString() : '';
+      accountsData[idx].bal = parseInt(v)||0;
+      updatePortfolioTotal(); markDirty();
     });
     td5.appendChild(balInp);
 
-    // Col 6: Return % — max 2 decimal places
+    // Col 6: Return %
     var td6 = document.createElement('td');
     var retInp = document.createElement('input');
-    retInp.type = 'number';
-    retInp.step = '0.01';
-    retInp.min = '0';
-    retInp.max = '20';
-    retInp.style.paddingRight = '28px';
+    retInp.type = 'number'; retInp.step = '0.01'; retInp.min = '0'; retInp.max = '20';
+    retInp.style.width = '65px';
     retInp.value = a.ret || 0;
     retInp.addEventListener('change', function() {
-      var n = parseFloat(this.value);
-      if (!isNaN(n)) this.value = Math.round(n * 100) / 100;
-      accountsData[idx].ret = parseFloat(this.value) || 0;
-      markDirty();
+      accountsData[idx].ret = parseFloat(this.value)||0; markDirty();
     });
     td6.appendChild(retInp);
 
     // Col 7: Annual Contribution
-    var td7c = document.createElement('td');
+    var td7 = document.createElement('td');
     var contribInp = document.createElement('input');
-    contribInp.type = 'text';
-    contribInp.inputMode = 'numeric';
-    contribInp.placeholder = '0';
-    contribInp.style.width = '90px';
+    contribInp.type = 'text'; contribInp.inputMode = 'numeric';
+    contribInp.placeholder = '0'; contribInp.style.width = '90px';
     contribInp.value = a.contrib ? parseInt(a.contrib).toLocaleString() : '';
     contribInp.addEventListener('input', function() {
       var v = this.value.replace(/[^0-9]/g,'');
       this.value = v ? parseInt(v).toLocaleString() : '';
-      accountsData[idx].contrib = parseInt(v)||0;
-      markDirty();
+      accountsData[idx].contrib = parseInt(v)||0; markDirty();
     });
-    td7c.appendChild(contribInp);
-    tr.appendChild(td7c);
+    td7.appendChild(contribInp);
 
     // Col 8: Employer Match
-    var td8m = document.createElement('td');
+    var td8 = document.createElement('td');
     var matchInp = document.createElement('input');
-    matchInp.type = 'text';
-    matchInp.inputMode = 'numeric';
-    matchInp.placeholder = '0';
-    matchInp.style.width = '90px';
+    matchInp.type = 'text'; matchInp.inputMode = 'numeric';
+    matchInp.placeholder = '0'; matchInp.style.width = '90px';
     matchInp.value = a.match ? parseInt(a.match).toLocaleString() : '';
     matchInp.addEventListener('input', function() {
       var v = this.value.replace(/[^0-9]/g,'');
       this.value = v ? parseInt(v).toLocaleString() : '';
-      accountsData[idx].match = parseInt(v)||0;
-      markDirty();
+      accountsData[idx].match = parseInt(v)||0; markDirty();
     });
-    td8m.appendChild(matchInp);
-    tr.appendChild(td8m);
+    td8.appendChild(matchInp);
 
     // Col 9: Status (select)
-    var td7 = document.createElement('td');
-    td7.innerHTML = statusSel(idx, a.status);
+    var td9 = document.createElement('td');
+    td9.innerHTML = statusSel(idx, a.status);
 
-    // Col 8: Dashboard (select)
-    var td8 = document.createElement('td');
-    td8.innerHTML = dashSel(idx, a.dash);
+    // Col 10: Dashboard (select)
+    var td10 = document.createElement('td');
+    td10.innerHTML = dashSel(idx, a.dash);
 
+    // Append ALL columns in correct order
     tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
     tr.appendChild(td5); tr.appendChild(td6); tr.appendChild(td7); tr.appendChild(td8);
+    tr.appendChild(td9); tr.appendChild(td10);
     tbody.appendChild(tr);
   });
   updatePortfolioTotal();
