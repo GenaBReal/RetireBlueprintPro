@@ -275,32 +275,61 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 <!-- ENGINES -->
 <!-- HOME EQUITY PANEL — reads from localStorage (set in Inputs calculator) -->
 <div id="home-equity-panel" style="display:none;background:#fff;border-radius:8px;border:1px solid #e0e4e8;padding:16px 20px;margin-bottom:16px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
     <div>
       <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:1px;">🏠 Home Equity</div>
-      <div style="font-size:9px;color:#5F6368;margin-top:2px;">From your Home Appreciation Calculator · Not included in portfolio total</div>
+      <div style="font-size:9px;color:#5F6368;margin-top:2px;">Not included in portfolio total · <span id="dash-home-name"></span></div>
     </div>
     <a href="RetireBlueprintPro_Inputs.html" style="font-size:9px;color:#1CC7D0;text-decoration:none;font-weight:700;">Update in Inputs →</a>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-    <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:12px 8px;">
-      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Current Value</div>
-      <div style="font-size:18px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-value">—</div>
+  <div style="display:grid;grid-template-columns:1fr 4px 1fr;gap:0;align-items:stretch;">
+
+    <!-- TODAY -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="text-align:center;padding:4px 0 8px;">
+        <div style="font-size:8px;font-weight:700;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">TODAY</div>
+      </div>
+      <div></div><div></div>
+      <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:10px 6px;">
+        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Home Value</div>
+        <div style="font-size:17px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-value">—</div>
+      </div>
+      <div style="text-align:center;background:#fce8e8;border-radius:6px;padding:10px 6px;">
+        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Mortgage Owed</div>
+        <div style="font-size:17px;font-weight:800;color:#A03030;margin-top:4px;" id="dash-home-mort-now">—</div>
+      </div>
+      <div style="text-align:center;background:#e8f5e9;border-radius:6px;padding:10px 6px;border:1px solid #c8e6c9;">
+        <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Net Equity</div>
+        <div style="font-size:17px;font-weight:800;color:#2E7032;margin-top:4px;" id="dash-home-equity-now">—</div>
+      </div>
     </div>
-    <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:12px 8px;">
-      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Projected Value</div>
-      <div style="font-size:18px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-fv">—</div>
-      <div style="font-size:9px;color:#5F6368;margin-top:2px;" id="dash-home-years-lbl"></div>
+
+    <!-- DIVIDER -->
+    <div style="background:#e0e4e8;margin:24px 12px 0;border-radius:2px;"></div>
+
+    <!-- AT PAYOFF -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="text-align:center;padding:4px 0 8px;">
+        <div style="font-size:8px;font-weight:700;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;" id="dash-home-proj-lbl">AT PAYOFF</div>
+      </div>
+      <div></div><div></div>
+      <div style="text-align:center;background:#f0fdfd;border-radius:6px;padding:10px 6px;border:1px solid #b2ebf2;">
+        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Home Value</div>
+        <div style="font-size:17px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-fv">—</div>
+        <div style="font-size:9px;color:#5F6368;margin-top:2px;" id="dash-home-years-lbl"></div>
+      </div>
+      <div style="text-align:center;background:#f0fdfd;border-radius:6px;padding:10px 6px;border:1px solid #b2ebf2;">
+        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Mortgage Left</div>
+        <div style="font-size:17px;font-weight:800;color:#A03030;margin-top:4px;" id="dash-home-mort">—</div>
+        <div style="font-size:9px;color:#5F6368;margin-top:2px;" class="mort-lbl"></div>
+      </div>
+      <div style="text-align:center;background:#e8f5e9;border-radius:6px;padding:10px 6px;border:1px solid #c8e6c9;">
+        <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Net Equity</div>
+        <div style="font-size:17px;font-weight:800;color:#2E7032;margin-top:4px;" id="dash-home-equity">—</div>
+        <div style="font-size:9px;color:#5F6368;margin-top:2px;" class="equity-lbl"></div>
+      </div>
     </div>
-    <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:12px 8px;">
-      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Mortgage Remaining</div>
-      <div style="font-size:18px;font-weight:800;color:#A03030;margin-top:4px;" id="dash-home-mort">—</div>
-    </div>
-    <div style="text-align:center;background:#e8f5e9;border-radius:6px;padding:12px 8px;border:1px solid #c8e6c9;">
-      <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Net Equity</div>
-      <div style="font-size:18px;font-weight:800;color:#2E7032;margin-top:4px;" id="dash-home-equity">—</div>
-      <div style="font-size:9px;color:#5F6368;margin-top:2px;">Projected net</div>
-    </div>
+
   </div>
 </div>
 
@@ -669,6 +698,7 @@ function populate(d){
 
   set('load-status', '✓ Plan loaded · '+meta.generated);
   drawCharts(d, p1, p2, p1n, p2n, longestN, longestP, otherP, otherN, meta);
+  loadHomeEquity(d); // Uses sheet debt data for mortgage + localStorage for home value
 }
 
 function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
@@ -825,25 +855,109 @@ function dismissDashWelcome() {
 }
 
 // ── HOME EQUITY PANEL ──────────────────────────────────────────
-// Reads from localStorage saved by the Inputs Home Appreciation Calculator
-// No sheet connection needed — purely local calculation
-function loadHomeEquity() {
+// Home value + appreciation rate: from localStorage (Inputs Home Appreciation Calculator)
+// Mortgage balance, monthly payment, end date: from sheet debt data (already loaded)
+// Calculates projected remaining mortgage using proper amortization
+function loadHomeEquity(sheetData) {
   try {
+    // Get home value and appreciation rate from localStorage calc
     var raw = localStorage.getItem('rbp_calc_data');
-    if (!raw) return;
-    var d = JSON.parse(raw);
-    var homeVal  = parseFloat(String(d.home_value||'0').replace(/[$,]/g,''))    || 0;
-    var rate     = parseFloat(d.home_rate||'3.5') / 100;
-    var mortgage = parseFloat(String(d.home_mortgage||'0').replace(/[$,]/g,'')) || 0;
-    var years    = parseFloat(d.home_years||'25') || 25;
+    var homeVal = 0, appRate = 0.035, calcYears = 25;
+    if (raw) {
+      var c = JSON.parse(raw);
+      homeVal   = parseFloat(String(c.home_value||'0').replace(/[$,]/g,'')) || 0;
+      appRate   = parseFloat(c.home_rate||'3.5') / 100;
+      calcYears = parseFloat(c.home_years||'25') || 25;
+    }
     if (!homeVal) return; // Nothing entered — keep panel hidden
+
+    // Get mortgage data from sheet debts (largest balance debt = mortgage)
+    var mortgageBalance = 0, mortgageMonthly = 0, mortgageEnd = null, mortgageName = '';
+    if (sheetData && sheetData.debts && sheetData.debts.length) {
+      sheetData.debts.forEach(function(debt) {
+        if (debt.name && debt.bal > mortgageBalance) {
+          mortgageBalance = debt.bal || 0;
+          mortgageMonthly = debt.mo  || 0;
+          mortgageEnd     = debt.end || null;
+          mortgageName    = debt.name;
+        }
+      });
+    }
+    // Fallback to localStorage if sheet debt data not yet saved
+    if (!mortgageBalance && raw) {
+      var lsMort = parseFloat(String(c.home_mortgage||'0').replace(/[$,]/g,'')) || 0;
+      if (lsMort) {
+        mortgageBalance = lsMort;
+        mortgageName = 'Mortgage (from Inputs calculator)';
+      }
+    }
+    console.log('Home equity debt data:', mortgageName, 'bal:', mortgageBalance, 'mo:', mortgageMonthly, 'end:', mortgageEnd);
+
+    // Calculate projected mortgage remaining using proper amortization
+    // We have: current balance (P), monthly payment (M), end date → months remaining (n)
+    // From these we can back-calculate monthly rate r, then compute future balance
+    var mortRemaining = mortgageBalance;
+    var mortLabel = 'Current balance';
+    var monthsLeft = 0;
+    if (mortgageEnd && mortgageMonthly > 0 && mortgageBalance > 0) {
+      try {
+        var endParts = String(mortgageEnd).split('/');
+        var endDate  = endParts.length === 3
+          ? new Date(parseInt(endParts[2]), parseInt(endParts[0])-1, 1)
+          : new Date(mortgageEnd);
+        var now = new Date();
+        monthsLeft = Math.max(1, Math.round(
+          (endDate.getFullYear() - now.getFullYear()) * 12 +
+          (endDate.getMonth() - now.getMonth())
+        ));
+
+        // Back-calculate monthly interest rate using bisection (robust, no derivative needed)
+        // Solve: M = P*r*(1+r)^n / [(1+r)^n - 1]
+        var P = mortgageBalance, M = mortgageMonthly, n = monthsLeft;
+        function mortPayment(rate) {
+          if (rate < 0.000001) return P / n; // zero-rate approximation
+          var rn = Math.pow(1+rate, n);
+          return P * rate * rn / (rn - 1);
+        }
+        // Bisection between 0.1% and 2% monthly (1.2% to 24% annual)
+        var rLo = 0.0001, rHi = 0.02, r = 0.005;
+        for (var i=0; i<60; i++) {
+          r = (rLo + rHi) / 2;
+          var pay = mortPayment(r);
+          if (Math.abs(pay - M) < 0.01) break;
+          if (pay > M) rHi = r; else rLo = r;
+        }
+
+        // Now calculate balance after calcYears years of payments
+        var monthsPaid = Math.round(calcYears * 12);
+        var monthsRemAfter = Math.max(0, monthsLeft - monthsPaid);
+        // Remaining balance = P*(1+r)^k - M*[(1+r)^k - 1]/r  where k=months paid so far extended
+        // Future balance after paying for calcYears more months:
+        if (monthsRemAfter <= 0) {
+          mortRemaining = 0; // paid off by then
+          mortLabel = 'Paid off by then';
+        } else if (r > 0) {
+          var k = monthsPaid;
+          var rk = Math.pow(1+r, k);
+          mortRemaining = Math.max(0, Math.round(P * rk - M * (rk - 1) / r));
+          var yrsLeft = Math.round(monthsRemAfter / 12 * 10) / 10;
+          var annualRate = Math.round(r * 12 * 1000) / 10; // % to 1 decimal
+          mortLabel = 'Est. in '+Math.round(calcYears)+' yrs · '+annualRate+'% rate · '+yrsLeft+' yrs left after';
+        } else {
+          // Zero interest — simple paydown
+          mortRemaining = Math.max(0, P - M * monthsPaid);
+          mortLabel = 'Est. remaining';
+        }
+      } catch(e) { mortLabel = 'Current balance'; }
+    }
+
+    // Projected home value at appreciation rate over calc years
+    var projectedValue = Math.round(homeVal * Math.pow(1 + appRate, calcYears));
+    var projectedEquity = projectedValue - mortRemaining;
+    var currentEquity   = homeVal - mortgageBalance;
 
     var panel = document.getElementById('home-equity-panel');
     if (panel) panel.style.display = 'block';
-
-    var fv      = Math.round(homeVal * Math.pow(1 + rate, years));
-    var mortRem = Math.max(0, Math.round(mortgage - (mortgage * 0.03 * years)));
-    var equity  = fv - mortRem;
 
     function fmtH(n) {
       if (!n && n!==0) return '—';
@@ -851,14 +965,27 @@ function loadHomeEquity() {
       if (Math.abs(n)>=1000)    return '$'+Math.round(n/1000)+'K';
       return '$'+Math.round(n).toLocaleString();
     }
-    document.getElementById('dash-home-value').textContent   = fmtH(homeVal);
-    document.getElementById('dash-home-fv').textContent      = fmtH(fv);
-    document.getElementById('dash-home-mort').textContent    = fmtH(mortRem);
-    document.getElementById('dash-home-equity').textContent  = fmtH(equity);
-    document.getElementById('dash-home-years-lbl').textContent = 'In '+Math.round(years)+' yrs @ '+(rate*100).toFixed(1)+'%/yr';
+    // TODAY values
+    document.getElementById('dash-home-value').textContent      = fmtH(homeVal);
+    document.getElementById('dash-home-mort-now').textContent   = fmtH(mortgageBalance);
+    document.getElementById('dash-home-equity-now').textContent = fmtH(homeVal - mortgageBalance);
+
+    // AT PAYOFF values
+    document.getElementById('dash-home-fv').textContent         = fmtH(projectedValue);
+    document.getElementById('dash-home-mort').textContent       = fmtH(mortRemaining);
+    document.getElementById('dash-home-equity').textContent     = fmtH(projectedEquity);
+
+    // Labels
+    var payoffYrs = mortgageEnd ? Math.round(monthsLeft/12) : Math.round(calcYears);
+    document.getElementById('dash-home-proj-lbl').textContent   = 'AT PAYOFF (~'+payoffYrs+' YRS)';
+    document.getElementById('dash-home-years-lbl').textContent  = (appRate*100).toFixed(1)+'%/yr appreciation';
+    document.getElementById('dash-home-name').textContent       = mortgageName ? mortgageName : '';
+    var mortLblEls = document.querySelectorAll('#home-equity-panel .mort-lbl');
+    mortLblEls.forEach(function(el){ el.textContent = mortRemaining === 0 ? 'Paid off!' : mortLabel; });
+    var equityLblEls = document.querySelectorAll('#home-equity-panel .equity-lbl');
+    equityLblEls.forEach(function(el){ el.textContent = 'Projected net'; });
   } catch(e) { console.log('Home equity load error:', e); }
 }
-loadHomeEquity();
 </script>
 
 <div class="welcome-modal-overlay" id="dash-welcome-modal">
