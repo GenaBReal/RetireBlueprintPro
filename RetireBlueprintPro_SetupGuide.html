@@ -57,7 +57,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
 .faq-q{padding:14px 16px;font-size:13px;font-weight:700;color:#0B2239;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#f8f9fa;}
 .faq-q:hover{background:#f0f2f4;}
 .faq-a{padding:0 16px;font-size:13px;color:#455A64;line-height:1.7;max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;}
-.faq-a.open{max-height:200px;padding:14px 16px;}
+.faq-a.open{max-height:800px;padding:14px 16px;}
 
 /* EMAIL */
 .email-box{background:#f8f9fa;border:1px solid #e8eaed;border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin:10px 0;}
@@ -325,10 +325,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
         <div class="step-content">
           <div class="step-title">My expenses or debts saved but aren't showing up correctly</div>
           <div class="step-desc">
-            Open your Google Sheet directly and look at the <strong>Inputs</strong> tab:<br><br>
-            • <strong>Expenses</strong> are in rows 58–85. Your monthly amounts should be in column B.<br>
-            • <strong>Debts</strong> are in rows 92–101. Monthly payment goes in column D, annual (monthly×12) in column E.<br><br>
-            If the data is in the wrong columns or rows, that means an older version of the save code wrote to the wrong place. You can fix it manually in the sheet — just move the values to the right cells. After fixing, save again from the Inputs page to confirm it's now going to the right place.
+            First, try saving again from the Inputs page — re-enter the expense or debt and click Save All Changes again. If data still isn't appearing correctly on your Dashboard after pressing Cmd+Shift+R, contact us at <strong>retireblueprintpro@gmail.com</strong> and we'll check your sheet directly. Include your name and a description of what's missing.
           </div>
         </div>
       </div>
@@ -357,8 +354,8 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             This usually means the connection to your Google Sheet timed out. Try these in order:<br><br>
             <strong>1.</strong> Press <strong>Cmd+Shift+R</strong> to force-reload<br>
             <strong>2.</strong> Make sure your Google Sheet is shared with <code>retireblueprintpro@gmail.com</code> as Editor<br>
-            <strong>3.</strong> Open your Google Sheet directly and check that the <strong>Inputs</strong> sheet tab exists (it should be one of the tabs at the bottom)<br>
-            <strong>4.</strong> Go to Setup and reconnect with your sheet URL
+            <strong>3.</strong> Go to Setup and reconnect by pasting your Google Sheet URL again<br>
+            <strong>4.</strong> If none of the above works, email us at <strong>retireblueprintpro@gmail.com</strong> — include your sheet URL and we'll get you sorted
           </div>
         </div>
       </div>
@@ -455,7 +452,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             Can I share my plan with my financial advisor? <span>▾</span>
           </div>
-          <div class="faq-a">Absolutely. The simplest way is to share your Google Sheet directly — open your sheet, click Share, and add your advisor's email. They'll be able to see all the projections and formula logic. You can also share this web dashboard URL and have them walk through it with you — all they need is the link and your sheet to be connected. No login required.</div>
+          <div class="faq-a">Absolutely. The easiest way is to share this web dashboard with them — just send them the link and walk through it together. They'll see everything on the Dashboard and Tax Engine pages. If they want deeper access to the underlying numbers, you can share your Google Sheet directly (open your sheet → Share → add their email) — they'll see the Master sheet with all the projections. No login required for the web pages.</div>
         </div>
 
         <div class="faq-item">
