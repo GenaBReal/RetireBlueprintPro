@@ -446,7 +446,7 @@ function fmtP(n){
 function mkChart(id,type,labels,datasets,stacked,legend){
   if(_charts[id]) _charts[id].destroy();
   var ctx=$s(id); if(!ctx) return;
-  var sy={ticks:{font:{size:8},color:'#5F6368',callback:function(v){return '$'+v+'K';}},grid:{color:'#f3f4f6'}};
+  var sy={ticks:{font:{size:8},color:'#5F6368',callback:function(v){if(v>=1000000)return'$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return'$'+Math.round(v/1000)+'K';return'$'+v;}},grid:{color:'#f3f4f6'}};
   if(stacked) sy.stacked=true;
   var sx={ticks:{font:{size:8},color:'#5F6368'},grid:{display:false}};
   if(stacked) sx.stacked=true;
@@ -539,7 +539,7 @@ function populate(d){
   set('kpi-runway-delta', otherN+' covered to age '+otherP.deathAge+' ('+otherP.projectedDeathYear+')');
   var rd=$s('runway-dots'); if(rd){var rh='';for(var i=0;i<Math.min(10,longestYrs);i++) rh+='<span style="width:8px;height:8px;border-radius:50%;background:#041E2F;display:inline-block;"></span>';rd.innerHTML=rh;}
 
-  var yr1inc = (proj.income&&proj.income.length&&proj.income[0]) ? proj.income[0]*1000 : 0;
+  var yr1inc = (proj.income&&proj.income.length&&proj.income[0]) ? proj.income[0] : 0; // already full dollars from GS
   set('kpi-income', fmt(yr1inc));
   set('kpi-income-note', 'Transition year · verify with your Inputs');
   set('kpi-income-badge', p1n+' SS starts '+p1.ssStartDate);
@@ -596,11 +596,11 @@ function populate(d){
   set('eng-cola2', cola.toFixed(1)+'%');
   set('eng-cola-disp', cola.toFixed(1)+'%/yr');
 
-  var yr1pre = (proj.preTax&&proj.preTax.length&&proj.preTax[0])?proj.preTax[0]*1000:0;
-  var yr1rth = (proj.roth&&proj.roth.length&&proj.roth[0])?proj.roth[0]*1000:0;
-  var yr1tax = (proj.taxable&&proj.taxable.length&&proj.taxable[0])?proj.taxable[0]*1000:0;
-  var yr1hsa = (proj.hsa&&proj.hsa.length&&proj.hsa[0])?proj.hsa[0]*1000:0;
-  var yr1end = (proj.endLiquid&&proj.endLiquid[0])?proj.endLiquid[0]*1000:0;
+  var yr1pre = (proj.preTax&&proj.preTax.length&&proj.preTax[0])?proj.preTax[0]:0;
+  var yr1rth = (proj.roth&&proj.roth.length&&proj.roth[0])?proj.roth[0]:0;
+  var yr1tax = (proj.taxable&&proj.taxable.length&&proj.taxable[0])?proj.taxable[0]:0;
+  var yr1hsa = (proj.hsa&&proj.hsa.length&&proj.hsa[0])?proj.hsa[0]:0;
+  var yr1end = (proj.endLiquid&&proj.endLiquid[0])?proj.endLiquid[0]:0;
   set('eng-port-hdr', (port.accounts||[]).length+' accounts · starting values');
   set('eng-port-total', fmt(port.total));
   set('eng-pretax', fmt(yr1pre));
@@ -657,7 +657,7 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   var roth    = kidx.map(function(i){return proj.roth[i]||0;});
   var taxable = kidx.map(function(i){return proj.taxable[i]||0;});
   var hsa     = kidx.map(function(i){return proj.hsa[i]||0;});
-  var floor   = yrs.map(function(){return Math.round((leg.safetyFloor||leg.goal||0)/1000);});
+  var floor   = yrs.map(function(){return Math.round(leg.safetyFloor||leg.goal||0);});
 
   mkChart('c1','line',yrs,[
     {label:'Portfolio',data:endLiq,borderColor:navy,backgroundColor:'rgba(4,30,47,0.07)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
