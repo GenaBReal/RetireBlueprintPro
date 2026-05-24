@@ -1616,7 +1616,7 @@ function calcDebtAnnual(i) {
 
 function collectDebts() {
   var debts = [];
-  for (var i=0; i<10; i++) { // 10 debt rows: sheet rows 88,89,92-101
+  for (var i=0; i<10; i++) { // 10 debt rows: sheet rows 92-101
     debts.push({
       inc:    (document.getElementById('d-inc-'+i)||{}).textContent||'No',
       name:   gv('d-name-'+i),
@@ -2264,28 +2264,7 @@ function saveAll() {
     });
   }
 
-  function collectDebts() {
-    var debts = [];
-    for (var i=0; i<10; i++) {
-      var incEl = document.getElementById('d-inc-'+i);
-      var moEl  = document.getElementById('d-mo-'+i);
-      var balEl = document.getElementById('d-bal-'+i);
-      var nmEl  = document.getElementById('d-name-'+i);
-      var stEl  = document.getElementById('d-start-'+i);
-      var enEl  = document.getElementById('d-end-'+i);
-      var mo  = moEl  ? parseInt(String(moEl.value).replace(/[^0-9]/g,''))||0 : 0;
-      var bal = balEl ? parseInt(String(balEl.value).replace(/[^0-9]/g,''))||0 : 0;
-      debts.push({
-        inc:  incEl ? incEl.textContent.trim() : 'No',
-        name: nmEl  ? nmEl.value.trim() : '',
-        mo: mo, ann: mo*12,
-        start: stEl ? stEl.value : '',
-        end:   enEl ? enEl.value : '',
-        bal: bal
-      });
-    }
-    return debts;
-  }
+  // collectDebts() is defined globally above — no duplicate needed here
 
   function collectRothPlan() {
     var plan = [];
@@ -2348,18 +2327,35 @@ function saveAll() {
 
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  fetch(SCRIPT + '?action=save&enc=b64&sheetId=' + sheetId + '&data=' + encodeURIComponent(b64), {mode:'no-cors'})
-    .then(function() {
-      setTimeout(function() {
-        setStatus('Saved!', 'success');
-        document.getElementById('save-btn').disabled = false;
-        isDirty = false;
-      }, 2000);
-    })
-    .catch(function(err) {
-      setStatus('Save failed: ' + err, 'error');
-      document.getElementById('save-btn').disabled = false;
-    });
+  // Use JSONP for save so Apps Script errors are visible in status bar
+  var cbName = 'rbpSaveCb_' + Date.now();
+  var saveTimeout = setTimeout(function() {
+    setStatus('⚠️ Save timed out — check your sheet or try again.', 'error');
+    document.getElementById('save-btn').disabled = false;
+    if (window[cbName]) delete window[cbName];
+  }, 20000);
+  window[cbName] = function(resp) {
+    clearTimeout(saveTimeout);
+    delete window[cbName];
+    if (resp && resp.status === 'ok') {
+      setStatus('✅ Saved successfully!', 'success');
+      isDirty = false;
+    } else {
+      setStatus('❌ Save error: ' + (resp && resp.error ? resp.error : 'Unknown error'), 'error');
+    }
+    document.getElementById('save-btn').disabled = false;
+  };
+  var s = document.createElement('script');
+  s.src = SCRIPT + '?action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) +
+          '&data=' + encodeURIComponent(b64) + '&callback=' + cbName;
+  s.onerror = function() {
+    clearTimeout(saveTimeout);
+    delete window[cbName];
+    setStatus('❌ Save failed — network error. Check connection.', 'error');
+    document.getElementById('save-btn').disabled = false;
+  };
+  document.body.appendChild(s);
+  setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 25000);
 }
 
 

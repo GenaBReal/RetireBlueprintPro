@@ -156,8 +156,8 @@ function readAll(ss, inp) {
     };
   });
 
-  // Debts rows 88-89 + 92-101 (A=1,B=2,C=3,D=4,E=5,F=6,H=8)
-  var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
+  // Debts rows 92-101 (rows 88-91 are expenses/header area — debt table starts at 92)
+  var debtRows = [92,93,94,95,96,97,98,99,100,101];
   var debts = debtRows.map(function(row) {
     // Smart read: detect old format (C=monthly,D=annual) vs new format (C=pp,D=monthly,E=annual)
     var colC = num(row,3), colD = num(row,4), colE = num(row,5);
@@ -407,9 +407,14 @@ function writeInputs(ss, inp, data) {
     }
 
     // ── DEBTS ─────────────────────────────────────────────────
-    // A=include, B=name, C=monthly, D=annual(C*12), E=start, F=end, H=balance
+    // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance
+    // Clear rows 88-89 in case old code wrote debt data there by mistake
+    ['A88','B88','C88','D88','E88','F88','G88','H88','I88','J88','K88',
+     'A89','B89','C89','D89','E89','F89','G89','H89','I89','J89','K89'].forEach(function(cell){
+      try { inp.getRange(cell).clearContent(); } catch(e){}
+    });
     if (data.debts && data.debts.length) {
-      var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
+      var debtRows = [92,93,94,95,96,97,98,99,100,101];
       data.debts.forEach(function(d, i) {
         if (i >= debtRows.length) return;
         var r = debtRows[i];
