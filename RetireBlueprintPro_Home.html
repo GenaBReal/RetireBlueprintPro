@@ -400,11 +400,11 @@ function loadData(){
       var legVar  = leg.variance||0;
       function fmtK(n){ return n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+Math.round(n/1000)+'K':'$'+Math.round(n); }
       set('kpi-legacy-sub', fmtK(legGoal)+' target · '+(legVar>=0?'+':'')+fmtK(legVar));
-    }catch(e){}
+    }catch(e){ console.error('Home populate error:',e); }
   };
   var s=document.createElement('script');
   var _sid=localStorage.getItem('rbp_sheet_id')||'';
-  s.src=SCRIPT_URL+'?callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
+  s.src=SCRIPT_URL+'?action=read&callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
   s.onerror=function(){delete window[cb];};
   setTimeout(function(){if(window[cb])delete window[cb];},6000);
   document.head.appendChild(s);
