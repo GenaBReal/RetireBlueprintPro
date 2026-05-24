@@ -424,7 +424,7 @@ function writeInputs(ss, inp, data) {
     // ── EXPENSES ──────────────────────────────────────────────
     // A=editable label, B=monthly($), C=yearly(FORMULA-NEVER WRITE), D=notes
     if (data.expenses && data.expenses.length) {
-      var skip = {62:true, 70:true, 82:true, 86:true, 87:true};
+      var skip = {70:true, 82:true, 86:true, 87:true}; // 70 and 82 are section headers; 86,87 are SUM rows
       data.expenses.forEach(function(exp) {
         var r = Number(exp.row);
         if (!r || r<58 || r>85 || skip[r]) return;
