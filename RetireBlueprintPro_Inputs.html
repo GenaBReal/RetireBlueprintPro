@@ -933,6 +933,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     <div style="background:#0A2030;border-left:4px solid #f4b86a;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px;">
       <strong style="color:#f4b86a;">💡 How to use this:</strong>
       <span style="color:#8aaabb;font-size:13px;"> If you or your partner are still working and contributing to retirement accounts, use this calculator to project what those accounts will be worth on your retirement date. Then copy that number into the <strong style="color:#fff;">Starting Balance</strong> field in the Named Accounts section below.</span>
+      <div style="margin-top:8px;color:#8aaabb;font-size:12px;">⚠️ <strong style="color:#ccc;">Assumes contributions continue each year until retirement.</strong> If contributions stop before retirement, reduce the Years Until Retirement accordingly.</div>
     </div>
 
     <!-- CALCULATOR GRID -->
@@ -951,7 +952,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div class="calc-field">
             <label>Annual Contribution ($)</label>
             <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
-            <div class="hint">Your personal contribution per year</div>
+            <div class="hint">Your personal contribution per year · Assumed to continue each year until retirement</div>
           </div>
           <div class="calc-field">
             <label>Employer Match ($)</label>
@@ -2098,7 +2099,7 @@ function populateFromData(d) {
     statusEl.textContent = leg.status || (leg.achievedPct>=100?'ON TRACK':'CHECK PLAN');
     statusEl.className = leg.achievedPct>=100 ? 'badge-go' : 'badge-watch';
   }
-  setTxt('r-savings', fmt(tax.rothConversionSavings));
+  // r-savings is set below from roth.taxSavings (more accurate than tax.rothConversionSavings)
 
   // Header stats
   var hdrStatus = document.getElementById('hdr-status');
@@ -2113,11 +2114,11 @@ function populateFromData(d) {
   if (roth.bracket) sv('f-B141', roth.bracket);
   if (roth.assumedRate) sv('f-B145', Math.round(roth.assumedRate*10000)/100);
 
-  // Roth solver results
-  setTxt('r-taxable',   fmt(roth.taxableIncome));
-  setTxt('r-optimal',   fmt(roth.optimalAmount));
-  setTxt('r-marginal',  fmt(roth.marginalTax));
-  setTxt('r-lifetime',  fmt(roth.taxSavings));
+  // Roth solver results — IDs match the HTML solver-kpi cards
+  setTxt('r-income',    fmt(roth.taxableIncome));   // Est. Taxable Income card
+  setTxt('r-optimal',   fmt(roth.optimalAmount));   // Optimal Conversion card
+  setTxt('r-tax-now',   fmt(roth.marginalTax));     // Marginal Tax on Conversion card
+  setTxt('r-savings',   fmt(roth.taxSavings));      // Lifetime Tax Savings card
 
   // ── ROTH PLAN AMOUNTS ────────────────────────────────
   // Rebuild table first to ensure fields exist, then populate
@@ -2328,11 +2329,9 @@ function saveAll() {
 
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-
-  // POST with no-cors: request reaches Google and executes even though we can't read response.
-  // Apps Script ContentService doesn't support custom CORS headers, so fetch+read is impossible
-  // from GitHub Pages. POST no-cors is the standard pattern for this architecture.
-  // We verify by doing a JSONP read 5 seconds after save to confirm data landed.
+  // POST no-cors: request fully executes on Google's servers even though we can't read response.
+  // GitHub Pages CSP blocks JSONP script injection for saves; POST no-cors is the correct pattern.
+  // We verify success 5s later via a JSONP read.
   fetch(SCRIPT, {
     method: 'POST',
     mode: 'no-cors',
@@ -2340,27 +2339,17 @@ function saveAll() {
     body: 'action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) + '&data=' + encodeURIComponent(b64)
   })
   .then(function() {
-    setStatus('⏳ Saving... verifying in 5s', 'info');
-    // After 5s, do a JSONP read to confirm a known field updated correctly
+    setStatus('⏳ Saving… verifying in 5s', 'info');
     setTimeout(function() {
       var cbName = 'rbpVerify_' + Date.now();
       var done = false;
       var t = setTimeout(function() {
-        if (!done) {
-          done = true;
-          delete window[cbName];
-          // Timed out on verify — save probably worked, can't confirm
+        if (!done) { done=true; delete window[cbName];
           setStatus('✅ Save sent — open your sheet to confirm.', 'success');
-          isDirty = false;
-          document.getElementById('save-btn').disabled = false;
-        }
+          isDirty = false; document.getElementById('save-btn').disabled = false; }
       }, 10000);
       window[cbName] = function(d) {
-        if (done) return;
-        done = true;
-        clearTimeout(t);
-        delete window[cbName];
-        // Check that plan start year matches what we just sent
+        if (done) return; done=true; clearTimeout(t); delete window[cbName];
         var sentYear = payload.global && payload.global.B6 ? String(payload.global.B6) : '';
         var gotYear  = d && d.global && d.global.planStartYear ? String(d.global.planStartYear) : '';
         if (sentYear && gotYear && sentYear === gotYear) {
@@ -2368,8 +2357,7 @@ function saveAll() {
         } else {
           setStatus('✅ Save sent — check your sheet to confirm.', 'success');
         }
-        isDirty = false;
-        document.getElementById('save-btn').disabled = false;
+        isDirty = false; document.getElementById('save-btn').disabled = false;
       };
       var s = document.createElement('script');
       s.src = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName;
