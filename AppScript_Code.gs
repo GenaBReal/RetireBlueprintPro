@@ -52,6 +52,36 @@ function doGet(e) {
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
+function doPost(e) {
+  // Called by HTML fetch POST (no-cors). Can't return readable CORS response,
+  // but the function executes fully and writes to the sheet.
+  try {
+    var params = {};
+    // Parse URL-encoded body
+    if (e.postData && e.postData.contents) {
+      e.postData.contents.split('&').forEach(function(pair) {
+        var kv = pair.split('=');
+        params[decodeURIComponent(kv[0])] = decodeURIComponent((kv[1]||'').replace(/\+/g,' '));
+      });
+    }
+    var sheetId = params.sheetId;
+    if (!sheetId) return ContentService.createTextOutput('{"error":"No sheetId"}').setMimeType(ContentService.MimeType.JSON);
+    var ss  = SpreadsheetApp.openById(sheetId);
+    var inp = ss.getSheetByName('Inputs');
+    if (!inp) return ContentService.createTextOutput('{"error":"No Inputs sheet"}').setMimeType(ContentService.MimeType.JSON);
+    var enc = params.enc;
+    var raw = enc === 'b64'
+      ? Utilities.newBlob(Utilities.base64Decode(params.data)).getDataAsString()
+      : params.data;
+    var data = JSON.parse(raw);
+    var result = writeInputs(ss, inp, data);
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error: err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+
 function readAll(ss, inp) {
   // Read entire sheet in ONE batch call — avoids timeout from individual getValue() calls
   var allData = inp.getDataRange().getValues();

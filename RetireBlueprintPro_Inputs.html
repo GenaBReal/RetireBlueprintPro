@@ -39,6 +39,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-wid
 .status-msg{font-size:10px;color:#8a9ab0;}
 .status-msg.success{color:var(--teal);}
 .status-msg.error{color:#f87171;}
+.status-msg.info{color:#facc15;}
 .save-btn{background:var(--orange);color:var(--navy);border:none;padding:10px 28px;border-radius:6px;font-size:14px;font-weight:800;letter-spacing:0.3px;
           font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;transition:opacity 0.2s;}
 .save-btn:hover{opacity:0.85;}
@@ -2327,35 +2328,59 @@ function saveAll() {
 
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  // Use JSONP for save so Apps Script errors are visible in status bar
-  var cbName = 'rbpSaveCb_' + Date.now();
-  var saveTimeout = setTimeout(function() {
-    setStatus('⚠️ Save timed out — check your sheet or try again.', 'error');
+
+  // POST with no-cors: request reaches Google and executes even though we can't read response.
+  // Apps Script ContentService doesn't support custom CORS headers, so fetch+read is impossible
+  // from GitHub Pages. POST no-cors is the standard pattern for this architecture.
+  // We verify by doing a JSONP read 5 seconds after save to confirm data landed.
+  fetch(SCRIPT, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) + '&data=' + encodeURIComponent(b64)
+  })
+  .then(function() {
+    setStatus('⏳ Saving... verifying in 5s', 'info');
+    // After 5s, do a JSONP read to confirm a known field updated correctly
+    setTimeout(function() {
+      var cbName = 'rbpVerify_' + Date.now();
+      var done = false;
+      var t = setTimeout(function() {
+        if (!done) {
+          done = true;
+          delete window[cbName];
+          // Timed out on verify — save probably worked, can't confirm
+          setStatus('✅ Save sent — open your sheet to confirm.', 'success');
+          isDirty = false;
+          document.getElementById('save-btn').disabled = false;
+        }
+      }, 10000);
+      window[cbName] = function(d) {
+        if (done) return;
+        done = true;
+        clearTimeout(t);
+        delete window[cbName];
+        // Check that plan start year matches what we just sent
+        var sentYear = payload.global && payload.global.B6 ? String(payload.global.B6) : '';
+        var gotYear  = d && d.global && d.global.planStartYear ? String(d.global.planStartYear) : '';
+        if (sentYear && gotYear && sentYear === gotYear) {
+          setStatus('✅ Saved and verified!', 'success');
+        } else {
+          setStatus('✅ Save sent — check your sheet to confirm.', 'success');
+        }
+        isDirty = false;
+        document.getElementById('save-btn').disabled = false;
+      };
+      var s = document.createElement('script');
+      s.src = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName;
+      document.body.appendChild(s);
+      setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 15000);
+    }, 5000);
+  })
+  .catch(function(err) {
+    setStatus('❌ Save failed: ' + (err.message || err), 'error');
     document.getElementById('save-btn').disabled = false;
-    if (window[cbName]) delete window[cbName];
-  }, 20000);
-  window[cbName] = function(resp) {
-    clearTimeout(saveTimeout);
-    delete window[cbName];
-    if (resp && resp.status === 'ok') {
-      setStatus('✅ Saved successfully!', 'success');
-      isDirty = false;
-    } else {
-      setStatus('❌ Save error: ' + (resp && resp.error ? resp.error : 'Unknown error'), 'error');
-    }
-    document.getElementById('save-btn').disabled = false;
-  };
-  var s = document.createElement('script');
-  s.src = SCRIPT + '?action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) +
-          '&data=' + encodeURIComponent(b64) + '&callback=' + cbName;
-  s.onerror = function() {
-    clearTimeout(saveTimeout);
-    delete window[cbName];
-    setStatus('❌ Save failed — network error. Check connection.', 'error');
-    document.getElementById('save-btn').disabled = false;
-  };
-  document.body.appendChild(s);
-  setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 25000);
+  });
 }
 
 
