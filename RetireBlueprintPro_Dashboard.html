@@ -273,60 +273,65 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 </div>
 
 <!-- ENGINES -->
-<!-- HOME EQUITY PANEL — reads from localStorage (set in Inputs calculator) -->
-<div id="home-equity-panel" style="display:none;background:#fff;border-radius:8px;border:1px solid #e0e4e8;padding:16px 20px;margin-bottom:16px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+<!-- HOME EQUITY ENGINE CARD — same style as engine cards below -->
+<div id="home-equity-panel" style="display:none;background:#fff;border-radius:6px;border:1px solid #e8eaed;overflow:hidden;margin-bottom:8px;">
+
+  <!-- Header — navy like engine cards -->
+  <div style="background:#041E2F;padding:9px 16px;display:flex;align-items:center;justify-content:space-between;">
     <div>
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:1px;">🏠 Home Equity</div>
-      <div style="font-size:9px;color:#5F6368;margin-top:2px;">Not included in portfolio total · <span id="dash-home-name"></span></div>
+      <div style="font-size:9px;font-weight:700;color:#f4b86a;letter-spacing:1px;text-transform:uppercase;">🏠 Home Equity Engine</div>
+      <div style="font-size:8px;color:#1CC7D0;margin-top:2px;">Not included in portfolio total · <span id="dash-home-name"></span></div>
     </div>
-    <a href="RetireBlueprintPro_Inputs.html" style="font-size:9px;color:#1CC7D0;text-decoration:none;font-weight:700;">Update in Inputs →</a>
+    <a href="RetireBlueprintPro_Inputs.html" style="font-size:8px;color:#1CC7D0;text-decoration:none;font-weight:700;letter-spacing:0.5px;">UPDATE IN INPUTS →</a>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 4px 1fr;gap:0;align-items:stretch;">
 
-    <!-- TODAY -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-      <div style="text-align:center;padding:4px 0 8px;">
-        <div style="font-size:8px;font-weight:700;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">TODAY</div>
-      </div>
-      <div></div><div></div>
-      <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:10px 6px;">
-        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Home Value</div>
-        <div style="font-size:17px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-value">—</div>
-      </div>
-      <div style="text-align:center;background:#fce8e8;border-radius:6px;padding:10px 6px;">
-        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Mortgage Owed</div>
-        <div style="font-size:17px;font-weight:800;color:#A03030;margin-top:4px;" id="dash-home-mort-now">—</div>
-      </div>
-      <div style="text-align:center;background:#e8f5e9;border-radius:6px;padding:10px 6px;border:1px solid #c8e6c9;">
-        <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Net Equity</div>
-        <div style="font-size:17px;font-weight:800;color:#2E7032;margin-top:4px;" id="dash-home-equity-now">—</div>
+  <!-- Two-column body: TODAY | AT PAYOFF -->
+  <div style="display:grid;grid-template-columns:1fr 1px 1fr;">
+
+    <!-- TODAY column -->
+    <div style="padding:14px 16px;">
+      <div style="font-size:8px;font-weight:700;color:#5F6368;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f0f2f4;">Today</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
+        <div>
+          <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px;">Home Value</div>
+          <div style="font-size:26px;font-weight:800;color:#041E2F;letter-spacing:-0.5px;" id="dash-home-value">—</div>
+          <div style="font-size:8px;color:#5F6368;margin-top:3px;">Current market</div>
+        </div>
+        <div>
+          <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px;">Mortgage Owed</div>
+          <div style="font-size:26px;font-weight:800;color:#A03030;letter-spacing:-0.5px;" id="dash-home-mort-now">—</div>
+          <div style="font-size:8px;color:#5F6368;margin-top:3px;">Current balance</div>
+        </div>
+        <div style="background:#F8F9FA;border-radius:6px;padding:10px 8px;border-left:3px solid #2E7032;">
+          <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;margin-bottom:6px;">Net Equity</div>
+          <div style="font-size:26px;font-weight:800;color:#2E7032;letter-spacing:-0.5px;" id="dash-home-equity-now">—</div>
+          <div style="font-size:8px;color:#5F6368;margin-top:3px;">Value minus mortgage</div>
+        </div>
       </div>
     </div>
 
-    <!-- DIVIDER -->
-    <div style="background:#e0e4e8;margin:24px 12px 0;border-radius:2px;"></div>
+    <!-- Vertical divider -->
+    <div style="background:#e8eaed;"></div>
 
-    <!-- AT PAYOFF -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-      <div style="text-align:center;padding:4px 0 8px;">
-        <div style="font-size:8px;font-weight:700;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;" id="dash-home-proj-lbl">AT PAYOFF</div>
-      </div>
-      <div></div><div></div>
-      <div style="text-align:center;background:#f0fdfd;border-radius:6px;padding:10px 6px;border:1px solid #b2ebf2;">
-        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Home Value</div>
-        <div style="font-size:17px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-fv">—</div>
-        <div style="font-size:9px;color:#5F6368;margin-top:2px;" id="dash-home-years-lbl"></div>
-      </div>
-      <div style="text-align:center;background:#f0fdfd;border-radius:6px;padding:10px 6px;border:1px solid #b2ebf2;">
-        <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Mortgage Left</div>
-        <div style="font-size:17px;font-weight:800;color:#A03030;margin-top:4px;" id="dash-home-mort">—</div>
-        <div style="font-size:9px;color:#5F6368;margin-top:2px;" class="mort-lbl"></div>
-      </div>
-      <div style="text-align:center;background:#e8f5e9;border-radius:6px;padding:10px 6px;border:1px solid #c8e6c9;">
-        <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Net Equity</div>
-        <div style="font-size:17px;font-weight:800;color:#2E7032;margin-top:4px;" id="dash-home-equity">—</div>
-        <div style="font-size:9px;color:#5F6368;margin-top:2px;" class="equity-lbl"></div>
+    <!-- AT PAYOFF column -->
+    <div style="padding:14px 16px;">
+      <div style="font-size:8px;font-weight:700;color:#1CC7D0;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f0f2f4;" id="dash-home-proj-lbl">At Payoff</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
+        <div>
+          <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px;">Home Value</div>
+          <div style="font-size:26px;font-weight:800;color:#041E2F;letter-spacing:-0.5px;" id="dash-home-fv">—</div>
+          <div style="font-size:8px;color:#5F6368;margin-top:3px;" id="dash-home-years-lbl">—</div>
+        </div>
+        <div>
+          <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px;">Mortgage Left</div>
+          <div style="font-size:26px;font-weight:800;color:#A03030;letter-spacing:-0.5px;" id="dash-home-mort">—</div>
+          <div style="font-size:8px;color:#5F6368;margin-top:3px;" class="mort-lbl">—</div>
+        </div>
+        <div style="background:#F8F9FA;border-radius:6px;padding:10px 8px;border-left:3px solid #2E7032;">
+          <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;margin-bottom:6px;">Net Equity</div>
+          <div style="font-size:26px;font-weight:800;color:#2E7032;letter-spacing:-0.5px;" id="dash-home-equity">—</div>
+          <div style="font-size:8px;color:#5F6368;margin-top:3px;" class="equity-lbl">Projected</div>
+        </div>
       </div>
     </div>
 
