@@ -283,53 +283,188 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
     </div>
   </div>
 
-  <!-- SECTION 5: FAQ -->
+  <!-- SECTION 5: TROUBLESHOOTING -->
   <div class="section-card">
     <div class="section-hdr">
       <div class="section-num">5</div>
       <div>
+        <div class="section-title">Troubleshooting</div>
+        <div class="section-sub">Fix common problems in under 2 minutes</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="step">
+        <div class="step-icon">❌</div>
+        <div class="step-content">
+          <div class="step-title">Save failed — network error</div>
+          <div class="step-desc">
+            This is the most common issue. Work through these steps in order:<br><br>
+            <strong>1. Check your internet connection</strong> — make sure you're online.<br><br>
+            <strong>2. Check that your sheet is still shared</strong> — open your Google Sheet, click <strong>Share</strong> (top right), and confirm <code>retireblueprintpro@gmail.com</code> is listed as <strong>Editor</strong>. If it's missing, re-add it.<br><br>
+            <strong>3. Try again</strong> — click Save All Changes again. If it still fails, press <strong>Cmd+Shift+R</strong> (Mac) or <strong>Ctrl+Shift+R</strong> (PC) to force-reload the page, then try saving again.<br><br>
+            <strong>4. Check your sheet URL</strong> — go to Setup and re-paste your Google Sheet URL. Sometimes the connection ID gets corrupted if you cleared browser data.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">⏳</div>
+        <div class="step-content">
+          <div class="step-title">I saved successfully but the Dashboard still shows old numbers</div>
+          <div class="step-desc">
+            This is normal — the Dashboard reads your sheet fresh each time you open it, but it doesn't auto-refresh while you're on it.<br><br>
+            <strong>The fix:</strong> Press <strong>Cmd+Shift+R</strong> (Mac) or <strong>Ctrl+Shift+R</strong> (PC) while on the Dashboard. This forces a hard reload and pulls the latest data from your sheet. Regular Cmd+R may serve a cached version — always use Cmd+Shift+R after saving.
+          </div>
+          <div class="tip"><strong>Workflow tip:</strong> Save in Inputs → Switch to Dashboard tab → Cmd+Shift+R → numbers update instantly.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📊</div>
+        <div class="step-content">
+          <div class="step-title">My expenses or debts saved but aren't showing up correctly</div>
+          <div class="step-desc">
+            Open your Google Sheet directly and look at the <strong>Inputs</strong> tab:<br><br>
+            • <strong>Expenses</strong> are in rows 58–85. Your monthly amounts should be in column B.<br>
+            • <strong>Debts</strong> are in rows 92–101. Monthly payment goes in column D, annual (monthly×12) in column E.<br><br>
+            If the data is in the wrong columns or rows, that means an older version of the save code wrote to the wrong place. You can fix it manually in the sheet — just move the values to the right cells. After fixing, save again from the Inputs page to confirm it's now going to the right place.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">💻</div>
+        <div class="step-content">
+          <div class="step-title">I'm using a new device or browser and my data is gone</div>
+          <div class="step-desc">
+            Your data is safe — it's in your Google Sheet. You just need to reconnect on this device.<br><br>
+            <strong>Steps:</strong><br>
+            1. Go to the <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html" style="color:var(--teal)">Setup page</a><br>
+            2. <strong>Skip Steps 1 and 2</strong> (you already made your copy and shared it)<br>
+            3. Open your Google Sheet in another tab, copy the URL from the address bar<br>
+            4. Paste it in Step 3 on the Setup page and click Connect<br>
+            5. Done — your data will load on all pages
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">🔄</div>
+        <div class="step-content">
+          <div class="step-title">Page says "Loading..." and never finishes</div>
+          <div class="step-desc">
+            This usually means the connection to your Google Sheet timed out. Try these in order:<br><br>
+            <strong>1.</strong> Press <strong>Cmd+Shift+R</strong> to force-reload<br>
+            <strong>2.</strong> Make sure your Google Sheet is shared with <code>retireblueprintpro@gmail.com</code> as Editor<br>
+            <strong>3.</strong> Open your Google Sheet directly and check that the <strong>Inputs</strong> sheet tab exists (it should be one of the tabs at the bottom)<br>
+            <strong>4.</strong> Go to Setup and reconnect with your sheet URL
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 6: FAQ -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <div class="section-num">6</div>
+      <div>
         <div class="section-title">Frequently Asked Questions</div>
-        <div class="section-sub">Common questions answered</div>
+        <div class="section-sub">Everything you were wondering but didn't know to ask</div>
       </div>
     </div>
     <div class="section-body">
       <div class="faq">
+
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             I closed my browser — do I need to reconnect? <span>▾</span>
           </div>
-          <div class="faq-a">No! Your sheet connection is saved permanently in your browser (localStorage). Just open the Inputs page and your data will load automatically. The only time you need to reconnect is if you clear your browser data or use a different browser/device.</div>
+          <div class="faq-a">No! Your sheet connection is saved in your browser. Just open the Inputs page and your data loads automatically. You only need to reconnect if you clear your browser history/data, or switch to a different browser or device.</div>
         </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
-            Why does "Save" sometimes take a few seconds? <span>▾</span>
-          </div>
-          <div class="faq-a">Your data is being sent to Google's servers and written to your Google Sheet. Google Sheets can take 2–5 seconds to process, especially if you've entered a lot of data at once. You'll see a green success message when it's done — wait for it before refreshing.</div>
-        </div>
+
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             Can I use this on multiple devices? <span>▾</span>
           </div>
-          <div class="faq-a">Yes, but you'll need to reconnect on each device. Go to the Setup page on your other device, skip steps 1 and 2, and just paste your sheet URL in Step 3. Your sheet ID will be saved on that device too.</div>
+          <div class="faq-a">Yes — your data lives in your Google Sheet so it's always current no matter which device you use. You just need to reconnect on each new device. Go to Setup, skip Steps 1 and 2, and paste your sheet URL in Step 3. Takes 30 seconds.</div>
         </div>
+
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
-            Is my financial data safe? <span>▾</span>
+            Is my financial data safe and private? <span>▾</span>
           </div>
-          <div class="faq-a">Your data lives entirely in your own Google Sheet — secured by your Google account. We only access it through the sharing permission you granted. We never store your data on our own servers. You can revoke our access at any time by removing retireblueprintpro@gmail.com from your sheet's sharing settings.</div>
+          <div class="faq-a">Yes. Your data lives entirely in your own Google Sheet — secured by your Google account and Google's encryption. We can only read your sheet because you shared it with us, and you can revoke that access any time by removing retireblueprintpro@gmail.com from your sheet's Share settings. We never store your financial data on our own servers.</div>
         </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
-            The page says "Timeout" — what do I do? <span>▾</span>
-          </div>
-          <div class="faq-a">This usually means your sheet isn't shared correctly. Open your Google Sheet, click Share (top right), and confirm that retireblueprintpro@gmail.com is listed as an Editor. If it's there, try refreshing the page. If the problem persists, contact us.</div>
-        </div>
+
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             What does "Legacy Goal" mean? <span>▾</span>
           </div>
-          <div class="faq-a">Your Legacy Goal is the minimum amount you want to leave behind when the plan ends (when the last surviving partner passes). The solver optimizes your spending to ensure you hit this goal while maximizing what you spend during retirement. Set it to $0 if you want to spend everything, or to a dollar amount if you want to leave an inheritance.</div>
+          <div class="faq-a">Your Legacy Goal is the minimum dollar amount you want remaining when the plan ends — typically when the last surviving partner passes. The system optimizes your spending so you hit this target while maximizing what you enjoy during retirement. Set it to $0 if you want to spend everything down, or to a dollar amount if you want to leave an inheritance or buffer.</div>
         </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            What is the Pre-Retirement Growth Calculator? <span>▾</span>
+          </div>
+          <div class="faq-a">It's a calculator in the Inputs page that projects what your retirement accounts will be worth on your actual retirement date — factoring in your current balance, annual contributions, employer match, expected return rate, and years until retirement. Use it to get an accurate "Starting Balance" for each account. The result you get is what to enter as your account's Starting Balance — not today's balance.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            What is a Roth conversion window and why does it matter? <span>▾</span>
+          </div>
+          <div class="faq-a">A Roth conversion window is the period between when you retire (income drops) and when Required Minimum Distributions (RMDs) begin at age 73 — typically a 5–15 year window of lower taxes. During this time, you can convert money from a traditional 401k/IRA into a Roth IRA, paying tax now at a lower rate (maybe 12%) instead of a higher rate later when RMDs force large taxable withdrawals. The Tax Engine page shows you the optimal conversion amount and estimated lifetime tax savings.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            What are stress tests and how do I use them? <span>▾</span>
+          </div>
+          <div class="faq-a">Stress tests simulate a stock market crash during your retirement to see if your plan survives. Two scenarios are available:<br><br>
+          <strong>Early Bear Market</strong> — a crash right when you retire (worst case scenario, 2008-style). Tests whether your plan can recover.<br>
+          <strong>Late Bear Market</strong> — a crash later in retirement when you have less time to recover.<br><br>
+          To activate: In Global Settings on the Inputs page, change "Early Bear Market?" from Normal Returns to Bear Market, set the start year and duration, then save. Your Dashboard will update with the stress-tested projections. Switch back to Normal Returns when you want to see your base plan again. A plan that survives an Early Bear test is very resilient.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            The Effective Federal Rate shows a dash (—) — is that normal? <span>▾</span>
+          </div>
+          <div class="faq-a">Yes, if you see a dash on first load it just means the data hasn't finished loading from your Google Sheet. Wait a moment and press Cmd+Shift+R to refresh. The Effective Federal Rate is calculated directly from your Master sheet's tax projections — it's the percentage of your taxable income that goes to federal taxes in year one of your plan.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            Why are some numbers on the Dashboard read-only? <span>▾</span>
+          </div>
+          <div class="faq-a">The Dashboard reads directly from your Google Sheet's Master projection, which calculates everything automatically. Numbers like your Safe Spending Capacity, Portfolio Sustainability, and Tax Efficiency are outputs — your sheet calculates them based on the inputs you entered. You change them by updating your Inputs and saving, not by editing the Dashboard directly.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            How do I update my plan after I actually retire? <span>▾</span>
+          </div>
+          <div class="faq-a">Just update your Inputs page to reflect your new reality: set your salary to $0 (or your actual part-time income), update your account balances to current values, confirm your Social Security start date, and update your monthly expenses if they've changed. Click Save, then Cmd+Shift+R on the Dashboard — your entire plan recalculates instantly. Do this annually using the Annual Check-In page to track how you're doing vs. the projection.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            Can I share my plan with my financial advisor? <span>▾</span>
+          </div>
+          <div class="faq-a">Absolutely. The simplest way is to share your Google Sheet directly — open your sheet, click Share, and add your advisor's email. They'll be able to see all the projections and formula logic. You can also share this web dashboard URL and have them walk through it with you — all they need is the link and your sheet to be connected. No login required.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            Why does "Save" say "Saving... verifying in 5s"? <span>▾</span>
+          </div>
+          <div class="faq-a">Because of how web security works, the save goes out silently and we can't read Google's response directly. So after 5 seconds, the system does a quick check by re-reading your sheet to confirm the data arrived. If it says "Saved and verified!" — you're all set. If it says "Save sent — check your sheet to confirm" — open your Google Sheet and you should see your data there. This is normal and your data saved correctly.</div>
+        </div>
+
       </div>
     </div>
   </div>

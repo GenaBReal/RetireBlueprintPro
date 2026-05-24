@@ -74,6 +74,12 @@ function doPost(e) {
       ? Utilities.newBlob(Utilities.base64Decode(params.data)).getDataAsString()
       : params.data;
     var data = JSON.parse(raw);
+    // Route to correct handler
+    var action2 = params.action || 'save';
+    if (action2 === 'saveCheckIn') {
+      var result2 = writeCheckIn(ss, data);
+      return ContentService.createTextOutput(JSON.stringify(result2)).setMimeType(ContentService.MimeType.JSON);
+    }
     var result = writeInputs(ss, inp, data);
     return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
@@ -333,9 +339,36 @@ function readAll(ss, inp) {
     tax.federalTaxes  = masterYear1FedTax;
   }
 
+  // Read Annual Check-In data from existing 'Annual Check-In' tab
+  // Cols: A=Year, B=Projected, C=Actual, D=Variance, E=Status, F=Notes
+  // Data starts at row 8
+  var checkInData = [];
+  try {
+    var ciSheet = ss.getSheetByName('Annual Check-In');
+    if (ciSheet) {
+      var ciLastRow = ciSheet.getLastRow();
+      if (ciLastRow >= 8) {
+        var ciData = ciSheet.getRange(8, 1, ciLastRow-7, 6).getValues();
+        ciData.forEach(function(ciRow) {
+          if (ciRow[0]) {
+            checkInData.push({
+              year:      Number(ciRow[0]),
+              projected: Number(ciRow[1])||0,   // B = Projected (Master formula)
+              actual:    ciRow[2]!==''?Number(ciRow[2]):null, // C = Actual (we write)
+              variance:  ciRow[3]!==''?Number(ciRow[3]):null, // D = Variance (formula)
+              status:    String(ciRow[4]||''),                // E = Status (formula)
+              notes:     String(ciRow[5]||'')                 // F = Notes (we write)
+            });
+          }
+        });
+      }
+    }
+  } catch(e) { Logger.log('CheckIn read error: '+e); }
+
   return {
     meta:{planYear:new Date().getFullYear()},
     people:{craig:p1, gena:p2},
+    checkIn:checkInData,
     global:gl, tax:tax,
     portfolio:{accounts:accounts, total:portfolioTotal},
     expenses:expenses, debts:debts,
@@ -611,6 +644,10 @@ function writeInputs(ss, inp, data) {
     }
 
     SpreadsheetApp.flush();
+
+    // Hide and protect all sheets except Master after every save
+    try { setupAllSheets(ss); } catch(e) { Logger.log('Sheet setup skipped: '+e); }
+
     return {success:true, timestamp:new Date().toISOString()};
   } catch(err) {
     return {success:false, error:err.toString()};
@@ -636,5 +673,137 @@ function addWelcomeBanner(ss, inp) {
     props.setProperty('welcomeShown', 'true');
   } catch(e) {
     Logger.log('Welcome banner error: ' + e);
+  }
+}
+
+// ── ANNUAL CHECK-IN WRITE ─────────────────────────────────────────────
+// Writes ONLY to the existing "Annual Check-In" sheet tab
+// Col A = Year (formula/static — never write)
+// Col B = Projected balance (Master formula — NEVER WRITE)
+// Col C = Actual End-of-Year Balance ← WE WRITE THIS
+// Col D = Variance (formula — NEVER WRITE)
+// Col E = Review Status (formula — NEVER WRITE)
+// Col F = Notes / Life Events ← WE WRITE THIS
+// Data rows start at row 8
+
+// ── SHEET VISIBILITY + FORMULA PROTECTION SETUP ──────────────────────
+// 1. Hides all tabs except Master (hidden state copies to customer sheets)
+// 2. Adds WARNING-ONLY range protection on formula cells in Inputs
+//    — scripts bypass warnings entirely so Apps Script writes freely
+//    — customers see "Are you sure?" if they unhide and try to edit formulas
+//    — data-entry cells are left completely open (no warning, no block)
+// 3. Annual Check-In: warning on everything except C and F (actuals/notes)
+// Safe to run multiple times — clears old range protections before adding new ones
+function setupAllSheets(ss) {
+  try {
+    var sheets = ss.getSheets();
+    sheets.forEach(function(sheet) {
+      var name = sheet.getName();
+
+      // Master stays visible and untouched
+      if (name === 'Master') return;
+
+      // Hide every other sheet
+      try { sheet.hideSheet(); } catch(e) {}
+
+      // Clear any existing RANGE protections on this sheet
+      var rangeProt = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE);
+      rangeProt.forEach(function(p) { try { p.remove(); } catch(e){} });
+
+      if (name === 'Inputs') {
+        // Protect formula/structural cells with WARNING only
+        // Scripts bypass warnings — customers see a caution dialog
+        // NEVER-WRITE formula cells (from handoff doc):
+        var formulaRanges = [
+          'B33','B36','B42','B43','B45','B48',   // Partner formula cells
+          'B86','B87',                             // Expense SUM rows
+          'B119','B120',                           // Solver cells
+          'B128:B130','B133','B134',               // Legacy cells
+          'B140','B142:B144','B146',               // Roth formula cells
+          'G122:G124',                             // Smile curve formulas
+          'C58:C85',                               // Expense yearly = monthly*12 (formula)
+        ];
+        formulaRanges.forEach(function(r) {
+          try {
+            var p = sheet.getRange(r).protect()
+              .setDescription('Formula — do not edit directly')
+              .setWarningOnly(true); // Warning dialog, not a hard block — scripts bypass
+          } catch(e) {}
+        });
+
+      } else if (name === 'Annual Check-In') {
+        // Protect everything EXCEPT col C (actuals) and col F (notes) with warning
+        // Rows 8+ are data rows
+        var ciWarningRanges = ['A8:B200', 'D8:E200', 'G8:ZZ200'];
+        ciWarningRanges.forEach(function(r) {
+          try {
+            sheet.getRange(r).protect()
+              .setDescription('Calculated — do not edit directly')
+              .setWarningOnly(true);
+          } catch(e) {}
+        });
+
+      } else {
+        // All other hidden sheets — warning on everything
+        try {
+          sheet.getDataRange().protect()
+            .setDescription(name + ' — do not edit directly')
+            .setWarningOnly(true);
+        } catch(e) {}
+      }
+    });
+  } catch(e) {
+    Logger.log('setupAllSheets error: ' + e);
+  }
+}
+
+function setupCheckInSheet(ss) {
+  // Just hides the Annual Check-In tab — no protection needed
+  // setupAllSheets() handles hiding all non-Master tabs anyway
+  try {
+    var ciSheet = ss.getSheetByName('Annual Check-In');
+    if (ciSheet) ciSheet.hideSheet();
+  } catch(e) {
+    Logger.log('setupCheckInSheet error: ' + e);
+  }
+}
+
+function writeCheckIn(ss, data) {
+  try {
+    var checkIns = data.checkIn;
+    if (!checkIns || !checkIns.length) return {status:'ok', message:'No data'};
+
+    var ciSheet = ss.getSheetByName('Annual Check-In');
+    if (!ciSheet) return {status:'error', error:'Annual Check-In sheet tab not found'};
+
+    // Ensure sheet is hidden and protected on every write (idempotent — safe to repeat)
+    try { setupCheckInSheet(ss); } catch(e) { Logger.log('Setup skipped: '+e); }
+
+    var written = 0;
+    checkIns.forEach(function(row) {
+      if (!row.year) return;
+      // Find the row by matching year in col A (rows 8+)
+      var startRow = 8;
+      var lastRow = ciSheet.getLastRow();
+      for (var r = startRow; r <= lastRow; r++) {
+        var yr = ciSheet.getRange(r, 1).getValue();
+        if (Number(yr) === Number(row.year)) {
+          // Write actual to col C only if provided
+          if (row.actual !== null && row.actual !== undefined && row.actual !== '') {
+            ciSheet.getRange(r, 3).setValue(Number(row.actual));
+          } else if (row.actual === null || row.actual === '') {
+            ciSheet.getRange(r, 3).clearContent();
+          }
+          // Write notes to col F
+          ciSheet.getRange(r, 6).setValue(String(row.notes||''));
+          written++;
+          break;
+        }
+      }
+    });
+
+    return {status:'ok', message:'CheckIn saved', written: written};
+  } catch(e) {
+    return {status:'error', error: e.toString()};
   }
 }
