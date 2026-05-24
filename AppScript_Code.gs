@@ -116,6 +116,15 @@ function readAll(ss, inp) {
     salary:num(37,2), salaryStart:dt(38,2), salaryEnd:dt(39,2),
     ssBase:num(40,2), ssFra:num(41,2),
     ssMonthly:num(43,2), ssStartDate:dt(44,2),
+    ssAnnual: num(43,2) * 12,
+    ssYear1: (function() {
+      // Prorate SS for the year it starts: count months from start month to Dec
+      // e.g. July start (month=6) → 12-6 = 6 months
+      var raw = r(44,2);
+      if (!raw) return 0;
+      try { var d=new Date(raw); if(isNaN(d)) return 0;
+        return Math.round(num(43,2) * (12 - d.getMonth())); } catch(e) { return 0; }
+    })(),
     pension:num(46,2), pensionStart:dt(47,2),
     otherIncome:num(49,2), otherStart:dt(50,2), otherEnd:dt(51,2),
     healthPreMedicare:num(52,2), healthMedicare:num(53,2), medicareAge:num(54,2),
@@ -131,6 +140,13 @@ function readAll(ss, inp) {
     salary:num(37,4), salaryStart:dt(38,4), salaryEnd:dt(39,4),
     ssBase:num(40,4), ssFra:num(41,4),
     ssMonthly:num(43,4), ssStartDate:dt(44,4),
+    ssAnnual: num(43,4) * 12,
+    ssYear1: (function() {
+      var raw = r(44,4);
+      if (!raw) return 0;
+      try { var d=new Date(raw); if(isNaN(d)) return 0;
+        return Math.round(num(43,4) * (12 - d.getMonth())); } catch(e) { return 0; }
+    })(),
     pension:num(46,4), pensionStart:dt(47,4),
     otherIncome:num(49,4), otherStart:dt(50,4), otherEnd:dt(51,4),
     healthPreMedicare:num(52,4), healthMedicare:num(53,4), medicareAge:num(54,4),

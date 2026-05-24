@@ -416,7 +416,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 <div style="background:#F8F9FA;border-top:2px solid #e8eaed;padding:10px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;">
   <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 1</div><div style="font-size:10px;color:#37474F;font-weight:600;">Open Your Inputs</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Update any number in the Inputs tab</div></div>
   <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 2</div><div style="font-size:10px;color:#37474F;font-weight:600;">Sheet Recalculates</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Master &amp; projections update automatically</div></div>
-  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 3</div><div style="font-size:10px;color:#37474F;font-weight:600;">Refresh Dashboard</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Press Cmd+R to reload this page</div></div>
+  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 3</div><div style="font-size:10px;color:#37474F;font-weight:600;">Refresh Dashboard</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Press Cmd+Shift+R to hard-reload this page</div></div>
   <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 4</div><div style="font-size:10px;color:#37474F;font-weight:600;">See Your Updated Plan</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">All charts and numbers refresh instantly</div></div>
 </div>
 <div class="disclaimer">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
@@ -481,7 +481,7 @@ function populate(d){
   }
   // ── END EMPTY SHEET GUARD ────────────────────────────────
   var p1n = p1.name||'Partner 1', p2n = p2.name||'Partner 2';
-  var sp = d.spending, leg = d.legacy, tax = d.tax, port = d.portfolio;
+  var sp = d.spending, leg = d.legacy, tax = d.tax, port = d.portfolio, gl = d.global||{};
   var proj = d.projections || {}, meta = d.meta || {};
 
   // Determine longest-lived person
@@ -535,8 +535,8 @@ function populate(d){
   var sb=$s('kpi-spend-bar'); if(sb) sb.style.width=Math.min(100,pct)+'%';
 
   set('kpi-runway', longestYrs+' years');
-  set('kpi-runway-sub', 'Covers '+longestN+' to age '+longestP.projectedDeathAge+' ('+longestP.projectedDeathYear+')');
-  set('kpi-runway-delta', otherN+' covered to age '+otherP.projectedDeathAge+' ('+otherP.projectedDeathYear+')');
+  set('kpi-runway-sub', 'Covers '+longestN+' to age '+longestP.deathAge+' ('+longestP.projectedDeathYear+')');
+  set('kpi-runway-delta', otherN+' covered to age '+otherP.deathAge+' ('+otherP.projectedDeathYear+')');
   var rd=$s('runway-dots'); if(rd){var rh='';for(var i=0;i<Math.min(10,longestYrs);i++) rh+='<span style="width:8px;height:8px;border-radius:50%;background:#041E2F;display:inline-block;"></span>';rd.innerHTML=rh;}
 
   var yr1inc = (proj.income&&proj.income.length&&proj.income[0]) ? proj.income[0]*1000 : 0;
@@ -547,7 +547,7 @@ function populate(d){
 
   set('kpi-tax', fmtP(tax.effectiveRate));
   set('kpi-tax-delta', 'Roth conversion saves '+fmt(tax.rothConversionSavings)+' now vs. later');
-  set('kpi-tax-foot', 'State: '+fmtP(tax.stateRate)+' · Deduction: '+fmt(tax.standardDeduction));
+  set('kpi-tax-foot', 'State: '+fmtP(tax.stateRate)+' · Deduction: '+fmt(gl.standardDeduction));
   var tb=$s('kpi-tax-bar'); if(tb) tb.style.width=Math.min(100,(tax.effectiveRate<1?tax.effectiveRate*100:tax.effectiveRate)*3)+'%';
 
   set('kpi-legacy', fmt(leg.projectedEnding));
@@ -559,7 +559,15 @@ function populate(d){
   // ENGINES
   set('eng-income-hdr', p1n+' & '+p2n+' · Year '+meta.planYear);
   set('lbl-p1-sal', p1n+' Salary');         set('eng-p1-sal', fmt(p1.salary));
-  set('lbl-p1-ss', p1n+' Social Security'); set('eng-p1-ss', fmt(p1.ssAnnual));
+  // Show prorated SS for start year (e.g. July start = 6 months), full annual after
+  var p1ssDisplay = (p1.ssYear1 && p1.ssYear1 > 0 && p1.ssYear1 < p1.ssAnnual)
+    ? p1.ssYear1  // partial year
+    : (p1.ssAnnual || 0);
+  var p2ssDisplay = (p2.ssYear1 && p2.ssYear1 > 0 && p2.ssYear1 < p2.ssAnnual)
+    ? p2.ssYear1
+    : (p2.ssAnnual || 0);
+  set('lbl-p1-ss', p1n+' Social Security'+(p1.ssYear1 && p1.ssYear1 < p1.ssAnnual ? ' (partial yr)' : ''));
+  set('eng-p1-ss', fmt(p1ssDisplay));
   set('lbl-p1-pen', p1n+' Pension');        set('eng-p1-pen', fmt((p1.pension||0)*12||p1.pensionAnnual||0));
   set('lbl-p1-other', p1n+' Other');        set('eng-p1-other', fmt(p1.otherIncome));
   set('lbl-p2-sal', p2n+' Salary');         set('eng-p2-sal', fmt(p2.salary));
@@ -574,7 +582,7 @@ function populate(d){
   set('eng-infl-disp', inf.toFixed(1)+'%/yr');
 
   set('eng-eff-rate', fmtP(tax.effectiveRate));
-  set('eng-std-ded', fmt(tax.standardDeduction));
+  set('eng-std-ded', fmt(gl.standardDeduction));
   set('eng-state-rate', fmtP(tax.stateRate));
   set('eng-roth-save', fmt(tax.rothConversionSavings));
   var cola=tax.ssCola<1?tax.ssCola*100:tax.ssCola;
@@ -610,7 +618,7 @@ function populate(d){
   set('eng-leg-badge', pct>=100?'Goal Met':'In Progress');
 
   // INTELLIGENCE
-  set('intel-lon-lbl', 'Longevity ('+longestN+' to '+longestP.projectedDeathAge+')');
+  set('intel-lon-lbl', 'Longevity ('+longestN+' to '+longestP.deathAge+')');
   set('intel-hc', fmtP(tax.healthcareInflation)+'/yr');
   set('intel-ss', p1n+' start: '+p1.ssStartDate);
   set('intel-legacy', pct>=100?'✅ Met':pct+'%');
@@ -621,9 +629,9 @@ function populate(d){
   set('c1-sub', 'Total end-of-year liquid assets · '+meta.planYear+'–'+longestP.projectedDeathYear);
   set('c1-note', 'Peak: '+fmt(port.peakValue)+' ('+port.peakYear+') · Ends: '+fmt(leg.projectedEnding)+' · Goal '+(pct>=100?'met ✅':pct+'%'));
   set('c3-sub', 'Salary → SS + Pension · '+p2n+' SS starts '+p2.ssStartDate);
-  set('c3-note', p2n+' SS: '+fmt(p2.ssAnnual)+'/yr · '+p1n+' pension: '+fmt((p1.pension||0)*12||p1.pensionAnnual||0)+'/yr');
+  set('c3-note', p2n+' SS: '+fmt(p2.ssAnnual||0)+'/yr · '+p1n+' pension: '+fmt((p1.pension||0)*12)+'/yr');
   set('c4-note', 'Phase 1: '+fmt((sp.baseAnnual||0)+(sp.phase1Extra||0))+'/yr · Phase 2: '+fmt((sp.baseAnnual||0)+(sp.phase2Extra||0))+'/yr · Phase 3: '+fmt((sp.baseAnnual||0)+(sp.phase3Extra||0))+'/yr');
-  set('c5-title', 'Survivor Plan — '+longestN+" runs to age "+longestP.projectedDeathAge);
+  set('c5-title', 'Survivor Plan — '+longestN+" runs to age "+longestP.deathAge);
   set('c5-sub', 'Joint '+meta.planYear+'–'+otherP.projectedDeathYear+' · '+longestN+' survivor '+(otherP.projectedDeathYear+1)+'–'+longestP.projectedDeathYear);
   set('c5-note', 'Handoff at '+fmt(port.peakValue)+' ('+port.peakYear+') · '+longestN+' plan ends at '+fmt(leg.projectedEnding));
 
