@@ -172,6 +172,10 @@ function readAll(ss, inp) {
     stateRate:pct(26,2), stdDedInflation:pct(27,2),
     healthcareInflation:pct(28,2),
     rothConversionSavings:num(144,2),
+    standardDeduction:num(25,2),
+    // Effective federal rate read directly from Master sheet (AJ/O for year 1)
+    // Populated after Master sheet is read — set as placeholder here, overwritten below
+    effectiveRate: 0
   };
 
   // Accounts (rows 105-116, cols A-H = 1-8)
@@ -280,26 +284,38 @@ function readAll(ss, inp) {
 
   // Read Master sheet for year-by-year projection data (charts)
   var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
-                     preTax:[], roth:[], taxable:[], hsa:[]};
+                     preTax:[], roth:[], taxable:[], hsa:[],
+                     federalTaxes:[], taxableIncome:[]};
+  var masterYear1FedTax = 0, masterYear1GrossIncome = 0, masterYear1TaxableIncome = 0;
   try {
     var masterSheet = ss.getSheetByName('Master');
     if (masterSheet) {
       var masterData = masterSheet.getRange('A8:BX200').getValues();
+      var isFirstRow = true;
       masterData.forEach(function(row) {
         var yr = Number(row[0]); // col A = year
         if (!yr || yr < 2020 || yr > 2200) return;
         projections.years.push(yr);
-        projections.income.push(Math.round(Number(row[14])||0));     // O = income
-        projections.withdrawals.push(Math.round(Number(row[39])||0)); // AN = withdrawals
-        projections.endLiquid.push(Math.round(Number(row[75])||0));   // BX = end liquid
+        projections.income.push(Math.round(Number(row[14])||0));      // O  = Total Gross Guaranteed Income
+        projections.withdrawals.push(Math.round(Number(row[39])||0)); // AN = Final Gross Withdrawal
+        projections.endLiquid.push(Math.round(Number(row[75])||0));   // BX = Total End of Year Liquid Assets
+        projections.federalTaxes.push(Math.round(Number(row[35])||0));  // AJ = Total Federal Taxes
+        projections.taxableIncome.push(Math.round(Number(row[34])||0)); // AI = Total Taxable Income
+        // Capture year-1 values for effective rate calculation
+        if (isFirstRow) {
+          masterYear1FedTax       = Number(row[35])||0; // AJ = Total Federal Taxes
+          masterYear1GrossIncome  = Number(row[14])||0; // O  = Total Gross Guaranteed Income
+          masterYear1TaxableIncome= Number(row[34])||0; // AI = Total Taxable Income
+          isFirstRow = false;
+        }
         // Account balances
-        var p1_401k   = Number(row[54])||0;  // BC
-        var p1_roth   = Number(row[55])||0;  // BD
-        var p1_brok   = Number(row[56])||0;  // BE
-        var p2_401k   = Number(row[57])||0;  // BF
-        var p2_roth   = Number(row[58])||0;  // BG
-        var p2_brok   = Number(row[59])||0;  // BH
-        var hsa       = Number(row[60])||0;  // BI
+        var p1_401k = Number(row[54])||0; // BC
+        var p1_roth = Number(row[55])||0; // BD
+        var p1_brok = Number(row[56])||0; // BE
+        var p2_401k = Number(row[57])||0; // BF
+        var p2_roth = Number(row[58])||0; // BG
+        var p2_brok = Number(row[59])||0; // BH
+        var hsa     = Number(row[60])||0; // BI
         projections.preTax.push(Math.round(p1_401k + p2_401k));
         projections.roth.push(Math.round(p1_roth + p2_roth));
         projections.taxable.push(Math.round(p1_brok + p2_brok));
@@ -308,6 +324,13 @@ function readAll(ss, inp) {
     }
   } catch(e) {
     Logger.log('Master read error: ' + e);
+  }
+
+  // Set effective federal rate from Master sheet year-1 data
+  if (masterYear1GrossIncome > 0) {
+    tax.effectiveRate = Math.round((masterYear1FedTax / masterYear1TaxableIncome) * 10000) / 10000; // AJ÷AI: fed taxes / taxable income = standard effective rate
+    tax.taxableIncome = masterYear1TaxableIncome;
+    tax.federalTaxes  = masterYear1FedTax;
   }
 
   return {

@@ -158,11 +158,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
     <div class="plan-meta">
       <div class="meta-item"><div class="mi-lbl">Partners</div><div class="mi-val" id="m-names">— · —</div></div>
       <div class="meta-item"><div class="mi-lbl">Plan Year</div><div class="mi-val" id="m-year">2026</div></div>
-      <div class="meta-item"><div class="mi-lbl">Phase</div><div class="mi-val">Transition</div></div>
-      <div class="meta-item"><div class="mi-lbl">Scenario</div><div class="mi-val">Base Case</div></div>
+      <div class="meta-item"><div class="mi-lbl">Phase</div><div class="mi-val" id="m-phase">Transition</div></div>
+      <div class="meta-item"><div class="mi-lbl">Scenario</div><div class="mi-val" id="m-scenario">Base Case</div></div>
       <div class="meta-item"><div class="mi-lbl">Runway</div><div class="mi-val" id="m-runway">—</div></div>
-      <div class="meta-item"><div class="mi-lbl">Inflation</div><div class="mi-val">3.0% / yr</div></div>
-      <div class="meta-item"><div class="mi-lbl">SS COLA</div><div class="mi-val">2.5% / yr</div></div>
+      <div class="meta-item"><div class="mi-lbl">Inflation</div><div class="mi-val" id="m-inflation">3.0% / yr</div></div>
+      <div class="meta-item"><div class="mi-lbl">SS COLA</div><div class="mi-val" id="m-cola">2.5% / yr</div></div>
     </div>
     <div class="status-pill">
       <div class="status-dot"></div>
@@ -178,7 +178,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
     <div class="kpi o">
       <div class="kpi-lbl">Plan Health Score</div>
       <div class="kpi-val" id="kpi-confidence">98%</div>
-      <div class="kpi-sub">Very Strong</div>
+      <div class="kpi-sub" id="kpi-confidence-sub">Very Strong</div>
     </div>
     <div class="kpi t">
       <div class="kpi-lbl">Safe Extra Spend</div>
@@ -188,12 +188,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
     <div class="kpi">
       <div class="kpi-lbl">Total Portfolio</div>
       <div class="kpi-val" id="kpi-portfolio">$943K</div>
-      <div class="kpi-sub">5 active accounts · 2026</div>
+      <div class="kpi-sub" id="kpi-portfolio-sub">5 active accounts · 2026</div>
     </div>
     <div class="kpi g">
       <div class="kpi-lbl">Legacy Goal</div>
       <div class="kpi-val" id="kpi-legacy">Met ✓</div>
-      <div class="kpi-sub">$250K target · +$62</div>
+      <div class="kpi-sub" id="kpi-legacy-sub">$250K target · +$62</div>
     </div>
     <div class="kpi t">
       <div class="kpi-lbl">Roth Conv. Savings</div>
@@ -349,22 +349,57 @@ function loadData(){
       var p1=p.craig||p.person1||{},p2=p.gena||p.person2||{};
       var craig=p1,gena=p2;
       var runway=gena.projectedDeathYear-meta.planYear;
-      set('k-confidence','98%');
+      set('k-confidence',Math.round(leg.achievedPct)+'%');
       set('k-portfolio',fmt(port.total));
       set('k-extra',fmt(sp.safeExtra));
       set('k-roth',fmt(tax.rothConversionSavings));
       set('k-legacy',leg.achievedPct>=100?'Goal Met ✓':Math.round(leg.achievedPct)+'%');
-      set('kpi-confidence','98%');
+      set('kpi-confidence',Math.round(leg.achievedPct)+'%');
       set('kpi-extra',fmt(sp.safeExtra));
       set('kpi-portfolio',fmt(port.total));
       set('kpi-legacy',leg.achievedPct>=100?'Met ✓':Math.round(leg.achievedPct)+'%');
       set('kpi-roth',fmt(tax.rothConversionSavings));
       set('kpi-runway',runway+' yrs');
-      set('kpi-runway-sub',p2.name+' covered to '+p2.projectedDeathAge);
+      set('kpi-runway-sub',p2.name+' covered to age '+p2.deathAge);
       set('m-names',craig.name+' '+craig.age+' · '+gena.name+' '+gena.age);
       set('m-year',meta.planYear);
       set('m-runway',runway+' yrs ('+p2.name+')');
       set('m-status',leg.achievedPct>=100?'ON TRACK · Legacy Goal Met':'REVIEW PLAN');
+
+      // Phase and Scenario
+      var gl = d.global||{};
+      var p1working = p1.salary > 0;
+      set('m-phase', p1working ? 'Transition' : 'Distribution');
+      var earlyBear = gl.stressEarly && gl.stressEarly === 'Bear Market';
+      var lateBear  = gl.stressLate  && gl.stressLate  === 'Bear Market';
+      var scenario  = earlyBear && lateBear ? 'Early + Late Bear'
+                    : earlyBear ? 'Early Bear Market'
+                    : lateBear  ? 'Late Bear Market'
+                    : 'Base Case';
+      set('m-scenario', scenario);
+
+      // Inflation and SS COLA from sheet
+      function fmtPct(n){ var v=n<1?n*100:n; return v.toFixed(1)+'% / yr'; }
+      set('m-inflation', fmtPct(tax.inflation||0.03));
+      set('m-cola',      fmtPct(tax.ssCola||0.025));
+
+      // KPI subs — confidence label
+      var pct = leg.achievedPct||0;
+      set('kpi-confidence', Math.round(pct)+'%');
+      set('k-confidence',   Math.round(pct)+'%');
+      set('kpi-confidence-sub', pct>=95?'Very Strong':pct>=80?'On Track':pct>=60?'Needs Review':'At Risk');
+
+      // Portfolio sub — active account count + year
+      var activeAccts = (d.portfolio && d.portfolio.accounts)
+        ? d.portfolio.accounts.filter(function(a){ return (a.showInCalc||'').toLowerCase()==='yes'; }).length
+        : 0;
+      set('kpi-portfolio-sub', activeAccts+' active accounts · '+(meta.planYear||2026));
+
+      // Legacy sub — goal + variance
+      var legGoal = leg.goal||gl.legacyGoal||0;
+      var legVar  = leg.variance||0;
+      function fmtK(n){ return n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+Math.round(n/1000)+'K':'$'+Math.round(n); }
+      set('kpi-legacy-sub', fmtK(legGoal)+' target · '+(legVar>=0?'+':'')+fmtK(legVar));
     }catch(e){}
   };
   var s=document.createElement('script');
