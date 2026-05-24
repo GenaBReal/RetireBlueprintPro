@@ -175,6 +175,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html">Setup Guide</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;">Master Sheet</a>
   <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;"></span>
   <button onclick="reloadData()" style="margin:4px 8px;background:#0A3145;border:1px solid #1a3a52;color:#1CC7D0;font-size:9px;font-weight:700;padding:4px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.5px;">↺ Refresh Data</button>
 </div>
@@ -272,6 +273,37 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 </div>
 
 <!-- ENGINES -->
+<!-- HOME EQUITY PANEL — reads from localStorage (set in Inputs calculator) -->
+<div id="home-equity-panel" style="display:none;background:#fff;border-radius:8px;border:1px solid #e0e4e8;padding:16px 20px;margin-bottom:16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:1px;">🏠 Home Equity</div>
+      <div style="font-size:9px;color:#5F6368;margin-top:2px;">From your Home Appreciation Calculator · Not included in portfolio total</div>
+    </div>
+    <a href="RetireBlueprintPro_Inputs.html" style="font-size:9px;color:#1CC7D0;text-decoration:none;font-weight:700;">Update in Inputs →</a>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+    <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:12px 8px;">
+      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Current Value</div>
+      <div style="font-size:18px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-value">—</div>
+    </div>
+    <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:12px 8px;">
+      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Projected Value</div>
+      <div style="font-size:18px;font-weight:800;color:#041E2F;margin-top:4px;" id="dash-home-fv">—</div>
+      <div style="font-size:9px;color:#5F6368;margin-top:2px;" id="dash-home-years-lbl"></div>
+    </div>
+    <div style="text-align:center;background:#f8f9fa;border-radius:6px;padding:12px 8px;">
+      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Mortgage Remaining</div>
+      <div style="font-size:18px;font-weight:800;color:#A03030;margin-top:4px;" id="dash-home-mort">—</div>
+    </div>
+    <div style="text-align:center;background:#e8f5e9;border-radius:6px;padding:12px 8px;border:1px solid #c8e6c9;">
+      <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">Net Equity</div>
+      <div style="font-size:18px;font-weight:800;color:#2E7032;margin-top:4px;" id="dash-home-equity">—</div>
+      <div style="font-size:9px;color:#5F6368;margin-top:2px;">Projected net</div>
+    </div>
+  </div>
+</div>
+
 <div class="engines-grid">
   <div class="engine">
     <div class="eng-hdr"><div class="eng-hdr-title">Income Engine</div><div class="eng-hdr-sub" id="eng-income-hdr">—</div></div>
@@ -791,6 +823,42 @@ function dismissDashWelcome() {
   if (modal) modal.classList.remove('show');
   try { localStorage.setItem('rbp_dash_welcomed', '1'); } catch(e) {}
 }
+
+// ── HOME EQUITY PANEL ──────────────────────────────────────────
+// Reads from localStorage saved by the Inputs Home Appreciation Calculator
+// No sheet connection needed — purely local calculation
+function loadHomeEquity() {
+  try {
+    var raw = localStorage.getItem('rbp_calc_data');
+    if (!raw) return;
+    var d = JSON.parse(raw);
+    var homeVal  = parseFloat(String(d.home_value||'0').replace(/[$,]/g,''))    || 0;
+    var rate     = parseFloat(d.home_rate||'3.5') / 100;
+    var mortgage = parseFloat(String(d.home_mortgage||'0').replace(/[$,]/g,'')) || 0;
+    var years    = parseFloat(d.home_years||'25') || 25;
+    if (!homeVal) return; // Nothing entered — keep panel hidden
+
+    var panel = document.getElementById('home-equity-panel');
+    if (panel) panel.style.display = 'block';
+
+    var fv      = Math.round(homeVal * Math.pow(1 + rate, years));
+    var mortRem = Math.max(0, Math.round(mortgage - (mortgage * 0.03 * years)));
+    var equity  = fv - mortRem;
+
+    function fmtH(n) {
+      if (!n && n!==0) return '—';
+      if (Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
+      if (Math.abs(n)>=1000)    return '$'+Math.round(n/1000)+'K';
+      return '$'+Math.round(n).toLocaleString();
+    }
+    document.getElementById('dash-home-value').textContent   = fmtH(homeVal);
+    document.getElementById('dash-home-fv').textContent      = fmtH(fv);
+    document.getElementById('dash-home-mort').textContent    = fmtH(mortRem);
+    document.getElementById('dash-home-equity').textContent  = fmtH(equity);
+    document.getElementById('dash-home-years-lbl').textContent = 'In '+Math.round(years)+' yrs @ '+(rate*100).toFixed(1)+'%/yr';
+  } catch(e) { console.log('Home equity load error:', e); }
+}
+loadHomeEquity();
 </script>
 
 <div class="welcome-modal-overlay" id="dash-welcome-modal">
