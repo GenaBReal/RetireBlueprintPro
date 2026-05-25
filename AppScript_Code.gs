@@ -537,15 +537,16 @@ function writeInputs(ss, inp, data) {
           ''                                 // N = Withdrawal Start (written separately below)
         ]);
       }
+      // Force J and K to number format BEFORE clearing/writing
+      // This prevents Sheets from auto-formatting as dates
+      inp.getRange('J105:K116').setNumberFormat('0');
+      SpreadsheetApp.flush();
       // Clear J-N completely before writing to remove any corrupt values
       inp.getRange('J105:N116').clearContent();
       SpreadsheetApp.flush(); // Ensure clear completes before writing
       // Log what we're about to write to J and K
       Logger.log('Writing accounts J/K: ' + acctData.map(function(r){return r[9]+'/'+r[10];}).join(', '));
       inp.getRange('A105:N116').setValues(acctData.slice(0,12));
-      // Force J and K to plain number format (prevents Sheets treating as dates)
-      inp.getRange('J105:K116').setNumberFormat('0');
-
       // Write contribution dates separately using setD (handles date format correctly)
       var acctRows = [105,106,107,108,109,110,111,112,113,114,115,116];
       for (var ai=0; ai<12; ai++) {
