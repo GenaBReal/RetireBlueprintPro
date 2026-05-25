@@ -82,12 +82,13 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html" class="nav-link">Annual Check-In</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html" class="nav-link">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html" class="nav-link act">Setup Guide</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html" class="nav-link">📄 Summary</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first.'); return false;" class="nav-link">Master Sheet</a>
 </nav>
 
 <div class="hero">
   <h1>RetireBlueprint Pro<br><span>Setup Guide</span></h1>
-  <p>Everything you need to know to get the most out of your retirement planning tool. Setup takes about 5 minutes.</p>
+  <p>Everything you need to know to get the most out of your retirement planning tool. No financial background required — we explain everything in plain English. Setup takes about 5 minutes.</p>
 </div>
 
 <div class="page">
@@ -380,10 +381,245 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
     </div>
   </div>
 
-  <!-- SECTION 6: FAQ -->
+  <!-- SECTION 6: YOUR PAGES EXPLAINED -->
   <div class="section-card">
     <div class="section-hdr">
       <div class="section-num">6</div>
+      <div>
+        <div class="section-title">Your Pages — What Each One Does</div>
+        <div class="section-sub">A plain-English guide to every section of your plan</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="step">
+        <div class="step-icon">🏠</div>
+        <div class="step-content">
+          <div class="step-title">Home Page — Your At-a-Glance Dashboard</div>
+          <div class="step-desc">Shows your most important numbers at a glance: plan confidence score, total portfolio, safe spending amount, and whether you're on track. Think of it as your retirement report card. The big colored number is your <strong>Plan Confidence Score</strong> — 100% means your plan fully funds your goals. Below 80% means you may need to adjust spending, timeline, or savings.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📊</div>
+        <div class="step-content">
+          <div class="step-title">Dashboard — Your Full Retirement Picture</div>
+          <div class="step-desc">Six charts and multiple data panels showing your entire retirement trajectory. Key panels to understand:<br><br>
+          <strong>• Plan Completion Score</strong> — a checklist showing which parts of your plan you've filled in. Incomplete items appear in white — click through to the Inputs page to complete them.<br>
+          <strong>• Account Mix Over Time</strong> — shows how your Pre-Tax (dark), Roth (teal), Taxable (orange), and HSA (green) accounts grow and shrink over time. You want to see Roth growing relative to Pre-Tax — that's your tax strategy working.<br>
+          <strong>• Tax Efficiency</strong> — your effective federal tax rate each year. Lower is better. Watch for spikes when RMDs begin at 73.<br>
+          <strong>• Stress Test</strong> — shows what happens to your ending portfolio if the market drops 20% or 30% in year 1 of retirement, or if inflation runs at 5% instead of 3%. If these numbers still look acceptable, your plan is resilient.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">✏️</div>
+        <div class="step-content">
+          <div class="step-title">Inputs Page — Where You Enter Everything</div>
+          <div class="step-desc">This is the heart of the system. Everything you enter here flows automatically into your Master spreadsheet and all the dashboards. Key sections:<br><br>
+          <strong>• Global Settings</strong> — Plan start year, legacy goal (how much you want to leave), stress test settings, inflation rate, Social Security COLA.<br>
+          <strong>• Partner Profiles</strong> — Names, birthdates, salary, Social Security, pension, healthcare costs. The <strong>SS Breakeven Analysis</strong> appears automatically and shows you whether claiming at 62, your Full Retirement Age, or 70 gives you more lifetime income.<br>
+          <strong>• Expenses</strong> — Your monthly spending categories. Be thorough here — underestimating expenses is the #1 planning mistake.<br>
+          <strong>• Debts</strong> — Mortgage, car loans, etc. For your home, enter the Zillow value in <strong>Current Value ($)</strong> and your home's annual appreciation rate (typically 3-4%) — this feeds your home equity panel on the Dashboard.<br>
+          <strong>• Named Accounts</strong> — Your 401k, Roth IRA, brokerage, HSA, and other accounts. Enter each separately with its current balance, expected return rate, and owner. The contribution fields (Annual Contribution, Employer Match, start/end dates) feed directly into the Master projection.<br>
+          <strong>• Roth Conversion Solver</strong> — Analyzes the optimal time and amount to convert pre-tax money to Roth. See Section 8 below for a full explanation.<br>
+          <strong>• Safe Spend Solver</strong> — Automatically calculates how much you can safely spend each year while still meeting your legacy goal.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📋</div>
+        <div class="step-content">
+          <div class="step-title">Annual Check-In — Track Your Progress Year by Year</div>
+          <div class="step-desc">Once a year, come here to enter your actual account balances and compare them to what the plan projected. Over time this builds a history of how closely reality matches your plan. If your actual balance is consistently higher than projected — great, your investments are outperforming. If consistently lower — your plan may need adjustment. Use the Notes column to record major events: "retired," "RV purchase," "market crash," etc.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">🧾</div>
+        <div class="step-content">
+          <div class="step-title">Tax Engine — Understand Your Tax Picture</div>
+          <div class="step-desc">Shows your tax situation in detail: effective federal rate, state rate, standard deduction, RMD planning window, and Roth conversion analysis. The <strong>RMD Planning Window</strong> box tells you how many years you have before Required Minimum Distributions begin at age 73 — that's your prime window to do Roth conversions at lower tax rates. The tax bracket table shows what % of income goes to taxes at each age.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📄</div>
+        <div class="step-content">
+          <div class="step-title">Summary Report — Print or Share Your Plan</div>
+          <div class="step-desc">A clean, professional one-page summary of your entire retirement plan. Shows your plan status, both partner profiles, all accounts, income sources, tax strategy, stress test results, and key milestones (retirement dates, SS start dates, Medicare, RMDs). To save as PDF: click <strong>🖨️ Print / Save PDF</strong> and choose "Save as PDF" as the destination in your print dialog. Share this with your financial advisor, children, or keep as an annual record.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 7: KEY CONCEPTS -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <div class="section-num">7</div>
+      <div>
+        <div class="section-title">Key Concepts — Plain English</div>
+        <div class="section-sub">Retirement planning terms explained without the jargon</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="step">
+        <div class="step-icon">💰</div>
+        <div class="step-content">
+          <div class="step-title">Pre-Tax vs. Roth vs. Taxable Accounts — What's the Difference?</div>
+          <div class="step-desc">
+          <strong>Pre-Tax (Traditional 401k/IRA)</strong> — You didn't pay taxes on this money going in. You will pay taxes when you take it out in retirement. The more you have here, the bigger your tax bill when RMDs force you to withdraw at 73.<br><br>
+          <strong>Roth (Roth 401k/IRA)</strong> — You already paid taxes on this money. It grows tax-free and comes out tax-free. No RMDs. The gold standard for retirement accounts.<br><br>
+          <strong>Taxable (Brokerage)</strong> — A regular investment account. You pay taxes on dividends and capital gains each year, but withdrawals themselves aren't taxed again.<br><br>
+          <strong>HSA (Health Savings Account)</strong> — Triple tax advantage: contributions are pre-tax, growth is tax-free, and withdrawals for medical expenses are tax-free. After 65 it works like a Traditional IRA for non-medical expenses.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📅</div>
+        <div class="step-content">
+          <div class="step-title">Required Minimum Distributions (RMDs) — What Are They?</div>
+          <div class="step-desc">The IRS requires you to start withdrawing money from your Pre-Tax retirement accounts beginning at age 73 — whether you want to or not. The amount is calculated by dividing your account balance by a life expectancy factor (about 26.5 at age 73, meaning you must withdraw about 3.8% of the balance). If you have a large pre-tax balance, RMDs can push you into a higher tax bracket and trigger Medicare surcharges. This is why Roth conversions before age 73 are so valuable.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">🔄</div>
+        <div class="step-content">
+          <div class="step-title">Roth Conversions — Moving Money to Save on Taxes</div>
+          <div class="step-desc">A Roth conversion means moving money from your Pre-Tax 401k/IRA into a Roth IRA. You pay income tax on the amount converted that year — but never again. The ideal time to convert is after you retire (income drops) and before RMDs begin at 73 — your "prime window." Converting enough to fill up your current tax bracket each year can save tens of thousands in lifetime taxes. The Roth Solver on the Inputs page calculates the optimal amount automatically.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">🌊</div>
+        <div class="step-content">
+          <div class="step-title">Smile Curve — Why Spending Isn't Flat in Retirement</div>
+          <div class="step-desc">Research shows retirees actually spend in a "smile" pattern: more in early retirement (active years — travel, hobbies), less in middle retirement (settling in), and more again late in retirement (healthcare costs). Your Inputs page lets you set three phases with different spending weights. Phase 1 is typically 115% of base spending, Phase 2 is 100%, Phase 3 is 90% — but these are customizable. The solver then calculates what your base spending can be while still hitting your legacy goal.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">🏥</div>
+        <div class="step-content">
+          <div class="step-title">The Healthcare Bridge — One of the Biggest Surprises in Early Retirement</div>
+          <div class="step-desc">If you retire before age 65, you lose employer health insurance but Medicare doesn't start until 65. You'll need to buy coverage through the ACA marketplace (healthcare.gov) or COBRA. Costs vary widely by income — if your retirement income is low enough, you may qualify for substantial subsidies. The Healthcare Bridge calculator on the Inputs page estimates your total pre-Medicare healthcare cost. This is often $50,000–$150,000+ for a couple retiring at 60 — a number many people miss completely.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📊</div>
+        <div class="step-content">
+          <div class="step-title">IRMAA — The Medicare Surcharge You Didn't Know About</div>
+          <div class="step-desc">IRMAA stands for Income-Related Monthly Adjustment Amount. If your income (including Roth conversions) exceeds certain thresholds, Medicare charges you extra for Part B and Part D coverage. In 2024, the threshold for married couples is about $206,000. The Roth Solver shows you if a planned conversion would push you over this threshold — and warns you to consider converting a smaller amount to avoid the surcharge.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">⏱️</div>
+        <div class="step-content">
+          <div class="step-title">The 5-Year Rule — When Can You Access Roth Money?</div>
+          <div class="step-desc">Each Roth conversion has a 5-year waiting period before you can withdraw it penalty-free. If you're under 59½, you must wait 5 years from the conversion date before touching that money without a 10% penalty. However, once you're over 59½, the 5-year rule applies to your original Roth IRA only (the account must be at least 5 years old), not to each individual conversion. The Roth Solver shows your earliest penalty-free access date automatically.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📈</div>
+        <div class="step-content">
+          <div class="step-title">Sequence of Returns Risk — Why Market Timing in Early Retirement Matters</div>
+          <div class="step-desc">This is one of the most important and least understood retirement risks. If the market drops 30% in your first year of retirement and you're withdrawing $60,000/year, you're forced to sell assets at low prices — permanently reducing your portfolio's ability to recover. The same 30% drop 10 years into retirement is far less damaging because you have fewer years of withdrawals ahead. The Stress Test panel on the Dashboard shows you exactly how a Year-1 crash would affect your plan. A resilient plan survives a 30% Year-1 drop with your legacy goal intact.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">📱</div>
+        <div class="step-content">
+          <div class="step-title">Account Owner — Why It Matters for Contributions and Taxes</div>
+          <div class="step-desc">Each account in the system is owned by Partner 1, Partner 2, or is Joint. This matters for two reasons:<br><br>
+          <strong>1. Contributions:</strong> Contribution amounts and employer match flow to the correct partner's columns in the Master spreadsheet, so the projection knows exactly how much each person is saving.<br><br>
+          <strong>2. RMDs:</strong> RMDs are calculated per person, not per household. Knowing who owns which accounts ensures the system calculates the right RMD amounts at the right ages.<br><br>
+          Always assign each account to the correct owner — don't leave everything as "Joint" unless it truly is a joint account.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">🏦</div>
+        <div class="step-content">
+          <div class="step-title">Contribution Dates — What Each Date Field Means</div>
+          <div class="step-desc">In the Named Accounts section, each account has three date fields:<br><br>
+          <strong>Contrib Start Date</strong> — When you started or will start contributing to this account. Usually your hire date or account opening date. Used to calculate partial-year contributions.<br><br>
+          <strong>Contrib End Date</strong> — When contributions stop. Usually your retirement date or the date you plan to stop making contributions. If you retire June 30, contributions are prorated to 50% for that year.<br><br>
+          <strong>Withdrawal Start Date</strong> — When you can start withdrawing from this account. Usually retirement date, but some plans have restrictions (e.g., some 403b plans require you to be 59½ before withdrawing). Leave blank if your retirement date applies.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 8: ROTH SOLVER DEEP DIVE -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <div class="section-num">8</div>
+      <div>
+        <div class="section-title">Using the Roth Conversion Solver</div>
+        <div class="section-sub">Step-by-step guide to optimizing your tax strategy</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="step">
+        <div class="step-icon">1️⃣</div>
+        <div class="step-content">
+          <div class="step-title">Set the Analysis Year</div>
+          <div class="step-desc">Choose the year you want to analyze. The solver will look up your projected taxable income for that year from your Master spreadsheet and show it automatically. The best years to convert are typically your first few years of retirement — when your salary income has ended but Social Security and RMDs haven't begun yet.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">2️⃣</div>
+        <div class="step-content">
+          <div class="step-title">Choose Your Target Tax Bracket</div>
+          <div class="step-desc">The solver shows which bracket you're currently in for the chosen year. Your target bracket is how high you want to fill — typically one bracket above where you are. For example, if you're in the 12% bracket with room to spare, converting enough to fill it up but not spill into 22% is the sweet spot. The solver calculates the optimal conversion amount automatically based on your choice.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">3️⃣</div>
+        <div class="step-content">
+          <div class="step-title">Review the Solver Results</div>
+          <div class="step-desc">
+          <strong>Est. Taxable Income</strong> — Your projected income before any Roth conversion for that year. Comes directly from your Master spreadsheet.<br>
+          <strong>Optimal Conversion</strong> — How much you can convert to fill your target bracket without crossing into the next one.<br>
+          <strong>Tax Cost Now</strong> — What you'll pay in taxes on the conversion this year.<br>
+          <strong>Lifetime Tax Savings</strong> — The estimated lifetime benefit of converting now vs. letting the money stay in pre-tax and paying higher taxes later at RMDs. Green = convert, Red = consider waiting.<br>
+          <strong>Est. RMD at 73</strong> — Your projected annual Required Minimum Distribution based on your current pre-tax balance and expected growth rate.<br>
+          <strong>IRMAA Warning</strong> — If your income + conversion would exceed the Medicare surcharge threshold ($206K for couples in 2024), a warning appears.<br>
+          <strong>5-Year Rule</strong> — Shows whether you're past 59½ (no restriction) or how long until the converted funds are fully accessible.<br>
+          <strong>State Tax</strong> — Toggle this on if your state taxes Roth conversions — it adjusts the tax cost calculation.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">4️⃣</div>
+        <div class="step-content">
+          <div class="step-title">Enter Your Planned Conversions</div>
+          <div class="step-desc">In the Roth Conversion Plan table below the solver, enter the dollar amount you plan to actually convert each year — for each partner. These amounts feed directly into your Master spreadsheet and affect your projections. The table runs 50 years (2026–2075) so you can plan your full conversion window. The grand total at the bottom shows your lifetime planned conversions for each partner and combined.</div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <strong>💡 Pro Tip:</strong> The "Should I Convert?" signal at the top (green/yellow/red) gives you an instant recommendation based on whether converting now at your current rate saves money vs. paying taxes later at your projected RMD rate. Green means convert — you'll save money. Red means the math doesn't favor conversion at this time (your future rate is expected to be lower).
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 9: FAQ -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <div class="section-num">9</div>
       <div>
         <div class="section-title">Frequently Asked Questions</div>
         <div class="section-sub">Everything you were wondering but didn't know to ask</div>
@@ -415,47 +651,91 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
 
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
-            What does "Legacy Goal" mean? <span>▾</span>
+            What is a Legacy Goal and should I set one? <span>▾</span>
           </div>
-          <div class="faq-a">Your Legacy Goal is the minimum dollar amount you want remaining when the plan ends — typically when the last surviving partner passes. The system optimizes your spending so you hit this target while maximizing what you enjoy during retirement. Set it to $0 if you want to spend everything down, or to a dollar amount if you want to leave an inheritance or buffer.</div>
+          <div class="faq-a">Your Legacy Goal is the minimum dollar amount you want remaining when the plan ends — typically when the last surviving partner passes. Common reasons to set one: leaving an inheritance for children, maintaining a buffer for unexpected late-life costs, or charitable giving. Set it to $0 if you want to spend everything down. A common starting point is 1–2 years of living expenses as a buffer, or the amount you'd like to leave to heirs.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
-            What is the Pre-Retirement Growth Calculator? <span>▾</span>
+            What is the Survivor Reduction % and what should I set it to? <span>▾</span>
           </div>
-          <div class="faq-a">It's a calculator in the Inputs page that projects what your retirement accounts will be worth on your actual retirement date — factoring in your current balance, annual contributions, employer match, expected return rate, and years until retirement. Use it to get an accurate "Starting Balance" for each account. The result you get is what to enter as your account's Starting Balance — not today's balance.</div>
+          <div class="faq-a">This is the percentage reduction in spending when one partner passes. Research shows surviving spouses typically spend 60-70% of what the couple spent together (some fixed costs like housing don't change, but food, travel, and entertainment often drop). A common setting is 30-40%, meaning the survivor spends 60-70% of the couple's prior spending. Social Security also changes when a spouse passes — the survivor keeps only the larger of the two SS benefits.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             What is a Roth conversion window and why does it matter? <span>▾</span>
           </div>
-          <div class="faq-a">A Roth conversion window is the period between when you retire (income drops) and when Required Minimum Distributions (RMDs) begin at age 73 — typically a 5–15 year window of lower taxes. During this time, you can convert money from a traditional 401k/IRA into a Roth IRA, paying tax now at a lower rate (maybe 12%) instead of a higher rate later when RMDs force large taxable withdrawals. The Tax Engine page shows you the optimal conversion amount and estimated lifetime tax savings.</div>
+          <div class="faq-a">A Roth conversion window is the period between when you retire (income drops) and when Required Minimum Distributions begin at age 73. During this window — often 5–15 years — your taxable income is at its lowest, making it the ideal time to convert pre-tax money to Roth at a lower tax rate. Every dollar converted during this window is one less dollar subject to RMDs and potentially higher taxes later. The Tax Engine and Roth Solver pages guide you through this process.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
-            What are stress tests and how do I use them? <span>▾</span>
+            Why does my Social Security show $0 in some years? <span>▾</span>
           </div>
-          <div class="faq-a">Stress tests simulate a stock market crash during your retirement to see if your plan survives. Two scenarios are available:<br><br>
-          <strong>Early Bear Market</strong> — a crash right when you retire (worst case scenario, 2008-style). Tests whether your plan can recover.<br>
-          <strong>Late Bear Market</strong> — a crash later in retirement when you have less time to recover.<br><br>
-          To activate: In Global Settings on the Inputs page, change "Early Bear Market?" from Normal Returns to Bear Market, set the start year and duration, then save. Your Dashboard will update with the stress-tested projections. Switch back to Normal Returns when you want to see your base plan again. A plan that survives an Early Bear test is very resilient.</div>
+          <div class="faq-a">Social Security only appears in the years after your SS Start Date. If your plan starts in 2026 but you don't plan to claim SS until 2033, the columns for 2026–2032 will show $0 for SS income — that's correct. The plan is showing your actual income picture each year. Make sure your SS Start Date is entered correctly on the Inputs page for each partner.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            What does "Expected Return (%)" mean for my accounts? <span>▾</span>
+          </div>
+          <div class="faq-a">This is the average annual investment return you expect this account to earn, entered as a percentage. A diversified stock/bond portfolio might average 6-8% over a long period. More conservative investments (bonds, CDs) might return 3-5%. This is one of the most important inputs in your plan — even a 1% difference in return rate has a huge effect over 20-30 years. Be realistic rather than optimistic. The Master spreadsheet applies this rate to the account balance each year to project growth.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            What are stress tests and how do I interpret them? <span>▾</span>
+          </div>
+          <div class="faq-a">Stress tests show your ending portfolio balance under adverse conditions. The Dashboard shows four scenarios automatically:<br><br>
+          <strong>Base:</strong> Normal market returns as projected.<br>
+          <strong>Down 20% Year 1:</strong> A mild bear market in your first year of retirement — similar to 2001 or 2011.<br>
+          <strong>Down 30% Year 1:</strong> A severe crash like 2008 in your first year.<br>
+          <strong>High Inflation (5%):</strong> What if inflation runs 5% instead of your projected rate?<br><br>
+          A well-built plan should still show a positive ending balance even in the 30% down scenario. If these numbers worry you, consider: keeping 2 years of expenses in cash (so you don't sell stocks at low prices), having a flexible spending plan, or adjusting your timeline.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            How do I use the Social Security Breakeven Analysis? <span>▾</span>
+          </div>
+          <div class="faq-a">The SS Breakeven Analysis appears automatically under your Social Security section on the Inputs page. It shows your monthly benefit at three claiming ages:<br><br>
+          <strong>Claim at 62:</strong> Reduced benefit — permanently lower, but you get more years of payments.<br>
+          <strong>Claim at FRA (Full Retirement Age):</strong> Your standard benefit, typically at 67.<br>
+          <strong>Delay to 70:</strong> Maximum benefit — 8% more per year for each year you delay past FRA.<br><br>
+          The "Breakeven Age" tells you at what age the higher monthly benefit from waiting outweighs the payments you missed. If you expect to live past the breakeven age (typically 79-82), delaying pays off. Health, other income sources, and whether you need the money now all factor into this decision.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            What should I enter for the Appreciation Rate on my home/mortgage? <span>▾</span>
+          </div>
+          <div class="faq-a">The Appreciation Rate is your estimate of how much your home's value increases each year, as a percentage. Historical average US home appreciation is about 3-4% per year, though it varies significantly by location. Enter your best estimate for your specific market. This rate is used to project your home's future value on the Dashboard home equity panel. For the Current Value, use your home's current estimated market value (Zillow is a common source, though not always precise).</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            Should I take my pension as monthly income or a lump sum? <span>▾</span>
+          </div>
+          <div class="faq-a">This is one of the most important retirement decisions you can make, and it's largely irreversible. The Pension vs. Lump Sum calculator on the Inputs page (under the Pension section) helps you analyze this. Generally:<br><br>
+          <strong>Monthly pension favors:</strong> Longer life expectancy, no strong investment skills, desire for guaranteed income, no heirs to leave money to.<br>
+          <strong>Lump sum favors:</strong> Shorter life expectancy, strong investment skills, desire to leave money to heirs, flexibility needs.<br><br>
+          The breakeven age shows how long you need to live for the pension to "win." Enter your lump sum offer and expected lifespan to see the analysis. Always consult a financial advisor before making this decision — it's permanent.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             The Effective Federal Rate shows a dash (—) — is that normal? <span>▾</span>
           </div>
-          <div class="faq-a">Yes, if you see a dash on first load it just means the data hasn't finished loading from your Google Sheet. Wait a moment and press Cmd+Shift+R to refresh. The Effective Federal Rate is calculated directly from your Master sheet's tax projections — it's the percentage of your taxable income that goes to federal taxes in year one of your plan.</div>
+          <div class="faq-a">Yes, if you see a dash on first load it just means the data hasn't finished loading from your Google Sheet. Wait a moment and press Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows) to refresh. The Effective Federal Rate is calculated directly from your Master sheet's tax projections — it's the percentage of your taxable income that goes to federal taxes in year one of your plan.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             Why are some numbers on the Dashboard read-only? <span>▾</span>
           </div>
-          <div class="faq-a">The Dashboard reads directly from your Google Sheet's Master projection, which calculates everything automatically. Numbers like your Safe Spending Capacity, Portfolio Sustainability, and Tax Efficiency are outputs — your sheet calculates them based on the inputs you entered. You change them by updating your Inputs and saving, not by editing the Dashboard directly.</div>
+          <div class="faq-a">The Dashboard reads directly from your Google Sheet's Master projection, which calculates everything automatically. Numbers like your Safe Spending Capacity, Portfolio Sustainability, and Tax Efficiency are outputs — your sheet calculates them based on the inputs you entered. You change them by updating your Inputs and saving, not by editing the Dashboard directly. Think of Inputs as the dial you turn, and the Dashboard as the gauge that responds.</div>
         </div>
 
         <div class="faq-item">
@@ -469,14 +749,28 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             Can I share my plan with my financial advisor? <span>▾</span>
           </div>
-          <div class="faq-a">Absolutely. The easiest way is to share this web dashboard with them — just send them the link and walk through it together. They'll see everything on the Dashboard and Tax Engine pages. If they want deeper access to the underlying numbers, you can share your Google Sheet directly (open your sheet → Share → add their email) — they'll see the Master sheet with all the projections. No login required for the web pages.</div>
+          <div class="faq-a">Absolutely. The easiest way is to use the Summary Report page (click "📄 Summary" in the navigation bar) — click the Print button and save as PDF, then email that PDF to your advisor. For deeper access, you can share the Dashboard URL directly. If they want the underlying numbers, share your Google Sheet (open the sheet → Share → add their email). No login required for the web pages.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             Why does "Save" say "Saving... verifying in 5s"? <span>▾</span>
           </div>
-          <div class="faq-a">Because of how web security works, the save goes out silently and we can't read Google's response directly. So after 5 seconds, the system does a quick check by re-reading your sheet to confirm the data arrived. If it says "Saved and verified!" — you're all set. If it says "Save sent — check your sheet to confirm" — open your Google Sheet and you should see your data there. This is normal and your data saved correctly.</div>
+          <div class="faq-a">Because of how web security works, the save goes out and we wait 5 seconds before checking if it arrived. If it says "✅ Saved and verified!" — you're all set. If you see any issues, open your Google Sheet directly and confirm the data is there. Always wait for the green confirmation before closing the browser tab.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+            My plan shows I'll run out of money — what do I do? <span>▾</span>
+          </div>
+          <div class="faq-a">First, don't panic — the plan is doing exactly what it's supposed to: showing you reality before it happens so you can adjust. Common levers to pull:<br><br>
+          <strong>1. Reduce spending</strong> — even 5-10% less spending has a major long-term impact.<br>
+          <strong>2. Work a bit longer</strong> — even 1-2 more years of saving + one less year of withdrawing is powerful.<br>
+          <strong>3. Delay Social Security</strong> — waiting from 62 to 67 or 70 increases your lifetime SS income significantly.<br>
+          <strong>4. Do Roth conversions</strong> — reducing your future tax bill keeps more money in your pocket.<br>
+          <strong>5. Increase returns</strong> — consider whether your investment allocation is appropriate for your timeline.<br>
+          <strong>6. Reduce legacy goal</strong> — if you planned to leave a large inheritance, consider whether that's flexible.<br><br>
+          Often a combination of small adjustments across multiple areas solves the problem without any single dramatic change.</div>
         </div>
 
       </div>

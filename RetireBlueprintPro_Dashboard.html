@@ -123,6 +123,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 .solver-kpi-lbl{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;}
 .solver-kpi-val{font-size:20px;font-weight:800;color:#f4b86a;margin-top:4px;}
 .solver-kpi-sub{font-size:9px;color:#8a9ab0;margin-top:2px;}
+.tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(28,199,208,0.2);color:#1CC7D0;font-size:10px;font-weight:700;cursor:help;margin-left:4px;position:relative;flex-shrink:0;}
+.tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:11px;font-weight:400;padding:8px 12px;border-radius:6px;white-space:normal;width:220px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -475,7 +477,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   <!-- Progress completion score -->
   <div id="completion-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(28,199,208,0.2);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;">📋 Plan Completion Score</div>
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;">📋 Plan Completion Score<span class="tooltip-icon" data-tip="Shows which sections of your plan are complete. Green checkmarks = done. White boxes = still needs your input on the Inputs page.">?</span></div>
       <div id="completion-score" style="font-size:28px;font-weight:900;color:#f4b86a;">—%</div>
     </div>
     <div style="background:rgba(0,0,0,0.3);border-radius:6px;height:8px;margin-bottom:16px;">
@@ -486,7 +488,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 
   <!-- Sequence of returns stress test -->
   <div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(255,107,107,0.2);">
-    <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">⚡ Stress Test — Sequence of Returns Risk</div>
+    <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;">⚡ Stress Test — Sequence of Returns Risk<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions. A good plan survives even the 30% Year-1 drop scenario with a positive balance." style="border-color:#ff6b6b;color:#ff6b6b;">?</span></div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
       <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
         <div class="solver-kpi-lbl">Base Scenario</div>

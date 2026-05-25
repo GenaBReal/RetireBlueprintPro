@@ -138,6 +138,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 .info-val{font-size:12px;font-weight:700;color:var(--navy);}
 .info-val.teal{color:var(--teal);}
 .info-val.orange{color:var(--orange);}
+.tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(28,199,208,0.2);color:#1CC7D0;font-size:10px;font-weight:700;cursor:help;margin-left:4px;position:relative;flex-shrink:0;}
+.tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:11px;font-weight:400;padding:8px 12px;border-radius:6px;white-space:normal;width:240px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -231,9 +233,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
       <div class="card-sub">2026 actuals from your sheet</div>
     </div>
     <div class="card-body">
-      <div class="info-row"><span class="info-lbl">Effective Federal Rate</span><span class="info-val teal" id="t-eff">15.6%</span></div>
+      <div class="info-row"><span class="info-lbl">Effective Federal Rate<span class="tooltip-icon" data-tip="The percentage of your taxable income that goes to federal taxes in year 1. Different from your marginal (bracket) rate — this is the actual average rate across all your income.">?</span></span><span class="info-val teal" id="t-eff">15.6%</span></div>
       <div class="info-row"><span class="info-lbl">State Tax Rate</span><span class="info-val" id="t-state">7.5%</span></div>
-      <div class="info-row"><span class="info-lbl">Standard Deduction</span><span class="info-val" id="t-ded">$30,000</span></div>
+      <div class="info-row"><span class="info-lbl">Standard Deduction<span class="tooltip-icon" data-tip="The amount the IRS lets you subtract from your income before calculating taxes. In 2024, it's $29,200 for married filing jointly. This amount increases slightly each year with inflation.">?</span></span><span class="info-val" id="t-ded">$30,000</span></div>
       <div class="info-row"><span class="info-lbl">2026 Gross Income</span><span class="info-val orange" id="t-income">$144,523</span></div>
       <div class="info-row"><span class="info-lbl">Taxable Income</span><span class="info-val" id="t-taxable">$114,523</span></div>
       <div class="info-row"><span class="info-lbl">Est. Federal Tax</span><span class="info-val" id="t-fedtax">$17,900</span></div>
@@ -396,7 +398,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
         <div class="explainer-body">When <span id="tax-p2-ss-note">your partner's</span> Social Security begins, combined SS income will be significant. Up to <strong>85% of SS benefits</strong> can become taxable income when combined income exceeds $44,000 (MFJ). Your plan accounts for this in the Master engine's income calculations. Watch effective rates in 2033-2040.</div>
       </div>
       <div class="explainer orange">
-        <div class="explainer-title">⏰ RMD Planning Window <span class="strat-badge strat-prime">Prime Now</span></div>
+        <div class="explainer-title">⏰ RMD Planning Window<span class="tooltip-icon" data-tip="The years between now and age 73 are your window to do Roth conversions at potentially lower tax rates. After 73, Required Minimum Distributions force taxable withdrawals whether you need the money or not.">?</span> <span class="strat-badge strat-prime">Prime Now</span></div>
         <div class="explainer-body"><span id="tax-rmd-note">Partner 1 RMDs begin at age 75, Partner 2 at 75. The years between now and RMD start are your window to reduce pre-tax balances through Roth conversions. <strong>Every $1 converted now</strong> reduces your future RMD obligation and the associated tax spike.</span></div>
       </div>
     </div>
