@@ -1739,9 +1739,9 @@ function calcSSBreakeven(baseId, fraId, ageId) {
     ? 70 + (missedAtFRA / (age70MonthlyGain * 12))
     : 999;
 
-  // Cap at reasonable age (100) and round to 1 decimal
-  breakeven67vs62 = Math.min(100, Math.round(breakeven67vs62 * 10) / 10);
-  breakeven70vs67 = Math.min(100, Math.round(breakeven70vs67 * 10) / 10);
+  // Cap at 110 (some people live to 105+!) and round to 1 decimal
+  breakeven67vs62 = Math.min(110, Math.round(breakeven67vs62 * 10) / 10);
+  breakeven70vs67 = Math.min(110, Math.round(breakeven70vs67 * 10) / 10);
 
   // Convert breakeven ages to calendar years
   var currentYear = new Date().getFullYear();
@@ -1759,8 +1759,8 @@ function calcSSBreakeven(baseId, fraId, ageId) {
   var panel = document.getElementById('ss-breakeven-'+suffix);
   if (!panel) return;
 
-  var be67label = breakeven67vs62 >= 100 ? 'Never breaks even' : 'Breakeven: age ' + breakeven67vs62 + ' (' + breakeven67yr + ')';
-  var be70label = breakeven70vs67 >= 100 ? 'Never breaks even' : 'Breakeven: age ' + breakeven70vs67 + ' (' + breakeven70yr + ')';
+  var be67label = breakeven67vs62 >= 110 ? 'Never breaks even' : 'Breakeven: age ' + breakeven67vs62 + ' (' + breakeven67yr + ')';
+  var be70label = breakeven70vs67 >= 110 ? 'Never breaks even' : 'Breakeven: age ' + breakeven70vs67 + ' (' + breakeven70yr + ')';
 
   panel.innerHTML =
     '<div style="font-size:9px;font-weight:700;color:var(--orange);text-transform:uppercase;margin-bottom:8px;">📊 Social Security Claiming Strategy</div>' +
@@ -1789,7 +1789,7 @@ function calcSSBreakeven(baseId, fraId, ageId) {
     '</div>' +
     '<div style="font-size:9px;color:#8aaabb;margin-top:8px;font-style:italic;padding:8px;background:rgba(0,0,0,0.15);border-radius:6px;">' +
       '💡 <strong style="color:#fff;">Rule of thumb:</strong> If you expect to live past ' +
-      (breakeven70vs67 < 100 ? 'age ' + breakeven70vs67 + ' (' + breakeven70yr + ')' : 'age 82') +
+      (breakeven70vs67 < 110 ? 'age ' + breakeven70vs67 + ' (' + breakeven70yr + ')' : 'age 82') +
       ', delaying to 70 maximizes your lifetime income. Claiming at 62 makes sense if you have health concerns or need the income now.' +
     '</div>';
 }
