@@ -176,8 +176,8 @@ function readAll(ss, inp) {
       showInCalc:str(ar,1), name:aName, owner:str(ar,3),
       type:str(ar,4), balance:bal,
       expectedReturn:ret*100, // *100 for display
-      contrib:num(ar,10),      // J = Annual Contribution
-      match:num(ar,11),        // K = Employer Match
+      contrib: (function(){ var v=num(ar,10); return (v>0 && v<500000) ? v : 0; })(),  // J = Annual Contribution
+      match:   (function(){ var v=num(ar,11); return (v>0 && v<500000) ? v : 0; })(),  // K = Employer Match
       contribStart:dt(ar,12),  // L = Contrib Start Date
       contribEnd:dt(ar,13),    // M = Contrib End Date
       withdrawStart:dt(ar,14), // N = Withdrawal Start Date
@@ -520,14 +520,6 @@ function writeInputs(ss, inp, data) {
         // ret comes in as whole number (7.0), store as decimal (0.07)
         var ret = Number(a.ret||a.expectedReturn||0);
         if (ret > 1) ret = ret/100;
-        // Parse date strings safely — avoid writing 0 which becomes 12/30/1899
-        function safeDate(val) {
-          if (!val || val === '' || val === '0') return '';
-          try {
-            var d = new Date(val);
-            return isNaN(d.getTime()) ? '' : d;
-          } catch(e) { return ''; }
-        }
         acctData.push([
           a.inc||a.showInCalc||'Yes',        // A = Include
           a.name||'',                        // B = Name
@@ -538,16 +530,25 @@ function writeInputs(ss, inp, data) {
           a.status||'Use for Withdrawals',   // G = Status
           a.dash||a.showOnDashboard||'No',   // H = Dashboard
           '',                                // I = Summary (read-only, skip)
-          Number(a.contrib||0),              // J = Annual Contribution
-          Number(a.match||0),                // K = Employer Match
-          safeDate(a.contribStart),          // L = Contrib Start Date
-          safeDate(a.contribEnd),            // M = Contrib End Date
-          safeDate(a.withdrawStart)          // N = Withdrawal Start Date
+          (isNaN(Number(a.contrib)) || Number(a.contrib) > 1000000 || Number(a.contrib) < 0) ? 0 : (Number(a.contrib)||0),   // J = Annual Contribution
+          (isNaN(Number(a.match))  || Number(a.match)  > 1000000 || Number(a.match)  < 0) ? 0 : (Number(a.match)||0),     // K = Employer Match
+          '',                                // L = Contrib Start (written separately below)
+          '',                                // M = Contrib End (written separately below)
+          ''                                 // N = Withdrawal Start (written separately below)
         ]);
       }
-      // Clear date columns first to avoid stale 1899 dates
-      inp.getRange('L105:N116').clearContent();
+      // Clear contribution and date columns first to remove any corrupt values
+      inp.getRange('J105:N116').clearContent();
       inp.getRange('A105:N116').setValues(acctData.slice(0,12));
+      // Write contribution dates separately using setD (handles date format correctly)
+      var acctRows = [105,106,107,108,109,110,111,112,113,114,115,116];
+      for (var ai=0; ai<12; ai++) {
+        var aa = data.accounts[ai] || {};
+        var r2 = acctRows[ai];
+        if (aa.contribStart) setD('L'+r2, aa.contribStart);
+        if (aa.contribEnd)   setD('M'+r2, aa.contribEnd);
+        if (aa.withdrawStart) setD('N'+r2, aa.withdrawStart);
+      }
 
       // Restore owner validation
       try {
