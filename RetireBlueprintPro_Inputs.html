@@ -1518,21 +1518,26 @@ function updatePartnerNames() {
   var oldP2 = ownerOptions[1];
   ownerOptions[0] = p1;
   ownerOptions[1] = p2;
-  // Update accountsData owners if they match old names
+  // Update accountsData owners — remap any owner not matching current valid names
   if (typeof accountsData !== 'undefined' && accountsData.length) {
-    var validNames = [p1.toLowerCase(), p2.toLowerCase(), 'joint', ''];
+    var validOwners = [p1.toLowerCase(), p2.toLowerCase(), 'joint', ''];
     accountsData.forEach(function(a) {
       var curr = String(a.owner||'').toLowerCase().trim();
-      // If owner matches old P1 name or is not a valid current name
-      if (curr === oldP1.toLowerCase() || 
-          (curr !== '' && curr !== 'joint' && 
-           validNames.indexOf(curr) < 0)) {
-        // Try to determine if it was P1 or P2
-        if (curr === oldP2.toLowerCase()) {
+      if (validOwners.indexOf(curr) < 0) {
+        // Not a valid name — remap to P1 or P2
+        if (oldP2 && curr === oldP2.toLowerCase()) {
           a.owner = p2;
         } else {
-          a.owner = p1; // default unrecognized to P1
+          a.owner = p1;
         }
+        markDirty();
+      } else if (curr === oldP1.toLowerCase() && p1 !== oldP1) {
+        // Was old P1 name, update to new P1 name
+        a.owner = p1;
+        markDirty();
+      } else if (curr === oldP2.toLowerCase() && p2 !== oldP2) {
+        // Was old P2 name, update to new P2 name  
+        a.owner = p2;
         markDirty();
       }
     });
@@ -1881,11 +1886,30 @@ function populateFromData(d) {
 
   // ── ACCOUNTS ───────────────────────────────────────────
   if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length) {
+    // Get current partner names from form
+    var _p1name = (document.getElementById('f-B31')||{value:''}).value.trim();
+    var _p2name = (document.getElementById('f-D31')||{value:''}).value.trim();
     accountsData = d.portfolio.accounts.map(function(a) {
+      // Remap owner: if not matching current p1, p2, or Joint — figure out which partner
+      var _owner = String(a.owner||'Joint').trim();
+      if (_p1name && _p2name) {
+        var _validNames = [_p1name.toLowerCase(), _p2name.toLowerCase(), 'joint'];
+        if (_validNames.indexOf(_owner.toLowerCase()) < 0) {
+          // Owner doesn't match current names — check server data for clues
+          // Use the original p1/p2 names from server (craig/gena aliases)
+          var _sp1 = d.people && d.people.craig ? (d.people.craig.name||'').toLowerCase() : '';
+          var _sp2 = d.people && d.people.gena  ? (d.people.gena.name||'').toLowerCase()  : '';
+          if (_sp2 && _owner.toLowerCase() === _sp2) {
+            _owner = _p2name;
+          } else {
+            _owner = _p1name; // default to p1
+          }
+        }
+      }
       return {
         inc:          a.showInCalc || 'No',
         name:         a.name || '',
-        owner:        a.owner || 'Joint',
+        owner:        _owner,
         type:         a.type || '',
         bal:          a.balance || 0,
         ret:          a.expectedReturn || 0, // already *100 from readAll
@@ -2908,10 +2932,13 @@ function syncCalcFromAccounts() {
 }
 
 function updateCalcNames() {
+  // Calculator was removed — this function is kept as a no-op to avoid errors
   var p1 = document.getElementById('f-B31');
   var p2 = document.getElementById('f-D31');
-  if (p1 && p1.value) document.getElementById('calc-p1-name').textContent = p1.value + ' — Pre-Retirement Projector';
-  if (p2 && p2.value) document.getElementById('calc-p2-name').textContent = p2.value + ' — Pre-Retirement Projector';
+  var el1 = document.getElementById('calc-p1-name');
+  var el2 = document.getElementById('calc-p2-name');
+  if (p1 && p1.value && el1) el1.textContent = p1.value + ' — Pre-Retirement Projector';
+  if (p2 && p2.value && el2) el2.textContent = p2.value + ' — Pre-Retirement Projector';
 }
 
 // ── CALCULATOR PERSISTENCE ────────────────────────────────
