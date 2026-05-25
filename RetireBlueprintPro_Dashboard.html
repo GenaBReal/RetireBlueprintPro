@@ -459,7 +459,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   <!-- New charts row -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;">
     <div class="chart-card">
-      <div class="chart-title">Roth Conversion Impact</div>
+      <div class="chart-title">Account Mix Over Time</div>
       <div class="chart-area"><canvas id="c6"></canvas></div>
     </div>
     <div class="chart-card">
@@ -798,17 +798,19 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
     {label:longestN+' Survivor',data:sData,borderColor:plum,borderDash:[5,3],fill:false,tension:0.4,pointRadius:3,borderWidth:2}
   ],false,true);
 
-  // ── C6: Roth Conversion Impact ──────────────────────────
-  // Show portfolio trajectory with vs without Roth conversions
-  // Simulate "no conversion" by assuming pre-tax stays taxed at futureRate
+  // ── C6: Account Mix Over Time ──────────────────────────
+  // Show how the mix of pre-tax, roth, and taxable changes over time
+  // This shows the tax diversification story
   var rothData = proj.roth || [];
   var preTaxData = proj.preTax || [];
-  var rothBalances = kidx.map(function(i){ return (rothData[i]||0); });
-  var preTaxBalances = kidx.map(function(i){ return (preTaxData[i]||0); });
-  mkChart('c6','line',yrs,[
-    {label:'Roth Balance',data:rothBalances,borderColor:teal,backgroundColor:'rgba(28,199,208,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2},
-    {label:'Pre-Tax Balance',data:preTaxBalances,borderColor:orange,backgroundColor:'rgba(244,184,106,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2}
-  ],false,true);
+  var taxableData = proj.taxable || [];
+  var hsaData = proj.hsa || [];
+  mkChart('c6','bar',yrs,[
+    {label:'Pre-Tax',data:kidx.map(function(i){return preTaxData[i]||0;}),backgroundColor:'rgba(4,30,47,0.85)',stack:'s'},
+    {label:'Roth',data:kidx.map(function(i){return rothData[i]||0;}),backgroundColor:teal,stack:'s'},
+    {label:'Taxable',data:kidx.map(function(i){return taxableData[i]||0;}),backgroundColor:orange,stack:'s'},
+    {label:'HSA',data:kidx.map(function(i){return hsaData[i]||0;}),backgroundColor:'#4CAF50',stack:'s'}
+  ],true,true);
 
   // ── C7: Tax Efficiency Over Time ──────────────────────────
   // Effective tax rate by year

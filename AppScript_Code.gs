@@ -120,6 +120,24 @@ function readAll(ss, inp) {
     salary:num(37,2), salaryStart:dt(38,2), salaryEnd:dt(39,2),
     ssBase:num(40,2), ssFra:num(41,2),
     ssMonthly:num(43,2), ssStartDate:dt(44,2),
+    ssAnnual:(function(){
+      var mo=num(43,2); return mo*12;
+    })(),
+    ssYear1:(function(){
+      // Prorate SS for start year based on start month
+      var mo=num(43,2); if(!mo) return 0;
+      var startDt=dt(44,2); if(!startDt) return mo*12;
+      var parts=String(startDt).split('/');
+      if(parts.length<3) return mo*12;
+      var planYr=(function(){ try{ return new Date(allData[5][1]).getFullYear(); } catch(e){ return new Date().getFullYear(); }})();
+      var ssYr=parseInt(parts[2]);
+      if(ssYr>planYr) return 0; // SS hasn't started yet in plan year
+      if(ssYr<planYr) return mo*12; // Full year
+      // Same year — prorate by months remaining
+      var ssMo=parseInt(parts[0]);
+      var monthsInYear=13-ssMo; // e.g. July start = 6 months (Jul-Dec)
+      return Math.round(mo*monthsInYear);
+    })(),
     pension:num(46,2), pensionStart:dt(47,2),
     otherIncome:num(49,2), otherStart:dt(50,2), otherEnd:dt(51,2),
     healthPreMedicare:num(52,2), healthMedicare:num(53,2), medicareAge:num(54,2),
@@ -135,6 +153,22 @@ function readAll(ss, inp) {
     salary:num(37,4), salaryStart:dt(38,4), salaryEnd:dt(39,4),
     ssBase:num(40,4), ssFra:num(41,4),
     ssMonthly:num(43,4), ssStartDate:dt(44,4),
+    ssAnnual:(function(){
+      var mo=num(43,4); return mo*12;
+    })(),
+    ssYear1:(function(){
+      var mo=num(43,4); if(!mo) return 0;
+      var startDt=dt(44,4); if(!startDt) return mo*12;
+      var parts=String(startDt).split('/');
+      if(parts.length<3) return mo*12;
+      var planYr=(function(){ try{ return new Date(allData[5][1]).getFullYear(); } catch(e){ return new Date().getFullYear(); }})();
+      var ssYr=parseInt(parts[2]);
+      if(ssYr>planYr) return 0;
+      if(ssYr<planYr) return mo*12;
+      var ssMo=parseInt(parts[0]);
+      var monthsInYear=13-ssMo;
+      return Math.round(mo*monthsInYear);
+    })(),
     pension:num(46,4), pensionStart:dt(47,4),
     otherIncome:num(49,4), otherStart:dt(50,4), otherEnd:dt(51,4),
     healthPreMedicare:num(52,4), healthMedicare:num(53,4), medicareAge:num(54,4),
