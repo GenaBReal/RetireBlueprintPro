@@ -369,6 +369,68 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   </div>
 </div>
 
+
+<!-- NEW CHARTS + PANELS -->
+<div style="padding:0 8px;">
+<!-- New charts row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;">
+    <div class="chart-card">
+      <div class="chart-title">Account Mix Over Time</div>
+      <div class="chart-area"><canvas id="c6"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Tax Efficiency Over Time</div>
+      <div class="chart-area"><canvas id="c7"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Withdrawal Strategy</div>
+      <div class="chart-area"><canvas id="c8"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Progress completion score -->
+  <div id="completion-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(28,199,208,0.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;">📋 Plan Completion Score<span class="tooltip-icon" data-tip="Shows which sections of your plan are complete. Green checkmarks = done. White boxes = still needs your input on the Inputs page.">?</span></div>
+      <div id="completion-score" style="font-size:28px;font-weight:900;color:#f4b86a;">—%</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.3);border-radius:6px;height:8px;margin-bottom:16px;">
+      <div id="completion-bar" style="height:8px;border-radius:6px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);width:0%;transition:width 1s ease;"></div>
+    </div>
+    <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;"></div>
+  </div>
+
+  <!-- Sequence of returns stress test -->
+  <div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(255,107,107,0.2);">
+    <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;">⚡ Stress Test — Sequence of Returns Risk<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions. A good plan survives even the 30% Year-1 drop scenario with a positive balance." style="border-color:#ff6b6b;color:#ff6b6b;">?</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">Base Scenario</div>
+        <div class="solver-kpi-val" id="stress-base" style="font-size:16px;color:#1CC7D0;">—</div>
+        <div class="solver-kpi-sub">Normal market returns</div>
+      </div>
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">Year 1 Down 20%</div>
+        <div class="solver-kpi-val" id="stress-20" style="font-size:16px;color:#f4b86a;">—</div>
+        <div class="solver-kpi-sub">Mild bear market</div>
+      </div>
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">Year 1 Down 30%</div>
+        <div class="solver-kpi-val" id="stress-30" style="font-size:16px;color:#ff6b6b;">—</div>
+        <div class="solver-kpi-sub">Severe bear market</div>
+      </div>
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">High Inflation (5%)</div>
+        <div class="solver-kpi-val" id="stress-inf" style="font-size:16px;color:#ff6b6b;">—</div>
+        <div class="solver-kpi-sub">vs base 3% inflation</div>
+      </div>
+    </div>
+  </div>
+    <div class="chart-note" id="c5-note">—</div>
+  </div>
+</div>
+</div>
+
 <!-- HOME EQUITY STRIP — only shows if home data in localStorage -->
 <div id="home-equity-panel" style="display:none;background:#fff;border-radius:6px;border:1px solid #e8eaed;overflow:hidden;margin-bottom:8px;">
   <div style="background:#041E2F;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;">
@@ -457,64 +519,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div class="chart-title" id="c5-title">Survivor Plan</div>
     <div class="chart-sub" id="c5-sub">Joint plan → Survivor plan</div>
     <div class="chart-area"><canvas id="c5"></canvas></div>
-
-  <!-- New charts row -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;">
-    <div class="chart-card">
-      <div class="chart-title">Account Mix Over Time</div>
-      <div class="chart-area"><canvas id="c6"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Tax Efficiency Over Time</div>
-      <div class="chart-area"><canvas id="c7"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Withdrawal Strategy</div>
-      <div class="chart-area"><canvas id="c8"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Progress completion score -->
-  <div id="completion-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(28,199,208,0.2);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;">📋 Plan Completion Score<span class="tooltip-icon" data-tip="Shows which sections of your plan are complete. Green checkmarks = done. White boxes = still needs your input on the Inputs page.">?</span></div>
-      <div id="completion-score" style="font-size:28px;font-weight:900;color:#f4b86a;">—%</div>
-    </div>
-    <div style="background:rgba(0,0,0,0.3);border-radius:6px;height:8px;margin-bottom:16px;">
-      <div id="completion-bar" style="height:8px;border-radius:6px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);width:0%;transition:width 1s ease;"></div>
-    </div>
-    <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;"></div>
-  </div>
-
-  <!-- Sequence of returns stress test -->
-  <div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(255,107,107,0.2);">
-    <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;">⚡ Stress Test — Sequence of Returns Risk<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions. A good plan survives even the 30% Year-1 drop scenario with a positive balance." style="border-color:#ff6b6b;color:#ff6b6b;">?</span></div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
-        <div class="solver-kpi-lbl">Base Scenario</div>
-        <div class="solver-kpi-val" id="stress-base" style="font-size:16px;color:#1CC7D0;">—</div>
-        <div class="solver-kpi-sub">Normal market returns</div>
-      </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
-        <div class="solver-kpi-lbl">Year 1 Down 20%</div>
-        <div class="solver-kpi-val" id="stress-20" style="font-size:16px;color:#f4b86a;">—</div>
-        <div class="solver-kpi-sub">Mild bear market</div>
-      </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
-        <div class="solver-kpi-lbl">Year 1 Down 30%</div>
-        <div class="solver-kpi-val" id="stress-30" style="font-size:16px;color:#ff6b6b;">—</div>
-        <div class="solver-kpi-sub">Severe bear market</div>
-      </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
-        <div class="solver-kpi-lbl">High Inflation (5%)</div>
-        <div class="solver-kpi-val" id="stress-inf" style="font-size:16px;color:#ff6b6b;">—</div>
-        <div class="solver-kpi-sub">vs base 3% inflation</div>
-      </div>
-    </div>
-  </div>
-    <div class="chart-note" id="c5-note">—</div>
-  </div>
-</div>
 
 <div style="background:#F8F9FA;border-top:2px solid #e8eaed;padding:10px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;">
   <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 1</div><div style="font-size:10px;color:#37474F;font-weight:600;">Open Your Inputs</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Update any number in the Inputs tab</div></div>
@@ -795,6 +799,9 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   var splitYr = otherP.projectedDeathYear;
   var jData = endLiq.map(function(v,i){return proj.years[kidx[i]]<=splitYr?v:null;});
   var sData = endLiq.map(function(v,i){return proj.years[kidx[i]]>=splitYr?v:null;});
+  // Clamp survivor data to 0 minimum
+  jData = jData.map(function(v){ return v !== null ? Math.max(0,v) : null; });
+  sData = sData.map(function(v){ return v !== null ? Math.max(0,v) : null; });
   mkChart('c5','line',yrs,[
     {label:'Joint Plan',data:jData,borderColor:navy,backgroundColor:'rgba(4,30,47,0.06)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
     {label:longestN+' Survivor',data:sData,borderColor:plum,borderDash:[5,3],fill:false,tension:0.4,pointRadius:3,borderWidth:2}
@@ -987,8 +994,13 @@ function updateStressTest(d) {
     var proj = d.projections;
     if (!proj || !proj.endLiquid || !proj.endLiquid.length) return;
 
-    // Base scenario — last value in projections
-    var baseEnd = proj.endLiquid[proj.endLiquid.length-1] || 0;
+    // Base scenario — find last NON-ZERO value in projections
+    var baseEnd = 0;
+    for (var si = proj.endLiquid.length-1; si >= 0; si--) {
+      if (proj.endLiquid[si] && proj.endLiquid[si] > 0) { baseEnd = proj.endLiquid[si]; break; }
+    }
+    // If still 0, try legacy projected ending
+    if (!baseEnd && d.legacy && d.legacy.projectedEnding) baseEnd = d.legacy.projectedEnding;
     var baseStart = proj.endLiquid[0] || 0;
 
     function fmtM(n) {
