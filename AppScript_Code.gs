@@ -453,22 +453,44 @@ function writeInputs(ss, inp, data) {
 
     // ── AUTO-UPDATE ACCOUNT OWNER NAMES ──────────────────────
     // When partner names change, update account owner cells that
-    // still have old/placeholder names to the new names
+    // don't match current valid names (p1New, p2New, Joint)
     try {
       var p1New = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
       var p2New = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
-      if (p1New || p2New) {
+      if (p1New && p2New) {
         var ownerRange = inp.getRange('C105:C116').getValues();
-        var oldNames = ['partner 1','partner 2','ken','barbie','carl','fred','eugene','john','jane'];
+        var accountData = inp.getRange('A105:N116').getValues();
+        var validNames = [p1New.toLowerCase(), p2New.toLowerCase(), 'joint', ''];
         var updated = false;
         for (var oi=0; oi<ownerRange.length; oi++) {
-          var val = String(ownerRange[oi][0]||'').trim().toLowerCase();
-          if (p1New && oldNames.indexOf(val) >= 0 && val !== p2New.toLowerCase() && val !== 'joint') {
-            ownerRange[oi][0] = p1New;
-            updated = true;
-          } else if (p2New && oldNames.indexOf(val) >= 0 && val !== p1New.toLowerCase() && val !== 'joint') {
-            ownerRange[oi][0] = p2New;
-            updated = true;
+          var currentOwner = String(ownerRange[oi][0]||'').trim();
+          var currentLower = currentOwner.toLowerCase();
+          // If current owner is not a valid name, figure out which partner it belongs to
+          if (validNames.indexOf(currentLower) < 0 && currentOwner !== '') {
+            // Check accounts data: if account has contribution data, 
+            // it's likely a personal account
+            // Use position heuristic: accounts 0-2 tend to be P1, 3-5 tend to be P2
+            // But better: check if the account has contributions matching P1 or P2
+            var hasP1Contrib = Number(accountData[oi][9]) > 0; // col J contrib
+            // Default: if first few accounts, assign to P1; later ones to P2
+            // Actually safest: keep as-is but update if it looks like an old test name
+            // The account write will have set the owner based on web app data
+            // so just log what we find
+            Logger.log('Found non-valid owner: "' + currentOwner + '" in row ' + (105+oi));
+          }
+        }
+        // Better approach: the accounts array from data already has correct owners
+        // (set by the web app). The sheet C105:C116 should match data.accounts[i].owner
+        // Let's use that directly:
+        if (data.accounts && data.accounts.length) {
+          for (var ai=0; ai<Math.min(data.accounts.length, 12); ai++) {
+            var webOwner = String(data.accounts[ai].owner||'').trim();
+            var sheetOwner = String(ownerRange[ai][0]||'').trim();
+            if (webOwner && webOwner !== sheetOwner) {
+              ownerRange[ai][0] = webOwner;
+              updated = true;
+              Logger.log('Updating owner row ' + (105+ai) + ': "' + sheetOwner + '" → "' + webOwner + '"');
+            }
           }
         }
         if (updated) inp.getRange('C105:C116').setValues(ownerRange);
