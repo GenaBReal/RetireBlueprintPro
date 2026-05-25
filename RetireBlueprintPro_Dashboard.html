@@ -466,7 +466,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 </div>
 
 <!-- CHARTS + INTEL -->
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr 195px;grid-template-rows:auto auto;gap:8px;margin-bottom:10px;">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 195px;grid-template-rows:auto auto;gap:8px;margin-bottom:0;">
   <div class="chart-card">
     <div class="chart-title">Portfolio Sustainability</div>
     <div class="chart-sub" id="c1-sub">Total end-of-year liquid assets</div>
@@ -520,8 +520,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   </div>
 </div>
 
-<!-- DIRECTIONS BAR — full width -->
-<div style="background:#F8F9FA;border-top:3px solid #1CC7D0;border-bottom:2px solid #e8eaed;padding:16px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:0;">
+<!-- DIRECTIONS BAR — full width, below grid -->
+<div style="background:#F8F9FA;border-top:3px solid #1CC7D0;border-bottom:2px solid #e8eaed;padding:16px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
   <div style="text-align:center;padding:8px;">
     <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 1</div>
     <div style="font-size:13px;color:#37474F;font-weight:700;">Open Your Inputs</div>
@@ -545,9 +545,65 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 </div>
 <div class="disclaimer" style="font-size:11px;padding:10px 24px;text-align:center;background:#f0f4f8;color:#5F6368;">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
 
-<!-- BELOW-GRID CONTENT (new charts, completion score, stress test, home equity) -->
-<div style="padding:0;">
+<!-- NEW CHARTS ROW -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:16px 0 8px;">
+  <div class="chart-card">
+    <div class="chart-title">Account Mix Over Time</div>
+    <div class="chart-area"><canvas id="c6"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Tax Efficiency Over Time</div>
+    <div class="chart-area"><canvas id="c7"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Withdrawal Strategy</div>
+    <div class="chart-area"><canvas id="c8"></canvas></div>
+  </div>
+</div>
 
+<!-- PLAN COMPLETION SCORE -->
+<div id="completion-panel" style="background:#0A3145;border-radius:12px;padding:28px;margin-bottom:16px;border:2px solid rgba(28,199,208,0.3);">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div style="font-size:16px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;">
+      📋 Plan Completion Score
+      <span class="tooltip-icon" data-tip="Shows which sections of your plan are complete. Green checkmarks = done. White boxes = still needs your input on the Inputs page.">?</span>
+    </div>
+    <div id="completion-score" style="font-size:48px;font-weight:900;color:#4CAF50;line-height:1;">—%</div>
+  </div>
+  <div style="background:rgba(0,0,0,0.4);border-radius:8px;height:12px;margin-bottom:20px;">
+    <div id="completion-bar" style="height:12px;border-radius:8px;background:linear-gradient(90deg,#1CC7D0,#4CAF50);width:0%;transition:width 1s ease;"></div>
+  </div>
+  <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;font-size:15px;"></div>
+</div>
+
+<!-- STRESS TEST -->
+<div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,107,107,0.2);">
+  <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+    ⚡ Stress Test — Sequence of Returns Risk
+    <span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions. A good plan survives even the 30% Year-1 drop scenario." style="border-color:#ff6b6b;color:#ff6b6b;">?</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+      <div class="solver-kpi-lbl">Base Scenario</div>
+      <div class="solver-kpi-val" id="stress-base" style="color:#1CC7D0;">—</div>
+      <div class="solver-kpi-sub">Normal market returns</div>
+    </div>
+    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+      <div class="solver-kpi-lbl">Year 1 Down 20%</div>
+      <div class="solver-kpi-val" id="stress-20">—</div>
+      <div class="solver-kpi-sub">Mild bear market</div>
+    </div>
+    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+      <div class="solver-kpi-lbl">Year 1 Down 30%</div>
+      <div class="solver-kpi-val" id="stress-30">—</div>
+      <div class="solver-kpi-sub">Severe bear market</div>
+    </div>
+    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+      <div class="solver-kpi-lbl">High Inflation (5%)</div>
+      <div class="solver-kpi-val" id="stress-inf">—</div>
+      <div class="solver-kpi-sub">vs base 3% inflation</div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
