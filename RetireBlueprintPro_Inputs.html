@@ -1514,8 +1514,29 @@ function updatePartnerNames() {
   var p2 = document.getElementById('f-D31').value || 'Partner 2';
   document.getElementById('p1-label').textContent = p1;
   document.getElementById('p2-label').textContent = p2;
+  var oldP1 = ownerOptions[0];
+  var oldP2 = ownerOptions[1];
   ownerOptions[0] = p1;
   ownerOptions[1] = p2;
+  // Update accountsData owners if they match old names
+  if (typeof accountsData !== 'undefined' && accountsData.length) {
+    var validNames = [p1.toLowerCase(), p2.toLowerCase(), 'joint', ''];
+    accountsData.forEach(function(a) {
+      var curr = String(a.owner||'').toLowerCase().trim();
+      // If owner matches old P1 name or is not a valid current name
+      if (curr === oldP1.toLowerCase() || 
+          (curr !== '' && curr !== 'joint' && 
+           validNames.indexOf(curr) < 0)) {
+        // Try to determine if it was P1 or P2
+        if (curr === oldP2.toLowerCase()) {
+          a.owner = p2;
+        } else {
+          a.owner = p1; // default unrecognized to P1
+        }
+        markDirty();
+      }
+    });
+  }
   // Rebuild accounts table so owner dropdowns show new names
   if (typeof buildAccountsTable === 'function') buildAccountsTable();
   // Update Roth plan table headers
