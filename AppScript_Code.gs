@@ -314,7 +314,7 @@ function readAll(ss, inp) {
   try {
     var masterSheet = ss.getSheetByName('Master');
     if (masterSheet) {
-      var masterData = masterSheet.getRange('A8:BX200').getValues();
+      var masterData = masterSheet.getRange('A8:CC200').getValues();
       masterData.forEach(function(row) {
         // col A = year — handle both plain number and date object
         var yr;
@@ -341,24 +341,29 @@ function readAll(ss, inp) {
         projections.federalTaxes.push(Math.round(fedTaxes));
         projections.taxableIncome.push(Math.round(taxableIncome));
         projections.stateIncome.push(Math.round(Number(row[42])||0)); // AP = State tax
-        // Account balances (all +5)
-        var p1_401k   = Number(row[59])||0;  // BC (+5)
-        var p1_roth   = Number(row[60])||0;  // BD (+5)
-        var p1_brok   = Number(row[61])||0;  // BE (+5)
-        var p2_401k   = Number(row[62])||0;  // BF (+5)
-        var p2_roth   = Number(row[63])||0;  // BG (+5)
-        var p2_brok   = Number(row[64])||0;  // BH (+5)
-        var hsa       = Number(row[65])||0;  // BI (+5)
+        // Account type TOTALS — correct column indices
+        var p1_401k   = Number(row[59])||0;  // BH = Craig 401k ending balance
+        var p1_roth   = Number(row[60])||0;  // BI = Craig Roth ending balance
+        var p1_brok   = Number(row[61])||0;  // BJ = Craig Brokerage ending balance
+        var p2_401k   = Number(row[62])||0;  // BK = Gena 401k ending balance
+        var p2_roth   = Number(row[63])||0;  // BL = Gena Roth ending balance
+        var p2_brok   = Number(row[64])||0;  // BM = Gena Brokerage ending balance
+        var hsa       = Number(row[65])||0;  // BN = HSA ending balance
+        // Portfolio type SUMMARIES for chart breakdowns
+        var totalPreTax = Number(row[72])||0;  // BU = total pre-tax
+        var totalRoth   = Number(row[73])||0;  // BV = total roth
+        var totalTaxable= Number(row[74])||0;  // BW = total taxable/liquid
+        var totalHSA    = Number(row[75])||0;  // BX = total HSA
         // Capture year 1 values for effective rate
         if (!masterYear1Set && yr >= 2020) {
           masterYear1FedTax        = fedTaxes;
           masterYear1TaxableIncome = taxableIncome;
           masterYear1Set = true;
         }
-        projections.preTax.push(Math.round(p1_401k + p2_401k));
-        projections.roth.push(Math.round(p1_roth + p2_roth));
-        projections.taxable.push(Math.round(p1_brok + p2_brok));
-        projections.hsa.push(Math.round(hsa));
+        projections.preTax.push(Math.round(totalPreTax||0));
+        projections.roth.push(Math.round(totalRoth||0));
+        projections.taxable.push(Math.round(totalTaxable||0));
+        projections.hsa.push(Math.round(totalHSA||0));
       });
     }
   } catch(e) {
