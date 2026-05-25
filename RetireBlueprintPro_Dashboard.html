@@ -463,7 +463,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZtBFAJXwiNSi60yk8fD7LQDi1xYlacsSUyzDkKcmQH3G5MbrpY_APjPBYbkbMX8ER/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 var navy='#041E2F', teal='#1CC7D0', orange='#f4b86a', green='#2E7032', plum='#6A4A6D';
 var _charts = {};
 
@@ -748,7 +748,7 @@ function loadData(){
 
   $s('loading-sub').textContent = 'Connecting to your Google Sheet…';
 
-  var url = 'https://script.google.com/macros/s/AKfycbwZtBFAJXwiNSi60yk8fD7LQDi1xYlacsSUyzDkKcmQH3G5MbrpY_APjPBYbkbMX8ER/exec?action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
+  var url = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec?action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
 
   fetch(url)
     .then(function(resp) { return resp.json(); })
@@ -803,7 +803,7 @@ function loadViaJSONP(sheetId) {
   };
 
   var s = document.createElement('script');
-  s.src = 'https://script.google.com/macros/s/AKfycbwZtBFAJXwiNSi60yk8fD7LQDi1xYlacsSUyzDkKcmQH3G5MbrpY_APjPBYbkbMX8ER/exec?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
+  s.src = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
   s.onerror = function() {
     clearTimeout(timer);
     $s('loading-overlay').style.display = 'none';
