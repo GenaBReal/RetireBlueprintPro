@@ -557,16 +557,15 @@ function writeInputs(ss, inp, data) {
         if (aa.withdrawStart) setD('N'+r2, aa.withdrawStart);
       }
 
-      // Restore owner validation
+      // Restore owner validation with actual partner names
       try {
-        var tsr = ss.getSheetByName('Technical Style Reference');
-        if (tsr) {
-          var rule = SpreadsheetApp.newDataValidation()
-            .requireValueInRange(tsr.getRange('F6:F8'), true)
-            .setAllowInvalid(false).build();
-          inp.getRange('C105:C124').setDataValidation(rule);
-        }
-      } catch(e){}
+        var p1n = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : 'Partner 1';
+        var p2n = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : 'Partner 2';
+        var ownerRule = SpreadsheetApp.newDataValidation()
+          .requireValueInList([p1n, p2n, 'Joint'], true)
+          .setAllowInvalid(true).build();
+        inp.getRange('C105:C116').setDataValidation(ownerRule);
+      } catch(e){ Logger.log('Owner validation error: ' + e); }
     }
 
     // ── SMILE CURVE ───────────────────────────────────────────

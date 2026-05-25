@@ -1516,6 +1516,8 @@ function updatePartnerNames() {
   document.getElementById('p2-label').textContent = p2;
   ownerOptions[0] = p1;
   ownerOptions[1] = p2;
+  // Rebuild accounts table so owner dropdowns show new names
+  if (typeof buildAccountsTable === 'function') buildAccountsTable();
   // Update Roth plan table headers
   var h1 = document.getElementById('roth-p1-hdr');
   var h2 = document.getElementById('roth-p2-hdr');
