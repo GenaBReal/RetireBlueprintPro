@@ -784,15 +784,15 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   var floor   = yrs.map(function(){return Math.round(leg.safetyFloor||leg.goal||0);});
 
   mkChart('c1','line',yrs,[
-    {label:'Portfolio',data:endLiq,borderColor:navy,backgroundColor:'rgba(4,30,47,0.07)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
-    {label:'Floor',data:floor,borderColor:orange,borderDash:[5,3],fill:false,pointRadius:0,borderWidth:1.5}
-  ],false,false);
+    {label:'Portfolio Balance',data:endLiq,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.12)',fill:true,tension:0.4,pointRadius:4,pointBackgroundColor:'#1CC7D0',borderWidth:3},
+    {label:'Legacy Goal',data:floor,borderColor:'#f4b86a',borderDash:[6,4],fill:false,pointRadius:0,borderWidth:2}
+  ],false,true);
 
   mkChart('c2','bar',yrs,[
-    {label:'Pre-Tax',data:preTax,backgroundColor:'rgba(4,30,47,0.85)',stack:'a'},
-    {label:'Roth',data:roth,backgroundColor:teal,stack:'a'},
-    {label:'Taxable',data:taxable,backgroundColor:orange,stack:'a'},
-    {label:'HSA',data:hsa,backgroundColor:green,stack:'a'}
+    {label:'Pre-Tax',data:preTax,backgroundColor:'#5b8fa8',stack:'a'},
+    {label:'Roth',data:roth,backgroundColor:'#1CC7D0',stack:'a'},
+    {label:'Taxable',data:taxable,backgroundColor:'#f4b86a',stack:'a'},
+    {label:'HSA',data:hsa,backgroundColor:'#4CAF50',stack:'a'}
   ],true,true);
 
   // Income bridge — first 12 years
@@ -821,8 +821,8 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
     _charts['c5'] = new Chart(c5ctx,{
       type:'line',
       data:{labels:allProjYrs,datasets:[
-        {label:'Joint Plan',data:jDataFull,borderColor:navy,backgroundColor:'rgba(4,30,47,0.2)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
-        {label:longestN+' Survivor',data:sDataFull,borderColor:plum,backgroundColor:'rgba(141,107,146,0.15)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5}
+        {label:'Joint Plan',data:jDataFull,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.12)',fill:true,tension:0.3,pointRadius:0,borderWidth:3},
+        {label:longestN+' Survivor',data:sDataFull,borderColor:'#f4b86a',backgroundColor:'rgba(244,184,106,0.1)',fill:true,tension:0.3,pointRadius:0,borderWidth:3}
       ]},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:true,labels:{font:{size:12},color:'#c8dae8',boxWidth:14}}},
@@ -842,7 +842,7 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   var taxableData = proj.taxable || [];
   var hsaData = proj.hsa || [];
   mkChart('c6','bar',yrs,[
-    {label:'Pre-Tax',data:kidx.map(function(i){return preTaxData[i]||0;}),backgroundColor:'rgba(4,30,47,0.85)',stack:'s'},
+    {label:'Pre-Tax',data:kidx.map(function(i){return preTaxData[i]||0;}),backgroundColor:'#5b8fa8',stack:'s'},
     {label:'Roth',data:kidx.map(function(i){return rothData[i]||0;}),backgroundColor:teal,stack:'s'},
     {label:'Taxable',data:kidx.map(function(i){return taxableData[i]||0;}),backgroundColor:orange,stack:'s'},
     {label:'HSA',data:kidx.map(function(i){return hsaData[i]||0;}),backgroundColor:'#4CAF50',stack:'s'}
@@ -858,14 +858,14 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
     return inc > 0 ? Math.round(tax/inc*1000)/10 : 0;
   });
   mkChart('c7','line',yrs,[
-    {label:'Effective Fed Rate %',data:effRates,borderColor:'#9b59b6',backgroundColor:'rgba(155,89,182,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2}
+    {label:'Effective Fed Rate %',data:effRates,borderColor:'#f4b86a',backgroundColor:'rgba(244,184,106,0.1)',fill:true,tension:0.4,pointRadius:4,pointBackgroundColor:'#f4b86a',borderWidth:3}
   ],false,false);
 
   // ── C8: Withdrawal Strategy ──────────────────────────────
   // Show which account types are being drawn down each year
   var wdPreTax = kidx.map(function(i){ return proj.withdrawals[i]||0; }); // simplified
   mkChart('c8','bar',yrs,[
-    {label:'Total Withdrawal',data:wdPreTax,backgroundColor:'rgba(244,184,106,0.7)',borderRadius:2}
+    {label:'Annual Withdrawal',data:wdPreTax,backgroundColor:'#f4b86a',borderRadius:3,borderWidth:0}
   ],false,false);
 }
 

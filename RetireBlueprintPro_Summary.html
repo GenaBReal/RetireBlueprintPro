@@ -24,7 +24,7 @@
   .page { max-width:800px; margin:20px auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
   
   /* Header */
-  .report-header { background:var(--navy); padding:24px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+  .report-header { background:var(--navy); padding:24px 32px; }
   .report-logo { color:#fff; }
   .report-logo-title { font-size:22px; font-weight:900; color:#fff; }
   .report-logo-sub { font-size:8px; color:var(--teal); text-transform:uppercase; letter-spacing:2px; }
@@ -97,19 +97,25 @@
 <div class="page" id="report-page" style="display:none;">
   <!-- Header -->
   <div class="report-header">
-    <div class="report-logo" style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
-      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:55px;width:auto;" onerror="this.style.display='none'">
-      <div>
-        <div class="report-logo-title">RETIRE<span style="color:var(--teal);">BLUEPRINT</span></div>
-        <div style="color:var(--orange);font-size:14px;font-weight:700;letter-spacing:2px;">— PRO —</div>
-        <div class="report-logo-sub">Your Retirement. Your Plan. Your Freedom.</div>
-      </div>
-    </div>
-    <div class="report-meta">
-      <div class="report-meta-name" id="r-names" style="color:#fff;font-size:16px;font-weight:800;margin-bottom:6px;">Your Retirement Plan</div>
-      <div id="r-date" style="color:#8aaabb;font-size:11px;margin-bottom:3px;">Generated: loading...</div>
-      <div id="r-plan-year" style="color:#8aaabb;font-size:11px;">Plan Year: —</div>
-    </div>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="vertical-align:middle;width:50%;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:55px;width:auto;" onerror="this.style.display='none'">
+            <div>
+              <div style="font-size:22px;font-weight:900;color:#fff;">RETIRE<span style="color:var(--teal);">BLUEPRINT</span></div>
+              <div style="color:var(--orange);font-size:13px;font-weight:700;letter-spacing:2px;">— PRO —</div>
+              <div style="font-size:9px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;">Your Retirement. Your Plan. Your Freedom.</div>
+            </div>
+          </div>
+        </td>
+        <td style="vertical-align:middle;text-align:right;width:50%;">
+          <div id="r-names" style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:6px;">Your Retirement Plan</div>
+          <div id="r-date" style="font-size:12px;color:#8aaabb;margin-bottom:3px;">Generated: loading...</div>
+          <div id="r-plan-year" style="font-size:12px;color:#8aaabb;">Plan Year: —</div>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <div class="report-body">
