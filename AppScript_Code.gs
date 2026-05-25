@@ -265,9 +265,9 @@ function readAll(ss, inp) {
     assumedRate:pct(145,2), taxSavings:num(146,2),
   };
 
-  // Roth plan (rows 150-169, B=col2, C=col3)
+  // Roth plan (rows 150-199, B=col2, C=col3) — 50 years 2026-2075
   var rothPlan = [];
-  for (var i=0; i<12; i++) {
+  for (var i=0; i<50; i++) {
     var row = 150+i;
     rothPlan.push({year:2026+i, p1:num(row,2), p2:num(row,3)});
   }
@@ -275,7 +275,7 @@ function readAll(ss, inp) {
   // Read Master sheet for year-by-year projection data (charts)
   var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
                      preTax:[], roth:[], taxable:[], hsa:[],
-                     federalTaxes:[], taxableIncome:[]};
+                     federalTaxes:[], taxableIncome:[], stateIncome:[]};
   var masterYear1FedTax = 0, masterYear1TaxableIncome = 0, masterYear1Set = false;
   try {
     var masterSheet = ss.getSheetByName('Master');
@@ -293,6 +293,7 @@ function readAll(ss, inp) {
         var taxableIncome= Number(row[39])||0;  // AI = Total Taxable Income (+5)
         projections.federalTaxes.push(Math.round(fedTaxes));
         projections.taxableIncome.push(Math.round(taxableIncome));
+        projections.stateIncome.push(Math.round(Number(row[42])||0)); // AP = State tax
         // Account balances (all +5)
         var p1_401k   = Number(row[59])||0;  // BC (+5)
         var p1_roth   = Number(row[60])||0;  // BD (+5)
@@ -660,17 +661,19 @@ function writeInputs(ss, inp, data) {
     // B150:B169 = partner1 amounts, C150:C169 = partner2 amounts (rows = 2026-2045)
     if (data.rothPlan && data.rothPlan.length) {
       // Write year, p1 amount, p2 amount to A:C rows 150-169
-      // Master VLOOKUP uses col A for year lookup: VLOOKUP(year, A136:C157, 2, FALSE)
       var allArr = [];
-      for (var i=0; i<12; i++) {
+      for (var i=0; i<50; i++) {
         var yr = 2026 + i;
         var p1 = 0, p2 = 0;
         data.rothPlan.forEach(function(row) {
           if (Number(row.year) === yr) { p1=Number(row.p1)||0; p2=Number(row.p2)||0; }
         });
-        allArr.push([yr, p1, p2]); // A=year, B=p1, C=p2
+        allArr.push([yr, p1, p2]);
       }
-      inp.getRange('A150:C169').setValues(allArr);
+      // Force year column to plain number format first
+      inp.getRange('A150:A199').setNumberFormat('0');
+      inp.getRange('B150:C199').setNumberFormat('0');
+      inp.getRange('A150:C199').setValues(allArr);
     }
 
     SpreadsheetApp.flush();

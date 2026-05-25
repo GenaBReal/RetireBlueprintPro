@@ -1055,18 +1055,19 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     <div class="form-grid-4" style="margin-bottom:14px;">
       <div class="field">
         <label>Analysis Year</label>
-        <input type="number" id="f-B139" value="" min="2026" max="2060" onchange="markDirty()">
+        <input type="number" id="f-B139" value="" min="2026" max="2060" onchange="updateRothIncomeForYear(); markDirty();">
         <span class="hint">Which year to analyze</span>
       </div>
       <div class="field">
         <label>Target Tax Bracket</label>
-        <select id="f-B141" onchange="markDirty()">
+        <select id="f-B141" onchange="updateRothIncomeForYear(); markDirty();">
           <option value="10%">10% Bracket</option>
           <option value="12%" selected>12% Bracket</option>
           <option value="22%">22% Bracket</option>
           <option value="24%">24% Bracket</option>
         </select>
         <span class="hint">Fill up to this bracket</span>
+        <div id="roth-bracket-hint" style="font-size:11px;color:var(--teal);margin-top:4px;font-style:italic;"></div>
       </div>
       <div class="field">
         <label>Assumed Future Rate (%)</label>
@@ -1509,6 +1510,47 @@ function calcSSMonthly(baseId, fraId, startDateId, ageId, monthlyId) {
 }
 
 // ── PARTNER NAMES ────────────────────────────────────────────
+function updateRothIncomeForYear() {
+  var yr = parseInt(document.getElementById('f-B139').value);
+  if (!yr || !window._rbpProjections) return;
+  var proj = window._rbpProjections;
+  var idx = proj.years ? proj.years.indexOf(yr) : -1;
+  if (idx < 0 || !proj.taxableIncome) return;
+
+  var income = proj.taxableIncome[idx];
+  setTxt('r-income', fmt(income));
+
+  // Inflation-adjusted MFJ bracket thresholds for chosen year
+  var yearsOut = Math.max(0, yr - 2024);
+  var inf = Math.pow(1.03, yearsOut);
+  var brackets = [
+    {name:'10% Bracket', threshold:Math.round(23200*inf)},
+    {name:'12% Bracket', threshold:Math.round(94300*inf)},
+    {name:'22% Bracket', threshold:Math.round(201050*inf)},
+    {name:'24% Bracket', threshold:Math.round(383900*inf)},
+    {name:'32% Bracket', threshold:Math.round(487450*inf)},
+    {name:'35% Bracket', threshold:Math.round(731200*inf)},
+  ];
+
+  // Find which bracket client is currently in
+  var currentBracketName = '35% Bracket';
+  for (var b=0; b<brackets.length; b++) {
+    if (income <= brackets[b].threshold) { currentBracketName = brackets[b].name; break; }
+  }
+
+  // Show current bracket as hint
+  var hint = document.getElementById('roth-bracket-hint');
+  if (hint) hint.textContent = 'Currently in ' + currentBracketName + ' for ' + yr;
+
+  // Calculate optimal conversion based on selected target bracket
+  var bracketEl = document.getElementById('f-B141');
+  var targetBracket = bracketEl ? bracketEl.value : '12% Bracket';
+  var targetThreshold = 94300; // default 12%
+  brackets.forEach(function(b){ if(b.name===targetBracket) targetThreshold=b.threshold; });
+  var optimal = Math.max(0, targetThreshold - income);
+  setTxt('r-optimal', fmt(optimal));
+}
+
 function updatePartnerNames() {
   var p1 = document.getElementById('f-B31').value || 'Partner 1';
   var p2 = document.getElementById('f-D31').value || 'Partner 2';
@@ -1979,11 +2021,21 @@ function populateFromData(d) {
   if (roth.bracket) sv('f-B141', roth.bracket);
   if (roth.assumedRate) sv('f-B145', Math.round(roth.assumedRate*10000)/100);
 
-  // Roth solver results
-  setTxt('r-income',   fmt(roth.taxableIncome));
+  // Roth solver results — look up taxable income for chosen year from projections
+  var _rothYr = roth.year || new Date().getFullYear();
+  var _rothIncome = 0;
+  if (d.projections && d.projections.years && d.projections.taxableIncome) {
+    var _yrIdx = d.projections.years.indexOf(_rothYr);
+    if (_yrIdx >= 0) _rothIncome = d.projections.taxableIncome[_yrIdx];
+  }
+  if (!_rothIncome) _rothIncome = roth.taxableIncome || 0;
+  setTxt('r-income', fmt(_rothIncome));
   setTxt('r-optimal',   fmt(roth.optimalAmount));
   setTxt('r-tax-now',  fmt(roth.marginalTax));
   setTxt('r-savings',  fmt(roth.taxSavings));
+  
+  // Store projections for year lookup when user changes analysis year
+  if (d.projections) window._rbpProjections = d.projections;
 
   // ── ROTH PLAN AMOUNTS ────────────────────────────────
   // Rebuild table first to ensure fields exist, then populate
@@ -2362,11 +2414,11 @@ function buildRothPlanTable() {
   var h2 = document.getElementById('roth-p2-hdr');
   if (h1) h1.textContent = p1 + "'s Conversion ($)";
   if (h2) h2.textContent = p2 + "'s Conversion ($)";
-  // Build rows 2026-2045 (prime Roth window years)
-  for (var yr = 2026; yr <= 2045; yr++) {
+  // Build rows 2026-2075 (50 year Roth window)
+  for (var yr = 2026; yr <= 2075; yr++) {
     var isCurrent = yr === 2026;
     html += '<tr' + (isCurrent ? ' style="background:#fffbf0;"' : '') + '>' +
-      '<td><strong>' + yr + '</strong>' + (yr <= 2033 ? ' <span style="font-size:8px;color:var(--teal);">Prime Window</span>' : '') + '</td>' +
+      '<td><strong>' + yr + '</strong>' + (yr <= 2033 ? ' <span style="font-size:8px;color:var(--teal);">Prime Window</span>' : yr <= 2045 ? ' <span style="font-size:8px;color:#8aaabb;">Pre-RMD</span>' : '') + '</td>' +
       '<td><input type="number" id="roth-p1-' + yr + '" value="0" min="0" step="1000" ' +
         'style="width:140px;" onchange="updateRothTotal(' + yr + ');markDirty();" placeholder="0"></td>' +
       '<td><input type="number" id="roth-p2-' + yr + '" value="0" min="0" step="1000" ' +
