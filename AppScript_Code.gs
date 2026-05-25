@@ -548,8 +548,9 @@ function writeInputs(ss, inp, data) {
     // A=include, B=name, C=owner, D=type, E=balance, F=return(decimal), G=status, H=dashboard
     if (data.accounts && data.accounts.length) {
       Logger.log('Accounts received: ' + data.accounts.length);
-      Logger.log('First account: ' + JSON.stringify(data.accounts[0]));
-      Logger.log('contrib: ' + data.accounts[0].contrib + ' match: ' + data.accounts[0].match);
+      Logger.log('First account owner: ' + data.accounts[0].owner);
+      Logger.log('p1name: ' + (data.partner1 ? data.partner1.B31 : 'MISSING'));
+      Logger.log('p2name: ' + (data.partner2 ? data.partner2.D31 : 'MISSING'));
       var p1name = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
       var p2name = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
 
@@ -560,9 +561,14 @@ function writeInputs(ss, inp, data) {
       for (var i=0; i<12; i++) {
         var a = data.accounts[i] || {};
         var owner = String(a.owner||'Joint').trim();
-        if (owner==='Partner 1'||owner==='Craig'||owner==='Kent') owner = p1name||'Joint';
-        if (owner==='Partner 2'||owner==='Gena'||owner==='Georgia') owner = p2name||'Joint';
-        if (!owner || owner==='Joint') owner = 'Joint';
+        var ownerLower = owner.toLowerCase();
+        var validOwners = [p1name.toLowerCase(), p2name.toLowerCase(), 'joint', ''];
+        if (validOwners.indexOf(ownerLower) < 0) {
+          // Unrecognized owner name — use index position to guess:
+          // accounts 0,1,2 (first 3) → P1; account 3 → P2; rest → Joint
+          owner = (i < 3) ? (p1name||'Joint') : (i===3 ? (p2name||'Joint') : 'Joint');
+        }
+        if (!owner || owner === '') owner = 'Joint';
         // ret comes in as whole number (7.0), store as decimal (0.07)
         var ret = Number(a.ret||a.expectedReturn||0);
         if (ret > 1) ret = ret/100;
@@ -592,6 +598,7 @@ function writeInputs(ss, inp, data) {
       SpreadsheetApp.flush(); // Ensure clear completes before writing
       // Log what we're about to write to J and K
       Logger.log('Writing accounts J/K: ' + acctData.map(function(r){return r[9]+'/'+r[10];}).join(', '));
+      Logger.log('Writing owners: ' + acctData.map(function(r){return r[2];}).join(', '));
       inp.getRange('A105:N116').setValues(acctData.slice(0,12));
       // Write contribution dates separately using setD (handles date format correctly)
       var acctRows = [105,106,107,108,109,110,111,112,113,114,115,116];
