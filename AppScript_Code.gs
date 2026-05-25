@@ -451,6 +451,30 @@ function writeInputs(ss, inp, data) {
       if (p.D54) setN('D54', p.D54);
     }
 
+    // ── AUTO-UPDATE ACCOUNT OWNER NAMES ──────────────────────
+    // When partner names change, update account owner cells that
+    // still have old/placeholder names to the new names
+    try {
+      var p1New = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
+      var p2New = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
+      if (p1New || p2New) {
+        var ownerRange = inp.getRange('C105:C116').getValues();
+        var oldNames = ['partner 1','partner 2','ken','barbie','carl','fred','eugene','john','jane'];
+        var updated = false;
+        for (var oi=0; oi<ownerRange.length; oi++) {
+          var val = String(ownerRange[oi][0]||'').trim().toLowerCase();
+          if (p1New && oldNames.indexOf(val) >= 0 && val !== p2New.toLowerCase() && val !== 'joint') {
+            ownerRange[oi][0] = p1New;
+            updated = true;
+          } else if (p2New && oldNames.indexOf(val) >= 0 && val !== p1New.toLowerCase() && val !== 'joint') {
+            ownerRange[oi][0] = p2New;
+            updated = true;
+          }
+        }
+        if (updated) inp.getRange('C105:C116').setValues(ownerRange);
+      }
+    } catch(e) { Logger.log('Auto-update owner names error: ' + e); }
+
     // ── EXPENSES ──────────────────────────────────────────────
     // A=editable label, B=monthly($), C=yearly(FORMULA-NEVER WRITE), D=notes
     if (data.expenses && data.expenses.length) {

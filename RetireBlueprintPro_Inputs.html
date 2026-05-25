@@ -1870,9 +1870,9 @@ function populateFromData(d) {
         ret:          a.expectedReturn || 0, // already *100 from readAll
         contrib:      a.contrib || 0,
         match:        a.match || 0,
-        contribStart: a.contribStart || '',  // K = Contrib Start Date
-        contribEnd:   a.contribEnd || '',    // L = Contrib End Date
-        withdrawStart:a.withdrawStart || '', // M = Withdrawal Start Date
+        contribStart: toISO(a.contribStart),  // L = Contrib Start Date
+        contribEnd:   toISO(a.contribEnd),    // M = Contrib End Date
+        withdrawStart:toISO(a.withdrawStart), // N = Withdrawal Start Date
         status:       a.status || 'Use for Withdrawals',
         dash:         a.showOnDashboard || 'No'
       };
@@ -2042,6 +2042,20 @@ function gd(id) {
   var el = document.getElementById(id);
   if (!el || !el.value) return '';
   return el.value; // Already in YYYY-MM-DD format
+}
+function toISO(val) {
+  // Convert M/D/YYYY (from GS dt()) to YYYY-MM-DD (for HTML date inputs)
+  if (!val || val === '') return '';
+  var s = String(val).trim();
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // Convert M/D/YYYY
+  var p = s.split('/');
+  if (p.length === 3) {
+    var yr = p[2], mo = p[0].padStart(2,'0'), dy = p[1].padStart(2,'0');
+    if (yr.length === 4) return yr + '-' + mo + '-' + dy;
+  }
+  return '';
 }
 function gn(id) {
   var el = document.getElementById(id);
