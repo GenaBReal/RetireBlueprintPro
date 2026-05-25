@@ -1070,9 +1070,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <div id="roth-bracket-hint" style="font-size:11px;color:var(--teal);margin-top:4px;font-style:italic;"></div>
       </div>
       <div class="field">
-        <label>Assumed Future Rate (%)</label>
-        <input type="number" id="f-B145" value="" min="10" max="40" onchange="markDirty()">
-        <span class="hint">Expected rate when RMDs begin at 73</span>
+        <label>Assumed Future Tax Rate (%)</label>
+        <input type="number" id="f-B145" value="" min="1" max="50" onchange="updateRothIncomeForYear(); markDirty();">
+        <span class="hint">Your estimated effective federal tax rate when RMDs begin at 73 — used to calculate tax savings of converting now vs later</span>
+        <div id="roth-tax-hint" style="font-size:11px;color:var(--teal);margin-top:4px;font-style:italic;"></div>
       </div>
     </div>
 
@@ -1541,6 +1542,14 @@ function updateRothIncomeForYear() {
   // Show current bracket as hint
   var hint = document.getElementById('roth-bracket-hint');
   if (hint) hint.textContent = 'Currently in ' + currentBracketName + ' for ' + yr;
+
+  // Show effective tax rate for chosen year
+  if (window._rbpProjections && window._rbpProjections.federalTaxes) {
+    var fedTax = window._rbpProjections.federalTaxes[idx] || 0;
+    var effRate = income > 0 ? Math.round(fedTax/income*1000)/10 : 0;
+    var taxHint = document.getElementById('roth-tax-hint');
+    if (taxHint && effRate > 0) taxHint.textContent = 'Projected effective rate in ' + yr + ': ' + effRate + '%';
+  }
 
   // Calculate optimal conversion based on selected target bracket
   var bracketEl = document.getElementById('f-B141');
@@ -2020,6 +2029,37 @@ function populateFromData(d) {
   if (roth.year && roth.year > 2020) sv('f-B139', roth.year);
   if (roth.bracket) sv('f-B141', roth.bracket);
   if (roth.assumedRate) sv('f-B145', Math.round(roth.assumedRate*10000)/100);
+
+  // Auto-populate assumed future tax rate from Master at RMD year (age 73)
+  // Only auto-populate if field is empty or still at default
+  var taxRateEl = document.getElementById('f-B145');
+  var currentTaxRate = taxRateEl ? parseFloat(taxRateEl.value) : 0;
+  if ((!currentTaxRate || currentTaxRate === 8) && d.projections && d.projections.years) {
+    // Find the year when Partner 1 turns 73
+    var p1Age = d.people && d.people.craig ? (d.people.craig.age||0) : 0;
+    var rmdYear = p1Age > 0 ? (new Date().getFullYear() + (73 - p1Age)) : 0;
+    if (rmdYear > 0) {
+      var rmdIdx = d.projections.years.indexOf(rmdYear);
+      if (rmdIdx < 0) {
+        // Find closest year
+        for (var ri=0; ri<d.projections.years.length; ri++) {
+          if (d.projections.years[ri] >= rmdYear) { rmdIdx = ri; break; }
+        }
+      }
+      if (rmdIdx >= 0 && d.projections.federalTaxes && d.projections.taxableIncome) {
+        var rmdFedTax = d.projections.federalTaxes[rmdIdx];
+        var rmdTaxable = d.projections.taxableIncome[rmdIdx];
+        if (rmdTaxable > 0) {
+          var effectiveRateAtRMD = Math.round((rmdFedTax / rmdTaxable) * 1000) / 10; // as %
+          if (effectiveRateAtRMD > 0 && effectiveRateAtRMD < 50) {
+            sv('f-B145', effectiveRateAtRMD);
+            var hint = document.getElementById('roth-tax-hint');
+            if (hint) hint.textContent = 'Auto-estimated from your projected ' + rmdYear + ' tax data (' + rmdYear + ' = age 73)';
+          }
+        }
+      }
+    }
+  }
 
   // Roth solver results — look up taxable income for chosen year from projections
   var _rothYr = roth.year || new Date().getFullYear();
