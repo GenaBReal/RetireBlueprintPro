@@ -1423,6 +1423,7 @@ function collectDebts() {
     debts.push({
       inc:    (document.getElementById('d-inc-'+i)||{}).textContent||'No',
       name:   gv('d-name-'+i),
+      pp:     parseInt(String(((document.getElementById('d-pp-'+i)||{value:'0'}).value)||'0').replace(/[^0-9]/g,''))||0,
       mo:     parseInt(String(((document.getElementById('d-mo-'+i)||{}).value)||'0').replace(/[^0-9]/g,''))||0,
       ann:    gn('d-ann-'+i),
       start:  gd('d-start-'+i),
@@ -1831,7 +1832,7 @@ function populateFromData(d) {
       if (incEl) { incEl.textContent = debt.inc||'No'; incEl.className = debt.inc==='Yes'?'toggle-yes':'toggle-no'; }
       if (nmEl)  nmEl.value  = debt.name || '';
     var ppEl = document.getElementById('d-pp-'+i);
-    if (ppEl) ppEl.value = debt.pp ? parseInt(debt.pp).toLocaleString() : '';
+    if (ppEl) ppEl.value = debt.pp && debt.pp > 0 ? parseInt(debt.pp).toLocaleString() : '';
       if (moEl)  moEl.value  = debt.mo  ? parseInt(debt.mo).toLocaleString()  : '';
       if (annEl) { var dmo=parseInt(debt.mo)||0; annEl.value = dmo ? '$'+(dmo*12).toLocaleString() : ''; }
       if (balEl) balEl.value = debt.bal ? parseInt(debt.bal).toLocaleString() : '';

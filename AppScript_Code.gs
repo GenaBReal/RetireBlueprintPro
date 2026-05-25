@@ -482,7 +482,7 @@ function writeInputs(ss, inp, data) {
         // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance
         inp.getRange('A'+r).setValue(d.inc||'Yes');
         if (d.name && String(d.name).trim()) inp.getRange('B'+r).setValue(String(d.name));
-        if (d.pp) inp.getRange('C'+r).setValue(Number(d.pp));
+        if (d.pp > 0) inp.getRange('C'+r).setValue(Number(d.pp));  // C = Purchase Price
         if (mo > 0 || hasData) {
           inp.getRange('D'+r).setValue(mo);      // D = Monthly
           inp.getRange('E'+r).setValue(mo*12);   // E = Annual (Master reads this!)
