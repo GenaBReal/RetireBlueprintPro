@@ -79,7 +79,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 .chart-card{background:#fff;border-radius:6px;padding:11px 13px;border:1px solid #e8eaed;}
 .chart-title{font-size:9px;font-weight:700;color:#0B2239;text-transform:uppercase;letter-spacing:1px;}
 .chart-sub{font-size:8px;color:#9ca3af;margin-bottom:8px;margin-top:1px;font-style:italic;}
-.chart-area{height:120px;position:relative;}
+.chart-area{height:180px;position:relative;}
 .chart-note{font-size:8px;color:#455A64;margin-top:6px;}
 .chart-note strong{color:#0B2239;font-size:11px;}
 .intel{background:#041E2F;border-radius:6px;padding:11px 13px;display:flex;flex-direction:column;height:100%;box-sizing:border-box;}
@@ -118,11 +118,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 .welcome-btn-dash{background:#f4b86a;color:#041E2F;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;width:100%;}
 
 .chart-card{background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:16px;border:1px solid rgba(28,199,208,0.15);}
-.chart-title{font-size:10px;font-weight:700;color:var(--teal,#1CC7D0);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.chart-title{font-size:13px;font-weight:700;color:var(--teal,#1CC7D0);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
 .solver-kpi{text-align:center;background:rgba(255,255,255,0.05);border-radius:6px;padding:12px 8px;}
-.solver-kpi-lbl{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;}
-.solver-kpi-val{font-size:20px;font-weight:800;color:#f4b86a;margin-top:4px;}
-.solver-kpi-sub{font-size:9px;color:#8a9ab0;margin-top:2px;}
+.solver-kpi-lbl{font-size:11px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;}
+.solver-kpi-val{font-size:26px;font-weight:800;color:#f4b86a;margin-top:6px;}
+.solver-kpi-sub{font-size:11px;color:#8a9ab0;margin-top:4px;line-height:1.4;}
 .tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(28,199,208,0.2);color:#1CC7D0;font-size:10px;font-weight:700;cursor:help;margin-left:4px;position:relative;flex-shrink:0;}
 .tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:11px;font-weight:400;padding:8px 12px;border-radius:6px;white-space:normal;width:220px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;}
 </style>
@@ -392,36 +392,36 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   <div id="completion-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(28,199,208,0.2);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;">📋 Plan Completion Score<span class="tooltip-icon" data-tip="Shows which sections of your plan are complete. Green checkmarks = done. White boxes = still needs your input on the Inputs page.">?</span></div>
-      <div id="completion-score" style="font-size:28px;font-weight:900;color:#f4b86a;">—%</div>
+      <div id="completion-score" style="font-size:36px;font-weight:900;color:#f4b86a;">—%</div>
     </div>
     <div style="background:rgba(0,0,0,0.3);border-radius:6px;height:8px;margin-bottom:16px;">
       <div id="completion-bar" style="height:8px;border-radius:6px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);width:0%;transition:width 1s ease;"></div>
     </div>
-    <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;"></div>
+    <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:13px;"></div>
   </div>
 
   <!-- Sequence of returns stress test -->
   <div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(255,107,107,0.2);">
     <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;">⚡ Stress Test — Sequence of Returns Risk<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions. A good plan survives even the 30% Year-1 drop scenario with a positive balance." style="border-color:#ff6b6b;color:#ff6b6b;">?</span></div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
         <div class="solver-kpi-lbl">Base Scenario</div>
-        <div class="solver-kpi-val" id="stress-base" style="font-size:16px;color:#1CC7D0;">—</div>
+        <div class="solver-kpi-val" id="stress-base" style="color:#1CC7D0;">—</div>
         <div class="solver-kpi-sub">Normal market returns</div>
       </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
         <div class="solver-kpi-lbl">Year 1 Down 20%</div>
-        <div class="solver-kpi-val" id="stress-20" style="font-size:16px;color:#f4b86a;">—</div>
+        <div class="solver-kpi-val" id="stress-20">—</div>
         <div class="solver-kpi-sub">Mild bear market</div>
       </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
         <div class="solver-kpi-lbl">Year 1 Down 30%</div>
-        <div class="solver-kpi-val" id="stress-30" style="font-size:16px;color:#ff6b6b;">—</div>
+        <div class="solver-kpi-val" id="stress-30">—</div>
         <div class="solver-kpi-sub">Severe bear market</div>
       </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
         <div class="solver-kpi-lbl">High Inflation (5%)</div>
-        <div class="solver-kpi-val" id="stress-inf" style="font-size:16px;color:#ff6b6b;">—</div>
+        <div class="solver-kpi-val" id="stress-inf">—</div>
         <div class="solver-kpi-sub">vs base 3% inflation</div>
       </div>
     </div>
@@ -553,11 +553,11 @@ function fmtP(n){
 function mkChart(id,type,labels,datasets,stacked,legend){
   if(_charts[id]) _charts[id].destroy();
   var ctx=$s(id); if(!ctx) return;
-  var sy={ticks:{font:{size:8},color:'#5F6368',callback:function(v){if(v>=1000000)return'$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return'$'+Math.round(v/1000)+'K';return'$'+v;}},grid:{color:'#f3f4f6'}};
+  var sy={ticks:{font:{size:12},color:'#8aaabb',maxTicksLimit:6,callback:function(v){if(v>=1000000)return'$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return'$'+Math.round(v/1000)+'K';return v===0?'$0':'$'+v;}},grid:{color:'rgba(255,255,255,0.06)'}};
   if(stacked) sy.stacked=true;
-  var sx={ticks:{font:{size:8},color:'#5F6368'},grid:{display:false}};
+  var sx={ticks:{font:{size:11},color:'#8aaabb',maxTicksLimit:8},grid:{display:false}};
   if(stacked) sx.stacked=true;
-  _charts[id]=new Chart(ctx,{type:type,data:{labels:labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:!!legend,labels:{font:{size:8},color:'#5F6368',boxWidth:10}}},scales:{x:sx,y:sy}}});
+  _charts[id]=new Chart(ctx,{type:type,data:{labels:labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:!!legend,labels:{font:{size:11},color:'#c8dae8',boxWidth:12,padding:8}}},scales:{x:sx,y:sy}}});
 }
 
 function populate(d){
@@ -734,13 +734,17 @@ function populate(d){
 
   // CHART NOTES
   set('c1-sub', 'Total end-of-year liquid assets · '+meta.planYear+'–'+longestP.projectedDeathYear);
-  set('c1-note', 'Peak: '+fmt(port.peakValue)+' ('+port.peakYear+') · Ends: '+fmt(leg.projectedEnding)+' · Goal '+(pct>=100?'met ✅':pct+'%'));
+  // Scan projections for actual peak
+  var _peakVal=0, _peakYr='';
+  if(proj.endLiquid) { proj.endLiquid.forEach(function(v,i){ if((v||0)>_peakVal){_peakVal=v;_peakYr=proj.years?proj.years[i]:'';} }); }
+  var _peakStr = _peakVal>0 ? fmt(_peakVal)+' in '+_peakYr : fmt(port.peakValue||0);
+  set('c1-note', 'Peak: '+_peakStr+' · Ends: '+fmt(leg.projectedEnding)+' · Goal '+(pct>=100?'met ✅':pct+'%'));
   set('c3-sub', 'Salary → SS + Pension · '+p2n+' SS starts '+p2.ssStartDate);
   set('c3-note', p2n+' SS: '+fmt(p2.ssAnnual||0)+'/yr · '+p1n+' pension: '+fmt((p1.pension||0)*12)+'/yr');
   set('c4-note', 'Phase 1: '+fmt((sp.baseAnnual||0)+(sp.phase1Extra||0))+'/yr · Phase 2: '+fmt((sp.baseAnnual||0)+(sp.phase2Extra||0))+'/yr · Phase 3: '+fmt((sp.baseAnnual||0)+(sp.phase3Extra||0))+'/yr');
   set('c5-title', 'Survivor Plan — '+longestN+" runs to age "+longestP.deathAge);
   set('c5-sub', 'Joint '+meta.planYear+'–'+otherP.projectedDeathYear+' · '+longestN+' survivor '+(otherP.projectedDeathYear+1)+'–'+longestP.projectedDeathYear);
-  set('c5-note', 'Handoff at '+fmt(port.peakValue)+' ('+port.peakYear+') · '+longestN+' plan ends at '+fmt(leg.projectedEnding));
+  set('c5-note', 'Joint plan → '+longestN+' survivor · '+longestN+' plan ends at '+fmt(leg.projectedEnding));
 
   set('load-status', '✓ Plan loaded · '+meta.generated);
   drawCharts(d, p1, p2, p1n, p2n, longestN, longestP, otherP, otherN, meta);
@@ -802,10 +806,24 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   // Clamp survivor data to 0 minimum
   jData = jData.map(function(v){ return v !== null ? Math.max(0,v) : null; });
   sData = sData.map(function(v){ return v !== null ? Math.max(0,v) : null; });
-  mkChart('c5','line',yrs,[
-    {label:'Joint Plan',data:jData,borderColor:navy,backgroundColor:'rgba(4,30,47,0.06)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
-    {label:longestN+' Survivor',data:sData,borderColor:plum,borderDash:[5,3],fill:false,tension:0.4,pointRadius:3,borderWidth:2}
-  ],false,true);
+  // Use custom chart options for survivor — force y-axis min to 0
+  if(_charts['c5']) _charts['c5'].destroy();
+  var c5ctx = $s('c5'); if(c5ctx) {
+    _charts['c5'] = new Chart(c5ctx,{
+      type:'line',
+      data:{labels:yrs,datasets:[
+        {label:'Joint Plan',data:jData,borderColor:navy,backgroundColor:'rgba(4,30,47,0.06)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
+        {label:longestN+' Survivor',data:sData,borderColor:plum,borderDash:[5,3],fill:false,tension:0.4,pointRadius:3,borderWidth:2}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,labels:{font:{size:11},color:'#c8dae8',boxWidth:12}}},
+        scales:{
+          x:{ticks:{font:{size:11},color:'#8aaabb'},grid:{display:false}},
+          y:{min:0,ticks:{font:{size:12},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.06)'}}
+        }
+      }
+    });
+  }
 
   // ── C6: Account Mix Over Time ──────────────────────────
   // Show how the mix of pre-tax, roth, and taxable changes over time
@@ -992,61 +1010,89 @@ function updateCompletionScore(d) {
 function updateStressTest(d) {
   try {
     var proj = d.projections;
+    var leg = d.legacy || {};
+    var p1 = d.people.craig || {};
+    var p2 = d.people.gena  || {};
     if (!proj || !proj.endLiquid || !proj.endLiquid.length) return;
 
-    // Base scenario — find last NON-ZERO value in projections
+    // Find last non-zero ending balance
     var baseEnd = 0;
     for (var si = proj.endLiquid.length-1; si >= 0; si--) {
       if (proj.endLiquid[si] && proj.endLiquid[si] > 0) { baseEnd = proj.endLiquid[si]; break; }
     }
-    // If still 0, try legacy projected ending
-    if (!baseEnd && d.legacy && d.legacy.projectedEnding) baseEnd = d.legacy.projectedEnding;
+    if (!baseEnd && leg.projectedEnding) baseEnd = leg.projectedEnding;
     var baseStart = proj.endLiquid[0] || 0;
+    var legacyGoal = leg.goal || 0;
+    var longestAge = Math.max(p1.deathAge||90, p2.deathAge||90);
+    var planEndYr = proj.years ? proj.years[proj.years.length-1] : new Date().getFullYear()+30;
 
     function fmtM(n) {
-      if (Math.abs(n) >= 1000000) return '$'+(n/1000000).toFixed(1)+'M';
-      if (Math.abs(n) >= 1000) return '$'+Math.round(n/1000)+'K';
-      return '$'+Math.round(n);
+      if (n >= 1000000) return '$'+(n/1000000).toFixed(1)+'M';
+      if (n >= 1000) return '$'+Math.round(n/1000)+'K';
+      if (n > 0) return '$'+Math.round(n);
+      return '$0';
     }
 
-    // Down 20% in year 1 — apply shock to starting balance and project forward
-    var shock20 = baseStart * 0.8;
-    var ratio20 = baseStart > 0 ? shock20/baseStart : 1;
-    var end20 = Math.round(baseEnd * ratio20 * 0.92); // slightly worse due to sequence risk
+    // Stress scenarios
+    var ratio20 = baseStart > 0 ? (baseStart*0.8)/baseStart : 1;
+    var ratio30 = baseStart > 0 ? (baseStart*0.7)/baseStart : 1;
+    var end20 = Math.max(0, Math.round(baseEnd * ratio20 * 0.92));
+    var end30 = Math.max(0, Math.round(baseEnd * ratio30 * 0.85));
+    var endInf = Math.max(0, Math.round(baseEnd * 0.82));
 
-    // Down 30% in year 1
-    var shock30 = baseStart * 0.7;
-    var ratio30 = baseStart > 0 ? shock30/baseStart : 1;
-    var end30 = Math.round(baseEnd * ratio30 * 0.85);
+    function stressFeedback(val, base, label) {
+      var pct = base > 0 ? Math.round((val-base)/base*100) : 0;
+      var color, icon, msg;
+      if (val >= legacyGoal && val > 0) {
+        color = '#4CAF50'; icon = '✅';
+        msg = 'Legacy goal met · ' + fmtM(val - legacyGoal) + ' above target';
+      } else if (val > 0) {
+        color = '#f4b86a'; icon = '⚠️';
+        msg = fmtM(legacyGoal - val) + ' below legacy goal';
+      } else {
+        // Find approx year money runs out
+        color = '#ff6b6b'; icon = '⛔';
+        msg = 'Portfolio depleted before plan ends';
+      }
+      return {pct:pct, color:color, icon:icon, msg:msg};
+    }
 
-    // High inflation 5% — expenses grow faster, roughly 15% worse outcome
-    var endInf = Math.round(baseEnd * 0.82);
+    var fb0 = stressFeedback(baseEnd, baseEnd, 'base');
+    var fb20 = stressFeedback(end20, baseEnd, '20%');
+    var fb30 = stressFeedback(end30, baseEnd, '30%');
+    var fbInf = stressFeedback(endInf, baseEnd, 'inflation');
 
-    function setStress(id, val, base) {
+    function renderStress(id, val, fb, pct) {
       var el = document.getElementById(id);
       if (!el) return;
       el.textContent = fmtM(val);
-      var pct = base > 0 ? Math.round((val-base)/base*100) : 0;
-      el.style.color = pct >= 0 ? '#4CAF50' : pct >= -20 ? '#f4b86a' : '#ff6b6b';
-      el.title = (pct >= 0 ? '+' : '') + pct + '% vs base scenario';
+      el.style.color = fb.color;
+      // Update subtitle
+      var sub = el.nextElementSibling;
+      if (sub) {
+        sub.innerHTML = '<div style="font-size:10px;color:'+fb.color+';font-weight:700;margin-top:4px;">'+fb.icon+' '+fb.msg+'</div>' +
+          (pct !== null ? '<div style="font-size:10px;color:#8aaabb;">'+( pct >= 0 ? '+' : '')+pct+'% vs base</div>' : '');
+      }
     }
 
-    setStress('stress-base', baseEnd, baseEnd);
-    setStress('stress-20',   end20,   baseEnd);
-    setStress('stress-30',   end30,   baseEnd);
-    setStress('stress-inf',  endInf,  baseEnd);
+    renderStress('stress-base', baseEnd, fb0, null);
+    renderStress('stress-20',   end20,   fb20, fb20.pct);
+    renderStress('stress-30',   end30,   fb30, fb30.pct);
+    renderStress('stress-inf',  endInf,  fbInf, fbInf.pct);
 
-    // Add % change labels
-    ['stress-20','stress-30','stress-inf'].forEach(function(id, i) {
-      var vals = [end20, end30, endInf];
-      var pct = baseEnd > 0 ? Math.round((vals[i]-baseEnd)/baseEnd*100) : 0;
-      var sub = document.querySelector('#'+id+' + .stress-sub') || 
-                (function(){ 
-                  var el = document.getElementById(id);
-                  var next = el ? el.nextElementSibling : null;
-                  return next;
-                })();
-    });
+    // Update panel header with overall verdict
+    var header = document.querySelector('#stress-panel > div:first-child');
+    if (header) {
+      var worstCase = Math.min(end20, end30, endInf);
+      var verdict = worstCase >= legacyGoal
+        ? ' — <span style="color:#4CAF50;font-size:12px;">✅ Plan survives all scenarios</span>'
+        : worstCase > 0
+        ? ' — <span style="color:#f4b86a;font-size:12px;">⚠️ Some scenarios fall below legacy goal</span>'
+        : ' — <span style="color:#ff6b6b;font-size:12px;">⛔ Plan at risk in worst case</span>';
+      header.innerHTML = '⚡ Stress Test — Sequence of Returns Risk' +
+        '<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions." style="border-color:#ff6b6b;color:#ff6b6b;">?</span>' +
+        verdict;
+    }
 
   } catch(e) { console.log('Stress test error:', e); }
 }
