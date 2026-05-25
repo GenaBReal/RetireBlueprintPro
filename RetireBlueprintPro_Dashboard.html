@@ -427,13 +427,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
         <div class="solver-kpi-val" id="stress-inf">—</div>
         <div class="solver-kpi-sub">vs base 3% inflation</div>
       </div>
-    </div>
-  </div>
-    <div class="chart-note" id="c5-note">—</div>
-  </div>
-</div>
-</div>
-
+ 
 <!-- HOME EQUITY STRIP — only shows if home data in localStorage -->
 <div id="home-equity-panel" style="display:none;background:#fff;border-radius:6px;border:1px solid #e8eaed;overflow:hidden;margin-bottom:8px;">
   <div style="background:#041E2F;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;">
@@ -522,14 +516,38 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div class="chart-title" id="c5-title">Survivor Plan</div>
     <div class="chart-sub" id="c5-sub">Joint plan → Survivor plan</div>
     <div class="chart-area"><canvas id="c5"></canvas></div>
-
-<div style="background:#F8F9FA;border-top:2px solid #e8eaed;padding:10px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;">
-  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 1</div><div style="font-size:10px;color:#37474F;font-weight:600;">Open Your Inputs</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Update any number in the Inputs tab</div></div>
-  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 2</div><div style="font-size:10px;color:#37474F;font-weight:600;">Sheet Recalculates</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Master &amp; projections update automatically</div></div>
-  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 3</div><div style="font-size:10px;color:#37474F;font-weight:600;">Refresh Dashboard</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">Press Cmd+Shift+R to hard-reload this page</div></div>
-  <div style="text-align:center;"><div style="font-size:9px;font-weight:700;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Step 4</div><div style="font-size:10px;color:#37474F;font-weight:600;">See Your Updated Plan</div><div style="font-size:9px;color:#5F6368;margin-top:2px;">All charts and numbers refresh instantly</div></div>
+    <div class="chart-note" id="c5-note">—</div>
+  </div>
 </div>
-<div class="disclaimer">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
+
+<!-- DIRECTIONS BAR — full width -->
+<div style="background:#F8F9FA;border-top:3px solid #1CC7D0;border-bottom:2px solid #e8eaed;padding:16px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:0;">
+  <div style="text-align:center;padding:8px;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 1</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">Open Your Inputs</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Update any number in the Inputs tab</div>
+  </div>
+  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 2</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">Sheet Recalculates</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Master &amp; projections update automatically</div>
+  </div>
+  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 3</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">Refresh Dashboard</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Press Cmd+Shift+R to hard-reload this page</div>
+  </div>
+  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 4</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">See Your Updated Plan</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">All charts and numbers refresh instantly</div>
+  </div>
+</div>
+<div class="disclaimer" style="font-size:11px;padding:10px 24px;text-align:center;background:#f0f4f8;color:#5F6368;">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
+
+<!-- BELOW-GRID CONTENT (new charts, completion score, stress test, home equity) -->
+<div style="padding:0;">
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -1214,5 +1232,6 @@ function loadHomeEquity(sheetData) {
 }
 
 </script>
+</div></div></div></div>
 </body>
 </html>
