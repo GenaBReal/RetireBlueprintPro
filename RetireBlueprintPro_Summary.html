@@ -106,9 +106,9 @@
       </div>
     </div>
     <div class="report-meta">
-      <div class="report-meta-name" id="r-names">—</div>
-      <div id="r-date">Generated: —</div>
-      <div id="r-plan-year">Plan Year: —</div>
+      <div class="report-meta-name" id="r-names" style="color:#fff;font-size:16px;font-weight:800;margin-bottom:6px;">Your Retirement Plan</div>
+      <div id="r-date" style="color:#8aaabb;font-size:11px;margin-bottom:3px;">Generated: loading...</div>
+      <div id="r-plan-year" style="color:#8aaabb;font-size:11px;">Plan Year: —</div>
     </div>
   </div>
 
@@ -351,15 +351,17 @@ function populateReport(d) {
   var proj = d.projections || {};
   var roth = d.roth || {};
 
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('report-page').style.display = 'block';
-
-  // Header
+  // Populate header FIRST so it shows immediately
   var today = new Date();
-  set('r-names', (p1.name||'Partner 1') + ' & ' + (p2.name||'Partner 2') + ' — Retirement Plan');
+  var p1name = p1.name || 'Partner 1';
+  var p2name = p2.name || 'Partner 2';
+  set('r-names', p1name + ' & ' + p2name + ' — Retirement Plan');
   set('r-date', 'Generated: ' + today.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}));
   set('r-plan-year', 'Plan Year: ' + (gl.planYear || today.getFullYear()));
   set('r-footer-date', today.toLocaleDateString());
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('report-page').style.display = 'block';
 
   // Plan status
   var confidence = leg.achievedPct || 0;

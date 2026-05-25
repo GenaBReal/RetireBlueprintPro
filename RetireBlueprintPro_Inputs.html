@@ -1763,34 +1763,44 @@ function calcSSBreakeven(baseId, fraId, ageId) {
   var be70label = breakeven70vs67 >= 110 ? 'Never breaks even' : 'Breakeven: age ' + breakeven70vs67 + ' (' + breakeven70yr + ')';
 
   panel.innerHTML =
-    '<div style="font-size:9px;font-weight:700;color:var(--orange);text-transform:uppercase;margin-bottom:8px;">📊 Social Security Claiming Strategy</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;">' +
-    '<div style="background:rgba(0,0,0,0.2);border-radius:6px;padding:10px;text-align:center;">' +
-      '<div style="font-size:8px;color:#f4b86a;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Claim at 62</div>' +
-      '<div style="font-size:18px;font-weight:800;color:#fff;">$' + Math.round(at62).toLocaleString() + '/mo</div>' +
-      '<div style="font-size:10px;color:#f4b86a;margin-top:2px;">$' + Math.round(at62*12/1000*10)/10 + 'K/yr</div>' +
-      '<div style="font-size:9px;color:#8aaabb;margin-top:6px;border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;">Total by age 85: $' + Math.round(total62at85/1000) + 'K</div>' +
-      '<div style="font-size:9px;color:#8aaabb;">Breakeven vs FRA: —</div>' +
+    '<div style="font-size:10px;font-weight:700;color:#0B2239;text-transform:uppercase;margin-bottom:10px;letter-spacing:0.5px;">📊 Social Security Claiming Strategy</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;">' +
+
+    '<div style="background:#fff3e0;border-radius:8px;padding:12px;text-align:center;border:1px solid #ffcc80;">' +
+      '<div style="font-size:9px;color:#e65100;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Claim at 62</div>' +
+      '<div style="font-size:20px;font-weight:800;color:#bf360c;">$' + Math.round(at62).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
+      '<div style="font-size:11px;color:#e65100;margin-top:2px;font-weight:600;">$' + Math.round(at62*12/1000*10)/10 + 'K/yr</div>' +
+      '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #ffcc80;">' +
+        '<div style="font-size:10px;color:#5d4037;">Lifetime to 85: <strong>$' + Math.round(total62at85/1000) + 'K</strong></div>' +
+        '<div style="font-size:10px;color:#bf360c;margin-top:2px;">Breakeven vs FRA: —</div>' +
+      '</div>' +
     '</div>' +
-    '<div style="background:rgba(28,199,208,0.1);border-radius:6px;padding:10px;text-align:center;border:1px solid rgba(28,199,208,0.3);">' +
-      '<div style="font-size:8px;color:#1CC7D0;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Claim at FRA (age ' + fra + ')</div>' +
-      '<div style="font-size:18px;font-weight:800;color:#1CC7D0;">$' + Math.round(atFRA).toLocaleString() + '/mo</div>' +
-      '<div style="font-size:10px;color:#1CC7D0;margin-top:2px;">$' + Math.round(atFRA*12/1000*10)/10 + 'K/yr</div>' +
-      '<div style="font-size:9px;color:#8aaabb;margin-top:6px;border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;">Total by age 85: $' + Math.round(totalFRAat85/1000) + 'K</div>' +
-      '<div style="font-size:9px;color:#1CC7D0;font-weight:600;">' + be67label + '</div>' +
+
+    '<div style="background:#e0f7fa;border-radius:8px;padding:12px;text-align:center;border:2px solid #0097a7;">' +
+      '<div style="font-size:9px;color:#006064;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Claim at FRA (age ' + fra + ')</div>' +
+      '<div style="font-size:20px;font-weight:800;color:#006064;">$' + Math.round(atFRA).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
+      '<div style="font-size:11px;color:#0097a7;margin-top:2px;font-weight:600;">$' + Math.round(atFRA*12/1000*10)/10 + 'K/yr</div>' +
+      '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #80deea;">' +
+        '<div style="font-size:10px;color:#004d40;">Lifetime to 85: <strong>$' + Math.round(totalFRAat85/1000) + 'K</strong></div>' +
+        '<div style="font-size:10px;color:#006064;font-weight:700;margin-top:2px;">' + be67label + '</div>' +
+      '</div>' +
     '</div>' +
-    '<div style="background:rgba(76,175,80,0.08);border-radius:6px;padding:10px;text-align:center;border:1px solid rgba(76,175,80,0.2);">' +
-      '<div style="font-size:8px;color:#4CAF50;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Delay to 70</div>' +
-      '<div style="font-size:18px;font-weight:800;color:#4CAF50;">$' + Math.round(at70).toLocaleString() + '/mo</div>' +
-      '<div style="font-size:10px;color:#4CAF50;margin-top:2px;">$' + Math.round(at70*12/1000*10)/10 + 'K/yr</div>' +
-      '<div style="font-size:9px;color:#8aaabb;margin-top:6px;border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;">Total by age 85: $' + Math.round(total70at85/1000) + 'K · Age 90: $' + Math.round(total70at90/1000) + 'K</div>' +
-      '<div style="font-size:9px;color:#4CAF50;font-weight:600;">' + be70label + '</div>' +
+
+    '<div style="background:#e8f5e9;border-radius:8px;padding:12px;text-align:center;border:1px solid #66bb6a;">' +
+      '<div style="font-size:9px;color:#1b5e20;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Delay to 70</div>' +
+      '<div style="font-size:20px;font-weight:800;color:#1b5e20;">$' + Math.round(at70).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
+      '<div style="font-size:11px;color:#2e7d32;margin-top:2px;font-weight:600;">$' + Math.round(at70*12/1000*10)/10 + 'K/yr</div>' +
+      '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #a5d6a7;">' +
+        '<div style="font-size:10px;color:#1b5e20;">To 85: <strong>$' + Math.round(total70at85/1000) + 'K</strong> · To 90: <strong>$' + Math.round(total70at90/1000) + 'K</strong></div>' +
+        '<div style="font-size:10px;color:#2e7d32;font-weight:700;margin-top:2px;">' + be70label + '</div>' +
+      '</div>' +
     '</div>' +
+
     '</div>' +
-    '<div style="font-size:9px;color:#8aaabb;margin-top:8px;font-style:italic;padding:8px;background:rgba(0,0,0,0.15);border-radius:6px;">' +
-      '💡 <strong style="color:#fff;">Rule of thumb:</strong> If you expect to live past ' +
+    '<div style="font-size:10px;color:#37474f;margin-top:10px;padding:10px 12px;background:#f5f5f5;border-left:3px solid #0097a7;border-radius:0 6px 6px 0;line-height:1.6;">' +
+      '💡 <strong>Rule of thumb:</strong> If you expect to live past ' +
       (breakeven70vs67 < 110 ? 'age ' + breakeven70vs67 + ' (' + breakeven70yr + ')' : 'age 82') +
-      ', delaying to 70 maximizes your lifetime income. Claiming at 62 makes sense if you have health concerns or need the income now.' +
+      ', delaying to 70 pays off. Claiming at 62 makes sense if you have health concerns or need the income now.' +
     '</div>';
 }
 
