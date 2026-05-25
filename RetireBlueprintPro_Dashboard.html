@@ -371,40 +371,40 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 
 
 <!-- HOME EQUITY -->
-<div style="background:#0A3145;border-top:2px solid #f4b86a;padding:12px 16px;margin-top:16px;border-radius:12px;">
+<div id="home-equity-panel" style="background:#fff;border-top:3px solid #f4b86a;border-bottom:1px solid #e8eaed;padding:12px 16px;margin:0 -14px 16px;display:none;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
     <div style="font-size:11px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:1px;">
-      🏠 <span id="home-equity-title">Home Equity</span> · <span id="home-equity-type" style="color:#8aaabb;">Mortgage</span>
+      🏠 <span id="dash-home-name">Home Equity</span> · <span style="color:#5F6368;">Mortgage</span>
     </div>
     <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="font-size:10px;color:#1CC7D0;text-decoration:none;">Update in Inputs →</a>
   </div>
   <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;">
     <div style="text-align:center;">
-      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Today · Home Value</div>
-      <div style="font-size:18px;font-weight:800;color:#fff;" id="he-value">—</div>
+      <div style="font-size:9px;color:#5F6368;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Today · Home Value</div>
+      <div style="font-size:18px;font-weight:800;color:#041E2F;" id="dash-home-value">—</div>
     </div>
     <div style="text-align:center;">
-      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Mortgage Owed</div>
-      <div style="font-size:18px;font-weight:800;color:#ff6b6b;" id="he-owed">—</div>
+      <div style="font-size:9px;color:#5F6368;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Mortgage Owed</div>
+      <div style="font-size:18px;font-weight:800;color:#C62828;" id="dash-home-mort-now">—</div>
     </div>
     <div style="text-align:center;">
-      <div style="font-size:9px;color:#1CC7D0;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Current Net Equity</div>
-      <div style="font-size:18px;font-weight:800;color:#1CC7D0;" id="he-equity">—</div>
+      <div style="font-size:9px;color:#1565C0;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Current Net Equity</div>
+      <div style="font-size:18px;font-weight:800;color:#1565C0;" id="dash-home-equity-now">—</div>
     </div>
     <div style="text-align:center;">
-      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">At Payoff (~<span id="he-payoff-yrs">—</span> Yrs)</div>
-      <div style="font-size:18px;font-weight:800;color:#4CAF50;" id="he-at-payoff">—</div>
-      <div style="font-size:9px;color:#8aaabb;" id="he-appr-rate">—</div>
+      <div style="font-size:9px;color:#5F6368;text-transform:uppercase;font-weight:700;margin-bottom:4px;" id="dash-home-proj-lbl">At Payoff</div>
+      <div style="font-size:18px;font-weight:800;color:#2E7032;" id="dash-home-fv">—</div>
+      <div style="font-size:9px;color:#5F6368;" id="dash-home-years-lbl">—</div>
     </div>
     <div style="text-align:center;">
-      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Mortgage Left</div>
-      <div style="font-size:18px;font-weight:800;color:#fff;" id="he-mort-left">—</div>
-      <div style="font-size:9px;color:#8aaabb;" class="equity-lbl"></div>
+      <div style="font-size:9px;color:#5F6368;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Mortgage Left</div>
+      <div style="font-size:18px;font-weight:800;color:#041E2F;" id="dash-home-mort">—</div>
+      <div style="font-size:9px;color:#5F6368;margin-top:2px;" class="mort-lbl"></div>
     </div>
     <div style="text-align:center;">
-      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Projected Net Equity</div>
-      <div style="font-size:18px;font-weight:800;color:#4CAF50;" id="dash-home-equity">—</div>
-      <div style="font-size:9px;color:#8aaabb;margin-top:2px;" class="equity-lbl"></div>
+      <div style="font-size:9px;color:#5F6368;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Projected Net Equity</div>
+      <div style="font-size:18px;font-weight:800;color:#2E7032;" id="dash-home-equity">—</div>
+      <div style="font-size:9px;color:#5F6368;margin-top:2px;" class="mort-lbl"></div>
     </div>
   </div>
 </div>
@@ -464,30 +464,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   </div>
 </div>
 
-<!-- DIRECTIONS BAR — full width, below grid -->
-<div style="background:#F8F9FA;border-top:3px solid #1CC7D0;border-bottom:2px solid #e8eaed;padding:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 -14px;">
-  <div style="text-align:center;padding:8px;">
-    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 1</div>
-    <div style="font-size:13px;color:#37474F;font-weight:700;">Open Your Inputs</div>
-    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Update any number in the Inputs tab</div>
-  </div>
-  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
-    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 2</div>
-    <div style="font-size:13px;color:#37474F;font-weight:700;">Sheet Recalculates</div>
-    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Master &amp; projections update automatically</div>
-  </div>
-  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
-    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 3</div>
-    <div style="font-size:13px;color:#37474F;font-weight:700;">Refresh Dashboard</div>
-    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Press Cmd+Shift+R to hard-reload this page</div>
-  </div>
-  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
-    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 4</div>
-    <div style="font-size:13px;color:#37474F;font-weight:700;">See Your Updated Plan</div>
-    <div style="font-size:11px;color:#5F6368;margin-top:4px;">All charts and numbers refresh instantly</div>
-  </div>
-</div>
-<div class="disclaimer" style="font-size:11px;padding:10px;text-align:center;background:#f0f4f8;color:#5F6368;margin:0 -14px;">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
+
 
 <!-- NEW CHARTS ROW -->
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:16px 0 8px;">
@@ -1235,5 +1212,29 @@ function loadHomeEquity(sheetData) {
 
 </script>
 </div>
+<!-- DIRECTIONS BAR — full width, below grid -->
+<div style="background:#F8F9FA;border-top:3px solid #1CC7D0;border-bottom:2px solid #e8eaed;padding:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 -14px;">
+  <div style="text-align:center;padding:8px;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 1</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">Open Your Inputs</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Update any number in the Inputs tab</div>
+  </div>
+  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 2</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">Sheet Recalculates</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Master &amp; projections update automatically</div>
+  </div>
+  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 3</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">Refresh Dashboard</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">Press Cmd+Shift+R to hard-reload this page</div>
+  </div>
+  <div style="text-align:center;padding:8px;border-left:1px solid #e8eaed;">
+    <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 4</div>
+    <div style="font-size:13px;color:#37474F;font-weight:700;">See Your Updated Plan</div>
+    <div style="font-size:11px;color:#5F6368;margin-top:4px;">All charts and numbers refresh instantly</div>
+  </div>
+</div>
+<div class="disclaimer" style="font-size:11px;padding:10px;text-align:center;background:#f0f4f8;color:#5F6368;margin:0 -14px;">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
 </body>
 </html>
