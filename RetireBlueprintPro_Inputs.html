@@ -1135,7 +1135,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 // Persistent callback registry — prevents garbage collection
 window._rbpCallbacks = window._rbpCallbacks || {};
 
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZtBFAJXwiNSi60yk8fD7LQDi1xYlacsSUyzDkKcmQH3G5MbrpY_APjPBYbkbMX8ER/exec';
 
 // Get customer's sheet ID from URL or localStorage
 var SHEET_ID = (function() {
@@ -1591,7 +1591,7 @@ function loadLiveData() {
 
   document.getElementById('dl-sub').textContent = 'Reading your Google Sheet…';
 
-  var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+  var SCRIPT = 'https://script.google.com/macros/s/AKfycbwZtBFAJXwiNSi60yk8fD7LQDi1xYlacsSUyzDkKcmQH3G5MbrpY_APjPBYbkbMX8ER/exec';
   var url = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
 
   fetch(url)
@@ -1817,8 +1817,10 @@ function populateFromData(d) {
   }
 
   // ── DEBTS ─────────────────────────────────────────────
+  console.log('Debts received:', d.debts ? d.debts.length : 'NONE', d.debts);
   if (d.debts && d.debts.length) {
     d.debts.forEach(function(debt, i) {
+      console.log('Loading debt', i, debt.name, 'mo:', debt.mo, 'bal:', debt.bal);
       var incEl  = document.getElementById('d-inc-'+i);
       var nmEl   = document.getElementById('d-name-'+i);
       var moEl   = document.getElementById('d-mo-'+i);
@@ -2142,7 +2144,7 @@ function saveAll() {
     rothPlan: collectRothPlan()
   };
 
-  var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+  var SCRIPT = 'https://script.google.com/macros/s/AKfycbwZtBFAJXwiNSi60yk8fD7LQDi1xYlacsSUyzDkKcmQH3G5MbrpY_APjPBYbkbMX8ER/exec';
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   fetch(SCRIPT, {
     method: 'POST',
