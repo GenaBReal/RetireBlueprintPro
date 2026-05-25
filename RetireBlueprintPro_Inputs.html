@@ -1079,10 +1079,18 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
     <!-- Solver results -->
     <div class="solver-box" style="margin-bottom:20px;">
-      <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">
-        Solver Results — read-only, calculated by your Google Sheet
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;">
+          Solver Results — calculated from your Master projection
+        </div>
+        <!-- Should I Convert Signal -->
+        <div id="roth-signal" style="display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.2);border-radius:20px;padding:6px 14px;">
+          <div id="roth-signal-dot" style="width:12px;height:12px;border-radius:50%;background:#8aaabb;"></div>
+          <div id="roth-signal-text" style="font-size:11px;font-weight:700;color:#8aaabb;">Analyzing...</div>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <!-- Row 1: Income + Conversion + Tax + Savings -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;">
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Est. Taxable Income</div>
           <div class="solver-kpi-val" id="r-income" style="font-size:16px;">—</div>
@@ -1091,18 +1099,46 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Optimal Conversion</div>
           <div class="solver-kpi-val" id="r-optimal">—</div>
-          <div class="solver-kpi-sub">Sweet spot amount</div>
+          <div class="solver-kpi-sub">Sweet spot to fill bracket</div>
         </div>
         <div class="solver-kpi">
-          <div class="solver-kpi-lbl">Marginal Tax on Conversion</div>
+          <div class="solver-kpi-lbl">Tax Cost Now</div>
           <div class="solver-kpi-val" id="r-tax-now">—</div>
-          <div class="solver-kpi-sub">Cost to convert now</div>
+          <div class="solver-kpi-sub">Marginal tax on conversion</div>
         </div>
         <div class="solver-kpi">
           <div class="solver-kpi-lbl">Lifetime Tax Savings</div>
           <div class="solver-kpi-val" id="r-savings">—</div>
           <div class="solver-kpi-sub">vs. waiting for RMDs</div>
         </div>
+      </div>
+      <!-- Row 2: RMD + IRMAA + 5-year + Total planned -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+        <div class="solver-kpi">
+          <div class="solver-kpi-lbl">Est. RMD at Age 73</div>
+          <div class="solver-kpi-val" id="r-rmd" style="font-size:16px;color:#f4b86a;">—</div>
+          <div class="solver-kpi-sub" id="r-rmd-year">Forced withdrawal/yr</div>
+        </div>
+        <div class="solver-kpi">
+          <div class="solver-kpi-lbl">IRMAA Warning</div>
+          <div class="solver-kpi-val" id="r-irmaa" style="font-size:14px;">—</div>
+          <div class="solver-kpi-sub">Medicare surcharge threshold</div>
+        </div>
+        <div class="solver-kpi">
+          <div class="solver-kpi-lbl">5-Year Rule</div>
+          <div class="solver-kpi-val" id="r-five-yr" style="font-size:14px;">—</div>
+          <div class="solver-kpi-sub">Access before 59½</div>
+        </div>
+        <div class="solver-kpi">
+          <div class="solver-kpi-lbl">Total Planned Conversions</div>
+          <div class="solver-kpi-val" id="r-total-planned" style="font-size:16px;color:#1CC7D0;">$0</div>
+          <div class="solver-kpi-sub">Across all years in plan</div>
+        </div>
+      </div>
+      <!-- State tax toggle -->
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+        <button id="r-state-tax-btn" class="toggle-no" onclick="toggleStateTax()" style="min-width:50px;">No</button>
+        <span style="font-size:11px;color:#8aaabb;">My state taxes Roth conversions (adds state rate to tax cost calculation)</span>
       </div>
     </div>
 
@@ -1126,6 +1162,15 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       </thead>
       <tbody id="roth-plan-body">
       </tbody>
+      <tfoot>
+        <tr style="background:rgba(28,199,208,0.1);font-weight:700;border-top:2px solid var(--teal);">
+          <td style="color:var(--teal);padding:10px 8px;">TOTAL ALL YEARS</td>
+          <td id="roth-total-p1-all" style="color:var(--teal);text-align:center;">$0</td>
+          <td id="roth-total-p2-all" style="color:var(--teal);text-align:center;">$0</td>
+          <td id="roth-total-all" style="color:var(--teal);text-align:center;font-size:16px;">$0</td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>
@@ -1511,6 +1556,44 @@ function calcSSMonthly(baseId, fraId, startDateId, ageId, monthlyId) {
 }
 
 // ── PARTNER NAMES ────────────────────────────────────────────
+// State tax toggle state
+var _rothStateTax = false;
+function toggleStateTax() {
+  _rothStateTax = !_rothStateTax;
+  var btn = document.getElementById('r-state-tax-btn');
+  if (btn) { btn.textContent = _rothStateTax ? 'Yes' : 'No'; btn.className = _rothStateTax ? 'toggle-yes' : 'toggle-no'; }
+  updateRothIncomeForYear();
+}
+
+// Update total planned conversions whenever a roth plan input changes
+function updateRothTotal(yr) {
+  var p1 = parseFloat((document.getElementById('roth-p1-'+yr)||{value:'0'}).value)||0;
+  var p2 = parseFloat((document.getElementById('roth-p2-'+yr)||{value:'0'}).value)||0;
+  var tot = p1 + p2;
+  var totEl = document.getElementById('roth-total-'+yr);
+  if (totEl) { totEl.textContent = '$'+tot.toLocaleString(); totEl.style.color = tot > 0 ? 'var(--teal)' : ''; }
+  // Update grand total
+  updateRothGrandTotal();
+}
+
+function updateRothGrandTotal() {
+  var total = 0, totalP1 = 0, totalP2 = 0;
+  for (var y = 2026; y <= 2075; y++) {
+    var p1el = document.getElementById('roth-p1-'+y);
+    var p2el = document.getElementById('roth-p2-'+y);
+    var p1v = p1el ? parseFloat(p1el.value)||0 : 0;
+    var p2v = p2el ? parseFloat(p2el.value)||0 : 0;
+    totalP1 += p1v; totalP2 += p2v; total += p1v + p2v;
+  }
+  setTxt('r-total-planned', '$'+Math.round(total).toLocaleString());
+  var fp1 = document.getElementById('roth-total-p1-all');
+  var fp2 = document.getElementById('roth-total-p2-all');
+  var ft  = document.getElementById('roth-total-all');
+  if (fp1) fp1.textContent = '$'+Math.round(totalP1).toLocaleString();
+  if (fp2) fp2.textContent = '$'+Math.round(totalP2).toLocaleString();
+  if (ft)  ft.textContent  = '$'+Math.round(total).toLocaleString();
+}
+
 function updateRothIncomeForYear() {
   var yr = parseInt(document.getElementById('f-B139').value);
   if (!yr || !window._rbpProjections) return;
@@ -1525,39 +1608,140 @@ function updateRothIncomeForYear() {
   var yearsOut = Math.max(0, yr - 2024);
   var inf = Math.pow(1.03, yearsOut);
   var brackets = [
-    {name:'10% Bracket', threshold:Math.round(23200*inf)},
-    {name:'12% Bracket', threshold:Math.round(94300*inf)},
-    {name:'22% Bracket', threshold:Math.round(201050*inf)},
-    {name:'24% Bracket', threshold:Math.round(383900*inf)},
-    {name:'32% Bracket', threshold:Math.round(487450*inf)},
-    {name:'35% Bracket', threshold:Math.round(731200*inf)},
+    {name:'10% Bracket', threshold:Math.round(23200*inf),  rate:0.10},
+    {name:'12% Bracket', threshold:Math.round(94300*inf),  rate:0.12},
+    {name:'22% Bracket', threshold:Math.round(201050*inf), rate:0.22},
+    {name:'24% Bracket', threshold:Math.round(383900*inf), rate:0.24},
+    {name:'32% Bracket', threshold:Math.round(487450*inf), rate:0.32},
+    {name:'35% Bracket', threshold:Math.round(731200*inf), rate:0.35},
   ];
 
   // Find which bracket client is currently in
-  var currentBracketName = '35% Bracket';
+  var currentBracket = brackets[brackets.length-1];
   for (var b=0; b<brackets.length; b++) {
-    if (income <= brackets[b].threshold) { currentBracketName = brackets[b].name; break; }
+    if (income <= brackets[b].threshold) { currentBracket = brackets[b]; break; }
   }
 
   // Show current bracket as hint
   var hint = document.getElementById('roth-bracket-hint');
-  if (hint) hint.textContent = 'Currently in ' + currentBracketName + ' for ' + yr;
+  if (hint) hint.textContent = 'Currently in ' + currentBracket.name + ' for ' + yr;
 
   // Show effective tax rate for chosen year
-  if (window._rbpProjections && window._rbpProjections.federalTaxes) {
-    var fedTax = window._rbpProjections.federalTaxes[idx] || 0;
-    var effRate = income > 0 ? Math.round(fedTax/income*1000)/10 : 0;
-    var taxHint = document.getElementById('roth-tax-hint');
-    if (taxHint && effRate > 0) taxHint.textContent = 'Projected effective rate in ' + yr + ': ' + effRate + '%';
-  }
+  var fedTax = (proj.federalTaxes && proj.federalTaxes[idx]) ? proj.federalTaxes[idx] : 0;
+  var effRate = income > 0 ? Math.round(fedTax/income*1000)/10 : 0;
+  var taxHint = document.getElementById('roth-tax-hint');
+  if (taxHint && effRate > 0) taxHint.textContent = 'Projected effective rate in ' + yr + ': ' + effRate + '%';
 
   // Calculate optimal conversion based on selected target bracket
   var bracketEl = document.getElementById('f-B141');
   var targetBracket = bracketEl ? bracketEl.value : '12% Bracket';
-  var targetThreshold = 94300; // default 12%
-  brackets.forEach(function(b){ if(b.name===targetBracket) targetThreshold=b.threshold; });
+  var targetThreshold = brackets[1].threshold; // default 12%
+  var targetRate = 0.12;
+  brackets.forEach(function(b){ if(b.name===targetBracket){ targetThreshold=b.threshold; targetRate=b.rate; } });
   var optimal = Math.max(0, targetThreshold - income);
   setTxt('r-optimal', fmt(optimal));
+
+  // Tax cost now (marginal rate × optimal amount)
+  var stateRateEl = document.getElementById('f-B26') || {value:'0'};
+  var stateRate = _rothStateTax ? (parseFloat(stateRateEl.value)||0)/100 : 0;
+  var taxNow = Math.round(optimal * (targetRate + stateRate));
+  setTxt('r-tax-now', fmt(taxNow));
+
+  // === LIFETIME TAX SAVINGS (proper calculation) ===
+  // Convert now: pay taxNow, get tax-free growth for N years
+  // Wait for RMDs: pay futureRate × optimal at age 73
+  var futureRateEl = document.getElementById('f-B145');
+  var futureRate = futureRateEl ? (parseFloat(futureRateEl.value)||8)/100 : 0.08;
+  var p1AgeEl = document.getElementById('f-B33'); // current age (read-only)
+  var p1Age = p1AgeEl ? parseFloat(p1AgeEl.value)||63 : 63;
+  var yrsToRMD = Math.max(1, 73 - p1Age);
+  // Assumed Roth growth rate (use avg account return or 7%)
+  var growthRate = 0.07;
+  // Value of converted amount at RMD time, tax-free
+  var rothValueAtRMD = optimal * Math.pow(1+growthRate, yrsToRMD);
+  // If NOT converted: same amount grows in pre-tax, but taxed at futureRate when withdrawn
+  var preTaxValueAtRMD = optimal * Math.pow(1+growthRate, yrsToRMD) * (1 - futureRate);
+  // Tax savings = (after-tax value of Roth) - (after-tax value of pre-tax) - tax paid now
+  var lifetimeSavings = Math.round(rothValueAtRMD - preTaxValueAtRMD - taxNow);
+  var savingsEl = document.getElementById('r-savings');
+  if (savingsEl) {
+    savingsEl.textContent = (lifetimeSavings >= 0 ? '+' : '') + '$' + Math.abs(Math.round(lifetimeSavings/1000)) + 'K';
+    savingsEl.style.color = lifetimeSavings > 0 ? '#4CAF50' : '#ff6b6b';
+  }
+
+  // === SHOULD I CONVERT SIGNAL ===
+  var signal = document.getElementById('roth-signal-dot');
+  var signalTxt = document.getElementById('roth-signal-text');
+  var currentRatePct = Math.round(currentBracket.rate * 100);
+  var futureRatePct = Math.round(futureRate * 100);
+  if (signal && signalTxt) {
+    if (lifetimeSavings > 5000) {
+      signal.style.background = '#4CAF50';
+      signalTxt.style.color = '#4CAF50';
+      signalTxt.textContent = '✅ Convert Now — saves ~$' + Math.round(lifetimeSavings/1000) + 'K lifetime';
+    } else if (lifetimeSavings > 0) {
+      signal.style.background = '#f4b86a';
+      signalTxt.style.color = '#f4b86a';
+      signalTxt.textContent = '⚠️ Marginal benefit — convert cautiously';
+    } else {
+      signal.style.background = '#ff6b6b';
+      signalTxt.style.color = '#ff6b6b';
+      signalTxt.textContent = '⛔ Wait — current rate exceeds future projected rate';
+    }
+  }
+
+  // === RMD PROJECTION ===
+  // Estimate pre-tax balance at age 73 using current pre-tax total
+  var preTaxNow = 0;
+  if (window._rbpProjections && window._rbpProjections.preTax && window._rbpProjections.preTax[0]) {
+    preTaxNow = window._rbpProjections.preTax[0];
+  }
+  var preTaxAtRMD = Math.round(preTaxNow * Math.pow(1+growthRate, yrsToRMD));
+  // RMD factor at age 73 = 26.5 (IRS Uniform Lifetime Table)
+  var rmdAmt = Math.round(preTaxAtRMD / 26.5);
+  var rmdEl = document.getElementById('r-rmd');
+  var rmdYrEl = document.getElementById('r-rmd-year');
+  var rmdYear2 = new Date().getFullYear() + yrsToRMD;
+  if (rmdEl) rmdEl.textContent = '$' + Math.round(rmdAmt/1000) + 'K/yr';
+  if (rmdYrEl) rmdYrEl.textContent = 'Est. starting ' + rmdYear2 + ' (age 73)';
+
+  // === IRMAA WARNING ===
+  // 2024 IRMAA threshold for MFJ: $206,000 MAGI
+  var irmaThreshold = Math.round(206000 * Math.pow(1.03, yearsOut));
+  var conversionTotal = optimal; // what they plan to convert
+  var totalWithConversion = income + conversionTotal;
+  var irmaaEl = document.getElementById('r-irmaa');
+  if (irmaaEl) {
+    if (totalWithConversion > irmaThreshold) {
+      irmaaEl.textContent = '⚠️ Over threshold';
+      irmaaEl.style.color = '#ff6b6b';
+      irmaaEl.style.fontSize = '11px';
+      irmaaEl.title = 'Income + conversion ($' + Math.round(totalWithConversion/1000) + 'K) exceeds IRMAA threshold ($' + Math.round(irmaThreshold/1000) + 'K) — may trigger Medicare surcharge';
+    } else {
+      var headroom = irmaThreshold - totalWithConversion;
+      irmaaEl.textContent = '✅ $' + Math.round(headroom/1000) + 'K headroom';
+      irmaaEl.style.color = '#4CAF50';
+      irmaaEl.style.fontSize = '12px';
+    }
+  }
+
+  // === 5-YEAR RULE ===
+  var fiveYrEl = document.getElementById('r-five-yr');
+  if (fiveYrEl) {
+    var age59half = 59.5;
+    if (p1Age >= age59half) {
+      fiveYrEl.textContent = '✅ No restriction';
+      fiveYrEl.style.color = '#4CAF50';
+      fiveYrEl.style.fontSize = '11px';
+    } else {
+      var yrsTo59 = Math.ceil(age59half - p1Age);
+      var accessYear = new Date().getFullYear() + Math.max(5, yrsTo59);
+      fiveYrEl.textContent = '⚠️ Access in ' + accessYear;
+      fiveYrEl.style.color = '#f4b86a';
+      fiveYrEl.style.fontSize = '11px';
+      fiveYrEl.title = 'Converted funds cannot be withdrawn penalty-free until 5 years after conversion or age 59½, whichever is later';
+    }
+  }
 }
 
 function updatePartnerNames() {
