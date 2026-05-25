@@ -282,7 +282,20 @@ function readAll(ss, inp) {
     if (masterSheet) {
       var masterData = masterSheet.getRange('A8:BX200').getValues();
       masterData.forEach(function(row) {
-        var yr = Number(row[0]); // col A = year
+        // col A = year — handle both plain number and date object
+        var yr;
+        var rawYr = row[0];
+        if (rawYr instanceof Date) {
+          yr = rawYr.getFullYear();
+        } else {
+          yr = Number(rawYr);
+          // If it looks like a date serial (large number), convert
+          if (yr > 40000 && yr < 100000) {
+            // Google Sheets date serial — convert to year
+            var d = new Date((yr - 25569) * 86400 * 1000);
+            yr = d.getFullYear();
+          }
+        }
         if (!yr || yr < 2020 || yr > 2200) return;
         projections.years.push(yr);
         projections.income.push(Math.round(Number(row[14])||0));     // O  = Total Gross Income (unchanged)
