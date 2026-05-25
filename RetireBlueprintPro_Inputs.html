@@ -751,7 +751,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 <div class="section-card">
   <div class="section-hdr" onclick="toggleSection(this)">
     <div class="section-hdr-title">V. Debts & One-Time Expenses</div>
-    <div class="section-hdr-sub">Mortgage, loans, and recurring obligations</div>
+    <div class="section-hdr-sub">Mortgage, loans, and recurring obligations · For real estate: enter Zillow value in Current Value and appreciation rate so your home equity appears on the Dashboard</div>
     <div class="section-hdr-arrow">▼</div>
   </div>
   <div class="section-body">
@@ -761,7 +761,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <th>Include?</th><th>Debt Name</th><th>Purchase Price ($)</th><th>Monthly ($)</th>
           <th>Annual ($)</th><th>Start Date</th><th>End Date</th><th>Balance ($)</th>
           <th style="color:#1CC7D0;">Bal. Remaining</th>
-          <th>Inflate?</th><th>Rate (%)</th><th>Current Value ($)</th>
+          <th>Inflate?</th><th>Inflation Rate (%)</th><th>Current Value / Zillow ($)</th><th>Appreciation Rate (%)<br><span style='font-weight:400;font-size:9px;color:#8aaabb;'>Real estate only</span></th>
         </tr>
       </thead>
       <tbody id="debts-body">
@@ -777,7 +777,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-0" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-0" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-0" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-0" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-0" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-0" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
           <td><button class="toggle-yes" id="d-inc-1" onclick="toggleDebt(this)">Yes</button></td>
@@ -791,10 +791,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-1" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-1" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-1" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-1" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-1" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-1" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-2" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-2" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-2" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-2" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-2" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(2);markDirty();"></td>
@@ -805,10 +805,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-2" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-2" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-2" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-2" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-2" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-2" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-3" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-3" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-3" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-3" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-3" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(3);markDirty();"></td>
@@ -819,10 +819,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-3" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-3" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-3" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-3" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-3" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-3" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-4" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-4" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-4" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-4" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-4" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(4);markDirty();"></td>
@@ -833,10 +833,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-4" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-4" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-4" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-4" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-4" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-4" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-5" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-5" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-5" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-5" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-5" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(5);markDirty();"></td>
@@ -847,10 +847,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-5" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-5" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-5" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-5" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-5" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-5" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-6" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-6" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-6" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-6" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-6" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(6);markDirty();"></td>
@@ -861,10 +861,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-6" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-6" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-6" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-6" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-6" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-6" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-7" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-7" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-7" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-7" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-7" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(7);markDirty();"></td>
@@ -875,10 +875,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-7" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-7" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-7" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-7" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-7" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-7" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-8" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-8" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-8" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-8" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-8" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(8);markDirty();"></td>
@@ -889,10 +889,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-8" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-8" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-8" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-8" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-8" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-8" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
         <tr>
-          <td><button class="toggle-no" id="d-inc-9" onclick="toggleDebt(this)">No</button></td>
+          <td><button class="toggle-yes" id="d-inc-9" onclick="toggleDebt(this)">Yes</button></td>
           <td><input type="text" id="d-name-9" value="" oninput="markDirty()"></td>
           <td><input type="text" inputmode="numeric" id="d-pp-9" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
           <td><input type="text" inputmode="numeric" id="d-mo-9" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';calcDebtAnnual(9);markDirty();"></td>
@@ -903,7 +903,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <td><input type="text" id="d-balrem-9" value="" readonly style="background:var(--light);color:#1CC7D0;font-weight:700;font-size:11px;" placeholder="See Master" title="Calculated on Master Sheet"></td>
         <td><button id="d-inf-9" class="toggle-no" onclick="var b=this;b.textContent=b.textContent==='Yes'?'No':'Yes';b.className=b.textContent==='Yes'?'toggle-yes':'toggle-no';markDirty();">No</button></td>
         <td><input type="text" inputmode="decimal" id="d-rate-9" value="" placeholder="0" style="width:60px" oninput="markDirty()"> %</td>
-        <td><input type="text" inputmode="numeric" id="d-curval-9" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td>
+        <td><input type="text" inputmode="numeric" id="d-curval-9" value="" placeholder="0" oninput="var v=this.value.replace(/[^0-9]/g,'');this.value=v?parseInt(v).toLocaleString():'';markDirty();"></td><td><input type="text" inputmode="decimal" id="d-appr-9" value="" placeholder="3.5" style="width:55px" oninput="markDirty();"> %</td>
         </tr>
       </tbody>
     </table>
@@ -911,233 +911,6 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 </div>
 
 
-<!-- PRE-RETIREMENT GROWTH CALCULATOR -->
-<div class="section-card" style="border:2px solid #1CC7D0;">
-  <div class="section-hdr" onclick="toggleSection(this)" style="background:linear-gradient(135deg,#041E2F,#0A3145);">
-    <div style="display:flex;align-items:center;gap:12px;flex:1;">
-      <div style="font-size:24px;">🚀</div>
-      <div>
-        <div class="section-hdr-title" style="color:#1CC7D0;">Pre-Retirement Growth Calculator</div>
-        <div class="section-hdr-sub" style="color:#8aaabb;">For accounts still growing · Calculate what your accounts will be worth AT retirement · Then enter that number as your Starting Balance above</div>
-      </div>
-    </div>
-    <div class="section-hdr-arrow" style="color:#1CC7D0;">▼</div>
-  </div>
-  <div class="section-body" style="display:block;">
-
-    <!-- INFO BANNER -->
-    <div style="background:#0A2030;border-left:4px solid #f4b86a;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px;">
-      <strong style="color:#f4b86a;">💡 How to use this:</strong>
-      <span style="color:#8aaabb;font-size:13px;"> If you or your partner are still working and contributing to retirement accounts, use this calculator to project what those accounts will be worth on your retirement date. Then copy that number into the <strong style="color:#fff;">Starting Balance</strong> field in the Named Accounts section below.</span>
-      <div style="margin-top:8px;color:#8aaabb;font-size:12px;">⚠️ <strong style="color:#ccc;">Assumes contributions continue each year until retirement.</strong> If contributions stop before retirement, reduce the Years Until Retirement accordingly.</div>
-    </div>
-
-    <!-- CALCULATOR GRID -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
-
-      <!-- PARTNER 1 -->
-      <div class="calc-partner-card" id="calc-p1">
-        <div class="calc-partner-title" id="calc-p1-name">Partner 1 — Pre-Retirement Projector</div>
-
-        <div class="calc-grid">
-          <div class="calc-field">
-            <label>Current Account Balance ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
-            <div class="hint">Today's total in this account</div>
-          </div>
-          <div class="calc-field">
-            <label>Annual Contribution ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
-            <div class="hint">Your personal contribution per year</div>
-          </div>
-          <div class="calc-field">
-            <label>Employer Match ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
-            <div class="hint">Annual employer match amount</div>
-          </div>
-          <div class="calc-field">
-            <label>Expected Annual Return (%)</label>
-            <div class="input-wrap"><input type="number" id="c1-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(1);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
-            <div class="hint">Typical: 6–8% for diversified portfolio</div>
-          </div>
-          <div class="calc-field">
-            <label>Years Until Retirement</label>
-            <div class="input-wrap"><input type="number" id="c1-years" placeholder="20" min="0" max="60" oninput="calcGrowth(1);saveCalcToStorage();"></div>
-            <div class="hint">Calculated from salary end date, or enter manually</div>
-          </div>
-          <div class="calc-field">
-            <label>Annual Contribution Growth (%)</label>
-            <div class="input-wrap"><input type="number" id="c1-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(1);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
-            <div class="hint">Rate contributions increase each year (salary raises)</div>
-          </div>
-        </div>
-
-        <!-- RESULTS -->
-        <div class="calc-results" id="c1-results" style="display:none;">
-          <div class="calc-result-title">📈 Projected Value at Retirement</div>
-          <div class="calc-result-main" id="c1-fv">$0</div>
-          <div class="calc-breakdown" id="c1-breakdown"></div>
-
-          <!-- Present Value Back-Calculation -->
-          <div style="background:#0A1F2E;border:1px solid #f4b86a;border-radius:8px;padding:12px;margin:12px 0;text-align:left;">
-            <div style="font-size:10px;color:#f4b86a;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
-              🎯 What to Enter as Starting Balance
-            </div>
-            <div style="font-size:11px;color:#8aaabb;line-height:1.6;">
-              Your plan starts now but you retire in <span style="color:#fff;" id="c1-pv-years">?</span> years.
-              The Master Sheet needs today's equivalent value — it will grow this forward
-              to your retirement amount automatically.
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
-              <div>
-                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Enter This Amount</div>
-                <div style="font-size:24px;font-weight:900;color:#f4b86a;" id="c1-pv">$0</div>
-              </div>
-              <div style="font-size:20px;color:#6a8a9a;">→</div>
-              <div>
-                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Master Grows To</div>
-                <div style="font-size:18px;font-weight:700;color:#1CC7D0;" id="c1-fv-small">$0</div>
-                <div style="font-size:9px;color:#6a8a9a;">at your retirement date</div>
-              </div>
-            </div>
-          </div>
-
-          <button class="calc-use-btn" onclick="useCalcValue(1)">
-            ✅ Use Back-Calculated Balance → Named Accounts
-          </button>
-          <div style="font-size:11px;color:#8aaabb;margin-top:8px;text-align:center;">
-            Enters the today's-equivalent value so Master projects correctly to retirement
-          </div>
-        </div>
-
-        <!-- GROWTH CHART -->
-        <canvas id="c1-chart" width="400" height="200" style="margin-top:16px;display:none;border-radius:8px;"></canvas>
-      </div>
-
-      <!-- PARTNER 2 -->
-      <div class="calc-partner-card" id="calc-p2">
-        <div class="calc-partner-title" id="calc-p2-name">Partner 2 — Pre-Retirement Projector</div>
-
-        <div class="calc-grid">
-          <div class="calc-field">
-            <label>Current Account Balance ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-balance" placeholder="0" oninput="fmtCalc(this);calcGrowth(2);saveCalcToStorage();"></div>
-          </div>
-          <div class="calc-field">
-            <label>Annual Contribution ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(2);saveCalcToStorage();"></div>
-          </div>
-          <div class="calc-field">
-            <label>Employer Match ($)</label>
-            <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c2-match" placeholder="0" oninput="fmtCalc(this);calcGrowth(2);saveCalcToStorage();"></div>
-          </div>
-          <div class="calc-field">
-            <label>Expected Annual Return (%)</label>
-            <div class="input-wrap"><input type="number" id="c2-return" placeholder="7" step="0.1" min="0" max="20" oninput="calcGrowth(2);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
-          </div>
-          <div class="calc-field">
-            <label>Years Until Retirement</label>
-            <div class="input-wrap"><input type="number" id="c2-years" placeholder="20" min="0" max="60" oninput="calcGrowth(2);saveCalcToStorage();"></div>
-          </div>
-          <div class="calc-field">
-            <label>Annual Contribution Growth (%)</label>
-            <div class="input-wrap"><input type="number" id="c2-contrib-growth" placeholder="2" step="0.1" min="0" max="10" oninput="calcGrowth(2);saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
-          </div>
-        </div>
-
-        <div class="calc-results" id="c2-results" style="display:none;">
-          <div class="calc-result-title">📈 Projected Value at Retirement</div>
-          <div class="calc-result-main" id="c2-fv">$0</div>
-          <div class="calc-breakdown" id="c2-breakdown"></div>
-
-          <!-- Present Value Back-Calculation -->
-          <div style="background:#0A1F2E;border:1px solid #f4b86a;border-radius:8px;padding:12px;margin:12px 0;text-align:left;">
-            <div style="font-size:10px;color:#f4b86a;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
-              🎯 What to Enter as Starting Balance
-            </div>
-            <div style="font-size:11px;color:#8aaabb;line-height:1.6;">
-              Your plan starts now but you retire in <span style="color:#fff;" id="c2-pv-years">?</span> years.
-              The Master Sheet needs today's equivalent value — it will grow this forward
-              to your retirement amount automatically.
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
-              <div>
-                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Enter This Amount</div>
-                <div style="font-size:24px;font-weight:900;color:#f4b86a;" id="c2-pv">$0</div>
-              </div>
-              <div style="font-size:20px;color:#6a8a9a;">→</div>
-              <div>
-                <div style="font-size:10px;color:#6a8a9a;text-transform:uppercase;">Master Grows To</div>
-                <div style="font-size:18px;font-weight:700;color:#1CC7D0;" id="c2-fv-small">$0</div>
-                <div style="font-size:9px;color:#6a8a9a;">at your retirement date</div>
-              </div>
-            </div>
-          </div>
-
-          <button class="calc-use-btn" onclick="useCalcValue(2)">
-            ✅ Use Back-Calculated Balance → Named Accounts
-          </button>
-          <div style="font-size:11px;color:#8aaabb;margin-top:8px;text-align:center;">
-            Enters the today's-equivalent value so Master projects correctly to retirement
-          </div>
-        </div>
-
-        <canvas id="c2-chart" width="400" height="200" style="margin-top:16px;display:none;border-radius:8px;"></canvas>
-      </div>
-    </div>
-
-    <!-- HOME APPRECIATION CALCULATOR -->
-    <div style="margin-top:32px;border-top:1px solid #1a3a52;padding-top:28px;">
-      <div style="font-size:16px;font-weight:800;color:#f4b86a;margin-bottom:6px;">🏠 Home Appreciation Calculator</div>
-      <div style="font-size:13px;color:#8aaabb;margin-bottom:20px;">Track your home as an asset — see net equity grow as your mortgage shrinks and your home value rises</div>
-
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
-        <div class="calc-field">
-          <label>Current Home Value ($)</label>
-          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-value" placeholder="0" oninput="fmtCalc(this);calcHome();saveCalcToStorage();"></div>
-          <div class="hint">Current market value (Zillow, Redfin)</div>
-        </div>
-        <div class="calc-field">
-          <label>Annual Appreciation (%)</label>
-          <div class="input-wrap"><input type="number" id="home-rate" placeholder="3.5" step="0.1" min="0" max="15" oninput="calcHome();saveCalcToStorage();" style="padding-right:28px;"><span class="suffix">%</span></div>
-          <div class="hint">Typical: 3–4% nationally</div>
-        </div>
-        <div class="calc-field">
-          <label>Current Mortgage Balance ($)</label>
-          <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="home-mortgage" placeholder="0" oninput="fmtCalc(this);calcHome();saveCalcToStorage();"></div>
-          <div class="hint">Remaining loan balance</div>
-        </div>
-        <div class="calc-field">
-          <label>Years to Project</label>
-          <div class="input-wrap"><input type="number" id="home-years" placeholder="25" min="1" max="60" oninput="calcHome();saveCalcToStorage();"></div>
-          <div class="hint">Years until plan end / retirement</div>
-        </div>
-      </div>
-
-      <div id="home-results" style="display:none;">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
-          <div class="home-stat-card">
-            <div class="home-stat-label">Home Value at Year End</div>
-            <div class="home-stat-value" id="home-fv">$0</div>
-          </div>
-          <div class="home-stat-card">
-            <div class="home-stat-label">Mortgage Paid Down (est.)</div>
-            <div class="home-stat-value" id="home-mort-rem">$0</div>
-          </div>
-          <div class="home-stat-card" style="border-color:#1CC7D0;">
-            <div class="home-stat-label" style="color:#1CC7D0;">Net Equity at Year End</div>
-            <div class="home-stat-value" style="color:#1CC7D0;" id="home-equity">$0</div>
-          </div>
-        </div>
-        <canvas id="home-chart" width="800" height="180" style="border-radius:8px;width:100%;"></canvas>
-        <div style="font-size:12px;color:#6a8a9a;margin-top:8px;text-align:center;">
-          💡 Consider adding your projected net equity to your retirement balance for a complete picture
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
 
 
 <!-- SECTION VI: ACCOUNTS -->
@@ -1466,11 +1239,11 @@ function buildAccountsTable() {
     contribInp.type = 'text'; contribInp.inputMode = 'numeric';
     contribInp.placeholder = '0'; contribInp.style.width = '90px';
     contribInp.value = a.contrib ? parseInt(a.contrib).toLocaleString() : '';
-    contribInp.addEventListener('input', function() {
+    (function(i){ contribInp.addEventListener('input', function() {
       var v = this.value.replace(/[^0-9]/g,'');
       this.value = v ? parseInt(v).toLocaleString() : '';
-      accountsData[idx].contrib = parseInt(v)||0; markDirty();
-    });
+      accountsData[i].contrib = parseInt(v)||0; markDirty();
+    }); })(idx);
     td7.appendChild(contribInp);
 
     // Col 8: Employer Match
@@ -1479,11 +1252,11 @@ function buildAccountsTable() {
     matchInp.type = 'text'; matchInp.inputMode = 'numeric';
     matchInp.placeholder = '0'; matchInp.style.width = '90px';
     matchInp.value = a.match ? parseInt(a.match).toLocaleString() : '';
-    matchInp.addEventListener('input', function() {
+    (function(i){ matchInp.addEventListener('input', function() {
       var v = this.value.replace(/[^0-9]/g,'');
       this.value = v ? parseInt(v).toLocaleString() : '';
-      accountsData[idx].match = parseInt(v)||0; markDirty();
-    });
+      accountsData[i].match = parseInt(v)||0; markDirty();
+    }); })(idx);
     td8.appendChild(matchInp);
 
     // Col 9: Contrib Start Date
@@ -1491,9 +1264,9 @@ function buildAccountsTable() {
     var csInp = document.createElement('input');
     csInp.type = 'date'; csInp.style.width = '110px';
     csInp.value = a.contribStart || '';
-    csInp.addEventListener('change', function() {
-      accountsData[idx].contribStart = this.value; markDirty();
-    });
+    (function(i){ csInp.addEventListener('change', function() {
+      accountsData[i].contribStart = this.value; markDirty();
+    }); })(idx);
     td9.appendChild(csInp);
 
     // Col 10: Contrib End Date
@@ -1501,9 +1274,9 @@ function buildAccountsTable() {
     var ceInp = document.createElement('input');
     ceInp.type = 'date'; ceInp.style.width = '110px';
     ceInp.value = a.contribEnd || '';
-    ceInp.addEventListener('change', function() {
-      accountsData[idx].contribEnd = this.value; markDirty();
-    });
+    (function(i){ ceInp.addEventListener('change', function() {
+      accountsData[i].contribEnd = this.value; markDirty();
+    }); })(idx);
     td10.appendChild(ceInp);
 
     // Col 11: Withdrawal Start Date (plan restriction)
@@ -1512,9 +1285,9 @@ function buildAccountsTable() {
     wsInp.type = 'date'; wsInp.style.width = '110px';
     wsInp.value = a.withdrawStart || '';
     wsInp.title = 'Leave blank unless plan has specific restriction (e.g. 62½ for some 403b plans)';
-    wsInp.addEventListener('change', function() {
-      accountsData[idx].withdrawStart = this.value; markDirty();
-    });
+    (function(i){ wsInp.addEventListener('change', function() {
+      accountsData[i].withdrawStart = this.value; markDirty();
+    }); })(idx);
     td11.appendChild(wsInp);
 
     // Col 12: Status (select)
@@ -1658,6 +1431,7 @@ function collectDebts() {
       inflate:(document.getElementById('d-inf-'+i)||{textContent:'No'}).textContent||'No',
       rate:   parseFloat(((document.getElementById('d-rate-'+i)||{value:'0'}).value)||'0')||0,
       curval: parseInt(String(((document.getElementById('d-curval-'+i)||{value:'0'}).value)||'0').replace(/[^0-9]/g,''))||0,
+      appr:   parseFloat(((document.getElementById('d-appr-'+i)||{value:'0'}).value)||'0')||0,
     });
   }
   return debts;
@@ -1693,6 +1467,7 @@ function loadDebts(debts) {
     if(infEl && d.inflate) { infEl.textContent=d.inflate; infEl.className=d.inflate==='Yes'?'toggle-yes':'toggle-no'; }
     el=document.getElementById('d-rate-'+i); if(el) el.value = d.rate||'';
     el=document.getElementById('d-curval-'+i); if(el) el.value = d.curval ? parseInt(d.curval).toLocaleString() : '';
+    el=document.getElementById('d-appr-'+i);   if(el) el.value = d.appr||'';
     calcBalRemaining(i); // update estimated balance remaining
   });
 }
@@ -2066,6 +1841,15 @@ function populateFromData(d) {
         var p=String(debt.end).split('/');
         if(p.length===3) enEl.value=p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0');
       }
+      // Inflate, rate, current value, appreciation rate
+      var infEl    = document.getElementById('d-inf-'+i);
+      var rateEl   = document.getElementById('d-rate-'+i);
+      var curvalEl = document.getElementById('d-curval-'+i);
+      var apprEl   = document.getElementById('d-appr-'+i);
+      if (infEl)    { infEl.textContent = debt.inflate||'No'; infEl.className = debt.inflate==='Yes'?'toggle-yes':'toggle-no'; }
+      if (rateEl)   rateEl.value   = debt.rate   || '';
+      if (curvalEl) curvalEl.value = debt.curval  ? parseInt(debt.curval).toLocaleString()  : '';
+      if (apprEl)   apprEl.value   = debt.appr    || '';
     });
   }
 

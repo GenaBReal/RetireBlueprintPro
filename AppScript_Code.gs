@@ -126,11 +126,13 @@ function readAll(ss, inp) {
     stateRate:pct(26,2), stdDedInflation:pct(27,2),
     healthcareInflation:pct(28,2),
     rothConversionSavings:num(144,2),
+    standardDeduction:num(25,2),
+    effectiveRate: 0  // set below from Master sheet data
   };
 
   // Accounts (rows 105-116, cols A-H = 1-8)
   var accounts = [], portfolioTotal = 0;
-  for (var ar=105; ar<=124; ar++) {
+  for (var ar=105; ar<=116; ar++) {
     var aName = str(ar,2);
     if (!aName) continue;
     var bal = num(ar,5);
@@ -160,7 +162,7 @@ function readAll(ss, inp) {
   });
 
   // Debts rows 88-89 + 92-101 (A=1,B=2,C=3,D=4,E=5,F=6,H=8)
-  var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
+  var debtRows = [92,93,94,95,96,97,98,99,100,101]; // rows 88,89 are expenses area
   var debts = debtRows.map(function(row) {
     // Smart read: detect old format (C=monthly,D=annual) vs new format (C=pp,D=monthly,E=annual)
     var colC = num(row,3), colD = num(row,4), colE = num(row,5);
@@ -187,7 +189,8 @@ function readAll(ss, inp) {
       bal:num(row,8),
       inflate:str(row,9),
       rate:(num(row,10)||0)*100,
-      curval:num(row,11)
+      curval:num(row,11),
+      appr:(num(row,12)||0)*100  // L = Appreciation rate, stored as decimal, returned as %
     };
   });
 
@@ -230,14 +233,16 @@ function readAll(ss, inp) {
 
   // Roth plan (rows 150-169, B=col2, C=col3)
   var rothPlan = [];
-  for (var i=0; i<20; i++) {
+  for (var i=0; i<12; i++) {
     var row = 150+i;
     rothPlan.push({year:2026+i, p1:num(row,2), p2:num(row,3)});
   }
 
   // Read Master sheet for year-by-year projection data (charts)
   var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
-                     preTax:[], roth:[], taxable:[], hsa:[]};
+                     preTax:[], roth:[], taxable:[], hsa:[],
+                     federalTaxes:[], taxableIncome:[]};
+  var masterYear1FedTax = 0, masterYear1TaxableIncome = 0, masterYear1Set = false;
   try {
     var masterSheet = ss.getSheetByName('Master');
     if (masterSheet) {
@@ -246,17 +251,28 @@ function readAll(ss, inp) {
         var yr = Number(row[0]); // col A = year
         if (!yr || yr < 2020 || yr > 2200) return;
         projections.years.push(yr);
-        projections.income.push(Math.round(Number(row[14])||0));     // O = income
-        projections.withdrawals.push(Math.round(Number(row[39])||0)); // AN = withdrawals
-        projections.endLiquid.push(Math.round(Number(row[75])||0));   // BX = end liquid
-        // Account balances
-        var p1_401k   = Number(row[54])||0;  // BC
-        var p1_roth   = Number(row[55])||0;  // BD
-        var p1_brok   = Number(row[56])||0;  // BE
-        var p2_401k   = Number(row[57])||0;  // BF
-        var p2_roth   = Number(row[58])||0;  // BG
-        var p2_brok   = Number(row[59])||0;  // BH
-        var hsa       = Number(row[60])||0;  // BI
+        projections.income.push(Math.round(Number(row[14])||0));     // O  = Total Gross Income (unchanged)
+        projections.withdrawals.push(Math.round(Number(row[44])||0)); // AN = Final Gross Withdrawal (+5)
+        projections.endLiquid.push(Math.round(Number(row[80])||0));   // BX = End of Year Liquid (+5)
+        // Federal taxes for effective rate calculation
+        var fedTaxes     = Number(row[40])||0;  // AJ = Total Federal Taxes (+5)
+        var taxableIncome= Number(row[39])||0;  // AI = Total Taxable Income (+5)
+        projections.federalTaxes.push(Math.round(fedTaxes));
+        projections.taxableIncome.push(Math.round(taxableIncome));
+        // Account balances (all +5)
+        var p1_401k   = Number(row[59])||0;  // BC (+5)
+        var p1_roth   = Number(row[60])||0;  // BD (+5)
+        var p1_brok   = Number(row[61])||0;  // BE (+5)
+        var p2_401k   = Number(row[62])||0;  // BF (+5)
+        var p2_roth   = Number(row[63])||0;  // BG (+5)
+        var p2_brok   = Number(row[64])||0;  // BH (+5)
+        var hsa       = Number(row[65])||0;  // BI (+5)
+        // Capture year 1 values for effective rate
+        if (!masterYear1Set && yr >= 2020) {
+          masterYear1FedTax        = fedTaxes;
+          masterYear1TaxableIncome = taxableIncome;
+          masterYear1Set = true;
+        }
         projections.preTax.push(Math.round(p1_401k + p2_401k));
         projections.roth.push(Math.round(p1_roth + p2_roth));
         projections.taxable.push(Math.round(p1_brok + p2_brok));
@@ -265,6 +281,13 @@ function readAll(ss, inp) {
     }
   } catch(e) {
     Logger.log('Master read error: ' + e);
+  }
+
+  // Set effective federal rate from Master year-1 data (AJ/AI)
+  if (masterYear1TaxableIncome > 0) {
+    tax.effectiveRate = Math.round((masterYear1FedTax / masterYear1TaxableIncome) * 10000) / 10000;
+    tax.federalTaxes  = masterYear1FedTax;
+    tax.taxableIncome = masterYear1TaxableIncome;
   }
 
   return {
@@ -412,7 +435,7 @@ function writeInputs(ss, inp, data) {
     // ── DEBTS ─────────────────────────────────────────────────
     // A=include, B=name, C=monthly, D=annual(C*12), E=start, F=end, H=balance
     if (data.debts && data.debts.length) {
-      var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
+      var debtRows = [92,93,94,95,96,97,98,99,100,101]; // rows 88,89 are expenses area
       data.debts.forEach(function(d, i) {
         if (i >= debtRows.length) return;
         var r = debtRows[i];
@@ -423,7 +446,7 @@ function writeInputs(ss, inp, data) {
         if (!hasData && i >= 2) return; // Skip empty extra rows (keep sheet data intact)
 
         // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance
-        inp.getRange('A'+r).setValue(d.inc||'No');
+        inp.getRange('A'+r).setValue(d.inc||'Yes');
         if (d.name && String(d.name).trim()) inp.getRange('B'+r).setValue(String(d.name));
         if (d.pp) inp.getRange('C'+r).setValue(Number(d.pp));
         if (mo > 0 || hasData) {
@@ -437,6 +460,7 @@ function writeInputs(ss, inp, data) {
         if (d.inflate) inp.getRange('I'+r).setValue(String(d.inflate));
         if (d.rate) inp.getRange('J'+r).setValue(Number(d.rate)/100);
         if (d.curval) inp.getRange('K'+r).setValue(Number(d.curval));
+        if (d.appr)   inp.getRange('L'+r).setValue(Number(d.appr)/100); // store as decimal
       });
     }
 
@@ -450,7 +474,7 @@ function writeInputs(ss, inp, data) {
       try { inp.getRange('C105:C124').clearDataValidations(); } catch(e){}
 
       var acctData = [];
-      for (var i=0; i<20; i++) {
+      for (var i=0; i<12; i++) {
         var a = data.accounts[i] || {};
         var owner = String(a.owner||'Joint').trim();
         if (owner==='Partner 1'||owner==='Craig'||owner==='Kent') owner = p1name||'Joint';
@@ -459,8 +483,16 @@ function writeInputs(ss, inp, data) {
         // ret comes in as whole number (7.0), store as decimal (0.07)
         var ret = Number(a.ret||a.expectedReturn||0);
         if (ret > 1) ret = ret/100;
+        // Parse date strings safely — avoid writing 0 which becomes 12/30/1899
+        function safeDate(val) {
+          if (!val || val === '' || val === '0') return '';
+          try {
+            var d = new Date(val);
+            return isNaN(d.getTime()) ? '' : d;
+          } catch(e) { return ''; }
+        }
         acctData.push([
-          a.inc||a.showInCalc||'No',        // A = Include
+          a.inc||a.showInCalc||'Yes',        // A = Include
           a.name||'',                        // B = Name
           owner,                             // C = Owner
           a.type||'',                        // D = Type
@@ -471,12 +503,14 @@ function writeInputs(ss, inp, data) {
           '',                                // I = Summary (read-only, skip)
           Number(a.contrib||0),              // J = Annual Contribution
           Number(a.match||0),                // K = Employer Match
-          a.contribStart||'',                // L = Contrib Start Date
-          a.contribEnd||'',                  // M = Contrib End Date
-          a.withdrawStart||''                // N = Withdrawal Start Date
+          safeDate(a.contribStart),          // L = Contrib Start Date
+          safeDate(a.contribEnd),            // M = Contrib End Date
+          safeDate(a.withdrawStart)          // N = Withdrawal Start Date
         ]);
       }
-      inp.getRange('A105:N124').setValues(acctData);
+      // Clear date columns first to avoid stale 1899 dates
+      inp.getRange('L105:N116').clearContent();
+      inp.getRange('A105:N116').setValues(acctData.slice(0,12));
 
       // Restore owner validation
       try {
@@ -531,7 +565,7 @@ function writeInputs(ss, inp, data) {
       // Write year, p1 amount, p2 amount to A:C rows 150-169
       // Master VLOOKUP uses col A for year lookup: VLOOKUP(year, A136:C157, 2, FALSE)
       var allArr = [];
-      for (var i=0; i<20; i++) {
+      for (var i=0; i<12; i++) {
         var yr = 2026 + i;
         var p1 = 0, p2 = 0;
         data.rothPlan.forEach(function(row) {
