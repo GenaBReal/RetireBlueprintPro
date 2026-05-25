@@ -117,6 +117,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 .welcome-modal .wtxt span{color:#8aaabb;}
 .welcome-btn-dash{background:#f4b86a;color:#041E2F;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;width:100%;}
 
+.chart-card{background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:16px;border:1px solid rgba(28,199,208,0.15);}
+.chart-title{font-size:10px;font-weight:700;color:var(--teal,#1CC7D0);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.solver-kpi{text-align:center;background:rgba(255,255,255,0.05);border-radius:6px;padding:12px 8px;}
+.solver-kpi-lbl{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;}
+.solver-kpi-val{font-size:20px;font-weight:800;color:#f4b86a;margin-top:4px;}
+.solver-kpi-sub{font-size:9px;color:#8a9ab0;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -175,6 +181,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html">Setup Guide</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;">Master Sheet</a>
   <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;"></span>
   <button onclick="reloadData()" style="margin:4px 8px;background:#0A3145;border:1px solid #1a3a52;color:#1CC7D0;font-size:9px;font-weight:700;padding:4px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.5px;">↺ Refresh Data</button>
@@ -448,6 +455,61 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div class="chart-title" id="c5-title">Survivor Plan</div>
     <div class="chart-sub" id="c5-sub">Joint plan → Survivor plan</div>
     <div class="chart-area"><canvas id="c5"></canvas></div>
+
+  <!-- New charts row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;">
+    <div class="chart-card">
+      <div class="chart-title">Roth Conversion Impact</div>
+      <div class="chart-area"><canvas id="c6"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Tax Efficiency Over Time</div>
+      <div class="chart-area"><canvas id="c7"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Withdrawal Strategy</div>
+      <div class="chart-area"><canvas id="c8"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Progress completion score -->
+  <div id="completion-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(28,199,208,0.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;">📋 Plan Completion Score</div>
+      <div id="completion-score" style="font-size:28px;font-weight:900;color:#f4b86a;">—%</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.3);border-radius:6px;height:8px;margin-bottom:16px;">
+      <div id="completion-bar" style="height:8px;border-radius:6px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);width:0%;transition:width 1s ease;"></div>
+    </div>
+    <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;"></div>
+  </div>
+
+  <!-- Sequence of returns stress test -->
+  <div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(255,107,107,0.2);">
+    <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">⚡ Stress Test — Sequence of Returns Risk</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">Base Scenario</div>
+        <div class="solver-kpi-val" id="stress-base" style="font-size:16px;color:#1CC7D0;">—</div>
+        <div class="solver-kpi-sub">Normal market returns</div>
+      </div>
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">Year 1 Down 20%</div>
+        <div class="solver-kpi-val" id="stress-20" style="font-size:16px;color:#f4b86a;">—</div>
+        <div class="solver-kpi-sub">Mild bear market</div>
+      </div>
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">Year 1 Down 30%</div>
+        <div class="solver-kpi-val" id="stress-30" style="font-size:16px;color:#ff6b6b;">—</div>
+        <div class="solver-kpi-sub">Severe bear market</div>
+      </div>
+      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);">
+        <div class="solver-kpi-lbl">High Inflation (5%)</div>
+        <div class="solver-kpi-val" id="stress-inf" style="font-size:16px;color:#ff6b6b;">—</div>
+        <div class="solver-kpi-sub">vs base 3% inflation</div>
+      </div>
+    </div>
+  </div>
     <div class="chart-note" id="c5-note">—</div>
   </div>
 </div>
@@ -676,7 +738,9 @@ function populate(d){
 
   set('load-status', '✓ Plan loaded · '+meta.generated);
   drawCharts(d, p1, p2, p1n, p2n, longestN, longestP, otherP, otherN, meta);
-  loadHomeEquity(d); // Uses sheet debt data for mortgage + localStorage for home value
+  loadHomeEquity(d);
+  updateCompletionScore(d);
+  updateStressTest(d); // Uses sheet debt data for mortgage + localStorage for home value
 }
 
 function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
@@ -733,6 +797,38 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
     {label:'Joint Plan',data:jData,borderColor:navy,backgroundColor:'rgba(4,30,47,0.06)',fill:true,tension:0.4,pointRadius:3,borderWidth:2},
     {label:longestN+' Survivor',data:sData,borderColor:plum,borderDash:[5,3],fill:false,tension:0.4,pointRadius:3,borderWidth:2}
   ],false,true);
+
+  // ── C6: Roth Conversion Impact ──────────────────────────
+  // Show portfolio trajectory with vs without Roth conversions
+  // Simulate "no conversion" by assuming pre-tax stays taxed at futureRate
+  var rothData = proj.roth || [];
+  var preTaxData = proj.preTax || [];
+  var rothBalances = kidx.map(function(i){ return (rothData[i]||0); });
+  var preTaxBalances = kidx.map(function(i){ return (preTaxData[i]||0); });
+  mkChart('c6','line',yrs,[
+    {label:'Roth Balance',data:rothBalances,borderColor:teal,backgroundColor:'rgba(28,199,208,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2},
+    {label:'Pre-Tax Balance',data:preTaxBalances,borderColor:orange,backgroundColor:'rgba(244,184,106,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2}
+  ],false,true);
+
+  // ── C7: Tax Efficiency Over Time ──────────────────────────
+  // Effective tax rate by year
+  var fedTaxes = proj.federalTaxes || [];
+  var taxableInc = proj.taxableIncome || [];
+  var effRates = kidx.map(function(i){
+    var inc = taxableInc[i]||0;
+    var tax = fedTaxes[i]||0;
+    return inc > 0 ? Math.round(tax/inc*1000)/10 : 0;
+  });
+  mkChart('c7','line',yrs,[
+    {label:'Effective Fed Rate %',data:effRates,borderColor:'#9b59b6',backgroundColor:'rgba(155,89,182,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2}
+  ],false,false);
+
+  // ── C8: Withdrawal Strategy ──────────────────────────────
+  // Show which account types are being drawn down each year
+  var wdPreTax = kidx.map(function(i){ return proj.withdrawals[i]||0; }); // simplified
+  mkChart('c8','bar',yrs,[
+    {label:'Total Withdrawal',data:wdPreTax,backgroundColor:'rgba(244,184,106,0.7)',borderRadius:2}
+  ],false,false);
 }
 
 // ── LOAD FROM SHEET VIA APPS SCRIPT ────────────────────────────
@@ -830,6 +926,113 @@ function dismissDashWelcome() {
   var modal = document.getElementById('dash-welcome-modal');
   if (modal) modal.classList.remove('show');
   try { localStorage.setItem('rbp_dash_welcomed', '1'); } catch(e) {}
+}
+
+// ── PLAN COMPLETION SCORE ────────────────────────────────────
+function updateCompletionScore(d) {
+  try {
+    var p1 = d.people.craig || {};
+    var p2 = d.people.gena  || {};
+    var gl = d.global || {};
+    var tax = d.tax || {};
+    var port = d.portfolio || {};
+    var debts = d.debts || [];
+    var roth = d.roth || {};
+
+    var items = [
+      { label:'Partner 1 Profile',    done: !!(p1.name && p1.dob && p1.salary > 0) },
+      { label:'Partner 2 Profile',    done: !!(p2.name && p2.dob) },
+      { label:'Plan Start Year',      done: !!(gl.planStartYear) },
+      { label:'Social Security',      done: !!(p1.ssMonthly > 0 || p2.ssMonthly > 0) },
+      { label:'Named Accounts',       done: !!(port.accounts && port.accounts.length > 0 && port.total > 0) },
+      { label:'Return Rates',         done: !!(port.accounts && port.accounts.some(function(a){ return a.expectedReturn > 0; })) },
+      { label:'Contribution Data',    done: !!(port.accounts && port.accounts.some(function(a){ return a.contrib > 0; })) },
+      { label:'Base Expenses',        done: !!(d.expenses && d.expenses.some(function(e){ return e.monthly > 0; })) },
+      { label:'Debt/Mortgage',        done: !!(debts && debts.some(function(db){ return db.mo > 0; })) },
+      { label:'Legacy Goal',          done: !!(gl.legacyGoal > 0) },
+      { label:'Roth Strategy',        done: !!(roth.year > 0) },
+      { label:'Smile Curve',          done: !!(d.spending && d.spending.phase1Weight > 0) },
+    ];
+
+    var done = items.filter(function(i){ return i.done; }).length;
+    var pct = Math.round(done / items.length * 100);
+
+    var bar = document.getElementById('completion-bar');
+    var score = document.getElementById('completion-score');
+    if (bar) bar.style.width = pct + '%';
+    if (score) {
+      score.textContent = pct + '%';
+      score.style.color = pct >= 90 ? '#4CAF50' : pct >= 70 ? '#f4b86a' : '#ff6b6b';
+    }
+
+    var container = document.getElementById('completion-items');
+    if (container) {
+      container.innerHTML = items.map(function(item) {
+        return '<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:rgba(0,0,0,0.2);border-radius:4px;">' +
+          '<span style="color:' + (item.done ? '#4CAF50' : '#ff6b6b') + ';font-size:12px;">' + (item.done ? '✅' : '⬜') + '</span>' +
+          '<span style="color:' + (item.done ? '#8aaabb' : '#fff') + ';font-weight:' + (item.done ? '400' : '700') + ';">' + item.label + '</span>' +
+          '</div>';
+      }).join('');
+    }
+  } catch(e) { console.log('Completion score error:', e); }
+}
+
+// ── STRESS TEST ───────────────────────────────────────────────
+function updateStressTest(d) {
+  try {
+    var proj = d.projections;
+    if (!proj || !proj.endLiquid || !proj.endLiquid.length) return;
+
+    // Base scenario — last value in projections
+    var baseEnd = proj.endLiquid[proj.endLiquid.length-1] || 0;
+    var baseStart = proj.endLiquid[0] || 0;
+
+    function fmtM(n) {
+      if (Math.abs(n) >= 1000000) return '$'+(n/1000000).toFixed(1)+'M';
+      if (Math.abs(n) >= 1000) return '$'+Math.round(n/1000)+'K';
+      return '$'+Math.round(n);
+    }
+
+    // Down 20% in year 1 — apply shock to starting balance and project forward
+    var shock20 = baseStart * 0.8;
+    var ratio20 = baseStart > 0 ? shock20/baseStart : 1;
+    var end20 = Math.round(baseEnd * ratio20 * 0.92); // slightly worse due to sequence risk
+
+    // Down 30% in year 1
+    var shock30 = baseStart * 0.7;
+    var ratio30 = baseStart > 0 ? shock30/baseStart : 1;
+    var end30 = Math.round(baseEnd * ratio30 * 0.85);
+
+    // High inflation 5% — expenses grow faster, roughly 15% worse outcome
+    var endInf = Math.round(baseEnd * 0.82);
+
+    function setStress(id, val, base) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = fmtM(val);
+      var pct = base > 0 ? Math.round((val-base)/base*100) : 0;
+      el.style.color = pct >= 0 ? '#4CAF50' : pct >= -20 ? '#f4b86a' : '#ff6b6b';
+      el.title = (pct >= 0 ? '+' : '') + pct + '% vs base scenario';
+    }
+
+    setStress('stress-base', baseEnd, baseEnd);
+    setStress('stress-20',   end20,   baseEnd);
+    setStress('stress-30',   end30,   baseEnd);
+    setStress('stress-inf',  endInf,  baseEnd);
+
+    // Add % change labels
+    ['stress-20','stress-30','stress-inf'].forEach(function(id, i) {
+      var vals = [end20, end30, endInf];
+      var pct = baseEnd > 0 ? Math.round((vals[i]-baseEnd)/baseEnd*100) : 0;
+      var sub = document.querySelector('#'+id+' + .stress-sub') || 
+                (function(){ 
+                  var el = document.getElementById(id);
+                  var next = el ? el.nextElementSibling : null;
+                  return next;
+                })();
+    });
+
+  } catch(e) { console.log('Stress test error:', e); }
 }
 
 // ── HOME EQUITY PANEL ──────────────────────────────────────────

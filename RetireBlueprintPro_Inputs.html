@@ -261,6 +261,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   <a href="RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
+  <a href="RetireBlueprintPro_Summary.html">📄 Summary</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;" target="_blank">Master Sheet</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
@@ -525,6 +526,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
               <input type="number" id="f-B43" value="0" readonly><span class="hint">Auto-calculated from SS base + FRA + start date</span>
+              <div id="ss-breakeven-p1" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(28,199,208,0.15);"></div>
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
@@ -538,12 +540,26 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Monthly Pension ($)</label>
-              <input type="number" id="f-B46" value="0">
+              <input type="number" id="f-B46" value="0" onchange="calcPensionVsLumpSum('p1');">
             </div>
             <div class="field">
               <label>Pension Start Date</label>
               <input type="date" id="f-B47" value="">
             </div>
+          </div>
+          <!-- Pension vs Lump Sum -->
+          <div style="margin-top:10px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
+              <div class="field">
+                <label>Lump Sum Offer ($) <span style="font-size:9px;color:#8aaabb;">optional</span></label>
+                <input type="number" id="p1-lump-sum" value="" placeholder="0" onchange="calcPensionVsLumpSum('p1');" style="border-color:rgba(244,184,106,0.3);">
+              </div>
+              <div class="field">
+                <label>Expected Lifespan (age)</label>
+                <input type="number" id="p1-pension-life" value="85" min="70" max="100" onchange="calcPensionVsLumpSum('p1');">
+              </div>
+            </div>
+            <div id="pension-compare-p1" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;border:1px solid rgba(244,184,106,0.15);display:none;"></div>
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
@@ -551,8 +567,9 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
-              <input type="number" id="f-B52" value="0" onchange="markDirty()">
-              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr</span>
+              <input type="number" id="f-B52" value="0" onchange="calcHealthcareBridge('p1'); markDirty();">
+              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr · <a href="#" onclick="autoEstimateACA('p1',event)" style="color:var(--teal);">Auto-estimate from income</a></span>
+              <div id="hc-bridge-p1" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(244,184,106,0.15);display:none;"></div>
             </div>
             <div class="field">
               <label>Medicare Annual ($)</label>
@@ -649,6 +666,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
               <input type="number" id="f-D43" value="0" readonly><span class="hint">Auto-calculated from SS base + FRA + start date</span>
+              <div id="ss-breakeven-p2" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(244,184,106,0.15);"></div>
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
@@ -675,8 +693,9 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
-              <input type="number" id="f-D52" value="0" onchange="markDirty()">
-              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr</span>
+              <input type="number" id="f-D52" value="0" onchange="calcHealthcareBridge('p2'); markDirty();">
+              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr · <a href="#" onclick="autoEstimateACA('p2',event)" style="color:var(--teal);">Auto-estimate from income</a></span>
+              <div id="hc-bridge-p2" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(244,184,106,0.15);display:none;"></div>
             </div>
             <div class="field">
               <label>Medicare Annual ($)</label>
@@ -1553,6 +1572,185 @@ function calcSSMonthly(baseId, fraId, startDateId, ageId, monthlyId) {
   }
   monthlyEl.value = Math.max(0, Math.round(adjusted));
   markDirty();
+  // Update breakeven analysis
+  calcSSBreakeven(baseId, fraId, ageId);
+}
+
+// ── HEALTHCARE BRIDGE ────────────────────────────────────────
+function autoEstimateACA(partner, e) {
+  if (e) e.preventDefault();
+  // Get projected income for retirement year from projections
+  var proj = window._rbpProjections;
+  var incomeEl = partner === 'p1' ? document.getElementById('f-B39') : document.getElementById('f-D39');
+  var retireDate = incomeEl ? incomeEl.value : '';
+  var retireYr = retireDate ? new Date(retireDate).getFullYear() : new Date().getFullYear() + 2;
+  
+  var retireIncome = 0;
+  if (proj && proj.years) {
+    var idx = proj.years.indexOf(retireYr);
+    if (idx >= 0) retireIncome = proj.income[idx] || 0;
+  }
+  
+  // 2024 ACA benchmark silver plan premium (MFJ) based on income
+  // Subsidies available up to 400% FPL (~$60K for single, $120K MFJ in 2024)
+  var fpl2024 = 32150; // 100% FPL for 2-person household
+  var fpl400 = fpl2024 * 4;
+  var benchmarkPremium = 1400 * 12; // ~$1,400/mo benchmark silver plan
+  
+  var subsidy = 0;
+  if (retireIncome < fpl400) {
+    // Sliding scale subsidy
+    var capPct = Math.min(0.085, 0.02 + (retireIncome/fpl400) * 0.065);
+    var maxContrib = retireIncome * capPct;
+    subsidy = Math.max(0, benchmarkPremium - maxContrib);
+  }
+  
+  var estPremium = Math.round(benchmarkPremium - subsidy);
+  var estTotal = estPremium + 3000; // Add est. out-of-pocket
+  
+  // Set the field
+  var fieldId = partner === 'p1' ? 'f-B52' : 'f-D52';
+  var el = document.getElementById(fieldId);
+  if (el) { el.value = estTotal; markDirty(); }
+  
+  calcHealthcareBridge(partner);
+}
+
+function calcPensionVsLumpSum(partner) {
+  var monthlyId = partner === 'p1' ? 'f-B46' : 'f-D46';
+  var lumpId = partner === 'p1' ? 'p1-lump-sum' : 'p2-lump-sum';
+  var lifeId = partner === 'p1' ? 'p1-pension-life' : 'p2-pension-life';
+  var panelId = 'pension-compare-' + partner;
+  var ageId = partner === 'p1' ? 'f-B33' : 'f-D33';
+
+  var monthly = parseFloat(String((document.getElementById(monthlyId)||{value:0}).value).replace(/[$,]/g,'')) || 0;
+  var lumpSum = parseFloat(String((document.getElementById(lumpId)||{value:0}).value).replace(/[$,]/g,'')) || 0;
+  var lifeAge = parseFloat((document.getElementById(lifeId)||{value:85}).value) || 85;
+  var currentAge = parseFloat((document.getElementById(ageId)||{value:0}).value) || 0;
+  var panel = document.getElementById(panelId);
+  if (!panel) return;
+
+  if (!monthly || monthly <= 0) { panel.style.display='none'; return; }
+  if (!lumpSum || lumpSum <= 0) { panel.style.display='none'; return; }
+
+  // Assume pension starts now (simplification)
+  var yearsOfPayments = Math.max(0, lifeAge - currentAge);
+  var totalPensionValue = monthly * 12 * yearsOfPayments;
+
+  // Lump sum invested at 6% — what does it grow to?
+  var growthRate = 0.06;
+  var lumpSumGrowth = lumpSum * Math.pow(1+growthRate, yearsOfPayments);
+  // But you'd also draw it down — simplified: compare raw totals
+  var breakEvenYrs = lumpSum / (monthly * 12);
+  var breakEvenAge = currentAge + breakEvenYrs;
+
+  var pensionWins = totalPensionValue > lumpSumGrowth * 0.85; // pension wins if lump sum needs >85% growth to match
+
+  panel.style.display = 'block';
+  panel.innerHTML =
+    '<div style="font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;margin-bottom:8px;">💰 Pension vs Lump Sum Analysis</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;">' +
+    '<div style="text-align:center;background:rgba(28,199,208,0.08);border-radius:6px;padding:8px;border:1px solid rgba(28,199,208,0.2);">' +
+      '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Pension Total</div>' +
+      '<div style="font-size:15px;font-weight:800;color:#1CC7D0;">$'+Math.round(totalPensionValue/1000)+'K</div>' +
+      '<div style="font-size:9px;color:#8aaabb;">over '+Math.round(yearsOfPayments)+' yrs</div>' +
+    '</div>' +
+    '<div style="text-align:center;background:rgba(244,184,106,0.08);border-radius:6px;padding:8px;border:1px solid rgba(244,184,106,0.2);">' +
+      '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Lump Sum Offer</div>' +
+      '<div style="font-size:15px;font-weight:800;color:#f4b86a;">$'+Math.round(lumpSum/1000)+'K</div>' +
+      '<div style="font-size:9px;color:#8aaabb;">at 6% grows to $'+Math.round(lumpSumGrowth/1000)+'K</div>' +
+    '</div>' +
+    '<div style="text-align:center;background:'+(pensionWins?'rgba(76,175,80,0.1)':'rgba(255,107,107,0.1)')+';border-radius:6px;padding:8px;border:1px solid '+(pensionWins?'rgba(76,175,80,0.3)':'rgba(255,107,107,0.3)')+'">' +
+      '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Breakeven Age</div>' +
+      '<div style="font-size:15px;font-weight:800;color:'+(pensionWins?'#4CAF50':'#ff6b6b')+';">'+Math.round(breakEvenAge)+'</div>' +
+      '<div style="font-size:9px;color:#8aaabb;">'+(pensionWins?'✅ Pension wins':'⚠️ Take lump sum')+'</div>' +
+    '</div>' +
+    '</div>' +
+    '<div style="font-size:9px;color:#8aaabb;font-style:italic;">💡 '+(pensionWins ? 'Pension pays more if you live past '+Math.round(breakEvenAge)+'. With expected lifespan of '+lifeAge+', take the pension.' : 'Lump sum may be better — breakeven age of '+Math.round(breakEvenAge)+' exceeds expected lifespan of '+lifeAge+'.')+'</div>';
+}
+
+function calcHealthcareBridge(partner) {
+  var panel = document.getElementById('hc-bridge-'+partner);
+  if (!panel) return;
+  
+  var ageId = partner === 'p1' ? 'f-B33' : 'f-D33';
+  var retireId = partner === 'p1' ? 'f-B39' : 'f-D39';
+  var hcId = partner === 'p1' ? 'f-B52' : 'f-D52';
+  var medicareAgeId = partner === 'p1' ? 'f-B54' : 'f-D54';
+  
+  var currentAge = parseFloat((document.getElementById(ageId)||{}).value) || 0;
+  var hcAnnual = parseFloat(String((document.getElementById(hcId)||{value:0}).value).replace(/[$,]/g,'')) || 0;
+  var medicareAge = parseFloat((document.getElementById(medicareAgeId)||{}).value) || 65;
+  
+  if (hcAnnual <= 0 || currentAge <= 0) { panel.style.display='none'; return; }
+  
+  var yrsToMedicare = Math.max(0, medicareAge - currentAge);
+  var totalBridgeCost = Math.round(hcAnnual * yrsToMedicare);
+  
+  panel.style.display = 'block';
+  panel.innerHTML = 
+    '<div style="font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;margin-bottom:8px;">🏥 Healthcare Bridge to Medicare</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">' +
+    '<div style="text-align:center;background:rgba(0,0,0,0.2);border-radius:6px;padding:8px;">' +
+      '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Annual Cost</div>' +
+      '<div style="font-size:16px;font-weight:800;color:#f4b86a;">$'+Math.round(hcAnnual/1000)+'K</div>' +
+    '</div>' +
+    '<div style="text-align:center;background:rgba(0,0,0,0.2);border-radius:6px;padding:8px;">' +
+      '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Years to Medicare</div>' +
+      '<div style="font-size:16px;font-weight:800;color:#fff;">'+yrsToMedicare+'</div>' +
+    '</div>' +
+    '<div style="text-align:center;background:rgba(255,107,107,0.1);border-radius:6px;padding:8px;border:1px solid rgba(255,107,107,0.2);">' +
+      '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Total Bridge Cost</div>' +
+      '<div style="font-size:16px;font-weight:800;color:#ff6b6b;">$'+Math.round(totalBridgeCost/1000)+'K</div>' +
+    '</div>' +
+    '</div>' +
+    '<div style="font-size:9px;color:#8aaabb;margin-top:6px;font-style:italic;">💡 This $'+Math.round(totalBridgeCost/1000)+'K healthcare bridge is one of the most overlooked early retirement costs.</div>';
+}
+
+function calcSSBreakeven(baseId, fraId, ageId) {
+  var base = parseFloat(String((document.getElementById(baseId)||{value:0}).value).replace(/[$,]/g,'')) || 0;
+  var fra = parseFloat((document.getElementById(fraId)||{value:67}).value) || 67;
+  var currentAge = parseFloat((document.getElementById(ageId)||{value:fra}).value) || fra;
+  if (base <= 0) return;
+
+  // Calculate monthly benefit at 62, 67 (FRA), 70
+  var at62 = base * (1 - 36*(5/9/100) - (fra>65 ? (fra-65)*12*(5/12/100) : 0));
+  var atFRA = base;
+  var at70 = base * (1 + (70-fra) * 0.08);
+
+  // Cumulative totals at each age
+  function cumulative(monthly, startAge, checkAge) {
+    return Math.max(0, Math.round(monthly * 12 * (checkAge - startAge)));
+  }
+
+  // Breakeven: when does waiting pay off?
+  var breakeven67vs62 = 62 + (atFRA * fra - at62 * 62) / (atFRA - at62); // simplified
+  var breakeven70vs67 = 67 + (at70 * 70 - atFRA * 67) / (at70 - atFRA);
+
+  // Suffix for partner
+  var suffix = baseId === 'f-B40' ? 'p1' : 'p2';
+  var panel = document.getElementById('ss-breakeven-'+suffix);
+  if (!panel) return;
+
+  panel.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;">' +
+    '<div style="background:rgba(0,0,0,0.2);border-radius:6px;padding:8px;text-align:center;">' +
+      '<div style="font-size:8px;color:#f4b86a;text-transform:uppercase;font-weight:700;">Claim at 62</div>' +
+      '<div style="font-size:16px;font-weight:800;color:#fff;">$' + Math.round(at62).toLocaleString() + '/mo</div>' +
+      '<div style="font-size:9px;color:#8aaabb;">Total by 85: $' + Math.round(at62*12*23/1000) + 'K</div>' +
+    '</div>' +
+    '<div style="background:rgba(28,199,208,0.1);border-radius:6px;padding:8px;text-align:center;border:1px solid rgba(28,199,208,0.3);">' +
+      '<div style="font-size:8px;color:#1CC7D0;text-transform:uppercase;font-weight:700;">Claim at FRA (' + fra + ')</div>' +
+      '<div style="font-size:16px;font-weight:800;color:#1CC7D0;">$' + Math.round(atFRA).toLocaleString() + '/mo</div>' +
+      '<div style="font-size:9px;color:#8aaabb;">Breakeven vs 62: age ' + Math.round(breakeven67vs62) + '</div>' +
+    '</div>' +
+    '<div style="background:rgba(0,0,0,0.2);border-radius:6px;padding:8px;text-align:center;">' +
+      '<div style="font-size:8px;color:#4CAF50;text-transform:uppercase;font-weight:700;">Delay to 70</div>' +
+      '<div style="font-size:16px;font-weight:800;color:#4CAF50;">$' + Math.round(at70).toLocaleString() + '/mo</div>' +
+      '<div style="font-size:9px;color:#8aaabb;">Breakeven vs FRA: age ' + Math.round(breakeven70vs67) + '</div>' +
+    '</div>' +
+    '</div>' +
+    '<div style="font-size:9px;color:#8aaabb;margin-top:6px;font-style:italic;">💡 If you expect to live past age ' + Math.round(breakeven70vs67) + ', delaying to 70 maximizes lifetime benefits.</div>';
 }
 
 // ── PARTNER NAMES ────────────────────────────────────────────
@@ -2211,6 +2409,11 @@ function populateFromData(d) {
 
   // ── ROTH SETTINGS ────────────────────────────────────
   if (roth.year && roth.year > 2020) sv('f-B139', roth.year);
+  // Trigger SS breakeven calculations
+  setTimeout(function(){
+    calcSSBreakeven('f-B40','f-B41','f-B33');
+    calcSSBreakeven('f-D40','f-D41','f-D33');
+  }, 100);
   if (roth.bracket) sv('f-B141', roth.bracket);
   if (roth.assumedRate) sv('f-B145', Math.round(roth.assumedRate*10000)/100);
 

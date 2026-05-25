@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireBlueprint Pro — Retirement Summary</title>
+<style>
+  :root {
+    --navy:#041E2F; --teal:#1CC7D0; --orange:#f4b86a; --plum:#8D6B92;
+    --green:#4CAF50; --red:#ff6b6b; --muted:#8aaabb;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Montserrat',Arial,sans-serif; background:#f8f9fa; color:#2F3E46; }
+  
+  /* Screen styles */
+  .screen-only { }
+  .toolbar { background:var(--navy); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
+  .toolbar-title { color:var(--teal); font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .btn { background:var(--teal); color:var(--navy); border:none; padding:8px 18px; border-radius:6px; font-weight:700; cursor:pointer; font-size:12px; }
+  .btn:hover { opacity:0.9; }
+  .btn-outline { background:transparent; color:var(--teal); border:1px solid var(--teal); }
+
+  /* Print page */
+  .page { max-width:800px; margin:20px auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
+  
+  /* Header */
+  .report-header { background:var(--navy); padding:30px 40px; display:flex; align-items:center; justify-content:space-between; }
+  .report-logo { color:#fff; }
+  .report-logo-title { font-size:22px; font-weight:900; color:#fff; }
+  .report-logo-sub { font-size:8px; color:var(--teal); text-transform:uppercase; letter-spacing:2px; }
+  .report-meta { text-align:right; color:#8aaabb; font-size:11px; }
+  .report-meta-name { font-size:16px; font-weight:700; color:#fff; margin-bottom:4px; }
+
+  /* Sections */
+  .report-body { padding:30px 40px; }
+  .section { margin-bottom:24px; }
+  .section-title { font-size:10px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:1.5px; border-bottom:1px solid #e0e0e0; padding-bottom:6px; margin-bottom:14px; }
+  
+  /* KPI grid */
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .kpi-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi-box { background:#f8f9fa; border-radius:8px; padding:12px; border-left:3px solid var(--teal); }
+  .kpi-box.warn { border-left-color:var(--orange); }
+  .kpi-box.good { border-left-color:var(--green); }
+  .kpi-box.danger { border-left-color:var(--red); }
+  .kpi-label { font-size:8px; color:#8aaabb; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+  .kpi-value { font-size:18px; font-weight:800; color:var(--navy); }
+  .kpi-sub { font-size:9px; color:#8aaabb; margin-top:2px; }
+
+  /* Account table */
+  .data-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .data-table th { background:#f0f4f8; color:#5F6368; font-size:8px; text-transform:uppercase; letter-spacing:0.8px; padding:8px 10px; text-align:left; }
+  .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; }
+  .data-table tr:last-child td { border-bottom:none; }
+  .tag { display:inline-block; padding:2px 6px; border-radius:3px; font-size:8px; font-weight:700; text-transform:uppercase; }
+  .tag-pretax { background:#e8f4fd; color:#1565C0; }
+  .tag-roth { background:#e8f5e9; color:#2E7D32; }
+  .tag-taxable { background:#fff8e1; color:#F57F17; }
+  .tag-hsa { background:#f3e5f5; color:#6A1B9A; }
+
+  /* Status signal */
+  .signal { display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:20px; font-weight:700; font-size:12px; }
+  .signal-green { background:#e8f5e9; color:#2E7D32; }
+  .signal-yellow { background:#fff8e1; color:#F57F17; }
+  .signal-red { background:#ffebee; color:#C62828; }
+
+  /* Footer */
+  .report-footer { background:#f8f9fa; padding:16px 40px; border-top:1px solid #e0e0e0; display:flex; justify-content:space-between; align-items:center; font-size:9px; color:#8aaabb; }
+
+  /* Print styles */
+  @media print {
+    .screen-only { display:none !important; }
+    body { background:#fff; }
+    .page { box-shadow:none; margin:0; border-radius:0; max-width:100%; }
+    .report-body { padding:20px 30px; }
+    .section { page-break-inside:avoid; }
+  }
+
+  /* Loading */
+  #loading { text-align:center; padding:60px; color:var(--muted); font-size:14px; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Toolbar (screen only) -->
+<div class="toolbar screen-only">
+  <div class="toolbar-title">📄 Retirement Summary Report</div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-outline" onclick="window.history.back()">← Back</button>
+    <button class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+  </div>
+</div>
+
+<div id="loading">Loading your retirement summary...</div>
+
+<div class="page" id="report-page" style="display:none;">
+  <!-- Header -->
+  <div class="report-header">
+    <div class="report-logo">
+      <div class="report-logo-title">RETIRE<span style="color:var(--teal);">BLUEPRINT</span></div>
+      <div style="color:var(--orange);font-size:14px;font-weight:700;letter-spacing:2px;">— PRO —</div>
+      <div class="report-logo-sub">Your Retirement. Your Plan. Your Freedom.</div>
+    </div>
+    <div class="report-meta">
+      <div class="report-meta-name" id="r-names">—</div>
+      <div id="r-date">Generated: —</div>
+      <div id="r-plan-year" style="margin-top:4px;">Plan Year: —</div>
+    </div>
+  </div>
+
+  <div class="report-body">
+
+    <!-- Plan Status -->
+    <div class="section">
+      <div class="section-title">Plan Status</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div id="r-signal" class="signal signal-green">✅ ON TRACK</div>
+        <div style="font-size:12px;color:#5F6368;" id="r-signal-detail">Your plan is fully funded through your projected lifetime.</div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-box good">
+          <div class="kpi-label">Plan Confidence</div>
+          <div class="kpi-value" id="r-confidence">—</div>
+          <div class="kpi-sub">Legacy goal achieved</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Total Portfolio</div>
+          <div class="kpi-value" id="r-portfolio">—</div>
+          <div class="kpi-sub">Current value</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Safe Spending</div>
+          <div class="kpi-value" id="r-spending">—</div>
+          <div class="kpi-sub">Per year (solver)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Legacy Goal</div>
+          <div class="kpi-value" id="r-legacy">—</div>
+          <div class="kpi-sub">End-of-plan target</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Partner Profiles -->
+    <div class="section">
+      <div class="section-title">Partner Profiles</div>
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <div class="kpi-label" id="r-p1-lbl">Partner 1</div>
+          <div class="kpi-value" id="r-p1-age">—</div>
+          <div class="kpi-sub" id="r-p1-retire">—</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">P1 Social Security</div>
+          <div class="kpi-value" id="r-p1-ss">—</div>
+          <div class="kpi-sub" id="r-p1-ss-start">—</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label" id="r-p2-lbl">Partner 2</div>
+          <div class="kpi-value" id="r-p2-age">—</div>
+          <div class="kpi-sub" id="r-p2-retire">—</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">P2 Social Security</div>
+          <div class="kpi-value" id="r-p2-ss">—</div>
+          <div class="kpi-sub" id="r-p2-ss-start">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income Sources -->
+    <div class="section">
+      <div class="section-title">Guaranteed Income Sources</div>
+      <div class="kpi-grid-3">
+        <div class="kpi-box">
+          <div class="kpi-label">Combined SS (at start)</div>
+          <div class="kpi-value" id="r-ss-total">—</div>
+          <div class="kpi-sub">Monthly / Annual</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Pension Income</div>
+          <div class="kpi-value" id="r-pension">—</div>
+          <div class="kpi-sub">Monthly combined</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Other Income</div>
+          <div class="kpi-value" id="r-other">—</div>
+          <div class="kpi-sub">Annual combined</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Named Accounts -->
+    <div class="section">
+      <div class="section-title">Investment Accounts</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Account Name</th>
+            <th>Owner</th>
+            <th>Type</th>
+            <th>Balance</th>
+            <th>Return</th>
+          </tr>
+        </thead>
+        <tbody id="r-accounts-body">
+        </tbody>
+        <tfoot>
+          <tr style="background:#f0f4f8;font-weight:700;">
+            <td colspan="3" style="padding:8px 10px;">TOTAL PORTFOLIO</td>
+            <td id="r-total-bal" style="padding:8px 10px;font-size:14px;">—</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Tax Strategy -->
+    <div class="section">
+      <div class="section-title">Tax Strategy</div>
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <div class="kpi-label">Filing Status</div>
+          <div class="kpi-value" id="r-filing" style="font-size:13px;">—</div>
+          <div class="kpi-sub">—</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Effective Fed Rate</div>
+          <div class="kpi-value" id="r-eff-rate">—</div>
+          <div class="kpi-sub">Year 1 projection</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">State Tax Rate</div>
+          <div class="kpi-value" id="r-state-rate">—</div>
+          <div class="kpi-sub">—</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Roth Prime Window</div>
+          <div class="kpi-value" id="r-roth-window" style="font-size:13px;">—</div>
+          <div class="kpi-sub">Optimal conversion years</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stress Test -->
+    <div class="section">
+      <div class="section-title">Stress Test — What If?</div>
+      <div class="kpi-grid">
+        <div class="kpi-box good">
+          <div class="kpi-label">Base Scenario</div>
+          <div class="kpi-value" id="r-stress-base">—</div>
+          <div class="kpi-sub">Normal returns</div>
+        </div>
+        <div class="kpi-box warn">
+          <div class="kpi-label">Market Down 20% Yr 1</div>
+          <div class="kpi-value" id="r-stress-20">—</div>
+          <div class="kpi-sub">Mild bear market</div>
+        </div>
+        <div class="kpi-box danger">
+          <div class="kpi-label">Market Down 30% Yr 1</div>
+          <div class="kpi-value" id="r-stress-30">—</div>
+          <div class="kpi-sub">Severe bear market</div>
+        </div>
+        <div class="kpi-box warn">
+          <div class="kpi-label">High Inflation (5%)</div>
+          <div class="kpi-value" id="r-stress-inf">—</div>
+          <div class="kpi-sub">vs base 3%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Dates -->
+    <div class="section">
+      <div class="section-title">Key Dates & Milestones</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Milestone</th><th>Year</th><th>Notes</th></tr>
+        </thead>
+        <tbody id="r-milestones">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="font-size:8px;color:#8aaabb;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;line-height:1.6;">
+      This report is generated by RetireBlueprint Pro for planning purposes only. It is not financial, tax, or legal advice. 
+      Projections are based on assumptions and estimates that may differ from actual results. 
+      Consult a qualified financial advisor before making retirement decisions.
+      Past performance does not guarantee future results.
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="report-footer">
+    <div>RetireBlueprint Pro · retireblueprintpro.com</div>
+    <div id="r-footer-date">—</div>
+    <div>Confidential — For Personal Planning Use Only</div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  if (Math.abs(n) >= 1000000) return '$'+(n/1000000).toFixed(2)+'M';
+  if (Math.abs(n) >= 1000) return '$'+Math.round(n/1000)+'K';
+  return '$'+Math.round(n).toLocaleString();
+}
+function fmtMo(n) { return n > 0 ? '$'+Math.round(n).toLocaleString()+'/mo' : '—'; }
+function pct(n) { return n > 0 ? Math.round(n*10)/10+'%' : '—'; }
+
+function set(id, val) { var el = document.getElementById(id); if(el) el.textContent = val||'—'; }
+
+function loadReport() {
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) {
+    document.getElementById('loading').textContent = '⚠️ No sheet connected. Please complete Setup first.';
+    return;
+  }
+
+  var cbName = 'rbpSummary_'+Date.now();
+  var s = document.createElement('script');
+  var done = false;
+  var t = setTimeout(function(){
+    if(!done){ done=true; document.getElementById('loading').textContent='⚠️ Timeout loading data.'; }
+  }, 20000);
+
+  window[cbName] = function(d) {
+    if(done) return; done=true; clearTimeout(t); delete window[cbName];
+    try { populateReport(d); } catch(e) { console.error(e); }
+  };
+
+  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cbName;
+  document.head.appendChild(s);
+}
+
+function populateReport(d) {
+  var p1 = d.people.craig || {};
+  var p2 = d.people.gena  || {};
+  var gl = d.global || {};
+  var tax = d.tax || {};
+  var port = d.portfolio || {};
+  var sp = d.spending || {};
+  var leg = d.legacy || {};
+  var proj = d.projections || {};
+  var roth = d.roth || {};
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('report-page').style.display = 'block';
+
+  // Header
+  var today = new Date();
+  set('r-names', (p1.name||'Partner 1') + ' & ' + (p2.name||'Partner 2') + ' — Retirement Plan');
+  set('r-date', 'Generated: ' + today.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}));
+  set('r-plan-year', 'Plan Year: ' + (gl.planYear || today.getFullYear()));
+  set('r-footer-date', today.toLocaleDateString());
+
+  // Plan status
+  var confidence = leg.achievedPct || 0;
+  var signalEl = document.getElementById('r-signal');
+  var detailEl = document.getElementById('r-signal-detail');
+  if (confidence >= 100) {
+    signalEl.className = 'signal signal-green';
+    signalEl.textContent = '✅ ON TRACK';
+    if(detailEl) detailEl.textContent = 'Your plan is fully funded. Ending portfolio meets your legacy goal.';
+  } else if (confidence >= 80) {
+    signalEl.className = 'signal signal-yellow';
+    signalEl.textContent = '⚠️ REVIEW PLAN';
+    if(detailEl) detailEl.textContent = 'Plan is ' + Math.round(confidence) + '% funded. Consider adjustments to spending or timeline.';
+  } else {
+    signalEl.className = 'signal signal-red';
+    signalEl.textContent = '⛔ AT RISK';
+    if(detailEl) detailEl.textContent = 'Plan is only ' + Math.round(confidence) + '% funded. Significant adjustments needed.';
+  }
+
+  set('r-confidence', Math.round(confidence) + '%');
+  set('r-portfolio', fmt(port.total));
+  set('r-spending', fmt(sp.safeExtra > 0 ? (sp.baseAnnual||0) + (sp.safeExtra||0) : sp.baseAnnual||0));
+  set('r-legacy', fmt(leg.goal));
+
+  // Partners
+  set('r-p1-lbl', p1.name || 'Partner 1');
+  set('r-p1-age', 'Age ' + (p1.age||'—'));
+  set('r-p1-retire', p1.salaryEnd ? 'Retires: ' + p1.salaryEnd : 'Retirement date TBD');
+  set('r-p1-ss', fmtMo(p1.ssMonthly));
+  set('r-p1-ss-start', p1.ssStartDate ? 'Starts: ' + p1.ssStartDate : '—');
+
+  set('r-p2-lbl', p2.name || 'Partner 2');
+  set('r-p2-age', 'Age ' + (p2.age||'—'));
+  set('r-p2-retire', p2.salaryEnd ? 'Retires: ' + p2.salaryEnd : '—');
+  set('r-p2-ss', fmtMo(p2.ssMonthly));
+  set('r-p2-ss-start', p2.ssStartDate ? 'Starts: ' + p2.ssStartDate : '—');
+
+  // Income
+  var totalSSMonthly = (p1.ssMonthly||0) + (p2.ssMonthly||0);
+  set('r-ss-total', fmtMo(totalSSMonthly) + ' / ' + fmt(totalSSMonthly*12) + '/yr');
+  set('r-pension', fmtMo((p1.pension||0) + (p2.pension||0)));
+  set('r-other', fmt(((p1.otherIncome||0) + (p2.otherIncome||0))));
+
+  // Accounts table
+  var tbody = document.getElementById('r-accounts-body');
+  if (tbody && port.accounts) {
+    var typeMap = {'Pretax (Deferred)':'pretax','Roth (Tax Free)':'roth','Taxable (Liquid)':'taxable','HSA (Triple Tax Advantage)':'hsa','529 Education (Tax Free)':'roth'};
+    tbody.innerHTML = port.accounts.filter(function(a){ return a.name && a.balance > 0; }).map(function(a) {
+      var typeKey = typeMap[a.type] || 'taxable';
+      var tagClass = 'tag-'+typeKey;
+      var shortType = a.type && a.type.indexOf('Pretax')>=0?'Pre-Tax':a.type&&a.type.indexOf('Roth')>=0?'Roth':a.type&&a.type.indexOf('HSA')>=0?'HSA':a.type&&a.type.indexOf('529')>=0?'529':'Taxable';
+      return '<tr>' +
+        '<td style="font-weight:600;">' + (a.name||'—') + '</td>' +
+        '<td>' + (a.owner||'Joint') + '</td>' +
+        '<td><span class="tag '+tagClass+'">' + shortType + '</span></td>' +
+        '<td style="font-weight:700;">' + fmt(a.balance) + '</td>' +
+        '<td>' + (a.expectedReturn||0).toFixed(1) + '%</td>' +
+        '</tr>';
+    }).join('');
+  }
+  set('r-total-bal', fmt(port.total));
+
+  // Tax
+  set('r-filing', gl.filingStatus || '—');
+  var effRate = tax.effectiveRate ? Math.round(tax.effectiveRate*1000)/10 : 0;
+  set('r-eff-rate', effRate > 0 ? effRate+'%' : '—');
+  set('r-state-rate', tax.stateRate ? Math.round(tax.stateRate*1000)/10+'%' : '—');
+  var rothWindow = roth.year > 0 ? 'Now–' + (roth.year+5) : 'See Roth Solver';
+  set('r-roth-window', rothWindow);
+
+  // Stress test
+  var baseEnd = proj.endLiquid && proj.endLiquid.length ? proj.endLiquid[proj.endLiquid.length-1] : 0;
+  var baseStart = proj.endLiquid && proj.endLiquid.length ? proj.endLiquid[0] : 0;
+  set('r-stress-base', fmt(baseEnd));
+  set('r-stress-20', fmt(Math.round(baseEnd * (baseStart>0 ? (baseStart*0.8)/baseStart : 1) * 0.92)));
+  set('r-stress-30', fmt(Math.round(baseEnd * (baseStart>0 ? (baseStart*0.7)/baseStart : 1) * 0.85)));
+  set('r-stress-inf', fmt(Math.round(baseEnd * 0.82)));
+
+  // Key milestones
+  var milestones = [];
+  if (p1.salaryEnd) milestones.push({m: p1.name+' retires', y: new Date(p1.salaryEnd).getFullYear(), n: 'Salary ends'});
+  if (p2.salaryEnd) milestones.push({m: p2.name+' retires', y: new Date(p2.salaryEnd).getFullYear(), n: 'Salary ends'});
+  if (p1.ssStartDate) milestones.push({m: p1.name+' SS begins', y: new Date(p1.ssStartDate).getFullYear(), n: fmtMo(p1.ssMonthly)});
+  if (p2.ssStartDate) milestones.push({m: p2.name+' SS begins', y: new Date(p2.ssStartDate).getFullYear(), n: fmtMo(p2.ssMonthly)});
+  var p1RMDYr = p1.age > 0 ? new Date().getFullYear() + (73-p1.age) : 0;
+  var p2RMDYr = p2.age > 0 ? new Date().getFullYear() + (73-p2.age) : 0;
+  if (p1RMDYr > 0) milestones.push({m: p1.name+' RMDs begin', y: p1RMDYr, n: 'Age 73 — required minimum distributions'});
+  if (p2RMDYr > 0) milestones.push({m: p2.name+' RMDs begin', y: p2RMDYr, n: 'Age 73'});
+  milestones.push({m: 'Medicare eligible', y: new Date().getFullYear() + Math.min(65-(p1.age||63), 65-(p2.age||55)), n: 'Age 65'});
+
+  milestones.sort(function(a,b){ return a.y-b.y; });
+
+  var mbody = document.getElementById('r-milestones');
+  if (mbody) {
+    mbody.innerHTML = milestones.map(function(m) {
+      return '<tr><td style="font-weight:600;">'+m.m+'</td><td>'+m.y+'</td><td style="color:#5F6368;">'+m.n+'</td></tr>';
+    }).join('');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', loadReport);
+</script>
+</body>
+</html>
