@@ -24,7 +24,7 @@
   .page { max-width:800px; margin:20px auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
   
   /* Header */
-  .report-header { background:var(--navy); padding:24px 32px; }
+  /* report-header replaced by two-row layout */
   .report-logo { color:#fff; }
   .report-logo-title { font-size:22px; font-weight:900; color:#fff; }
   .report-logo-sub { font-size:8px; color:var(--teal); text-transform:uppercase; letter-spacing:2px; }
@@ -96,22 +96,24 @@
 
 <div class="page" id="report-page" style="display:none;">
   <!-- Header -->
-  <div class="report-header">
+  <!-- Logo banner -->
+  <div style="background:var(--navy);padding:22px 32px;display:flex;align-items:center;gap:16px;">
+    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:52px;width:auto;" onerror="this.style.display='none'">
+    <div>
+      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;">RETIRE<span style="color:var(--teal);">BLUEPRINT</span></div>
+      <div style="color:var(--orange);font-size:12px;font-weight:700;letter-spacing:2px;">— PRO —</div>
+      <div style="font-size:8px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;">Your Retirement. Your Plan. Your Freedom.</div>
+    </div>
+  </div>
+  <!-- Info bar below logo -->
+  <div style="background:#1a3a52;border-bottom:3px solid var(--teal);padding:14px 32px;">
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td style="vertical-align:middle;width:50%;">
-          <div style="display:flex;align-items:center;gap:16px;">
-            <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:55px;width:auto;" onerror="this.style.display='none'">
-            <div>
-              <div style="font-size:22px;font-weight:900;color:#fff;">RETIRE<span style="color:var(--teal);">BLUEPRINT</span></div>
-              <div style="color:var(--orange);font-size:13px;font-weight:700;letter-spacing:2px;">— PRO —</div>
-              <div style="font-size:9px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;">Your Retirement. Your Plan. Your Freedom.</div>
-            </div>
-          </div>
+        <td style="vertical-align:middle;">
+          <div id="r-names" style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:3px;">Your Retirement Plan</div>
         </td>
-        <td style="vertical-align:middle;text-align:right;width:50%;">
-          <div id="r-names" style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:6px;">Your Retirement Plan</div>
-          <div id="r-date" style="font-size:12px;color:#8aaabb;margin-bottom:3px;">Generated: loading...</div>
+        <td style="vertical-align:middle;text-align:right;">
+          <div id="r-date" style="font-size:12px;color:#8aaabb;margin-bottom:2px;">Generated: loading...</div>
           <div id="r-plan-year" style="font-size:12px;color:#8aaabb;">Plan Year: —</div>
         </td>
       </tr>
@@ -347,8 +349,10 @@ function loadReport() {
 }
 
 function populateReport(d) {
-  var p1 = d.people.craig || {};
-  var p2 = d.people.gena  || {};
+  // Support any partner names dynamically
+  var peopleKeys = Object.keys(d.people || {});
+  var p1 = d.people[peopleKeys[0]] || d.people.craig || {};
+  var p2 = d.people[peopleKeys[1]] || d.people.gena  || {};
   var gl = d.global || {};
   var tax = d.tax || {};
   var port = d.portfolio || {};
@@ -388,9 +392,9 @@ function populateReport(d) {
   }
 
   set('r-confidence', Math.round(confidence) + '%');
-  set('r-portfolio', fmt(port.total));
+  set('r-portfolio', fmt(port.total || port.totalStart || 0));
   set('r-spending', fmt(sp.safeExtra > 0 ? (sp.baseAnnual||0) + (sp.safeExtra||0) : sp.baseAnnual||0));
-  set('r-legacy', fmt(leg.goal));
+  set('r-legacy', fmt(leg.goal || leg.legacyGoal || 0));
 
   // Partners
   set('r-p1-lbl', p1.name || 'Partner 1');
