@@ -530,15 +530,16 @@ function writeInputs(ss, inp, data) {
           a.status||'Use for Withdrawals',   // G = Status
           a.dash||a.showOnDashboard||'No',   // H = Dashboard
           '',                                // I = Summary (read-only, skip)
-          (isNaN(Number(a.contrib)) || Number(a.contrib) > 1000000 || Number(a.contrib) < 0) ? 0 : (Number(a.contrib)||0),   // J = Annual Contribution
-          (isNaN(Number(a.match))  || Number(a.match)  > 1000000 || Number(a.match)  < 0) ? 0 : (Number(a.match)||0),     // K = Employer Match
+          (function(){ var v=parseFloat(a.contrib); return (isFinite(v) && v>=0 && v<=200000) ? Math.round(v) : 0; })(),  // J = Annual Contribution
+          (function(){ var v=parseFloat(a.match);  return (isFinite(v) && v>=0 && v<=200000) ? Math.round(v) : 0; })(),  // K = Employer Match
           '',                                // L = Contrib Start (written separately below)
           '',                                // M = Contrib End (written separately below)
           ''                                 // N = Withdrawal Start (written separately below)
         ]);
       }
-      // Clear contribution and date columns first to remove any corrupt values
+      // Clear J-N completely before writing to remove any corrupt values
       inp.getRange('J105:N116').clearContent();
+      SpreadsheetApp.flush(); // Ensure clear completes before writing
       inp.getRange('A105:N116').setValues(acctData.slice(0,12));
       // Write contribution dates separately using setD (handles date format correctly)
       var acctRows = [105,106,107,108,109,110,111,112,113,114,115,116];
