@@ -370,97 +370,41 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 </div>
 
 
-<!-- NEW CHARTS + PANELS -->
-<div style="padding:0 8px;">
-<!-- New charts row -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;">
-    <div class="chart-card">
-      <div class="chart-title">Account Mix Over Time</div>
-      <div class="chart-area"><canvas id="c6"></canvas></div>
+<!-- HOME EQUITY -->
+<div style="background:#0A3145;border-top:2px solid #f4b86a;padding:12px 16px;margin-top:16px;border-radius:12px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div style="font-size:11px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:1px;">
+      🏠 <span id="home-equity-title">Home Equity</span> · <span id="home-equity-type" style="color:#8aaabb;">Mortgage</span>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">Tax Efficiency Over Time</div>
-      <div class="chart-area"><canvas id="c7"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Withdrawal Strategy</div>
-      <div class="chart-area"><canvas id="c8"></canvas></div>
-    </div>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="font-size:10px;color:#1CC7D0;text-decoration:none;">Update in Inputs →</a>
   </div>
-
-  <!-- Progress completion score -->
-  <div id="completion-panel" style="background:#0A3145;border-radius:12px;padding:28px;margin-top:16px;border:2px solid rgba(28,199,208,0.3);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:16px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;">
-        📋 Plan Completion Score
-        <span class="tooltip-icon" data-tip="Shows which sections of your plan are complete. Green checkmarks = done. White boxes = still needs your input on the Inputs page.">?</span>
-      </div>
-      <div id="completion-score" style="font-size:48px;font-weight:900;color:#4CAF50;line-height:1;">—%</div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;">
+    <div style="text-align:center;">
+      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Today · Home Value</div>
+      <div style="font-size:18px;font-weight:800;color:#fff;" id="he-value">—</div>
     </div>
-    <div style="background:rgba(0,0,0,0.4);border-radius:8px;height:12px;margin-bottom:20px;">
-      <div id="completion-bar" style="height:12px;border-radius:8px;background:linear-gradient(90deg,#1CC7D0,#4CAF50);width:0%;transition:width 1s ease;"></div>
+    <div style="text-align:center;">
+      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Mortgage Owed</div>
+      <div style="font-size:18px;font-weight:800;color:#ff6b6b;" id="he-owed">—</div>
     </div>
-    <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;font-size:15px;"></div>
-  </div>
-
-  <!-- Sequence of returns stress test -->
-  <div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-top:16px;border:1px solid rgba(255,107,107,0.2);">
-    <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;">⚡ Stress Test — Sequence of Returns Risk<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions. A good plan survives even the 30% Year-1 drop scenario with a positive balance." style="border-color:#ff6b6b;color:#ff6b6b;">?</span></div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
-        <div class="solver-kpi-lbl">Base Scenario</div>
-        <div class="solver-kpi-val" id="stress-base" style="color:#1CC7D0;">—</div>
-        <div class="solver-kpi-sub">Normal market returns</div>
-      </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
-        <div class="solver-kpi-lbl">Year 1 Down 20%</div>
-        <div class="solver-kpi-val" id="stress-20">—</div>
-        <div class="solver-kpi-sub">Mild bear market</div>
-      </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
-        <div class="solver-kpi-lbl">Year 1 Down 30%</div>
-        <div class="solver-kpi-val" id="stress-30">—</div>
-        <div class="solver-kpi-sub">Severe bear market</div>
-      </div>
-      <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
-        <div class="solver-kpi-lbl">High Inflation (5%)</div>
-        <div class="solver-kpi-val" id="stress-inf">—</div>
-        <div class="solver-kpi-sub">vs base 3% inflation</div>
-      </div>
- 
-<!-- HOME EQUITY STRIP — only shows if home data in localStorage -->
-<div id="home-equity-panel" style="display:none;background:#fff;border-radius:6px;border:1px solid #e8eaed;overflow:hidden;margin-bottom:8px;">
-  <div style="background:#041E2F;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;">
-    <div style="font-size:9px;font-weight:700;color:#f4b86a;letter-spacing:1px;text-transform:uppercase;">🏠 Home Equity &nbsp;<span style="color:#1CC7D0;font-weight:400;" id="dash-home-name"></span></div>
-    <a href="RetireBlueprintPro_Inputs.html" style="font-size:8px;color:#1CC7D0;text-decoration:none;font-weight:600;">Update in Inputs →</a>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid #f0f2f4;">
-    <div style="padding:10px 14px;border-right:1px solid #f0f2f4;">
-      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:4px;">Today · Home Value</div>
-      <div style="font-size:18px;font-weight:800;color:#041E2F;" id="dash-home-value">—</div>
+    <div style="text-align:center;">
+      <div style="font-size:9px;color:#1CC7D0;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Current Net Equity</div>
+      <div style="font-size:18px;font-weight:800;color:#1CC7D0;" id="he-equity">—</div>
     </div>
-    <div style="padding:10px 14px;border-right:1px solid #f0f2f4;">
-      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:4px;">Mortgage Owed</div>
-      <div style="font-size:18px;font-weight:800;color:#A03030;" id="dash-home-mort-now">—</div>
+    <div style="text-align:center;">
+      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">At Payoff (~<span id="he-payoff-yrs">—</span> Yrs)</div>
+      <div style="font-size:18px;font-weight:800;color:#4CAF50;" id="he-at-payoff">—</div>
+      <div style="font-size:9px;color:#8aaabb;" id="he-appr-rate">—</div>
     </div>
-    <div style="padding:10px 14px;border-right:1px solid #f0f2f4;background:#f8fffe;">
-      <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;margin-bottom:4px;">Current Net Equity</div>
-      <div style="font-size:18px;font-weight:800;color:#2E7032;" id="dash-home-equity-now">—</div>
+    <div style="text-align:center;">
+      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Mortgage Left</div>
+      <div style="font-size:18px;font-weight:800;color:#fff;" id="he-mort-left">—</div>
+      <div style="font-size:9px;color:#8aaabb;" class="equity-lbl"></div>
     </div>
-    <div style="padding:10px 14px;border-right:1px solid #f0f2f4;">
-      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:4px;" id="dash-home-proj-lbl">At Payoff · Home Value</div>
-      <div style="font-size:18px;font-weight:800;color:#041E2F;" id="dash-home-fv">—</div>
-      <div style="font-size:8px;color:#5F6368;margin-top:2px;" id="dash-home-years-lbl"></div>
-    </div>
-    <div style="padding:10px 14px;border-right:1px solid #f0f2f4;">
-      <div style="font-size:8px;color:#5F6368;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:4px;">Mortgage Left</div>
-      <div style="font-size:18px;font-weight:800;color:#A03030;" id="dash-home-mort">—</div>
-      <div style="font-size:8px;color:#5F6368;margin-top:2px;" class="mort-lbl"></div>
-    </div>
-    <div style="padding:10px 14px;background:#f8fffe;">
-      <div style="font-size:8px;color:#2E7032;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;margin-bottom:4px;">Projected Net Equity</div>
-      <div style="font-size:18px;font-weight:800;color:#2E7032;" id="dash-home-equity">—</div>
-      <div style="font-size:8px;color:#5F6368;margin-top:2px;" class="equity-lbl"></div>
+    <div style="text-align:center;">
+      <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Projected Net Equity</div>
+      <div style="font-size:18px;font-weight:800;color:#4CAF50;" id="dash-home-equity">—</div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:2px;" class="equity-lbl"></div>
     </div>
   </div>
 </div>
@@ -521,7 +465,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
 </div>
 
 <!-- DIRECTIONS BAR — full width, below grid -->
-<div style="background:#F8F9FA;border-top:3px solid #1CC7D0;border-bottom:2px solid #e8eaed;padding:16px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+<div style="background:#F8F9FA;border-top:3px solid #1CC7D0;border-bottom:2px solid #e8eaed;padding:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 -14px;">
   <div style="text-align:center;padding:8px;">
     <div style="font-size:11px;font-weight:800;color:#041E2F;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">STEP 1</div>
     <div style="font-size:13px;color:#37474F;font-weight:700;">Open Your Inputs</div>
@@ -543,7 +487,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     <div style="font-size:11px;color:#5F6368;margin-top:4px;">All charts and numbers refresh instantly</div>
   </div>
 </div>
-<div class="disclaimer" style="font-size:11px;padding:10px 24px;text-align:center;background:#f0f4f8;color:#5F6368;">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
+<div class="disclaimer" style="font-size:11px;padding:10px;text-align:center;background:#f0f4f8;color:#5F6368;margin:0 -14px;">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
 
 <!-- NEW CHARTS ROW -->
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:16px 0 8px;">
@@ -605,6 +549,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:12
     </div>
   </div>
 </div>
+
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
@@ -1288,6 +1234,6 @@ function loadHomeEquity(sheetData) {
 }
 
 </script>
-</div></div></div></div>
+</div>
 </body>
 </html>
