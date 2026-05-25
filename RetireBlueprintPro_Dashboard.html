@@ -833,106 +833,85 @@ function dismissDashWelcome() {
 }
 
 // ── HOME EQUITY PANEL ──────────────────────────────────────────
-// Home value + appreciation rate: from localStorage (Inputs Home Appreciation Calculator)
-// Mortgage balance, monthly payment, end date: from sheet debt data (already loaded)
-// Calculates projected remaining mortgage using proper amortization
+// Reads entirely from sheet debt data (d.debts)
+// Home value = debt.curval (col K = Zillow value)
+// Appreciation rate = debt.appr (col L)
+// Mortgage balance = debt.bal, monthly = debt.mo, end = debt.end
+// No localStorage needed — all data from Inputs debts section
 function loadHomeEquity(sheetData) {
   try {
-    // Get home value and appreciation rate from localStorage calc
-    var raw = localStorage.getItem('rbp_calc_data');
-    var homeVal = 0, appRate = 0.035, calcYears = 25;
-    if (raw) {
-      var c = JSON.parse(raw);
-      homeVal   = parseFloat(String(c.home_value||'0').replace(/[$,]/g,'')) || 0;
-      appRate   = parseFloat(c.home_rate||'3.5') / 100;
-      calcYears = parseFloat(c.home_years||'25') || 25;
-    }
-    if (!homeVal) return; // Nothing entered — keep panel hidden
+    if (!sheetData || !sheetData.debts || !sheetData.debts.length) return;
 
-    // Get mortgage data from sheet debts (largest balance debt = mortgage)
-    var mortgageBalance = 0, mortgageMonthly = 0, mortgageEnd = null, mortgageName = '';
-    if (sheetData && sheetData.debts && sheetData.debts.length) {
+    // Find the real estate debt — highest curval with an appreciation rate
+    var homeDbt = null;
+    sheetData.debts.forEach(function(debt) {
+      if (debt.curval > 0 && debt.appr > 0) {
+        if (!homeDbt || debt.curval > homeDbt.curval) homeDbt = debt;
+      }
+    });
+    // Fallback: largest curval even without appreciation rate
+    if (!homeDbt) {
       sheetData.debts.forEach(function(debt) {
-        if (debt.name && debt.bal > mortgageBalance) {
-          mortgageBalance = debt.bal || 0;
-          mortgageMonthly = debt.mo  || 0;
-          mortgageEnd     = debt.end || null;
-          mortgageName    = debt.name;
+        if (debt.curval > 0) {
+          if (!homeDbt || debt.curval > homeDbt.curval) homeDbt = debt;
         }
       });
     }
-    // Fallback to localStorage if sheet debt data not yet saved
-    if (!mortgageBalance && raw) {
-      var lsMort = parseFloat(String(c.home_mortgage||'0').replace(/[$,]/g,'')) || 0;
-      if (lsMort) {
-        mortgageBalance = lsMort;
-        mortgageName = 'Mortgage (from Inputs calculator)';
+    if (!homeDbt) return; // No real estate found
+
+    var homeVal  = homeDbt.curval || 0;
+    var appRate  = (homeDbt.appr || 3.5) / 100; // comes back as %, convert to decimal
+    var mortgage = homeDbt.bal || 0;
+    var monthly  = homeDbt.mo  || 0;
+    var endDate  = homeDbt.end || '';
+
+    // Calculate months to payoff
+    var monthsLeft = 0;
+    if (endDate) {
+      try {
+        var parts = String(endDate).split('/');
+        var ed = parts.length === 3
+          ? new Date(parseInt(parts[2]), parseInt(parts[0])-1, 1)
+          : new Date(endDate);
+        var now = new Date();
+        monthsLeft = Math.max(0, Math.round(
+          (ed.getFullYear()-now.getFullYear())*12 + (ed.getMonth()-now.getMonth())
+        ));
+      } catch(e) {}
+    }
+    var payoffYrs = Math.round(monthsLeft/12*10)/10;
+
+    // Back-calculate interest rate via bisection
+    var mortRemaining = mortgage;
+    var mortLabel = 'Current balance';
+    if (monthsLeft > 0 && monthly > 0 && mortgage > 0) {
+      function mortPay(r) {
+        if (r < 0.000001) return mortgage/monthsLeft;
+        var rn = Math.pow(1+r, monthsLeft);
+        return mortgage * r * rn / (rn-1);
+      }
+      var rLo=0.0001, rHi=0.02, r=0.005;
+      for (var i=0;i<60;i++) {
+        r=(rLo+rHi)/2;
+        if (Math.abs(mortPay(r)-monthly)<0.01) break;
+        if (mortPay(r)>monthly) rHi=r; else rLo=r;
+      }
+      // Balance after payoffYrs years
+      var k = Math.round(payoffYrs*12);
+      if (k >= monthsLeft) {
+        mortRemaining = 0;
+        mortLabel = 'Paid off!';
+      } else {
+        var rk = Math.pow(1+r, k);
+        mortRemaining = Math.max(0, Math.round(mortgage*rk - monthly*(rk-1)/r));
+        mortLabel = 'Est. at payoff · '+(r*12*100).toFixed(1)+'% rate';
       }
     }
-    console.log('Home equity debt data:', mortgageName, 'bal:', mortgageBalance, 'mo:', mortgageMonthly, 'end:', mortgageEnd);
 
-    // Calculate projected mortgage remaining using proper amortization
-    // We have: current balance (P), monthly payment (M), end date → months remaining (n)
-    // From these we can back-calculate monthly rate r, then compute future balance
-    var mortRemaining = mortgageBalance;
-    var mortLabel = 'Current balance';
-    var monthsLeft = 0;
-    if (mortgageEnd && mortgageMonthly > 0 && mortgageBalance > 0) {
-      try {
-        var endParts = String(mortgageEnd).split('/');
-        var endDate  = endParts.length === 3
-          ? new Date(parseInt(endParts[2]), parseInt(endParts[0])-1, 1)
-          : new Date(mortgageEnd);
-        var now = new Date();
-        monthsLeft = Math.max(1, Math.round(
-          (endDate.getFullYear() - now.getFullYear()) * 12 +
-          (endDate.getMonth() - now.getMonth())
-        ));
-
-        // Back-calculate monthly interest rate using bisection (robust, no derivative needed)
-        // Solve: M = P*r*(1+r)^n / [(1+r)^n - 1]
-        var P = mortgageBalance, M = mortgageMonthly, n = monthsLeft;
-        function mortPayment(rate) {
-          if (rate < 0.000001) return P / n; // zero-rate approximation
-          var rn = Math.pow(1+rate, n);
-          return P * rate * rn / (rn - 1);
-        }
-        // Bisection between 0.1% and 2% monthly (1.2% to 24% annual)
-        var rLo = 0.0001, rHi = 0.02, r = 0.005;
-        for (var i=0; i<60; i++) {
-          r = (rLo + rHi) / 2;
-          var pay = mortPayment(r);
-          if (Math.abs(pay - M) < 0.01) break;
-          if (pay > M) rHi = r; else rLo = r;
-        }
-
-        // Now calculate balance after calcYears years of payments
-        var monthsPaid = Math.round(calcYears * 12);
-        var monthsRemAfter = Math.max(0, monthsLeft - monthsPaid);
-        // Remaining balance = P*(1+r)^k - M*[(1+r)^k - 1]/r  where k=months paid so far extended
-        // Future balance after paying for calcYears more months:
-        if (monthsRemAfter <= 0) {
-          mortRemaining = 0; // paid off by then
-          mortLabel = 'Paid off by then';
-        } else if (r > 0) {
-          var k = monthsPaid;
-          var rk = Math.pow(1+r, k);
-          mortRemaining = Math.max(0, Math.round(P * rk - M * (rk - 1) / r));
-          var yrsLeft = Math.round(monthsRemAfter / 12 * 10) / 10;
-          var annualRate = Math.round(r * 12 * 1000) / 10; // % to 1 decimal
-          mortLabel = 'Est. in '+Math.round(calcYears)+' yrs · '+annualRate+'% rate · '+yrsLeft+' yrs left after';
-        } else {
-          // Zero interest — simple paydown
-          mortRemaining = Math.max(0, P - M * monthsPaid);
-          mortLabel = 'Est. remaining';
-        }
-      } catch(e) { mortLabel = 'Current balance'; }
-    }
-
-    // Projected home value at appreciation rate over calc years
-    var projectedValue = Math.round(homeVal * Math.pow(1 + appRate, calcYears));
-    var projectedEquity = projectedValue - mortRemaining;
-    var currentEquity   = homeVal - mortgageBalance;
+    // Projected home value at payoff
+    var projValue = Math.round(homeVal * Math.pow(1+appRate, payoffYrs));
+    var currentEquity = homeVal - mortgage;
+    var projEquity = projValue - mortRemaining;
 
     var panel = document.getElementById('home-equity-panel');
     if (panel) panel.style.display = 'block';
@@ -940,46 +919,26 @@ function loadHomeEquity(sheetData) {
     function fmtH(n) {
       if (!n && n!==0) return '—';
       if (Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
-      if (Math.abs(n)>=1000)    return '$'+Math.round(n/1000)+'K';
+      if (Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
       return '$'+Math.round(n).toLocaleString();
     }
-    // TODAY values
-    document.getElementById('dash-home-value').textContent      = fmtH(homeVal);
-    document.getElementById('dash-home-mort-now').textContent   = fmtH(mortgageBalance);
-    document.getElementById('dash-home-equity-now').textContent = fmtH(homeVal - mortgageBalance);
 
-    // AT PAYOFF values
-    document.getElementById('dash-home-fv').textContent         = fmtH(projectedValue);
-    document.getElementById('dash-home-mort').textContent       = fmtH(mortRemaining);
-    document.getElementById('dash-home-equity').textContent     = fmtH(projectedEquity);
+    document.getElementById('dash-home-value').textContent   = fmtH(homeVal);
+    document.getElementById('dash-home-mort-now').textContent = fmtH(mortgage);
+    document.getElementById('dash-home-equity-now').textContent = fmtH(currentEquity);
+    document.getElementById('dash-home-fv').textContent      = fmtH(projValue);
+    document.getElementById('dash-home-mort').textContent    = fmtH(mortRemaining);
+    document.getElementById('dash-home-equity').textContent  = fmtH(projEquity);
+    document.getElementById('dash-home-proj-lbl').textContent = 'AT PAYOFF (~'+payoffYrs+' YRS)';
+    document.getElementById('dash-home-years-lbl').textContent = (appRate*100).toFixed(1)+'%/yr appreciation';
+    document.getElementById('dash-home-name').textContent = homeDbt.name || 'Primary Residence';
+    var mortLbls = document.querySelectorAll('#home-equity-panel .mort-lbl');
+    mortLbls.forEach(function(el){ el.textContent = mortLabel; });
 
-    // Labels
-    var payoffYrs = mortgageEnd ? Math.round(monthsLeft/12) : Math.round(calcYears);
-    document.getElementById('dash-home-proj-lbl').textContent   = 'AT PAYOFF (~'+payoffYrs+' YRS)';
-    document.getElementById('dash-home-years-lbl').textContent  = (appRate*100).toFixed(1)+'%/yr appreciation';
-    document.getElementById('dash-home-name').textContent       = mortgageName ? mortgageName : '';
-    var mortLblEls = document.querySelectorAll('#home-equity-panel .mort-lbl');
-    mortLblEls.forEach(function(el){ el.textContent = mortRemaining === 0 ? 'Paid off!' : mortLabel; });
-    var equityLblEls = document.querySelectorAll('#home-equity-panel .equity-lbl');
-    equityLblEls.forEach(function(el){ el.textContent = 'Projected net'; });
-  } catch(e) { console.log('Home equity load error:', e); }
+    console.log('Home equity loaded from debt data:', homeDbt.name, 'value:', homeVal, 'appr:', appRate*100+'%');
+  } catch(e) { console.log('Home equity error:', e); }
 }
+
 </script>
-
-<div class="welcome-modal-overlay" id="dash-welcome-modal">
-  <div class="welcome-modal">
-    <div style="font-size:44px;">👋</div>
-    <h2>Welcome to Your Dashboard!</h2>
-    <p><strong style="color:#fff;">Feel free to look around!</strong> Some panels may show placeholders or zeros until you enter your data — that's completely normal.</p>
-    <p>When you're ready, here's how it works:</p>
-    <div class="wsteps">
-      <div class="wstep"><div class="wnum">1</div><div class="wtxt"><strong>Go to Inputs</strong><br><span>Fill in your personal information, accounts, income, and expenses.</span></div></div>
-      <div class="wstep"><div class="wnum">2</div><div class="wtxt"><strong>Click 💾 Save All Changes</strong><br><span>Your data saves to your private Google Sheet instantly.</span></div></div>
-      <div class="wstep"><div class="wnum">3</div><div class="wtxt"><strong>Come back here</strong><br><span>Your full lifetime retirement plan populates automatically!</span></div></div>
-    </div>
-    <button class="welcome-btn-dash" onclick="dismissDashWelcome()">Got it — Let's Go! 🚀</button>
-  </div>
-</div>
-
 </body>
 </html>
