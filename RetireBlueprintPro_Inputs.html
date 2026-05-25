@@ -455,10 +455,8 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div class="field">
             <label>Theme Color</label>
             <select id="f-B34" onchange="updateTheme(1,this.value)">
-              <option value="Steel Blue" selected>Steel Blue (Cool Slate)</option>
-              <option value="Frost Plum">Frost Plum</option>
-              <option value="Forest Green">Forest Green</option>
-              <option value="Warm Amber">Warm Amber</option>
+              <option value="Steel Blue" selected>Steel Blue</option>
+              <option value="Slate Teal">Slate Teal</option>
             </select>
           </div>
           <div class="field">
@@ -581,10 +579,8 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div class="field">
             <label>Theme Color</label>
             <select id="f-D34" onchange="updateTheme(2,this.value)">
-              <option value="Frost Plum" selected>Frost Plum</option>
-              <option value="Steel Blue">Steel Blue (Cool Slate)</option>
-              <option value="Forest Green">Forest Green</option>
-              <option value="Warm Amber">Warm Amber</option>
+              <option value="Muted Mauve" selected>Muted Mauve</option>
+              <option value="Frost Plum">Frost Plum</option>
             </select>
           </div>
           <div class="field">
@@ -952,7 +948,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div class="calc-field">
             <label>Annual Contribution ($)</label>
             <div class="input-wrap"><span class="prefix">$</span><input type="text" inputmode="numeric" id="c1-contrib" placeholder="0" oninput="fmtCalc(this);calcGrowth(1);saveCalcToStorage();"></div>
-            <div class="hint">Your personal contribution per year · Assumed to continue each year until retirement</div>
+            <div class="hint">Your personal contribution per year</div>
           </div>
           <div class="calc-field">
             <label>Employer Match ($)</label>
@@ -1156,7 +1152,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       <thead>
         <tr>
           <th>Include?</th><th>Account Name</th><th>Owner</th><th>Type</th>
-          <th>Balance ($)</th><th>Return (%)</th><th>Ann. Contrib ($)</th><th>Emp. Match ($)</th><th>Status</th><th>Dashboard?</th>
+          <th>Balance ($)</th><th>Return (%)</th><th>Ann. Contrib ($)</th><th>Emp. Match ($)</th><th>Contrib Start</th><th>Contrib End</th><th>Withdraw Start</th><th>Status</th><th>Dashboard?</th>
         </tr>
       </thead>
       <tbody id="accounts-body">
@@ -1490,18 +1486,50 @@ function buildAccountsTable() {
     });
     td8.appendChild(matchInp);
 
-    // Col 9: Status (select)
+    // Col 9: Contrib Start Date
     var td9 = document.createElement('td');
-    td9.innerHTML = statusSel(idx, a.status);
+    var csInp = document.createElement('input');
+    csInp.type = 'date'; csInp.style.width = '110px';
+    csInp.value = a.contribStart || '';
+    csInp.addEventListener('change', function() {
+      accountsData[idx].contribStart = this.value; markDirty();
+    });
+    td9.appendChild(csInp);
 
-    // Col 10: Dashboard (select)
+    // Col 10: Contrib End Date
     var td10 = document.createElement('td');
-    td10.innerHTML = dashSel(idx, a.dash);
+    var ceInp = document.createElement('input');
+    ceInp.type = 'date'; ceInp.style.width = '110px';
+    ceInp.value = a.contribEnd || '';
+    ceInp.addEventListener('change', function() {
+      accountsData[idx].contribEnd = this.value; markDirty();
+    });
+    td10.appendChild(ceInp);
+
+    // Col 11: Withdrawal Start Date (plan restriction)
+    var td11 = document.createElement('td');
+    var wsInp = document.createElement('input');
+    wsInp.type = 'date'; wsInp.style.width = '110px';
+    wsInp.value = a.withdrawStart || '';
+    wsInp.title = 'Leave blank unless plan has specific restriction (e.g. 62½ for some 403b plans)';
+    wsInp.addEventListener('change', function() {
+      accountsData[idx].withdrawStart = this.value; markDirty();
+    });
+    td11.appendChild(wsInp);
+
+    // Col 12: Status (select)
+    var td12 = document.createElement('td');
+    td12.innerHTML = statusSel(idx, a.status);
+
+    // Col 13: Dashboard (select)
+    var td13 = document.createElement('td');
+    td13.innerHTML = dashSel(idx, a.dash);
 
     // Append ALL columns in correct order
     tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
     tr.appendChild(td5); tr.appendChild(td6); tr.appendChild(td7); tr.appendChild(td8);
-    tr.appendChild(td9); tr.appendChild(td10);
+    tr.appendChild(td9); tr.appendChild(td10); tr.appendChild(td11);
+    tr.appendChild(td12); tr.appendChild(td13);
     tbody.appendChild(tr);
   });
   updatePortfolioTotal();
@@ -1722,10 +1750,10 @@ function updatePartnerNames() {
 
 // ── THEME COLORS ─────────────────────────────────────────────
 var themeColors = {
-  'Steel Blue':    '#2E4053',
-  'Frost Plum':    '#6A4A6D',
-  'Forest Green':  '#2E7032',
-  'Warm Amber':    '#C9A040',
+  'Steel Blue':  '#60828C',  // Craig option 1
+  'Slate Teal':  '#456A73',  // Craig option 2
+  'Muted Mauve': '#B07BBF',  // Gena option 1
+  'Frost Plum':  '#8D6B92',  // Gena option 2
 };
 
 function updateTheme(partner, val) {
@@ -2045,16 +2073,19 @@ function populateFromData(d) {
   if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length) {
     accountsData = d.portfolio.accounts.map(function(a) {
       return {
-        inc:    a.showInCalc || 'No',
-        name:   a.name || '',
-        owner:  a.owner || 'Joint',
-        type:   a.type || '',
-        bal:    a.balance || 0,
-        ret:    a.expectedReturn || 0, // already *100 from readAll
-        contrib:a.contrib || 0,
-        match:  a.match || 0,
-        status: a.status || 'Use for Withdrawals',
-        dash:   a.showOnDashboard || 'No'
+        inc:          a.showInCalc || 'No',
+        name:         a.name || '',
+        owner:        a.owner || 'Joint',
+        type:         a.type || '',
+        bal:          a.balance || 0,
+        ret:          a.expectedReturn || 0, // already *100 from readAll
+        contrib:      a.contrib || 0,
+        match:        a.match || 0,
+        contribStart: a.contribStart || '',  // K = Contrib Start Date
+        contribEnd:   a.contribEnd || '',    // L = Contrib End Date
+        withdrawStart:a.withdrawStart || '', // M = Withdrawal Start Date
+        status:       a.status || 'Use for Withdrawals',
+        dash:         a.showOnDashboard || 'No'
       };
     });
     buildAccountsTable();
@@ -2099,7 +2130,7 @@ function populateFromData(d) {
     statusEl.textContent = leg.status || (leg.achievedPct>=100?'ON TRACK':'CHECK PLAN');
     statusEl.className = leg.achievedPct>=100 ? 'badge-go' : 'badge-watch';
   }
-  // r-savings is set below from roth.taxSavings (more accurate than tax.rothConversionSavings)
+  setTxt('r-savings', fmt(tax.rothConversionSavings));
 
   // Header stats
   var hdrStatus = document.getElementById('hdr-status');
@@ -2114,11 +2145,11 @@ function populateFromData(d) {
   if (roth.bracket) sv('f-B141', roth.bracket);
   if (roth.assumedRate) sv('f-B145', Math.round(roth.assumedRate*10000)/100);
 
-  // Roth solver results — IDs match the HTML solver-kpi cards
-  setTxt('r-income',    fmt(roth.taxableIncome));   // Est. Taxable Income card
-  setTxt('r-optimal',   fmt(roth.optimalAmount));   // Optimal Conversion card
-  setTxt('r-tax-now',   fmt(roth.marginalTax));     // Marginal Tax on Conversion card
-  setTxt('r-savings',   fmt(roth.taxSavings));      // Lifetime Tax Savings card
+  // Roth solver results
+  setTxt('r-income',   fmt(roth.taxableIncome));
+  setTxt('r-optimal',   fmt(roth.optimalAmount));
+  setTxt('r-tax-now',  fmt(roth.marginalTax));
+  setTxt('r-savings',  fmt(roth.taxSavings));
 
   // ── ROTH PLAN AMOUNTS ────────────────────────────────
   // Rebuild table first to ensure fields exist, then populate
@@ -2329,9 +2360,6 @@ function saveAll() {
 
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  // POST no-cors: request fully executes on Google's servers even though we can't read response.
-  // GitHub Pages CSP blocks JSONP script injection for saves; POST no-cors is the correct pattern.
-  // We verify success 5s later via a JSONP read.
   fetch(SCRIPT, {
     method: 'POST',
     mode: 'no-cors',
@@ -2632,7 +2660,7 @@ initCurrencyFields();
 initPctFields();
 updatePartnerNames();
 updateTheme(1, 'Steel Blue');
-updateTheme(2, 'Frost Plum');
+updateTheme(2, 'Muted Mauve');
 loadLiveData();
 
 // ── WELCOME MODAL ─────────────────────────────────────────

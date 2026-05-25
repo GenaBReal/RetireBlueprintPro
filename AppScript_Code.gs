@@ -52,42 +52,6 @@ function doGet(e) {
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
-function doPost(e) {
-  // Called by HTML fetch POST (no-cors). Can't return readable CORS response,
-  // but the function executes fully and writes to the sheet.
-  try {
-    var params = {};
-    // Parse URL-encoded body
-    if (e.postData && e.postData.contents) {
-      e.postData.contents.split('&').forEach(function(pair) {
-        var kv = pair.split('=');
-        params[decodeURIComponent(kv[0])] = decodeURIComponent((kv[1]||'').replace(/\+/g,' '));
-      });
-    }
-    var sheetId = params.sheetId;
-    if (!sheetId) return ContentService.createTextOutput('{"error":"No sheetId"}').setMimeType(ContentService.MimeType.JSON);
-    var ss  = SpreadsheetApp.openById(sheetId);
-    var inp = ss.getSheetByName('Inputs');
-    if (!inp) return ContentService.createTextOutput('{"error":"No Inputs sheet"}').setMimeType(ContentService.MimeType.JSON);
-    var enc = params.enc;
-    var raw = enc === 'b64'
-      ? Utilities.newBlob(Utilities.base64Decode(params.data)).getDataAsString()
-      : params.data;
-    var data = JSON.parse(raw);
-    // Route to correct handler
-    var action2 = params.action || 'save';
-    if (action2 === 'saveCheckIn') {
-      var result2 = writeCheckIn(ss, data);
-      return ContentService.createTextOutput(JSON.stringify(result2)).setMimeType(ContentService.MimeType.JSON);
-    }
-    var result = writeInputs(ss, inp, data);
-    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-  } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({error: err.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-
 function readAll(ss, inp) {
   // Read entire sheet in ONE batch call — avoids timeout from individual getValue() calls
   var allData = inp.getDataRange().getValues();
@@ -122,15 +86,6 @@ function readAll(ss, inp) {
     salary:num(37,2), salaryStart:dt(38,2), salaryEnd:dt(39,2),
     ssBase:num(40,2), ssFra:num(41,2),
     ssMonthly:num(43,2), ssStartDate:dt(44,2),
-    ssAnnual: num(43,2) * 12,
-    ssYear1: (function() {
-      // Prorate SS for the year it starts: count months from start month to Dec
-      // e.g. July start (month=6) → 12-6 = 6 months
-      var raw = r(44,2);
-      if (!raw) return 0;
-      try { var d=new Date(raw); if(isNaN(d)) return 0;
-        return Math.round(num(43,2) * (12 - d.getMonth())); } catch(e) { return 0; }
-    })(),
     pension:num(46,2), pensionStart:dt(47,2),
     otherIncome:num(49,2), otherStart:dt(50,2), otherEnd:dt(51,2),
     healthPreMedicare:num(52,2), healthMedicare:num(53,2), medicareAge:num(54,2),
@@ -146,13 +101,6 @@ function readAll(ss, inp) {
     salary:num(37,4), salaryStart:dt(38,4), salaryEnd:dt(39,4),
     ssBase:num(40,4), ssFra:num(41,4),
     ssMonthly:num(43,4), ssStartDate:dt(44,4),
-    ssAnnual: num(43,4) * 12,
-    ssYear1: (function() {
-      var raw = r(44,4);
-      if (!raw) return 0;
-      try { var d=new Date(raw); if(isNaN(d)) return 0;
-        return Math.round(num(43,4) * (12 - d.getMonth())); } catch(e) { return 0; }
-    })(),
     pension:num(46,4), pensionStart:dt(47,4),
     otherIncome:num(49,4), otherStart:dt(50,4), otherEnd:dt(51,4),
     healthPreMedicare:num(52,4), healthMedicare:num(53,4), medicareAge:num(54,4),
@@ -178,15 +126,11 @@ function readAll(ss, inp) {
     stateRate:pct(26,2), stdDedInflation:pct(27,2),
     healthcareInflation:pct(28,2),
     rothConversionSavings:num(144,2),
-    standardDeduction:num(25,2),
-    // Effective federal rate read directly from Master sheet (AJ/O for year 1)
-    // Populated after Master sheet is read — set as placeholder here, overwritten below
-    effectiveRate: 0
   };
 
   // Accounts (rows 105-116, cols A-H = 1-8)
   var accounts = [], portfolioTotal = 0;
-  for (var ar=105; ar<=116; ar++) {
+  for (var ar=105; ar<=124; ar++) {
     var aName = str(ar,2);
     if (!aName) continue;
     var bal = num(ar,5);
@@ -196,8 +140,11 @@ function readAll(ss, inp) {
       showInCalc:str(ar,1), name:aName, owner:str(ar,3),
       type:str(ar,4), balance:bal,
       expectedReturn:ret*100, // *100 for display
-      contrib:num(ar,12),    // L = Annual Contribution
-      match:num(ar,13),      // M = Employer Match
+      contrib:num(ar,10),      // J = Annual Contribution
+      match:num(ar,11),        // K = Employer Match
+      contribStart:dt(ar,12),  // L = Contrib Start Date
+      contribEnd:dt(ar,13),    // M = Contrib End Date
+      withdrawStart:dt(ar,14), // N = Withdrawal Start Date
       status:str(ar,7), showOnDashboard:str(ar,8)
     });
   }
@@ -212,8 +159,8 @@ function readAll(ss, inp) {
     };
   });
 
-  // Debts rows 92-101 (rows 88-91 are expenses/header area — debt table starts at 92)
-  var debtRows = [92,93,94,95,96,97,98,99,100,101];
+  // Debts rows 88-89 + 92-101 (A=1,B=2,C=3,D=4,E=5,F=6,H=8)
+  var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
   var debts = debtRows.map(function(row) {
     // Smart read: detect old format (C=monthly,D=annual) vs new format (C=pp,D=monthly,E=annual)
     var colC = num(row,3), colD = num(row,4), colE = num(row,5);
@@ -290,38 +237,26 @@ function readAll(ss, inp) {
 
   // Read Master sheet for year-by-year projection data (charts)
   var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
-                     preTax:[], roth:[], taxable:[], hsa:[],
-                     federalTaxes:[], taxableIncome:[]};
-  var masterYear1FedTax = 0, masterYear1GrossIncome = 0, masterYear1TaxableIncome = 0;
+                     preTax:[], roth:[], taxable:[], hsa:[]};
   try {
     var masterSheet = ss.getSheetByName('Master');
     if (masterSheet) {
       var masterData = masterSheet.getRange('A8:BX200').getValues();
-      var isFirstRow = true;
       masterData.forEach(function(row) {
         var yr = Number(row[0]); // col A = year
         if (!yr || yr < 2020 || yr > 2200) return;
         projections.years.push(yr);
-        projections.income.push(Math.round(Number(row[14])||0));      // O  = Total Gross Guaranteed Income
-        projections.withdrawals.push(Math.round(Number(row[39])||0)); // AN = Final Gross Withdrawal
-        projections.endLiquid.push(Math.round(Number(row[75])||0));   // BX = Total End of Year Liquid Assets
-        projections.federalTaxes.push(Math.round(Number(row[35])||0));  // AJ = Total Federal Taxes
-        projections.taxableIncome.push(Math.round(Number(row[34])||0)); // AI = Total Taxable Income
-        // Capture year-1 values for effective rate calculation
-        if (isFirstRow) {
-          masterYear1FedTax       = Number(row[35])||0; // AJ = Total Federal Taxes
-          masterYear1GrossIncome  = Number(row[14])||0; // O  = Total Gross Guaranteed Income
-          masterYear1TaxableIncome= Number(row[34])||0; // AI = Total Taxable Income
-          isFirstRow = false;
-        }
+        projections.income.push(Math.round(Number(row[14])||0));     // O = income
+        projections.withdrawals.push(Math.round(Number(row[39])||0)); // AN = withdrawals
+        projections.endLiquid.push(Math.round(Number(row[75])||0));   // BX = end liquid
         // Account balances
-        var p1_401k = Number(row[54])||0; // BC
-        var p1_roth = Number(row[55])||0; // BD
-        var p1_brok = Number(row[56])||0; // BE
-        var p2_401k = Number(row[57])||0; // BF
-        var p2_roth = Number(row[58])||0; // BG
-        var p2_brok = Number(row[59])||0; // BH
-        var hsa     = Number(row[60])||0; // BI
+        var p1_401k   = Number(row[54])||0;  // BC
+        var p1_roth   = Number(row[55])||0;  // BD
+        var p1_brok   = Number(row[56])||0;  // BE
+        var p2_401k   = Number(row[57])||0;  // BF
+        var p2_roth   = Number(row[58])||0;  // BG
+        var p2_brok   = Number(row[59])||0;  // BH
+        var hsa       = Number(row[60])||0;  // BI
         projections.preTax.push(Math.round(p1_401k + p2_401k));
         projections.roth.push(Math.round(p1_roth + p2_roth));
         projections.taxable.push(Math.round(p1_brok + p2_brok));
@@ -332,43 +267,9 @@ function readAll(ss, inp) {
     Logger.log('Master read error: ' + e);
   }
 
-  // Set effective federal rate from Master sheet year-1 data
-  if (masterYear1GrossIncome > 0) {
-    tax.effectiveRate = Math.round((masterYear1FedTax / masterYear1TaxableIncome) * 10000) / 10000; // AJ÷AI: fed taxes / taxable income = standard effective rate
-    tax.taxableIncome = masterYear1TaxableIncome;
-    tax.federalTaxes  = masterYear1FedTax;
-  }
-
-  // Read Annual Check-In data from existing 'Annual Check-In' tab
-  // Cols: A=Year, B=Projected, C=Actual, D=Variance, E=Status, F=Notes
-  // Data starts at row 8
-  var checkInData = [];
-  try {
-    var ciSheet = ss.getSheetByName('Annual Check-In');
-    if (ciSheet) {
-      var ciLastRow = ciSheet.getLastRow();
-      if (ciLastRow >= 8) {
-        var ciData = ciSheet.getRange(8, 1, ciLastRow-7, 6).getValues();
-        ciData.forEach(function(ciRow) {
-          if (ciRow[0]) {
-            checkInData.push({
-              year:      Number(ciRow[0]),
-              projected: Number(ciRow[1])||0,   // B = Projected (Master formula)
-              actual:    ciRow[2]!==''?Number(ciRow[2]):null, // C = Actual (we write)
-              variance:  ciRow[3]!==''?Number(ciRow[3]):null, // D = Variance (formula)
-              status:    String(ciRow[4]||''),                // E = Status (formula)
-              notes:     String(ciRow[5]||'')                 // F = Notes (we write)
-            });
-          }
-        });
-      }
-    }
-  } catch(e) { Logger.log('CheckIn read error: '+e); }
-
   return {
     meta:{planYear:new Date().getFullYear()},
     people:{craig:p1, gena:p2},
-    checkIn:checkInData,
     global:gl, tax:tax,
     portfolio:{accounts:accounts, total:portfolioTotal},
     expenses:expenses, debts:debts,
@@ -496,7 +397,7 @@ function writeInputs(ss, inp, data) {
     // ── EXPENSES ──────────────────────────────────────────────
     // A=editable label, B=monthly($), C=yearly(FORMULA-NEVER WRITE), D=notes
     if (data.expenses && data.expenses.length) {
-      var skip = {70:true, 82:true, 86:true, 87:true}; // 70 and 82 are section headers; 86,87 are SUM rows
+      var skip = {62:true, 70:true, 82:true, 86:true, 87:true};
       data.expenses.forEach(function(exp) {
         var r = Number(exp.row);
         if (!r || r<58 || r>85 || skip[r]) return;
@@ -509,14 +410,9 @@ function writeInputs(ss, inp, data) {
     }
 
     // ── DEBTS ─────────────────────────────────────────────────
-    // A=Include, B=Name, C=PurchasePrice, D=Monthly, E=Annual, F=Start, G=End, H=Balance
-    // Clear rows 88-89 in case old code wrote debt data there by mistake
-    ['A88','B88','C88','D88','E88','F88','G88','H88','I88','J88','K88',
-     'A89','B89','C89','D89','E89','F89','G89','H89','I89','J89','K89'].forEach(function(cell){
-      try { inp.getRange(cell).clearContent(); } catch(e){}
-    });
+    // A=include, B=name, C=monthly, D=annual(C*12), E=start, F=end, H=balance
     if (data.debts && data.debts.length) {
-      var debtRows = [92,93,94,95,96,97,98,99,100,101];
+      var debtRows = [88,89,92,93,94,95,96,97,98,99,100,101];
       data.debts.forEach(function(d, i) {
         if (i >= debtRows.length) return;
         var r = debtRows[i];
@@ -551,10 +447,10 @@ function writeInputs(ss, inp, data) {
       var p2name = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
 
       // Clear owner validation temporarily
-      try { inp.getRange('C105:C116').clearDataValidations(); } catch(e){}
+      try { inp.getRange('C105:C124').clearDataValidations(); } catch(e){}
 
       var acctData = [];
-      for (var i=0; i<12; i++) {
+      for (var i=0; i<20; i++) {
         var a = data.accounts[i] || {};
         var owner = String(a.owner||'Joint').trim();
         if (owner==='Partner 1'||owner==='Craig'||owner==='Kent') owner = p1name||'Joint';
@@ -564,20 +460,23 @@ function writeInputs(ss, inp, data) {
         var ret = Number(a.ret||a.expectedReturn||0);
         if (ret > 1) ret = ret/100;
         acctData.push([
-          a.inc||a.showInCalc||'No',  // A
-          a.name||'',                  // B
-          owner,                       // C
-          a.type||'',                  // D
-          Number(a.bal||a.balance)||0, // E = balance
-          ret,                         // F = return as decimal
-          a.status||'Use for Withdrawals', // G
-          a.dash||a.showOnDashboard||'No', // H
-          '', '', '',                    // I, J, K (unused)
-          Number(a.contrib||0),            // L = Annual Contribution
-          Number(a.match||0)               // M = Employer Match
+          a.inc||a.showInCalc||'No',        // A = Include
+          a.name||'',                        // B = Name
+          owner,                             // C = Owner
+          a.type||'',                        // D = Type
+          Number(a.bal||a.balance)||0,       // E = Balance
+          ret,                               // F = Return (decimal)
+          a.status||'Use for Withdrawals',   // G = Status
+          a.dash||a.showOnDashboard||'No',   // H = Dashboard
+          '',                                // I = Summary (read-only, skip)
+          Number(a.contrib||0),              // J = Annual Contribution
+          Number(a.match||0),                // K = Employer Match
+          a.contribStart||'',                // L = Contrib Start Date
+          a.contribEnd||'',                  // M = Contrib End Date
+          a.withdrawStart||''                // N = Withdrawal Start Date
         ]);
       }
-      inp.getRange('A105:M116').setValues(acctData);
+      inp.getRange('A105:N124').setValues(acctData);
 
       // Restore owner validation
       try {
@@ -586,7 +485,7 @@ function writeInputs(ss, inp, data) {
           var rule = SpreadsheetApp.newDataValidation()
             .requireValueInRange(tsr.getRange('F6:F8'), true)
             .setAllowInvalid(false).build();
-          inp.getRange('C105:C116').setDataValidation(rule);
+          inp.getRange('C105:C124').setDataValidation(rule);
         }
       } catch(e){}
     }
@@ -645,8 +544,8 @@ function writeInputs(ss, inp, data) {
 
     SpreadsheetApp.flush();
 
-    // Hide and protect all sheets except Master after every save
-    try { setupAllSheets(ss); } catch(e) { Logger.log('Sheet setup skipped: '+e); }
+    // Apply theme colors to contribution columns in Master sheet
+    try { applyMasterThemeFormatting(ss); } catch(e) { Logger.log('Theme formatting skipped: '+e); }
 
     return {success:true, timestamp:new Date().toISOString()};
   } catch(err) {
@@ -676,134 +575,76 @@ function addWelcomeBanner(ss, inp) {
   }
 }
 
-// ── ANNUAL CHECK-IN WRITE ─────────────────────────────────────────────
-// Writes ONLY to the existing "Annual Check-In" sheet tab
-// Col A = Year (formula/static — never write)
-// Col B = Projected balance (Master formula — NEVER WRITE)
-// Col C = Actual End-of-Year Balance ← WE WRITE THIS
-// Col D = Variance (formula — NEVER WRITE)
-// Col E = Review Status (formula — NEVER WRITE)
-// Col F = Notes / Life Events ← WE WRITE THIS
-// Data rows start at row 8
-
-// ── SHEET VISIBILITY + FORMULA PROTECTION SETUP ──────────────────────
-// 1. Hides all tabs except Master (hidden state copies to customer sheets)
-// 2. Adds WARNING-ONLY range protection on formula cells in Inputs
-//    — scripts bypass warnings entirely so Apps Script writes freely
-//    — customers see "Are you sure?" if they unhide and try to edit formulas
-//    — data-entry cells are left completely open (no warning, no block)
-// 3. Annual Check-In: warning on everything except C and F (actuals/notes)
-// Safe to run multiple times — clears old range protections before adding new ones
-function setupAllSheets(ss) {
+// ── MASTER SHEET THEME FORMATTING ────────────────────────────────────
+// Applies conditional formatting to new contribution columns P-T
+// so they automatically match the partner theme colors chosen in Inputs
+function applyMasterThemeFormatting(ss) {
   try {
-    var sheets = ss.getSheets();
-    sheets.forEach(function(sheet) {
-      var name = sheet.getName();
+    var master = ss.getSheetByName('Master');
+    if (!master) return;
 
-      // Master stays visible and untouched
-      if (name === 'Master') return;
+    var p1Themes = {
+      'Steel Blue': '#60828C',  // Craig option 1
+      'Slate Teal': '#456A73',  // Craig option 2
+    };
+    var p2Themes = {
+      'Muted Mauve': '#B07BBF', // Gena option 1
+      'Frost Plum':  '#8D6B92', // Gena option 2
+    };
+    var lightThemes = []; // none of these are light enough to need dark text
 
-      // Hide every other sheet
-      try { sheet.hideSheet(); } catch(e) {}
-
-      // Clear any existing RANGE protections on this sheet
-      var rangeProt = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE);
-      rangeProt.forEach(function(p) { try { p.remove(); } catch(e){} });
-
-      if (name === 'Inputs') {
-        // Protect formula/structural cells with WARNING only
-        // Scripts bypass warnings — customers see a caution dialog
-        // NEVER-WRITE formula cells (from handoff doc):
-        var formulaRanges = [
-          'B33','B36','B42','B43','B45','B48',   // Partner formula cells
-          'B86','B87',                             // Expense SUM rows
-          'B119','B120',                           // Solver cells
-          'B128:B130','B133','B134',               // Legacy cells
-          'B140','B142:B144','B146',               // Roth formula cells
-          'G122:G124',                             // Smile curve formulas
-          'C58:C85',                               // Expense yearly = monthly*12 (formula)
-        ];
-        formulaRanges.forEach(function(r) {
-          try {
-            var p = sheet.getRange(r).protect()
-              .setDescription('Formula — do not edit directly')
-              .setWarningOnly(true); // Warning dialog, not a hard block — scripts bypass
-          } catch(e) {}
-        });
-
-      } else if (name === 'Annual Check-In') {
-        // Protect everything EXCEPT col C (actuals) and col F (notes) with warning
-        // Rows 8+ are data rows
-        var ciWarningRanges = ['A8:B200', 'D8:E200', 'G8:ZZ200'];
-        ciWarningRanges.forEach(function(r) {
-          try {
-            sheet.getRange(r).protect()
-              .setDescription('Calculated — do not edit directly')
-              .setWarningOnly(true);
-          } catch(e) {}
-        });
-
-      } else {
-        // All other hidden sheets — warning on everything
-        try {
-          sheet.getDataRange().protect()
-            .setDescription(name + ' — do not edit directly')
-            .setWarningOnly(true);
-        } catch(e) {}
-      }
-    });
-  } catch(e) {
-    Logger.log('setupAllSheets error: ' + e);
-  }
-}
-
-function setupCheckInSheet(ss) {
-  // Just hides the Annual Check-In tab — no protection needed
-  // setupAllSheets() handles hiding all non-Master tabs anyway
-  try {
-    var ciSheet = ss.getSheetByName('Annual Check-In');
-    if (ciSheet) ciSheet.hideSheet();
-  } catch(e) {
-    Logger.log('setupCheckInSheet error: ' + e);
-  }
-}
-
-function writeCheckIn(ss, data) {
-  try {
-    var checkIns = data.checkIn;
-    if (!checkIns || !checkIns.length) return {status:'ok', message:'No data'};
-
-    var ciSheet = ss.getSheetByName('Annual Check-In');
-    if (!ciSheet) return {status:'error', error:'Annual Check-In sheet tab not found'};
-
-    // Ensure sheet is hidden and protected on every write (idempotent — safe to repeat)
-    try { setupCheckInSheet(ss); } catch(e) { Logger.log('Setup skipped: '+e); }
-
-    var written = 0;
-    checkIns.forEach(function(row) {
-      if (!row.year) return;
-      // Find the row by matching year in col A (rows 8+)
-      var startRow = 8;
-      var lastRow = ciSheet.getLastRow();
-      for (var r = startRow; r <= lastRow; r++) {
-        var yr = ciSheet.getRange(r, 1).getValue();
-        if (Number(yr) === Number(row.year)) {
-          // Write actual to col C only if provided
-          if (row.actual !== null && row.actual !== undefined && row.actual !== '') {
-            ciSheet.getRange(r, 3).setValue(Number(row.actual));
-          } else if (row.actual === null || row.actual === '') {
-            ciSheet.getRange(r, 3).clearContent();
-          }
-          // Write notes to col F
-          ciSheet.getRange(r, 6).setValue(String(row.notes||''));
-          written++;
-          break;
-        }
-      }
+    // Clear existing conditional formatting on P:T columns only
+    var existingRules = master.getConditionalFormatRules();
+    var keptRules = existingRules.filter(function(rule) {
+      var ranges = rule.getRanges();
+      // Keep rules not touching columns P-T (cols 16-20)
+      return !ranges.some(function(r) {
+        var col = r.getColumn();
+        return col >= 16 && col <= 20;
+      });
     });
 
-    return {status:'ok', message:'CheckIn saved', written: written};
+    var newRules = keptRules.slice();
+
+    // P6:Q (Craig's contribution columns) — Partner 1 theme
+    var p1Range = master.getRange('P6:Q');
+    Object.keys(p1Themes).forEach(function(themeName) {
+      var hex = p1Themes[themeName];
+      var fontColor = (lightThemes.indexOf(themeName) >= 0) ? '#041E2F' : '#FFFFFF';
+      var rule = SpreadsheetApp.newConditionalFormatRule()
+        .whenFormulaSatisfied('=Inputs!$B$34="' + themeName + '"')
+        .setBackground(hex)
+        .setFontColor(fontColor)
+        .setBold(true)
+        .setRanges([p1Range])
+        .build();
+      newRules.push(rule);
+    });
+
+    // R6:S (Gena's contribution columns) — Partner 2 theme
+    var p2Range = master.getRange('R6:S');
+    Object.keys(p2Themes).forEach(function(themeName) {
+      var hex = p2Themes[themeName];
+      var fontColor = (lightThemes.indexOf(themeName) >= 0) ? '#041E2F' : '#FFFFFF';
+      var rule = SpreadsheetApp.newConditionalFormatRule()
+        .whenFormulaSatisfied('=Inputs!$D$34="' + themeName + '"')
+        .setBackground(hex)
+        .setFontColor(fontColor)
+        .setBold(true)
+        .setRanges([p2Range])
+        .build();
+      newRules.push(rule);
+    });
+
+    master.setConditionalFormatRules(newRules);
+
+    // T column (Total) — static dark navy, no conditional formatting needed
+    // Just set it directly
+    master.getRange('T6:T').setBackground('#1A3A52').setFontColor('#FFFFFF').setFontWeight('bold');
+
+    Logger.log('Master theme formatting applied');
   } catch(e) {
-    return {status:'error', error: e.toString()};
+    Logger.log('applyMasterThemeFormatting error: ' + e);
   }
 }
+
