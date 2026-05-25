@@ -51,6 +51,40 @@ function doGet(e) {
   }
 }
 
+
+function doPost(e) {
+  try {
+    var params = {};
+    if (e.postData && e.postData.contents) {
+      e.postData.contents.split('&').forEach(function(pair) {
+        var kv = pair.split('=');
+        if (kv.length >= 2) {
+          params[decodeURIComponent(kv[0])] = decodeURIComponent(kv.slice(1).join('=').replace(/\+/g,' '));
+        }
+      });
+    }
+    var sheetId = params.sheetId;
+    if (!sheetId) return ContentService.createTextOutput(JSON.stringify({error:'No sheetId'})).setMimeType(ContentService.MimeType.JSON);
+    var ss  = SpreadsheetApp.openById(sheetId);
+    var inp = ss.getSheetByName('Inputs');
+    if (!inp) return ContentService.createTextOutput(JSON.stringify({error:'No Inputs sheet'})).setMimeType(ContentService.MimeType.JSON);
+    var enc = params.enc;
+    var raw = enc === 'b64'
+      ? Utilities.newBlob(Utilities.base64Decode(params.data)).getDataAsString()
+      : params.data;
+    var data = JSON.parse(raw);
+    var action = params.action || 'save';
+    if (action === 'saveCheckIn') {
+      var result2 = writeCheckIn(ss, data);
+      return ContentService.createTextOutput(JSON.stringify(result2)).setMimeType(ContentService.MimeType.JSON);
+    }
+    var result = writeInputs(ss, inp, data);
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error: err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
 // ── HELPERS ───────────────────────────────────────────────────
 function readAll(ss, inp) {
   // Read entire sheet in ONE batch call — avoids timeout from individual getValue() calls
@@ -467,6 +501,9 @@ function writeInputs(ss, inp, data) {
     // ── ACCOUNTS ──────────────────────────────────────────────
     // A=include, B=name, C=owner, D=type, E=balance, F=return(decimal), G=status, H=dashboard
     if (data.accounts && data.accounts.length) {
+      Logger.log('Accounts received: ' + data.accounts.length);
+      Logger.log('First account: ' + JSON.stringify(data.accounts[0]));
+      Logger.log('contrib: ' + data.accounts[0].contrib + ' match: ' + data.accounts[0].match);
       var p1name = data.partner1 && data.partner1.B31 ? String(data.partner1.B31).trim() : '';
       var p2name = data.partner2 && data.partner2.D31 ? String(data.partner2.D31).trim() : '';
 
