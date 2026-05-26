@@ -1174,7 +1174,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <tr>
           <th>Year</th>
           <th id="roth-p1-hdr">Partner 1's Conversion ($)</th>
-          <th id="roth-p2-hdr">Gena's Conversion ($)</th>
+          <th id="roth-p2-hdr">Partner 2 Conversion ($)</th>
           <th>Total Conversion</th>
           <th>Notes</th>
         </tr>
@@ -1994,6 +1994,13 @@ function updateRothIncomeForYear() {
 }
 
 function updatePartnerNames() {
+  // Update Roth table headers
+  var p1hdr = document.getElementById('roth-p1-hdr');
+  var p2hdr = document.getElementById('roth-p2-hdr');
+  var p1name = document.getElementById('f-B31') ? document.getElementById('f-B31').value : '';
+  var p2name = document.getElementById('f-D31') ? document.getElementById('f-D31').value : '';
+  if (p1hdr && p1name) p1hdr.textContent = p1name + "'s Conversion ($)";
+  if (p2hdr && p2name) p2hdr.textContent = p2name + "'s Conversion ($)";
   var p1 = document.getElementById('f-B31').value || 'Partner 1';
   var p2 = document.getElementById('f-D31').value || 'Partner 2';
   document.getElementById('p1-label').textContent = p1;

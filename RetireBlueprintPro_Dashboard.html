@@ -622,8 +622,8 @@ function populate(d){
     var da = (port.accounts||[]).filter(function(a){return a.showOnDashboard==='Yes';});
     if(!da.length) da = (port.accounts||[]).slice(0,5);
     da = da.slice(0,5);
-    var bc={'Craig':'#2E4053','Gena':'#6A4A6D','Joint':'#7C9A7C'};
-    var tc={'Craig':'#456A73','Gena':'#6A4A6D','Joint':'#7C9A7C'};
+    var bc={}; bc[p1n]='#2E4053'; bc[p2n]='#6A4A6D'; bc['Joint']='#7C9A7C';
+    var tc={}; tc[p1n]='#456A73'; tc[p2n]='#6A4A6D'; tc['Joint']='#7C9A7C';
     var h='';
     da.forEach(function(a){
       h+='<div class="acct-card" style="border-left-color:'+(bc[a.owner]||navy)+';"><div class="acct-owner" style="color:'+(tc[a.owner]||teal)+';">'+a.owner+'</div><div class="acct-name">'+a.name+'</div><div class="acct-type">'+a.type+'</div><div class="acct-bal">'+fmt(a.balance)+'</div><div class="acct-ret">'+fmtP(a.expectedReturn)+' expected return</div></div>';
