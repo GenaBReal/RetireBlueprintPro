@@ -260,7 +260,7 @@
 
     <!-- ── 4. INVESTMENT ACCOUNTS ── -->
     <div class="rpt-section">
-      <div class="rpt-section-title"><span class="icon">📊</span> Investment Accounts</div>
+      <div class="rpt-section-title"><span class="icon">📊</span> Investment Accounts <span style="font-size:8px;font-weight:400;color:#888;text-transform:none;letter-spacing:0;">(accounts flagged "Yes" in Inputs → Named Accounts → Show on Summary)</span></div>
       <table class="rtbl">
         <thead><tr><th>Account Name</th><th>Owner</th><th>Type</th><th>Balance</th><th>Return %</th><th>Ann. Contrib</th><th>Employer Match</th></tr></thead>
         <tbody id="r-accounts-body"></tbody>
@@ -316,7 +316,7 @@
     </div>
 
     <!-- ── 7. DEBTS & REAL ESTATE ── -->
-    <div class="rpt-section pb-before">
+    <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">🏠</span> Debts &amp; Real Estate</div>
       <table class="rtbl">
         <thead><tr><th>Name</th><th>Monthly Payment</th><th>Balance</th><th>End Date</th><th>Current Value</th><th>Equity</th><th>Notes</th></tr></thead>
@@ -325,7 +325,7 @@
     </div>
 
     <!-- ── 8. STRESS TEST ── -->
-    <div class="rpt-section">
+    <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">⚡</span> Stress Test — Sequence of Returns Risk</div>
       <p style="font-size:10px;color:#555;margin:0 0 10px;">Shows your projected ending portfolio balance under adverse market conditions. A resilient plan survives even the severe scenario.</p>
       <div class="stress-grid">
@@ -576,7 +576,13 @@ function populateReport(d) {
   var shortMap = {'Pretax (Deferred)':'Pre-Tax','Roth (Tax Free)':'Roth','Taxable (Liquid)':'Taxable','HSA (Triple Tax Advantage)':'HSA','529 Education (Tax Free)':'529'};
   var preTaxT=0, rothT=0, taxableT=0, hsaT=0;
   if (acctBody && port.accounts) {
-    acctBody.innerHTML = port.accounts.filter(function(a){ return a.name; }).map(function(a){
+    // Only show accounts flagged for Summary (showOnDashboard === 'Yes')
+    var summaryAccts = port.accounts.filter(function(a){
+      return a.name && (a.showOnDashboard === 'Yes' || a.showOnDashboard === 'yes');
+    });
+    // Fallback: if nobody flagged anything, show all accounts
+    if (summaryAccts.length === 0) summaryAccts = port.accounts.filter(function(a){ return a.name; });
+    acctBody.innerHTML = summaryAccts.map(function(a){
       var tk = typeMap[a.type] || 'taxable';
       var sh = shortMap[a.type] || 'Taxable';
       if (tk==='pretax') preTaxT += a.balance||0;
