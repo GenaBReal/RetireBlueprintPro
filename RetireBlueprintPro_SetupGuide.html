@@ -69,6 +69,35 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
 .time-badge{font-size:11px;color:var(--muted);font-weight:600;margin-left:auto;padding-left:12px;}
 
 
+
+/* ── MOBILE RESPONSIVE ────────────────────────────────── */
+@media (max-width: 768px) {
+  .page, .rpt-body { padding: 10px !important; }
+  .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3 { 
+    grid-template-columns: 1fr !important; 
+  }
+  .kpi2 { grid-template-columns: 1fr 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr 1fr !important; }
+  .nav, .nav-bar { flex-wrap: nowrap; overflow-x: auto; }
+  .nav a, .nav-bar a { font-size: 9px; padding: 8px 10px; white-space: nowrap; }
+  .header-right, .header-stats { display: none !important; }
+  .partner-card { margin-bottom: 12px; }
+  table.rtbl { font-size: 10px; }
+  table.rtbl td, table.rtbl th { padding: 5px 6px; }
+  .report-wrap { margin: 0 !important; border-radius: 0 !important; }
+  .rpt-header-top { padding: 14px 16px !important; }
+  .rpt-header-info { padding: 10px 16px !important; }
+  .rpt-names { font-size: 14px !important; }
+  .kval { font-size: 16px !important; }
+  .chart-area { height: 140px !important; }
+  .roth-grid { grid-template-columns: 1fr 1fr !important; }
+  .intel { display: none; } /* Hide intel panel on mobile - too cramped */
+}
+@media (max-width: 480px) {
+  .kpi4, .kpi3 { grid-template-columns: 1fr 1fr !important; }
+  .kpi2 { grid-template-columns: 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 </head>
 <body>
@@ -471,7 +500,119 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
     <div class="section-hdr">
       <div class="section-num">7</div>
       <div>
-        <div class="section-title">Key Concepts — Plain English</div>
+        <div class="section-title">❓ Beginner Questions — Plain English Answers</div>
+        <div style="display:grid;gap:8px;margin-top:12px;">
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              🔐 Do I need to know spreadsheets or coding?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              No. Enter your numbers in the web-based Inputs page — everything calculates automatically.
+              You never touch a formula. The only time you go to your Google Sheet directly is to enter
+              account balances in column E of the Named Accounts rows.
+            </div>
+          </details>
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              💰 How do I find my Social Security benefit amount?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              Go to <strong style="color:#f4b86a;">ssa.gov/myaccount</strong> and create a free account.
+              Under "My Home" → "View estimated benefits" you'll see your monthly benefit at different retirement ages.
+              Enter the <strong>monthly</strong> amount you plan to take. The plan calculates annual automatically.
+              If you haven't started SS yet, enter your projected benefit at the age you plan to claim.
+            </div>
+          </details>
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              🔄 What's a Roth conversion and should I do one?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              A Roth conversion moves money from a Traditional IRA/401k (pre-tax) to a Roth IRA (tax-free).
+              You pay income tax now, but the money grows tax-free forever with no Required Minimum Distributions.
+              <br><br>
+              <strong style="color:#f4b86a;">When it makes sense:</strong> When your tax rate NOW is lower than it will be when RMDs begin at age 73.
+              The window between retiring and age 73 is typically your best opportunity.
+              Your Tax Engine page shows exactly how much you can convert without jumping tax brackets.
+            </div>
+          </details>
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              📋 What are RMDs and why do they matter?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              Required Minimum Distributions — the IRS requires withdrawals from pre-tax accounts (Traditional IRA, 401k)
+              starting at age 73. The amount is your account balance divided by an IRS life expectancy factor.
+              <br><br>
+              <strong style="color:#f4b86a;">Why plan ahead:</strong> Large RMDs can push you into higher tax brackets,
+              increase Medicare premiums (IRMAA), and make Social Security more taxable.
+              Converting some pre-tax money to Roth before 73 reduces future RMD amounts.
+              Your RMD schedule is projected automatically in the Tax Engine.
+            </div>
+          </details>
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              🏥 What is IRMAA?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              Income-Related Monthly Adjustment Amount — extra Medicare premiums triggered when your income
+              exceeds $212,000 (married, 2025). A large Roth conversion could temporarily push you over this
+              threshold, adding $74-$444/month per person to Medicare costs.
+              Your Tax Engine shows all five IRMAA tiers so you can plan conversions to stay just under the thresholds.
+            </div>
+          </details>
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              😊 What's the Smile Curve spending plan?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              Research shows retirees typically spend MORE early in retirement (travel, activities),
+              LESS in the middle years (settled lifestyle), and slightly more again late in life (healthcare).
+              Graphed over time this looks like a smile. Your plan sets three spending phases:
+              <br><br>
+              <strong style="color:#f4b86a;">Phase 1:</strong> Active years — higher spending on experiences<br>
+              <strong style="color:#f4b86a;">Phase 2:</strong> Settled years — core lifestyle spending<br>
+              <strong style="color:#f4b86a;">Phase 3:</strong> Later years — reduced travel, more healthcare
+            </div>
+          </details>
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              🔧 My numbers look wrong — what do I check first?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              Check these five things in order:<br><br>
+              <strong style="color:#f4b86a;">1.</strong> Column E of Named Accounts in your Google Sheet — are balances entered?<br>
+              <strong style="color:#f4b86a;">2.</strong> Column A of Named Accounts — is "Include?" set to <strong>Yes</strong> for each active account?<br>
+              <strong style="color:#f4b86a;">3.</strong> Partner names in Inputs — are both names filled in?<br>
+              <strong style="color:#f4b86a;">4.</strong> Plan start year — is it set to the current year?<br>
+              <strong style="color:#f4b86a;">5.</strong> Hard refresh — press <strong>Cmd+Shift+R</strong> (Mac) or <strong>Ctrl+Shift+R</strong> (Windows) on the Dashboard
+            </div>
+          </details>
+
+          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              📄 How do I share this with my financial advisor?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              The easiest way: go to the <strong style="color:#f4b86a;">Summary page</strong> and click <strong>🖨️ Print / Save PDF</strong>.
+              This creates a professional 4-page PDF with all your plan details, income, accounts, tax strategy,
+              stress test results, and key milestones — everything a financial advisor needs to review your plan.
+              <br><br>
+              Alternatively, click the <strong>📤 Share</strong> button on the Summary page to copy a live link
+              your advisor can open to see real-time data.
+            </div>
+          </details>
+
+        </div>
+
+        <div class="section-title" style="margin-top:24px;">Key Concepts — Plain English</div>
         <div class="section-sub">Retirement planning terms explained without the jargon</div>
       </div>
     </div>

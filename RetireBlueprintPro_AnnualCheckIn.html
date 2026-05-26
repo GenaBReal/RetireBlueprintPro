@@ -10,7 +10,7 @@
   --navy:#041E2F;--navy2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;
   --green:#2E7032;--red:#A03030;--light:#F0F4F8;--border:#e0e4e8;--dark:#2F3E46;--muted:#5F6368;
 }
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark);}
+body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark);}
 .header{background:var(--navy);border-bottom:3px solid var(--orange);}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;}
 .header-inner img{height:52px;}
@@ -79,6 +79,35 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
 .loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
 .tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(28,199,208,0.3);color:#1CC7D0;font-size:9px;font-weight:700;cursor:help;margin-left:4px;position:relative;}
 .tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:10px;padding:6px 10px;border-radius:5px;white-space:normal;width:200px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;}
+
+/* ── MOBILE RESPONSIVE ────────────────────────────────── */
+@media (max-width: 768px) {
+  .page, .rpt-body { padding: 10px !important; }
+  .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3 { 
+    grid-template-columns: 1fr !important; 
+  }
+  .kpi2 { grid-template-columns: 1fr 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr 1fr !important; }
+  .nav, .nav-bar { flex-wrap: nowrap; overflow-x: auto; }
+  .nav a, .nav-bar a { font-size: 9px; padding: 8px 10px; white-space: nowrap; }
+  .header-right, .header-stats { display: none !important; }
+  .partner-card { margin-bottom: 12px; }
+  table.rtbl { font-size: 10px; }
+  table.rtbl td, table.rtbl th { padding: 5px 6px; }
+  .report-wrap { margin: 0 !important; border-radius: 0 !important; }
+  .rpt-header-top { padding: 14px 16px !important; }
+  .rpt-header-info { padding: 10px 16px !important; }
+  .rpt-names { font-size: 14px !important; }
+  .kval { font-size: 16px !important; }
+  .chart-area { height: 140px !important; }
+  .roth-grid { grid-template-columns: 1fr 1fr !important; }
+  .intel { display: none; } /* Hide intel panel on mobile - too cramped */
+}
+@media (max-width: 480px) {
+  .kpi4, .kpi3 { grid-template-columns: 1fr 1fr !important; }
+  .kpi2 { grid-template-columns: 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
@@ -221,19 +250,15 @@ function loadData() {
 
 function loadEmbedded() {
   // Embedded real projection data as fallback
-  var projected = [1009733,1080702,1136009,1157432,1177036,1190796,1203369,1235677,1270193,1306161,
-    1338920,1372624,1398604,1424594,1450518,1474017,1496962,1519207,1540614,1563685,
-    1579381,1584826,1586362,1583486,1575699,1562534,1543417,1561862,1577486,1589321,
-    1575811,1556611,1531163,1498970,1459324,1411671,1355346,1289711,1214056,1127584,
-    1023461,925780,851395,795900,734000,661000,578000,482000,374000,250062];
-  var yr = 2026;
-  checkInData = projected.map(function(p, i) {
-    return { year: yr+i, projected: p, actual: i===0?1003500:null,
-             variance: i===0?-6233:null, status: i===0?'Pending Check-In':'Pending Check-In', notes:'' };
+  // No fallback data — show empty table prompting user to connect their sheet
+  var yr = new Date().getFullYear();
+  checkInData = Array.from({length:50}, function(_, i) {
+    return { year: yr+i, projected: null, actual: null,
+             variance: null, status: 'Connect your sheet to see projections', notes:'' };
   });
   renderTable(null);
   updateKPIsFromData();
-  document.getElementById('save-msg').textContent = 'Showing embedded data -- connect your sheet for live data';
+  document.getElementById('save-msg').textContent = 'Connect your Google Sheet to see your projected values. Go to Setup Guide to get started.';
   document.getElementById('save-btn').disabled = false;
 }
 
@@ -340,8 +365,8 @@ function updateKPIs(data) {
   }
   if (data && data.people) {
     var longestYear = Math.max(
-      (data.people.craig||{}).projectedDeathYear||2070,
-      (data.people.gena||{}).projectedDeathYear||2075
+      (data.people[Object.keys(data.people||{})[0]]||{}).projectedDeathYear||2070,
+      (data.people[Object.keys(data.people||{})[1]]||{}).projectedDeathYear||2075
     );
     var lbl = document.getElementById('k-end-lbl');
     if (lbl) lbl.textContent = 'Projected End ' + longestYear;

@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   /* ── SCREEN CHROME ─────────────────────────────────── */
-  body { margin:0; padding:0; font-family:'Montserrat',Arial,sans-serif; background:#f0f2f5; color:#1a1a2e; }
+  body{overflow-x:hidden; margin:0; padding:0; font-family:'Montserrat',Arial,sans-serif; background:#f0f2f5; color:#1a1a2e; }
   .toolbar { background:#041E2F; padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; z-index:100; }
   .toolbar-title { color:#1CC7D0; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
   .btn { background:#1CC7D0; color:#041E2F; border:none; padding:8px 18px; border-radius:5px; font-weight:700; cursor:pointer; font-size:12px; font-family:inherit; }
@@ -139,6 +139,35 @@
     /* Ensure colors print */
     * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   }
+
+/* ── MOBILE RESPONSIVE ────────────────────────────────── */
+@media (max-width: 768px) {
+  .page, .rpt-body { padding: 10px !important; }
+  .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3 { 
+    grid-template-columns: 1fr !important; 
+  }
+  .kpi2 { grid-template-columns: 1fr 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr 1fr !important; }
+  .nav, .nav-bar { flex-wrap: nowrap; overflow-x: auto; }
+  .nav a, .nav-bar a { font-size: 9px; padding: 8px 10px; white-space: nowrap; }
+  .header-right, .header-stats { display: none !important; }
+  .partner-card { margin-bottom: 12px; }
+  table.rtbl { font-size: 10px; }
+  table.rtbl td, table.rtbl th { padding: 5px 6px; }
+  .report-wrap { margin: 0 !important; border-radius: 0 !important; }
+  .rpt-header-top { padding: 14px 16px !important; }
+  .rpt-header-info { padding: 10px 16px !important; }
+  .rpt-names { font-size: 14px !important; }
+  .kval { font-size: 16px !important; }
+  .chart-area { height: 140px !important; }
+  .roth-grid { grid-template-columns: 1fr 1fr !important; }
+  .intel { display: none; } /* Hide intel panel on mobile - too cramped */
+}
+@media (max-width: 480px) {
+  .kpi4, .kpi3 { grid-template-columns: 1fr 1fr !important; }
+  .kpi2 { grid-template-columns: 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 </head>
 <body>
@@ -555,8 +584,8 @@ function loadReport(attempt) {
 
 function populateReport(d) {
   var keys = Object.keys(d.people || {});
-  var p1  = d.people[keys[0]] || d.people.craig || {};
-  var p2  = d.people[keys[1]] || d.people.gena  || {};
+  var p1  = d.people[keys[0]] || d.people[Object.keys(d.people||{})[0]] || {};
+  var p2  = d.people[keys[1]] || d.people[Object.keys(d.people||{})[1]]  || {};
   var gl  = d.global   || {};
   var tax = d.tax      || {};
   var port= d.portfolio|| {};
@@ -1007,7 +1036,7 @@ function populateReport(d) {
     // Coverage check: does the plan cover each partner to their projected lifespan?
     // deathAge comes from Inputs projected lifespan field
     var p1DeathAge = p1.deathAge || p1.projectedAge || 90;
-    var p2DeathAge = p2.deathAge || p2.projectedAge || 105; // Gena's longer lifespan
+    var p2DeathAge = p2.deathAge || p2.projectedAge || 90; // Fallback to 90 for new clients
     var p1YrsToEnd = Math.max(0, p1DeathAge - (p1.age||0));
     var p2YrsToEnd = Math.max(0, p2DeathAge - (p2.age||0));
     var planEndYear = curYear + Math.max(p1YrsToEnd, p2YrsToEnd);

@@ -12,7 +12,7 @@
   --dark:#2F3E46; --muted:#5F6368; --border:#e0e4e8;
   --p1-color:#2E4053; --p2-color:#6A4A6D;
 }
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-width:900px;color:var(--dark);}
+body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);min-width:900px;color:var(--dark);}
 
 /* ── HEADER ── */
 .header{background:var(--navy);border-bottom:3px solid var(--orange);padding:0;}
@@ -220,6 +220,35 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .home-stat-label { font-size:11px;color:#6a8a9a;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px; }
 .home-stat-value { font-size:22px;font-weight:800;color:#fff; }
 
+
+/* ── MOBILE RESPONSIVE ────────────────────────────────── */
+@media (max-width: 768px) {
+  .page, .rpt-body { padding: 10px !important; }
+  .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3 { 
+    grid-template-columns: 1fr !important; 
+  }
+  .kpi2 { grid-template-columns: 1fr 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr 1fr !important; }
+  .nav, .nav-bar { flex-wrap: nowrap; overflow-x: auto; }
+  .nav a, .nav-bar a { font-size: 9px; padding: 8px 10px; white-space: nowrap; }
+  .header-right, .header-stats { display: none !important; }
+  .partner-card { margin-bottom: 12px; }
+  table.rtbl { font-size: 10px; }
+  table.rtbl td, table.rtbl th { padding: 5px 6px; }
+  .report-wrap { margin: 0 !important; border-radius: 0 !important; }
+  .rpt-header-top { padding: 14px 16px !important; }
+  .rpt-header-info { padding: 10px 16px !important; }
+  .rpt-names { font-size: 14px !important; }
+  .kval { font-size: 16px !important; }
+  .chart-area { height: 140px !important; }
+  .roth-grid { grid-template-columns: 1fr 1fr !important; }
+  .intel { display: none; } /* Hide intel panel on mobile - too cramped */
+}
+@media (max-width: 480px) {
+  .kpi4, .kpi3 { grid-template-columns: 1fr 1fr !important; }
+  .kpi2 { grid-template-columns: 1fr !important; }
+  .stress-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 </head>
 <body>
@@ -285,6 +314,23 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 </div>
 
 <div class="page">
+
+<!-- NOVICE QUICK START TIP -->
+<div style="background:linear-gradient(135deg,#f0fdfe,#e8f9fa);border-radius:10px;padding:14px 18px;margin-bottom:16px;border:1px solid #b2ebf2;display:flex;gap:14px;align-items:flex-start;">
+  <div style="font-size:24px;flex-shrink:0;">🚀</div>
+  <div>
+    <div style="font-size:13px;font-weight:800;color:#006064;margin-bottom:4px;">First Time? Fill These 4 Things First</div>
+    <div style="font-size:11px;color:#00838f;line-height:1.8;">
+      <strong>1. Partner Names & Ages</strong> (Section II &amp; III) → Required for any calculation<br>
+      <strong>2. Account Balances</strong> (Section VI: Named Accounts) → Your starting portfolio values<br>
+      <strong>3. Social Security amounts</strong> (in each partner section) → Your guaranteed income foundation<br>
+      <strong>4. Base Annual Expenses</strong> (Section IV) → What you spend each year<br>
+      <span style="color:#0097a7;">Everything else can be refined later. These 4 unlock your first projection! ✨</span>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- SECTION I: GLOBAL SETTINGS -->
 <div class="section-card">
@@ -1994,13 +2040,18 @@ function updateRothIncomeForYear() {
 }
 
 function updatePartnerNames() {
+  var p1name = (document.getElementById('f-B31')||{}).value || 'Partner 1';
+  var p2name = (document.getElementById('f-D31')||{}).value || 'Partner 2';
   // Update Roth table headers
   var p1hdr = document.getElementById('roth-p1-hdr');
   var p2hdr = document.getElementById('roth-p2-hdr');
-  var p1name = document.getElementById('f-B31') ? document.getElementById('f-B31').value : '';
-  var p2name = document.getElementById('f-D31') ? document.getElementById('f-D31').value : '';
-  if (p1hdr && p1name) p1hdr.textContent = p1name + "'s Conversion ($)";
-  if (p2hdr && p2name) p2hdr.textContent = p2name + "'s Conversion ($)";
+  if (p1hdr) p1hdr.textContent = p1name + "'s Conversion ($)";
+  if (p2hdr) p2hdr.textContent = p2name + "'s Conversion ($)";
+  // Update all p1/p2 section labels
+  document.querySelectorAll('[data-p1-label]').forEach(function(el){ el.textContent = p1name + ' ' + el.getAttribute('data-p1-label'); });
+  document.querySelectorAll('[data-p2-label]').forEach(function(el){ el.textContent = p2name + ' ' + el.getAttribute('data-p2-label'); });
+  // Update section headers
+  ['p1-section-name','p2-section-name'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.textContent = [p1name,p2name][i]; });
   var p1 = document.getElementById('f-B31').value || 'Partner 1';
   var p2 = document.getElementById('f-D31').value || 'Partner 2';
   document.getElementById('p1-label').textContent = p1;
@@ -2388,8 +2439,8 @@ function populateFromData(d) {
         if (_validNames.indexOf(_owner.toLowerCase()) < 0) {
           // Owner doesn't match current names — check server data for clues
           // Use the original p1/p2 names from server (craig/gena aliases)
-          var _sp1 = d.people && d.people.craig ? (d.people.craig.name||'').toLowerCase() : '';
-          var _sp2 = d.people && d.people.gena  ? (d.people.gena.name||'').toLowerCase()  : '';
+          var _sp1 = d.people && d.people[Object.keys(d.people||{})[0]] ? (d.people[Object.keys(d.people||{})[0]].name||'').toLowerCase() : '';
+          var _sp2 = d.people && d.people[Object.keys(d.people||{})[1]]  ? (d.people[Object.keys(d.people||{})[1]].name||'').toLowerCase()  : '';
           if (_sp2 && _owner.toLowerCase() === _sp2) {
             _owner = _p2name;
           } else {
@@ -2481,7 +2532,7 @@ function populateFromData(d) {
   var currentTaxRate = taxRateEl ? parseFloat(taxRateEl.value) : 0;
   if ((!currentTaxRate || currentTaxRate === 8) && d.projections && d.projections.years) {
     // Find the year when Partner 1 turns 73
-    var p1Age = d.people && d.people.craig ? (d.people.craig.age||0) : 0;
+    var p1Age = d.people && d.people[Object.keys(d.people||{})[0]] ? (d.people[Object.keys(d.people||{})[0]].age||0) : 0;
     var rmdYear = p1Age > 0 ? (new Date().getFullYear() + (73 - p1Age)) : 0;
     if (rmdYear > 0) {
       var rmdIdx = d.projections.years.indexOf(rmdYear);
