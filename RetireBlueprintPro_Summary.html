@@ -493,7 +493,7 @@ function shareWithAdvisor() {
   var url = window.location.href;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(function() {
-      alert('✅ Link copied! Share this URL with your financial advisor:\n\n' + url + '\n\nThey'll see your live plan when they open it.');
+      alert('✅ Link copied! Share this URL with your financial advisor:\n\n' + url + '\n\nThey will see your live plan when they open it.');
     });
   } else {
     prompt('Copy this link to share with your financial advisor:', url);
