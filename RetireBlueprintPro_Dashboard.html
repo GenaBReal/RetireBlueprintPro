@@ -876,33 +876,9 @@ function loadData(){
     b.textContent = '⚠ No sheet connected. Please complete Setup first.';
     return;
   }
-
   $s('loading-sub').textContent = 'Connecting to your Google Sheet…';
-
-  var url = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec?action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
-
-  fetch(url)
-    .then(function(resp) { return resp.json(); })
-    .then(function(data) {
-      $s('loading-overlay').style.display = 'none';
-      if (data.error) {
-        var b = $s('error-banner');
-        b.style.display = 'block';
-        b.textContent = '⚠ Error reading sheet: ' + data.error;
-        return;
-      }
-      try { populate(data); }
-      catch(e) {
-        var b = $s('error-banner');
-        b.style.display = 'block';
-        b.textContent = '⚠ Error displaying data: ' + e.message;
-        console.error(e);
-      }
-    })
-    .catch(function() {
-      // Fallback to JSONP
-      loadViaJSONP(sheetId);
-    });
+  // Go straight to JSONP — fetch fails on hard refresh due to CORS
+  loadViaJSONP(sheetId);
 }
 
 function loadViaJSONP(sheetId) {
@@ -913,7 +889,7 @@ function loadViaJSONP(sheetId) {
     b.style.display = 'block';
     b.textContent = '⚠ Timeout — make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.';
     delete window[cbName];
-  }, 30000);
+  }, 60000);
 
   window[cbName] = function(data) {
     clearTimeout(timer);

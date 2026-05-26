@@ -512,7 +512,7 @@ function loadReport(attempt) {
         loadEl.innerHTML = '⚠️ Timeout after 3 attempts.<br><button onclick="loadReport(1)" style="margin-top:10px;padding:8px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;">Try Again</button>';
       }
     }
-  }, 45000);
+  }, 60000);
 
   window[cb] = function(d) {
     if (done) return;
@@ -792,7 +792,7 @@ function populateReport(d) {
   if (narr) narr.innerHTML = buildNarrative(p1, p2, p1n, p2n, leg, sp, port, roth, tax, gl, proj);
 
   // ── NET WORTH + MONTHLY BUDGET ──
-  populateNetWorthAndBudget(p1, p2, p1n, p2n, port, sp, leg, proj, d);
+  populateNetWorthAndBudget(p1, p2, p1n, p2n, port, sp, leg, proj, d, curYear, tax);
 
   // ── DEBTS ──
   var debtBody = document.getElementById('r-debts-body');
@@ -812,12 +812,13 @@ function populateReport(d) {
   }
 
   // ── STRESS TEST ──
-  var baseEnd = 0;
-  if (proj.endLiquid && proj.endLiquid.length) {
+  // Use leg.projectedEnding as the reliable base — it comes from the solver
+  var baseEnd = leg.projectedEnding || 0;
+  if (!baseEnd && proj && proj.endLiquid && proj.endLiquid.length) {
     for (var si=proj.endLiquid.length-1;si>=0;si--) { if(proj.endLiquid[si]>0){baseEnd=proj.endLiquid[si];break;} }
   }
-  if (!baseEnd) baseEnd = leg.projectedEnding || 0;
-  var baseStart = (proj.endLiquid && proj.endLiquid[0]) || 0;
+  if (!baseEnd) baseEnd = leg.goal || 0;
+  var baseStart = port.total || 0; // starting portfolio = more accurate shock base
   var legGoal = leg.goal || 0;
   function stressNote(val) {
     if (val >= legGoal && legGoal > 0) return '✅ Legacy goal met';
@@ -898,8 +899,8 @@ function populateReport(d) {
     story += '(' + Math.round(conf) + '% funded toward a $' + Math.round((leg.goal||0)/1000) + 'K legacy goal). ';
     story += 'Their combined portfolio of <strong>' + fmt(port.total||0) + '</strong> is projected to support ';
     // Coverage per partner
-    var p1DA = p1.deathAge || 90;
-    var p2DA = p2.deathAge || 90;
+    var p1DA = p1.deathAge || p1.projectedAge || 90;
+    var p2DA = p2.deathAge || p2.projectedAge || 105;
     var p1EndYr = new Date().getFullYear() + Math.max(0, p1DA - (p1.age||0));
     var p2EndYr = new Date().getFullYear() + Math.max(0, p2DA - (p2.age||0));
     if (conf >= 100) {
@@ -949,7 +950,7 @@ function populateReport(d) {
   }
 
   // ── NET WORTH & MONTHLY BUDGET POPULATION ──
-  function populateNetWorthAndBudget(p1, p2, p1n, p2n, port, sp, leg, proj, d) {
+  function populateNetWorthAndBudget(p1, p2, p1n, p2n, port, sp, leg, proj, d, curYear, tax) {
     // Net worth
     var homeVal = 0, homeLiability = 0, homeEquity = 0;
     if (d.debts) d.debts.forEach(function(db) {
@@ -989,8 +990,9 @@ function populateReport(d) {
     set('r-roth-pct', rothPct + '%');
 
     // Coverage check: does the plan cover each partner to their projected lifespan?
-    var p1DeathAge = p1.deathAge || 90;
-    var p2DeathAge = p2.deathAge || 90;
+    // deathAge comes from Inputs projected lifespan field
+    var p1DeathAge = p1.deathAge || p1.projectedAge || 90;
+    var p2DeathAge = p2.deathAge || p2.projectedAge || 105; // Gena's longer lifespan
     var p1YrsToEnd = Math.max(0, p1DeathAge - (p1.age||0));
     var p2YrsToEnd = Math.max(0, p2DeathAge - (p2.age||0));
     var planEndYear = curYear + Math.max(p1YrsToEnd, p2YrsToEnd);
@@ -1034,7 +1036,11 @@ function populateReport(d) {
     if (p2.ssMonthly > 0) { moIncome.push({src: p2n+' SS', mo: p2.ssMonthly}); moTotal += p2.ssMonthly; }
     if (p1.pension > 0)   { moIncome.push({src: p1n+' Pension', mo: p1.pension}); moTotal += p1.pension; }
     if (p2.pension > 0)   { moIncome.push({src: p2n+' Pension', mo: p2.pension}); moTotal += p2.pension; }
-    var portWithdrawalMo = Math.round(portfolioNeeded/12);
+    // Portfolio withdrawal = gap between expenses and guaranteed income
+    var annualExpenses = (sp.baseAnnual||0) + (sp.safeExtra||0) + (sp.phase1Extra||0);
+    var guaranteedAnnual2 = ((p1.ssMonthly||0)+(p2.ssMonthly||0)+(p1.pension||0)+(p2.pension||0))*12;
+    var portfolioNeeded2 = Math.max(0, annualExpenses - guaranteedAnnual2);
+    var portWithdrawalMo = Math.round(portfolioNeeded2/12);
     if (portWithdrawalMo > 0) { moIncome.push({src:'Portfolio Withdrawal', mo: portWithdrawalMo}); moTotal += portWithdrawalMo; }
 
     var miBody = document.getElementById('r-monthly-income');

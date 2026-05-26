@@ -407,7 +407,7 @@ function loadData(){
   var _sid=localStorage.getItem('rbp_sheet_id')||'';
   s.src=SCRIPT_URL+'?action=read&callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
   s.onerror=function(){delete window[cb];};
-  setTimeout(function(){if(window[cb])delete window[cb];},6000);
+  setTimeout(function(){if(window[cb])delete window[cb];},60000);
   document.head.appendChild(s);
 }
 loadData();
