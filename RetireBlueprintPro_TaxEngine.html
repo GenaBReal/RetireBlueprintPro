@@ -669,13 +669,13 @@ function populate(data) {
 
   renderBrackets(taxable1 || 0);
   renderTimeline(proj, tax);
-  } catch(e) {
-    console.error('Tax Engine populate error:', e);
-    document.getElementById('status-msg').textContent = '⚠️ Error loading data: ' + e.message;
-  }
-
-  document.getElementById('status-msg').textContent = '✅ Tax data loaded — ' + (data.meta&&data.meta.generated||'May 2026');
+    document.getElementById('status-msg').textContent = '✅ Tax data loaded — ' + (data.meta&&data.meta.generated||'May 2026');
   document.getElementById('status-msg').className = 'status-msg ok';
+  } catch(e) {
+    console.error('Tax Engine error:', e.message);
+    document.getElementById('status-msg').textContent = '⚠️ Error displaying data: ' + e.message;
+    document.getElementById('status-msg').className = 'status-msg';
+  }
 }
 
 function loadData() {
