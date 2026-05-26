@@ -19,7 +19,7 @@
 
   /* ── HEADER ────────────────────────────────────────── */
   .rpt-header { background:#041E2F; padding:0; }
-  .rpt-header-top { padding:20px 32px; display:flex; align-items:center; gap:20px; }
+  .rpt-header-top { padding:20px 32px; display:flex; align-items:center; gap:20px; overflow:hidden; }
   .rpt-header-info { background:#0A3145; border-top:3px solid #1CC7D0; padding:12px 32px; }
   .rpt-header-info table { width:100%; border-collapse:collapse; }
   .rpt-plan-name { font-size:18px; font-weight:800; color:#fff; }
@@ -133,8 +133,8 @@
 
   <!-- ── HEADER ── -->
   <div class="rpt-header">
-    <div class="rpt-header-top">
-      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;" onerror="this.style.display='none'">
+    <div class="rpt-header-top" style="overflow:hidden;">
+      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;max-width:100%;display:block;" onerror="this.style.display='none'">
     </div>
     <div class="rpt-header-info">
       <table>
@@ -489,14 +489,47 @@ function populateReport(d) {
     rows.push({src:src, mo:mo, yr:yr, startYr:startYr, endYr:endYr, note:note, active:active, statusLabel:statusLabel, statusColor:statusColor, statusBg:statusBg});
   }
 
-  if (p1.salary>0)      addInc(p1n+' Salary',          Math.round(p1.salary/12), p1.salary,         null,           p1.salaryEnd,    'Ends '+(p1.salaryEnd||'—'));
-  if (p2.salary>0)      addInc(p2n+' Salary',          Math.round(p2.salary/12), p2.salary,         null,           p2.salaryEnd,    'Ends '+(p2.salaryEnd||'—'));
+  // Prorate salary for partial year based on end date
+  if (p1.salary>0) {
+    var p1SalMo = 12, p1SalNote = 'Full year';
+    if (p1.salaryEnd) {
+      try {
+        var p1End = new Date(p1.salaryEnd);
+        if (p1End.getFullYear() === planYear) {
+          p1SalMo = p1End.getMonth() + 1; // months worked (Jan=1)
+          p1SalNote = p1SalMo+' months in '+planYear+' (ends '+p1.salaryEnd+')';
+        } else if (p1End.getFullYear() < planYear) {
+          p1SalMo = 0; p1SalNote = 'Retired before plan year';
+        } else {
+          p1SalNote = 'Full year (retires '+p1.salaryEnd+')';
+        }
+      } catch(e) { p1SalNote = 'Ends '+p1.salaryEnd; }
+    }
+    if (p1SalMo > 0) addInc(p1n+' Salary', Math.round(p1.salary/12), Math.round(p1.salary/12*p1SalMo), null, p1.salaryEnd, p1SalNote);
+  }
+  if (p2.salary>0) {
+    var p2SalMo = 12, p2SalNote = 'Full year';
+    if (p2.salaryEnd) {
+      try {
+        var p2End = new Date(p2.salaryEnd);
+        if (p2End.getFullYear() === planYear) {
+          p2SalMo = p2End.getMonth() + 1;
+          p2SalNote = p2SalMo+' months in '+planYear+' (ends '+p2.salaryEnd+')';
+        } else if (p2End.getFullYear() < planYear) {
+          p2SalMo = 0; p2SalNote = 'Retired before plan year';
+        } else {
+          p2SalNote = 'Full year (retires '+p2.salaryEnd+')';
+        }
+      } catch(e) { p2SalNote = 'Ends '+p2.salaryEnd; }
+    }
+    if (p2SalMo > 0) addInc(p2n+' Salary', Math.round(p2.salary/12), Math.round(p2.salary/12*p2SalMo), null, p2.salaryEnd, p2SalNote);
+  }
   if (p1.ssMonthly>0)   addInc(p1n+' Social Security', p1.ssMonthly,             p1.ssMonthly*12,   p1.ssStartDate, null,            'COLA '+(gl.ssCola||2.5)+'%/yr');
   if (p2.ssMonthly>0)   addInc(p2n+' Social Security', p2.ssMonthly,             p2.ssMonthly*12,   p2.ssStartDate, null,            'COLA '+(gl.ssCola||2.5)+'%/yr');
   if (p1.pension>0)     addInc(p1n+' Pension',         p1.pension,               p1.pension*12,     p1.pensionStart||null, null,    'Fixed monthly income');
   if (p2.pension>0)     addInc(p2n+' Pension',         p2.pension,               p2.pension*12,     p2.pensionStart||null, null,    'Fixed monthly income');
-  if (p1.otherIncome>0) addInc(p1n+' Other Income',   Math.round(p1.otherIncome/12), p1.otherIncome, null,           null,            '—');
-  if (p2.otherIncome>0) addInc(p2n+' Other Income',   Math.round(p2.otherIncome/12), p2.otherIncome, null,           null,            '—');
+  if (p1.otherIncome>0) addInc(p1n+' Other Income',   Math.round(p1.otherIncome/12), p1.otherIncome, p1.otherStart||null, p1.otherEnd||null, p1.otherStart ? 'Starts '+(p1.otherStart) : '—');
+  if (p2.otherIncome>0) addInc(p2n+' Other Income',   Math.round(p2.otherIncome/12), p2.otherIncome, p2.otherStart||null, p2.otherEnd||null, p2.otherStart ? 'Starts '+(p2.otherStart) : '—');
 
   var tbody = document.getElementById('r-income-rows');
   if (tbody) tbody.innerHTML = rows.map(function(r){
