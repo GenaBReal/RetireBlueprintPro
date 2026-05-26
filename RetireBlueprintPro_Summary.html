@@ -489,6 +489,17 @@ function fmtFull(n) {
 function fmtMo(n) { return (n > 0) ? '$'+Math.round(n).toLocaleString()+'/mo' : '—'; }
 function set(id, val) { var el = document.getElementById(id); if(el) el.textContent = (val !== null && val !== undefined && val !== '') ? val : '—'; }
 
+function shareWithAdvisor() {
+  var url = window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      alert('✅ Link copied! Share this URL with your financial advisor:\n\n' + url + '\n\nThey'll see your live plan when they open it.');
+    });
+  } else {
+    prompt('Copy this link to share with your financial advisor:', url);
+  }
+}
+
 function loadReport(attempt) {
   attempt = attempt || 1;
   var sheetId = localStorage.getItem('rbp_sheet_id');
@@ -897,7 +908,11 @@ function populateReport(d) {
 
     var story = '<strong>' + p1n + ' and ' + p2n + '</strong> have a retirement plan that is <strong>' + confWord + '</strong> ';
     story += '(' + Math.round(conf) + '% funded toward a $' + Math.round((leg.goal||0)/1000) + 'K legacy goal). ';
-    story += 'Their combined portfolio of <strong>' + fmt(port.total||0) + '</strong> is projected to support ';
+    // Plan duration = from now to longest lifespan
+    var p1YrsLeft = Math.max(0, (p1.deathAge||90) - (p1.age||63));
+    var p2YrsLeft = Math.max(0, (p2.deathAge||105) - (p2.age||55));
+    var planDuration = Math.max(p1YrsLeft, p2YrsLeft);
+    story += 'Their combined portfolio of <strong>' + fmt(port.total||0) + '</strong>, running across a <strong>' + planDuration + '-year projection</strong>, is designed to support ';
     // Coverage per partner
     var p1DA = p1.deathAge || p1.projectedAge || 90;
     var p2DA = p2.deathAge || p2.projectedAge || 105;

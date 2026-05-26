@@ -77,6 +77,8 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
 
 /* Loading */
 .loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+.tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(28,199,208,0.3);color:#1CC7D0;font-size:9px;font-weight:700;cursor:help;margin-left:4px;position:relative;}
+.tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:10px;padding:6px 10px;border-radius:5px;white-space:normal;width:200px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
@@ -116,7 +118,16 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
 
 <div class="page">
 
-  <div class="instructions">
+  <div style="background:#e8f5e9;border-left:4px solid #2E7D32;border-radius:8px;padding:14px 18px;margin-bottom:16px;">
+  <div style="font-size:13px;font-weight:700;color:#1b5e20;margin-bottom:6px;">📅 How to Use Annual Check-In</div>
+  <div style="font-size:11px;color:#2E7D32;line-height:1.7;">
+    Once a year (January is ideal), enter your actual account balances in the <strong>Actual Balance</strong> column.
+    The chart above shows whether you're ahead of plan (green dots) or behind (red dots).
+    Add notes about major events — job changes, big purchases, market crashes — to build your financial history.
+    <strong>Your entries are saved directly to your Google Sheet.</strong>
+  </div>
+</div>
+<div class="instructions">
     <div class="inst-icon">📋</div>
     <div class="inst-text">
       <strong>How to use this tab:</strong> Every January, enter your actual December 31 portfolio balance in the <strong>Actual Balance</strong> column for the previous year.
