@@ -78,6 +78,7 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
 /* Loading */
 .loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -186,10 +187,10 @@ function loadData() {
       updateKPIs(data);
       // Set partner names and plan year for table headers
     if (data.people) {
-      window._p1Name = (data.people.craig||{}).name||'Partner 1';
-      window._p2Name = (data.people.gena||{}).name||'Partner 2';
-      window._p1Age  = (data.people.craig||{}).age||63;
-      window._p2Age  = (data.people.gena||{}).age||55;
+      var _pKeys=Object.keys(data.people||{}); window._p1Name=(data.people[_pKeys[0]]||{}).name||'Partner 1';
+      window._p2Name=(data.people[_pKeys[1]]||{}).name||'Partner 2';
+      window._p1Age=(data.people[_pKeys[0]]||{}).age||63;
+      window._p2Age=(data.people[_pKeys[1]]||{}).age||55;
     }
     if (data.meta) window._planYear = data.meta.planYear||2026;
     document.getElementById('save-msg').textContent = 'Data loaded — enter your actual balances below';
@@ -390,6 +391,86 @@ function saveCheckIn() {
 }
 
 loadData();
+
+// Draw actual vs projected chart after data loads
+function drawActualVsProjected() {
+  var canvas = document.getElementById('actual-vs-proj-chart');
+  if (!canvas || !checkInData || !checkInData.length) return;
+  if (window._avcChart) window._avcChart.destroy();
+
+  var labels = [], proj = [], actual = [];
+  checkInData.forEach(function(row) {
+    labels.push(row.year);
+    proj.push(row.projected || null);
+    actual.push(row.actual || null);
+  });
+
+  function fmtK(v) {
+    if (!v) return '';
+    if (v >= 1000000) return '$'+(v/1000000).toFixed(1)+'M';
+    return '$'+Math.round(v/1000)+'K';
+  }
+
+  var ctx = canvas.getContext('2d');
+  window._avcChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Projected',
+          data: proj,
+          borderColor: '#1CC7D0',
+          backgroundColor: 'rgba(28,199,208,0.08)',
+          borderWidth: 2.5,
+          pointRadius: 2,
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Actual',
+          data: actual,
+          borderColor: '#f4b86a',
+          backgroundColor: '#f4b86a',
+          borderWidth: 0,
+          pointRadius: 6,
+          pointBackgroundColor: actual.map(function(v, i) {
+            if (!v || !proj[i]) return '#f4b86a';
+            return v >= proj[i] ? '#4CAF50' : '#ff6b6b';
+          }),
+          pointBorderWidth: 2,
+          pointBorderColor: '#fff',
+          showLine: true,
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { font:{size:11}, color:'#5F6368', boxWidth:12 } },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return ctx.dataset.label+': '+fmtK(ctx.raw); }
+          }
+        }
+      },
+      scales: {
+        x: { ticks:{font:{size:11},color:'#8aaabb',maxTicksLimit:10}, grid:{display:false} },
+        y: { ticks:{font:{size:11},color:'#8aaabb',callback:function(v){return fmtK(v);}}, grid:{color:'rgba(0,0,0,0.05)'} }
+      }
+    }
+  });
+}
+
+// Patch renderTable to also draw chart
+var _origRenderTable = renderTable;
+renderTable = function(data) {
+  _origRenderTable(data);
+  setTimeout(drawActualVsProjected, 100);
+};
+
 </script>
 
 <div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;">Not financial advice. Not legal advice. For personal planning purposes only. Always consult a licensed financial advisor before making major retirement decisions. © 2026 RetireBlueprint Pro</div>
