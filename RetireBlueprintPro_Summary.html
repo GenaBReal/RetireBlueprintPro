@@ -421,9 +421,9 @@
           <div class="ksub">Higher = better tax position</div>
         </div>
         <div class="kbox">
-          <div class="klabel">Years of Expenses in Portfolio</div>
-          <div class="kval" id="r-years-covered">—</div>
-          <div class="ksub">At current spending rate</div>
+          <div class="klabel">Lifespan Coverage</div>
+          <div class="kval" id="r-years-covered" style="font-size:12px;line-height:1.4;">—</div>
+          <div class="ksub" id="r-years-sub">Funded through projected lifespans</div>
         </div>
       </div>
     </div>
@@ -883,7 +883,11 @@ function populateReport(d) {
     var conf = leg.achievedPct || 0;
     var confWord = conf >= 100 ? 'fully funded' : conf >= 80 ? 'on track' : 'needs attention';
     var totalSS = ((p1.ssMonthly||0) + (p2.ssMonthly||0)) * 12;
-    var portfolioYrs = sp.baseAnnual > 0 ? Math.round((port.total||0) / sp.baseAnnual) : 0;
+    // Years covered = portfolio / annual gap (expenses minus guaranteed income)
+    // This is the honest number — SS and pension cover most expenses
+    var guaranteedIncome = ((p1.ssMonthly||0) + (p2.ssMonthly||0) + (p1.pension||0) + (p2.pension||0)) * 12;
+    var annualGap = Math.max(0, (sp.baseAnnual||0) - guaranteedIncome);
+    var portfolioYrs = annualGap > 0 ? Math.round((port.total||0) / annualGap) : 99;
     var p1RetYr = p1.salaryEnd ? new Date(p1.salaryEnd).getFullYear() : '—';
     var p2RetYr = p2.salaryEnd ? new Date(p2.salaryEnd).getFullYear() : '—';
     var p1RMD = p1.age > 0 ? new Date().getFullYear() + (73-p1.age) : '—';
@@ -893,7 +897,22 @@ function populateReport(d) {
     var story = '<strong>' + p1n + ' and ' + p2n + '</strong> have a retirement plan that is <strong>' + confWord + '</strong> ';
     story += '(' + Math.round(conf) + '% funded toward a $' + Math.round((leg.goal||0)/1000) + 'K legacy goal). ';
     story += 'Their combined portfolio of <strong>' + fmt(port.total||0) + '</strong> is projected to support ';
-    story += 'roughly <strong>' + portfolioYrs + ' years</strong> of living expenses at the current spending rate. ';
+    // Coverage per partner
+    var p1DA = p1.deathAge || 90;
+    var p2DA = p2.deathAge || 90;
+    var p1EndYr = new Date().getFullYear() + Math.max(0, p1DA - (p1.age||0));
+    var p2EndYr = new Date().getFullYear() + Math.max(0, p2DA - (p2.age||0));
+    if (conf >= 100) {
+      story += 'projected to fully cover <strong>' + p1n + ' through age ' + p1DA + ' (' + p1EndYr + ')</strong> ';
+      story += 'and <strong>' + p2n + ' through age ' + p2DA + ' (' + p2EndYr + ')</strong>. ';
+    } else {
+      story += 'projected to cover ' + Math.round(conf) + '% of the plan through both partners' projected lifespans. ';
+    }
+    if (guaranteedIncome > 0) {
+      story += 'Social Security and pension provide <strong>' + fmt(guaranteedIncome) + '/year</strong> in guaranteed income, ';
+      var ssCovPct = sp.baseAnnual > 0 ? Math.round(guaranteedIncome/sp.baseAnnual*100) : 0;
+      story += 'covering <strong>' + ssCovPct + '%</strong> of base living expenses before any portfolio withdrawal. ';
+    }
     story += '<br><br>';
 
     if (p1RetYr !== '—') story += '<strong>' + p1n + '</strong> retires in <strong>' + p1RetYr + '</strong>';
@@ -969,8 +988,45 @@ function populateReport(d) {
     set('r-pretax-pct', preTaxPct + '%');
     set('r-roth-pct', rothPct + '%');
 
+    // Coverage check: does the plan cover each partner to their projected lifespan?
+    var p1DeathAge = p1.deathAge || 90;
+    var p2DeathAge = p2.deathAge || 90;
+    var p1YrsToEnd = Math.max(0, p1DeathAge - (p1.age||0));
+    var p2YrsToEnd = Math.max(0, p2DeathAge - (p2.age||0));
+    var planEndYear = curYear + Math.max(p1YrsToEnd, p2YrsToEnd);
+    var p1EndYear = curYear + p1YrsToEnd;
+    var p2EndYear = curYear + p2YrsToEnd;
+
+    // Simple check using legacy achievement
+    var conf2 = leg.achievedPct || 0;
     var yearsEl = document.getElementById('r-years-covered');
-    if (yearsEl && annualSpend > 0) yearsEl.textContent = Math.round((port.total||0)/annualSpend) + ' years';
+    var subEl = document.getElementById('r-years-sub');
+    var coverBox = yearsEl ? yearsEl.closest('.kbox') : null;
+
+    if (yearsEl) {
+      if (conf2 >= 100) {
+        yearsEl.innerHTML =
+          '✅ ' + p1n + ' to age ' + p1DeathAge + ' (' + p1EndYear + ')<br>' +
+          '✅ ' + p2n + ' to age ' + p2DeathAge + ' (' + p2EndYear + ')';
+        yearsEl.style.color = '#2E7D32';
+        if (subEl) subEl.textContent = 'Both fully funded through projected lifespans';
+        if (coverBox) { coverBox.className = 'kbox green'; }
+      } else if (conf2 >= 80) {
+        yearsEl.innerHTML =
+          '⚠️ ' + p1n + ' to age ' + p1DeathAge + ' (' + p1EndYear + ')<br>' +
+          '⚠️ ' + p2n + ' to age ' + p2DeathAge + ' (' + p2EndYear + ')';
+        yearsEl.style.color = '#E65100';
+        if (subEl) subEl.textContent = 'Mostly funded — small adjustments may help';
+        if (coverBox) { coverBox.className = 'kbox orange'; }
+      } else {
+        yearsEl.innerHTML =
+          '⚠️ ' + p1n + ' — review needed<br>' +
+          '⚠️ ' + p2n + ' — review needed';
+        yearsEl.style.color = '#C62828';
+        if (subEl) subEl.textContent = 'Plan may not fully cover projected lifespans';
+        if (coverBox) { coverBox.className = 'kbox red'; }
+      }
+    }
 
     // Monthly income table (at full retirement)
     var moIncome = [], moTotal = 0;
