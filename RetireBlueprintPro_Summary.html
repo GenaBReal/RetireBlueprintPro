@@ -98,9 +98,9 @@
 
   /* ── STRESS TEST ───────────────────────────────────── */
   .stress-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-  .stress-box { border-radius:6px; padding:10px; text-align:center; border:1px solid #e0e0e0; }
+  .stress-box { border-radius:6px; padding:8px 6px; text-align:center; border:1px solid #e0e0e0; }
   .stress-label { font-size:8px; text-transform:uppercase; letter-spacing:0.8px; color:#666; font-weight:700; margin-bottom:4px; }
-  .stress-val { font-size:18px; font-weight:800; }
+  .stress-val { font-size:16px; font-weight:800; }
   .stress-note { font-size:9px; color:#666; margin-top:3px; }
 
   /* ── FOOTER ────────────────────────────────────────── */
@@ -111,10 +111,10 @@
     .toolbar { display:none !important; }
     body { background:#fff; }
     .report-wrap { box-shadow:none; margin:0; max-width:100%; }
-    .rpt-body { padding:16px 24px; }
+    .rpt-body { padding:12px 20px; }
 
     /* Keep section title with its content */
-    .rpt-section { page-break-inside:avoid; orphans:3; widows:3; }
+    .rpt-section { page-break-inside:avoid; orphans:3; widows:3; margin-bottom:14px; }
 
     /* Force page breaks BEFORE certain sections */
     .pb-before { page-break-before:always; }
@@ -325,9 +325,9 @@
     </div>
 
     <!-- ── 8. STRESS TEST ── -->
-    <div class="rpt-section pb-before">
+    <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">⚡</span> Stress Test — Sequence of Returns Risk</div>
-      <p style="font-size:10px;color:#555;margin:0 0 10px;">Shows your projected ending portfolio balance under adverse market conditions. A resilient plan survives even the severe scenario.</p>
+      <p style="font-size:9px;color:#555;margin:0 0 8px;">Shows projected ending portfolio balance under adverse conditions. A resilient plan survives even the severe scenario.</p>
       <div class="stress-grid">
         <div class="stress-box" style="border-color:#1CC7D0;background:#f0fdfe;">
           <div class="stress-label">Base Scenario</div>
@@ -401,15 +401,56 @@ function fmtFull(n) {
 function fmtMo(n) { return (n > 0) ? '$'+Math.round(n).toLocaleString()+'/mo' : '—'; }
 function set(id, val) { var el = document.getElementById(id); if(el) el.textContent = (val !== null && val !== undefined && val !== '') ? val : '—'; }
 
-function loadReport() {
+function loadReport(attempt) {
+  attempt = attempt || 1;
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId) { document.getElementById('loading').textContent = '⚠️ No sheet connected. Go to Setup Guide first.'; return; }
+
+  var loadEl = document.getElementById('loading');
+  loadEl.innerHTML = 'Loading your retirement summary' + (attempt > 1 ? ' (attempt '+attempt+' of 3)' : '') + '...<br><small style="color:#aaa;">This may take 15-30 seconds on first load</small>';
+
   var cb = 'rbpSum_'+Date.now();
   var done = false;
-  var t = setTimeout(function(){ if(!done){ done=true; document.getElementById('loading').textContent='⚠️ Timeout. Try refreshing.'; }}, 20000);
-  window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); delete window[cb]; try{ populateReport(d); } catch(e){ console.error(e); document.getElementById('loading').textContent='⚠️ Error loading data: '+e.message; } };
+
+  // 45 second timeout, retry up to 3 times
+  var t = setTimeout(function(){
+    if (!done) {
+      done = true;
+      delete window[cb];
+      if (attempt < 3) {
+        loadEl.textContent = 'Retrying... (attempt '+(attempt+1)+' of 3)';
+        setTimeout(function(){ loadReport(attempt+1); }, 1000);
+      } else {
+        loadEl.innerHTML = '⚠️ Timeout after 3 attempts.<br><button onclick="loadReport(1)" style="margin-top:10px;padding:8px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;">Try Again</button>';
+      }
+    }
+  }, 45000);
+
+  window[cb] = function(d) {
+    if (done) return;
+    done = true;
+    clearTimeout(t);
+    delete window[cb];
+    try { populateReport(d); }
+    catch(e) {
+      console.error(e);
+      loadEl.innerHTML = '⚠️ Error loading data: '+e.message+'<br><button onclick="loadReport(1)" style="margin-top:10px;padding:8px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;">Try Again</button>';
+    }
+  };
+
   var s = document.createElement('script');
-  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb;
+  s.onerror = function() {
+    if (!done) {
+      done = true;
+      clearTimeout(t);
+      if (attempt < 3) {
+        setTimeout(function(){ loadReport(attempt+1); }, 2000);
+      } else {
+        loadEl.innerHTML = '⚠️ Could not reach your Google Sheet.<br><small>Check your internet connection, then</small><br><button onclick="loadReport(1)" style="margin-top:8px;padding:8px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;">Try Again</button>';
+      }
+    }
+  };
+  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&t='+Date.now();
   document.head.appendChild(s);
 }
 
