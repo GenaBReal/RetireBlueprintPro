@@ -19,7 +19,7 @@
 
   /* ── HEADER ────────────────────────────────────────── */
   .rpt-header { background:#041E2F; padding:0; }
-  .rpt-header-top { padding:20px 32px; display:flex; align-items:center; gap:20px; overflow:hidden; }
+  .rpt-header-top { padding:20px 32px; overflow:hidden; max-height:100px; }
   .rpt-header-info { background:#0A3145; border-top:3px solid #1CC7D0; padding:12px 32px; }
   .rpt-header-info table { width:100%; border-collapse:collapse; }
   .rpt-plan-name { font-size:18px; font-weight:800; color:#fff; }
@@ -111,8 +111,33 @@
     .toolbar { display:none !important; }
     body { background:#fff; }
     .report-wrap { box-shadow:none; margin:0; max-width:100%; }
-    .rpt-section { page-break-inside:avoid; }
     .rpt-body { padding:16px 24px; }
+
+    /* Keep section title with its content */
+    .rpt-section { page-break-inside:avoid; orphans:3; widows:3; }
+
+    /* Force page breaks BEFORE certain sections */
+    .pb-before { page-break-before:always; }
+
+    /* Never break inside these */
+    .kpi4, .kpi3, .kpi2, .kpi6,
+    .col2, .col3,
+    .stress-grid,
+    .partner-card,
+    table.rtbl,
+    .status-banner { page-break-inside:avoid; }
+
+    /* Table headers repeat on each page */
+    table.rtbl thead { display:table-header-group; }
+    table.rtbl tfoot { display:table-footer-group; }
+
+    /* Shrink font slightly for print */
+    body { font-size:11px; }
+    .kval { font-size:15px; }
+    .rpt-section-title { font-size:9px; }
+
+    /* Ensure colors print */
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   }
 </style>
 </head>
@@ -134,7 +159,7 @@
   <!-- ── HEADER ── -->
   <div class="rpt-header">
     <div class="rpt-header-top" style="overflow:hidden;">
-      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;max-width:100%;display:block;" onerror="this.style.display='none'">
+      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;display:block;flex-shrink:0;" onerror="this.style.display='none'">
     </div>
     <div class="rpt-header-info">
       <table>
@@ -224,7 +249,7 @@
     </div>
 
     <!-- ── 3. INCOME SOURCES ── -->
-    <div class="rpt-section">
+    <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">💵</span> Year 1 Income Detail</div>
       <table class="rtbl">
         <thead><tr><th>Income Source</th><th>Status in Plan Year</th><th>Monthly</th><th>Annual</th><th>Notes</th></tr></thead>
@@ -256,7 +281,7 @@
     </div>
 
     <!-- ── 5. SPENDING PLAN ── -->
-    <div class="rpt-section">
+    <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">🌊</span> Smile Curve Spending Plan</div>
       <div class="kpi4">
         <div class="kbox"><div class="klabel">Base Annual Spending</div><div class="kval" id="r-base-spend">—</div><div class="ksub">Core lifestyle</div></div>
@@ -291,7 +316,7 @@
     </div>
 
     <!-- ── 7. DEBTS & REAL ESTATE ── -->
-    <div class="rpt-section">
+    <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">🏠</span> Debts &amp; Real Estate</div>
       <table class="rtbl">
         <thead><tr><th>Name</th><th>Monthly Payment</th><th>Balance</th><th>End Date</th><th>Current Value</th><th>Equity</th><th>Notes</th></tr></thead>
@@ -328,7 +353,7 @@
     </div>
 
     <!-- ── 9. KEY MILESTONES ── -->
-    <div class="rpt-section">
+    <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">📅</span> Key Dates &amp; Milestones</div>
       <table class="rtbl">
         <thead><tr><th>Milestone</th><th style="text-align:center;">Year</th><th>Details</th></tr></thead>
