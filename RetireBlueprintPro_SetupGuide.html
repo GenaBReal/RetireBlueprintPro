@@ -508,9 +508,11 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
               🔐 Do I need to know spreadsheets or coding?
             </summary>
             <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
-              No. Enter your numbers in the web-based Inputs page — everything calculates automatically.
-              You never touch a formula. The only time you go to your Google Sheet directly is to enter
-              account balances in column E of the Named Accounts rows.
+              No. Everything is entered through the web-based Inputs page — you never need to open
+              or touch your Google Sheet directly. The sheet is your data engine running silently in the
+              background. Just go to Inputs, fill in your numbers, click Save, and your plan updates.
+              You can optionally view the Master Timeline in your sheet to see the raw year-by-year
+              calculations, but you never need to enter anything there.
             </div>
           </details>
 
@@ -521,8 +523,19 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Go to <strong style="color:#f4b86a;">ssa.gov/myaccount</strong> and create a free account.
               Under "My Home" → "View estimated benefits" you'll see your monthly benefit at different retirement ages.
-              Enter the <strong>monthly</strong> amount you plan to take. The plan calculates annual automatically.
-              If you haven't started SS yet, enter your projected benefit at the age you plan to claim.
+              <br><br>
+              Enter <strong>two things</strong> in the Inputs page:<br><br>
+              <strong style="color:#f4b86a;">1. Your monthly benefit at Full Retirement Age (FRA)</strong><br>
+              This is the specific amount shown on your SS statement for your FRA — not the age-62 reduced
+              amount, and not the delayed-credit amount. Enter your <strong>FRA amount</strong> and also enter
+              your actual FRA age (usually 66-67 depending on birth year). The plan then adjusts the benefit
+              automatically based on when you actually plan to claim (your SS start date).<br><br>
+              <strong style="color:#f4b86a;">2. Your SS start date</strong> — the month and year you plan to begin collecting.<br><br>
+              The plan automatically:<br>
+              • Prorates SS for the start year (e.g. July start = 6 months counted that year)<br>
+              • Adjusts the benefit for early or delayed claiming vs. your FRA<br>
+              • Applies your SS COLA rate (default 2.5%) every year after<br><br>
+              You do <strong>not</strong> need to calculate annual amounts or adjustments — the plan handles it all.
             </div>
           </details>
 
@@ -588,7 +601,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </summary>
             <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Check these five things in order:<br><br>
-              <strong style="color:#f4b86a;">1.</strong> Column E of Named Accounts in your Google Sheet — are balances entered?<br>
+              <strong style="color:#f4b86a;">1.</strong> Named Accounts in Inputs (Section VI) — are account balances entered for each account?<br>
               <strong style="color:#f4b86a;">2.</strong> Column A of Named Accounts — is "Include?" set to <strong>Yes</strong> for each active account?<br>
               <strong style="color:#f4b86a;">3.</strong> Partner names in Inputs — are both names filled in?<br>
               <strong style="color:#f4b86a;">4.</strong> Plan start year — is it set to the current year?<br>
@@ -666,7 +679,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
         <div class="step-icon">📊</div>
         <div class="step-content">
           <div class="step-title">IRMAA — The Medicare Surcharge You Didn't Know About</div>
-          <div class="step-desc">IRMAA stands for Income-Related Monthly Adjustment Amount. If your income (including Roth conversions) exceeds certain thresholds, Medicare charges you extra for Part B and Part D coverage. In 2024, the threshold for married couples is about $206,000. The Roth Solver shows you if a planned conversion would push you over this threshold — and warns you to consider converting a smaller amount to avoid the surcharge.</div>
+          <div class="step-desc">IRMAA stands for Income-Related Monthly Adjustment Amount. If your income (including Roth conversions) exceeds certain thresholds, Medicare charges you extra for Part B and Part D coverage. In 2025, the threshold for married couples is $212,000. The Roth Solver shows you if a planned conversion would push you over this threshold — and warns you to consider converting a smaller amount to avoid the surcharge.</div>
         </div>
       </div>
 
@@ -748,7 +761,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
           <strong>Tax Cost Now</strong> — What you'll pay in taxes on the conversion this year.<br>
           <strong>Lifetime Tax Savings</strong> — The estimated lifetime benefit of converting now vs. letting the money stay in pre-tax and paying higher taxes later at RMDs. Green = convert, Red = consider waiting.<br>
           <strong>Est. RMD at 73</strong> — Your projected annual Required Minimum Distribution based on your current pre-tax balance and expected growth rate.<br>
-          <strong>IRMAA Warning</strong> — If your income + conversion would exceed the Medicare surcharge threshold ($206K for couples in 2024), a warning appears.<br>
+          <strong>IRMAA Warning</strong> — If your income + conversion would exceed the Medicare surcharge threshold ($212K for couples in 2025), a warning appears.<br>
           <strong>5-Year Rule</strong> — Shows whether you're past 59½ (no restriction) or how long until the converted funds are fully accessible.<br>
           <strong>State Tax</strong> — Toggle this on if your state taxes Roth conversions — it adjusts the tax cost calculation.</div>
         </div>

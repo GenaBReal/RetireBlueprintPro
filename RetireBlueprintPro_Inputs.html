@@ -562,7 +562,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
                 </a>
               </label>
               <input type="number" id="f-B40" value="0" onchange="calcSSMonthly('f-B40','f-B41','f-B44','f-B33','f-B43')">
-              <span class="hint">Your monthly benefit if you claim exactly at your Full Retirement Age. Find this on your Social Security statement at ssa.gov/myaccount</span>
+              <span class="hint">Enter your benefit at your Full Retirement Age (FRA) — NOT your age-62 or delayed amount. Find the FRA column at ssa.gov/myaccount. The plan adjusts for your actual start date automatically.</span>
             </div>
             <div class="field">
               <label>Full Retirement Age</label>
@@ -702,7 +702,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
                 </a>
               </label>
               <input type="number" id="f-D40" value="0" onchange="calcSSMonthly('f-D40','f-D41','f-D44','f-D33','f-D43')">
-              <span class="hint">Your monthly benefit if you claim exactly at your Full Retirement Age. Find this on your Social Security statement at ssa.gov/myaccount</span>
+              <span class="hint">Enter your benefit at your Full Retirement Age (FRA) — NOT your age-62 or delayed amount. Find the FRA column at ssa.gov/myaccount. The plan adjusts for your actual start date automatically.</span>
             </div>
             <div class="field">
               <label>Full Retirement Age</label>
@@ -1637,10 +1637,10 @@ function autoEstimateACA(partner, e) {
     if (idx >= 0) retireIncome = proj.income[idx] || 0;
   }
   
-  // 2024 ACA benchmark silver plan premium (MFJ) based on income
-  // Subsidies available up to 400% FPL (~$60K for single, $120K MFJ in 2024)
-  var fpl2024 = 32150; // 100% FPL for 2-person household
-  var fpl400 = fpl2024 * 4;
+  // 2025 ACA benchmark silver plan premium (MFJ) based on income
+  // Subsidies available up to 400% FPL (~$66K for single, $133K MFJ in 2025)
+  var fpl2025 = 33860; // 100% FPL for 2-person household
+  var fpl400 = fpl2025 * 4;
   var benchmarkPremium = 1400 * 12; // ~$1,400/mo benchmark silver plan
   
   var subsidy = 0;
@@ -2001,8 +2001,8 @@ function updateRothIncomeForYear() {
   if (rmdYrEl) rmdYrEl.textContent = 'Est. starting ' + rmdYear2 + ' (age 73)';
 
   // === IRMAA WARNING ===
-  // 2024 IRMAA threshold for MFJ: $206,000 MAGI
-  var irmaThreshold = Math.round(206000 * Math.pow(1.03, yearsOut));
+  // 2025 IRMAA threshold for MFJ: $212,000 MAGI
+  var irmaThreshold = Math.round(212000 * Math.pow(1.03, yearsOut));
   var conversionTotal = optimal; // what they plan to convert
   var totalWithConversion = income + conversionTotal;
   var irmaaEl = document.getElementById('r-irmaa');

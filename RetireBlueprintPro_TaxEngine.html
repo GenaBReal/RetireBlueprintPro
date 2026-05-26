@@ -607,6 +607,7 @@ function calcGrossUp() {
 }
 
 function populate(data) {
+  try {
   var tax=data.tax||{};
   var gl=data.global||{};
   var meta=data.meta||{};
@@ -628,8 +629,8 @@ function populate(data) {
 
   // Tax profile — use real data from projections
   var _pKeys2 = Object.keys(data.people || {});
-  var _p1 = data.people[_pKeys2[0]] || {};
-  var _p2 = data.people[_pKeys2[1]] || {};
+  var _p1 = (_pKeys2.length > 0 && data.people) ? (data.people[_pKeys2[0]] || {}) : {};
+  var _p2 = (_pKeys2.length > 1 && data.people) ? (data.people[_pKeys2[1]] || {}) : {};
   var _p1n = _p1.name || 'Partner 1';
   var _p2n = _p2.name || 'Partner 2';
 
@@ -668,8 +669,12 @@ function populate(data) {
 
   renderBrackets(taxable1 || 0);
   renderTimeline(proj, tax);
+  } catch(e) {
+    console.error('Tax Engine populate error:', e);
+    document.getElementById('status-msg').textContent = '⚠️ Error loading data: ' + e.message;
+  }
 
-  document.getElementById('status-msg').textContent = 'Tax data loaded — ' + (data.meta&&data.meta.generated||'May 2026');
+  document.getElementById('status-msg').textContent = '✅ Tax data loaded — ' + (data.meta&&data.meta.generated||'May 2026');
   document.getElementById('status-msg').className = 'status-msg ok';
 }
 
@@ -679,7 +684,7 @@ function loadData() {
   var s=document.createElement('script');
   var _sid=localStorage.getItem('rbp_sheet_id')||'';
   s.src=SCRIPT_URL+'?callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
-  s.onerror=function(){ delete window[cb]; populate({}); document.getElementById('status-msg').textContent='Using embedded data -- connect your sheet for live values'; };
+  s.onerror=function(){ delete window[cb]; populate({}); document.getElementById('status-msg').textContent='⚠️ Could not load your sheet — check your connection and refresh. Some values shown are estimates.'; };
   setTimeout(function(){if(window[cb]){delete window[cb];populate({});} },60000);
   document.head.appendChild(s);
 }
