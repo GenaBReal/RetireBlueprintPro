@@ -134,12 +134,7 @@
   <!-- ── HEADER ── -->
   <div class="rpt-header">
     <div class="rpt-header-top">
-      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:52px;width:auto;" onerror="this.style.display='none'">
-      <div>
-        <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;">RETIRE<span style="color:#1CC7D0;">BLUEPRINT</span></div>
-        <div style="color:#f4b86a;font-size:11px;font-weight:700;letter-spacing:3px;">— PRO —</div>
-        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:2px;">Your Retirement. Your Plan. Your Freedom.</div>
-      </div>
+      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;" onerror="this.style.display='none'">
     </div>
     <div class="rpt-header-info">
       <table>
@@ -232,7 +227,7 @@
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">💵</span> Year 1 Income Detail</div>
       <table class="rtbl">
-        <thead><tr><th>Income Source</th><th>Monthly</th><th>Annual</th><th>Start Date</th><th>End / Notes</th></tr></thead>
+        <thead><tr><th>Income Source</th><th>Status in Plan Year</th><th>Monthly</th><th>Annual</th><th>Notes</th></tr></thead>
         <tbody id="r-income-rows"></tbody>
         <tfoot><tr><td><strong>TOTAL INCOME</strong></td><td id="r-total-mo">—</td><td id="r-total-yr">—</td><td colspan="2"></td></tr></tfoot>
       </table>
@@ -462,26 +457,60 @@ function populateReport(d) {
   partnerBlock(p2, p2n, 'r-p2');
 
   // ── INCOME TABLE ──
-  var rows = [], totalMo = 0, totalYr = 0;
-  function addInc(src, mo, startDate, endNote) {
-    if (!mo || mo <= 0) return;
-    rows.push({src:src, mo:mo, yr:mo*12, start:startDate||'—', end:endNote||'—'});
-    totalMo += mo; totalYr += mo*12;
+  // Show each income source with active status — don't add inactive sources to total
+  var rows = [], activeMo = 0, activeYr = 0;
+  var planYear = gl.planYear || curYear;
+
+  function isActive(startDateStr, endDateStr) {
+    var started = true, ended = false;
+    if (startDateStr) {
+      try { var sy = new Date(startDateStr).getFullYear(); if (sy > planYear) started = false; } catch(e){}
+    }
+    if (endDateStr) {
+      try { var ey = new Date(endDateStr).getFullYear(); if (ey < planYear) ended = true; } catch(e){}
+    }
+    return started && !ended;
   }
-  if (p1.salary>0) addInc(p1n+' Salary', Math.round(p1.salary/12), 'Now', 'Ends '+(p1.salaryEnd||'—'));
-  if (p2.salary>0) addInc(p2n+' Salary', Math.round(p2.salary/12), 'Now', 'Ends '+(p2.salaryEnd||'—'));
-  if (p1.ssMonthly>0) addInc(p1n+' Social Security', p1.ssMonthly, p1.ssStartDate, 'COLA '+((gl.ssCola||2.5))+'%/yr');
-  if (p2.ssMonthly>0) addInc(p2n+' Social Security', p2.ssMonthly, p2.ssStartDate, 'COLA '+((gl.ssCola||2.5))+'%/yr');
-  if (p1.pension>0)   addInc(p1n+' Pension', p1.pension, p1.pensionStart||'—', 'Fixed income');
-  if (p2.pension>0)   addInc(p2n+' Pension', p2.pension, p2.pensionStart||'—', 'Fixed income');
-  if (p1.otherIncome>0) addInc(p1n+' Other Income', Math.round(p1.otherIncome/12), '—', '—');
-  if (p2.otherIncome>0) addInc(p2n+' Other Income', Math.round(p2.otherIncome/12), '—', '—');
+
+  function addInc(src, mo, yr, startDateStr, endDateStr, note) {
+    if (!mo || mo <= 0) return;
+    var active = isActive(startDateStr, endDateStr);
+    var startYr = startDateStr ? (function(){ try{ return new Date(startDateStr).getFullYear(); } catch(e){ return null; }})() : null;
+    var endYr   = endDateStr   ? (function(){ try{ return new Date(endDateStr).getFullYear();   } catch(e){ return null; }})() : null;
+    var statusLabel, statusColor, statusBg;
+    if (!active && startYr && startYr > planYear) {
+      statusLabel = 'Starts '+startYr; statusColor='#1565C0'; statusBg='#e3f2fd';
+    } else if (!active && endYr && endYr < planYear) {
+      statusLabel = 'Ended '+endYr; statusColor='#888'; statusBg='#f5f5f5';
+    } else {
+      statusLabel = 'Active'; statusColor='#2E7D32'; statusBg='#e8f5e9';
+      activeMo += mo; activeYr += yr;
+    }
+    rows.push({src:src, mo:mo, yr:yr, startYr:startYr, endYr:endYr, note:note, active:active, statusLabel:statusLabel, statusColor:statusColor, statusBg:statusBg});
+  }
+
+  if (p1.salary>0)      addInc(p1n+' Salary',          Math.round(p1.salary/12), p1.salary,         null,           p1.salaryEnd,    'Ends '+(p1.salaryEnd||'—'));
+  if (p2.salary>0)      addInc(p2n+' Salary',          Math.round(p2.salary/12), p2.salary,         null,           p2.salaryEnd,    'Ends '+(p2.salaryEnd||'—'));
+  if (p1.ssMonthly>0)   addInc(p1n+' Social Security', p1.ssMonthly,             p1.ssMonthly*12,   p1.ssStartDate, null,            'COLA '+(gl.ssCola||2.5)+'%/yr');
+  if (p2.ssMonthly>0)   addInc(p2n+' Social Security', p2.ssMonthly,             p2.ssMonthly*12,   p2.ssStartDate, null,            'COLA '+(gl.ssCola||2.5)+'%/yr');
+  if (p1.pension>0)     addInc(p1n+' Pension',         p1.pension,               p1.pension*12,     p1.pensionStart||null, null,    'Fixed monthly income');
+  if (p2.pension>0)     addInc(p2n+' Pension',         p2.pension,               p2.pension*12,     p2.pensionStart||null, null,    'Fixed monthly income');
+  if (p1.otherIncome>0) addInc(p1n+' Other Income',   Math.round(p1.otherIncome/12), p1.otherIncome, null,           null,            '—');
+  if (p2.otherIncome>0) addInc(p2n+' Other Income',   Math.round(p2.otherIncome/12), p2.otherIncome, null,           null,            '—');
+
   var tbody = document.getElementById('r-income-rows');
   if (tbody) tbody.innerHTML = rows.map(function(r){
-    return '<tr><td style="font-weight:600;">'+r.src+'</td><td>'+fmtMo(r.mo)+'</td><td>'+fmt(r.yr)+'/yr</td><td>'+r.start+'</td><td style="color:#555;">'+r.end+'</td></tr>';
+    return '<tr>'+
+      '<td style="font-weight:700;">'+r.src+'</td>'+
+      '<td><span style="background:'+r.statusBg+';color:'+r.statusColor+';font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;">'+r.statusLabel+'</span></td>'+
+      '<td style="font-weight:'+(r.active?'700':'400')+';color:'+(r.active?'#1a1a2e':'#aaa')+';">'+fmtMo(r.mo)+'</td>'+
+      '<td style="color:'+(r.active?'#1a1a2e':'#aaa')+';">'+fmt(r.yr)+'/yr</td>'+
+      '<td style="font-size:9px;color:#555;">'+r.note+'</td>'+
+    '</tr>';
   }).join('');
-  set('r-total-mo', fmtMo(totalMo));
-  set('r-total-yr', fmt(totalYr)+'/yr');
+  // Footer shows ACTIVE income only
+  set('r-total-mo', fmtMo(activeMo) + (rows.some(function(r){return !r.active;}) ? ' (active sources only)' : ''));
+  set('r-total-yr', fmt(activeYr)+'/yr');
 
   // ── ACCOUNTS TABLE ──
   var acctBody = document.getElementById('r-accounts-body');
