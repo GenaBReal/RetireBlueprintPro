@@ -3,90 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RetireBlueprint Pro — Retirement Summary</title>
+<title>RetireBlueprint Pro — Retirement Summary Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy:#041E2F; --teal:#1CC7D0; --orange:#f4b86a; --plum:#8D6B92;
-    --green:#4CAF50; --red:#ff6b6b; --muted:#8aaabb;
+  /* ── SCREEN CHROME ─────────────────────────────────── */
+  body { margin:0; padding:0; font-family:'Montserrat',Arial,sans-serif; background:#f0f2f5; color:#1a1a2e; }
+  .toolbar { background:#041E2F; padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; z-index:100; }
+  .toolbar-title { color:#1CC7D0; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .btn { background:#1CC7D0; color:#041E2F; border:none; padding:8px 18px; border-radius:5px; font-weight:700; cursor:pointer; font-size:12px; font-family:inherit; }
+  .btn-outline { background:transparent; color:#1CC7D0; border:1px solid #1CC7D0; margin-right:8px; }
+
+  /* ── REPORT PAGE (white) ───────────────────────────── */
+  .report-wrap { max-width:850px; margin:60px auto 40px; background:#fff; box-shadow:0 2px 20px rgba(0,0,0,0.15); }
+  #loading { text-align:center; padding:80px; color:#888; font-size:14px; margin-top:60px; }
+
+  /* ── HEADER ────────────────────────────────────────── */
+  .rpt-header { background:#041E2F; padding:0; }
+  .rpt-header-top { padding:20px 32px; display:flex; align-items:center; gap:20px; }
+  .rpt-header-info { background:#0A3145; border-top:3px solid #1CC7D0; padding:12px 32px; }
+  .rpt-header-info table { width:100%; border-collapse:collapse; }
+  .rpt-plan-name { font-size:18px; font-weight:800; color:#fff; }
+  .rpt-date { font-size:11px; color:#8aaabb; }
+
+  /* ── BODY ──────────────────────────────────────────── */
+  .rpt-body { padding:24px 32px; }
+  .rpt-section { margin-bottom:22px; }
+  .rpt-section-title {
+    font-size:10px; font-weight:800; color:#041E2F; text-transform:uppercase;
+    letter-spacing:2px; border-bottom:2px solid #1CC7D0; padding-bottom:5px;
+    margin-bottom:12px; display:flex; align-items:center; gap:8px;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Montserrat',Arial,sans-serif; background:#041E2F; color:#2F3E46; }
-  
-  /* Screen styles */
-  .screen-only { }
-  .toolbar { background:#041E2F; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
-  .toolbar-title { color:var(--teal); font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
-  .btn { background:var(--teal); color:var(--navy); border:none; padding:8px 18px; border-radius:6px; font-weight:700; cursor:pointer; font-size:12px; }
-  .btn:hover { opacity:0.9; }
-  .btn-outline { background:transparent; color:var(--teal); border:1px solid var(--teal); }
+  .rpt-section-title .icon { font-size:13px; }
 
-  /* Print page */
-  .page { max-width:800px; margin:0 auto 20px; background:#fff; border-radius:0 0 12px 12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
-  
-  /* Header */
-  /* report-header replaced by two-row layout */
-  .report-logo { color:#fff; }
-  .report-logo-title { font-size:22px; font-weight:900; color:#fff; }
-  .report-logo-sub { font-size:8px; color:var(--teal); text-transform:uppercase; letter-spacing:2px; }
-  .report-meta { text-align:right; color:#8aaabb; font-size:11px; flex-shrink:0; min-width:200px; }
-  .report-meta-name { font-size:16px; font-weight:700; color:#fff; margin-bottom:4px; }
+  /* ── STATUS BANNER ─────────────────────────────────── */
+  .status-banner { border-radius:6px; padding:10px 16px; display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .status-banner.green { background:#e8f5e9; border-left:5px solid #2E7D32; }
+  .status-banner.yellow { background:#fff8e1; border-left:5px solid #F57F17; }
+  .status-banner.red { background:#ffebee; border-left:5px solid #C62828; }
+  .status-pill { font-size:13px; font-weight:800; white-space:nowrap; }
+  .status-detail { font-size:12px; color:#444; }
 
-  /* Sections */
-  .report-body { padding:30px 40px; }
-  .section { margin-bottom:24px; }
-  .section-title { font-size:10px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:1.5px; border-bottom:1px solid #e0e0e0; padding-bottom:6px; margin-bottom:14px; }
-  
-  /* KPI grid */
-  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-  .kpi-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-  .kpi-box { background:#f8f9fa; border-radius:8px; padding:12px; border-left:3px solid var(--teal); }
-  .kpi-box.warn { border-left-color:var(--orange); }
-  .kpi-box.good { border-left-color:var(--green); }
-  .kpi-box.danger { border-left-color:var(--red); }
-  .kpi-label { font-size:8px; color:#8aaabb; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
-  .kpi-value { font-size:18px; font-weight:800; color:var(--navy); }
-  .kpi-sub { font-size:9px; color:#8aaabb; margin-top:2px; }
+  /* ── KPI GRIDS ─────────────────────────────────────── */
+  .kpi4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .kpi2 { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .kpi6 { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; }
+  .kbox { background:#f8f9fa; border-radius:6px; padding:10px 12px; border-left:3px solid #1CC7D0; }
+  .kbox.orange { border-left-color:#f4b86a; }
+  .kbox.green  { border-left-color:#2E7D32; }
+  .kbox.red    { border-left-color:#C62828; }
+  .kbox.navy   { border-left-color:#041E2F; }
+  .kbox.purple { border-left-color:#6A4A6D; }
+  .klabel { font-size:8px; color:#888; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; font-weight:600; }
+  .kval   { font-size:17px; font-weight:800; color:#1a1a2e; line-height:1.1; }
+  .kval.teal   { color:#006064; }
+  .kval.green  { color:#2E7D32; }
+  .kval.red    { color:#C62828; }
+  .kval.orange { color:#E65100; }
+  .kval.navy   { color:#041E2F; }
+  .ksub  { font-size:9px; color:#888; margin-top:2px; }
 
-  /* Account table */
-  .data-table { width:100%; border-collapse:collapse; font-size:11px; }
-  .data-table th { background:#f0f4f8; color:#5F6368; font-size:8px; text-transform:uppercase; letter-spacing:0.8px; padding:8px 10px; text-align:left; }
-  .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; }
-  .data-table tr:last-child td { border-bottom:none; }
-  .tag { display:inline-block; padding:2px 6px; border-radius:3px; font-size:8px; font-weight:700; text-transform:uppercase; }
-  .tag-pretax { background:#e8f4fd; color:#1565C0; }
-  .tag-roth { background:#e8f5e9; color:#2E7D32; }
-  .tag-taxable { background:#fff8e1; color:#F57F17; }
-  .tag-hsa { background:#f3e5f5; color:#6A1B9A; }
+  /* ── TABLES ────────────────────────────────────────── */
+  table.rtbl { width:100%; border-collapse:collapse; font-size:11px; }
+  table.rtbl th { background:#041E2F; color:#1CC7D0; font-size:8px; text-transform:uppercase; letter-spacing:0.8px; padding:7px 10px; text-align:left; font-weight:700; }
+  table.rtbl td { padding:7px 10px; border-bottom:1px solid #f0f0f0; vertical-align:top; }
+  table.rtbl tr:last-child td { border-bottom:none; }
+  table.rtbl tr:nth-child(even) td { background:#fafafa; }
+  table.rtbl tfoot td { background:#f0f4f8; font-weight:700; border-top:2px solid #1CC7D0; }
+  .tag { display:inline-block; padding:2px 7px; border-radius:3px; font-size:8px; font-weight:700; text-transform:uppercase; }
+  .tag-pretax  { background:#e3f2fd; color:#1565C0; }
+  .tag-roth    { background:#e8f5e9; color:#2E7D32; }
+  .tag-taxable { background:#fff8e1; color:#E65100; }
+  .tag-hsa     { background:#f3e5f5; color:#6A1B9A; }
 
-  /* Status signal */
-  .signal { display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:20px; font-weight:700; font-size:12px; }
-  .signal-green { background:#e8f5e9; color:#2E7D32; }
-  .signal-yellow { background:#fff8e1; color:#F57F17; }
-  .signal-red { background:#ffebee; color:#C62828; }
+  /* ── TWO-COL LAYOUT ────────────────────────────────── */
+  .col2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .col3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
 
-  /* Footer */
-  .report-footer { background:#f8f9fa; padding:16px 40px; border-top:1px solid #e0e0e0; display:flex; justify-content:space-between; align-items:center; font-size:9px; color:#8aaabb; }
+  /* ── PARTNER CARD ──────────────────────────────────── */
+  .partner-card { border:1px solid #e0e0e0; border-radius:8px; padding:14px; }
+  .partner-name { font-size:15px; font-weight:800; color:#041E2F; margin-bottom:8px; border-bottom:2px solid #1CC7D0; padding-bottom:5px; }
+  .partner-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px dotted #f0f0f0; font-size:11px; }
+  .partner-row:last-child { border-bottom:none; }
+  .pr-label { color:#666; }
+  .pr-value { font-weight:700; color:#1a1a2e; }
 
-  /* Print styles */
+  /* ── PROGRESS BAR ──────────────────────────────────── */
+  .prog-bar-wrap { background:#e0e0e0; border-radius:4px; height:10px; margin:6px 0; }
+  .prog-bar { height:10px; border-radius:4px; background:linear-gradient(90deg,#1CC7D0,#2E7D32); transition:width 1s; }
+
+  /* ── MILESTONE TABLE ───────────────────────────────── */
+  .milestone-row td:first-child { font-weight:700; color:#041E2F; }
+  .milestone-year { background:#041E2F; color:#1CC7D0; font-weight:800; text-align:center; border-radius:4px; padding:3px 8px; font-size:11px; display:inline-block; }
+
+  /* ── STRESS TEST ───────────────────────────────────── */
+  .stress-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .stress-box { border-radius:6px; padding:10px; text-align:center; border:1px solid #e0e0e0; }
+  .stress-label { font-size:8px; text-transform:uppercase; letter-spacing:0.8px; color:#666; font-weight:700; margin-bottom:4px; }
+  .stress-val { font-size:18px; font-weight:800; }
+  .stress-note { font-size:9px; color:#666; margin-top:3px; }
+
+  /* ── FOOTER ────────────────────────────────────────── */
+  .rpt-footer { background:#f8f9fa; border-top:1px solid #e0e0e0; padding:10px 32px; display:flex; justify-content:space-between; align-items:center; font-size:9px; color:#888; }
+
+  /* ── PRINT ─────────────────────────────────────────── */
   @media print {
-    .screen-only { display:none !important; }
+    .toolbar { display:none !important; }
     body { background:#fff; }
-    .page { box-shadow:none; margin:0; border-radius:0; max-width:100%; }
-    .report-body { padding:20px 30px; }
-    .section { page-break-inside:avoid; }
+    .report-wrap { box-shadow:none; margin:0; max-width:100%; }
+    .rpt-section { page-break-inside:avoid; }
+    .rpt-body { padding:16px 24px; }
   }
-
-  /* Loading */
-  #loading { text-align:center; padding:60px; color:var(--muted); font-size:14px; }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<!-- Toolbar (screen only) -->
-<div class="toolbar screen-only">
+<!-- Toolbar -->
+<div class="toolbar">
   <div class="toolbar-title">📄 Retirement Summary Report</div>
-  <div style="display:flex;gap:10px;">
+  <div>
     <button class="btn btn-outline" onclick="window.history.back()">← Back</button>
     <button class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
   </div>
@@ -94,317 +129,241 @@
 
 <div id="loading">Loading your retirement summary...</div>
 
-<div class="page" id="report-page" style="display:none;">
-  <!-- Header -->
-  <!-- Logo banner -->
-  <div style="background:#041E2F;padding:22px 32px;display:flex;align-items:center;gap:16px;">
-    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:52px;width:auto;" onerror="this.style.display='none'">
-    <div>
-      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;">RETIRE<span style="color:var(--teal);">BLUEPRINT</span></div>
-      <div style="color:var(--orange);font-size:12px;font-weight:700;letter-spacing:2px;">— PRO —</div>
-      <div style="font-size:8px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;">Your Retirement. Your Plan. Your Freedom.</div>
+<div class="report-wrap" id="report-page" style="display:none;">
+
+  <!-- ── HEADER ── -->
+  <div class="rpt-header">
+    <div class="rpt-header-top">
+      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:52px;width:auto;" onerror="this.style.display='none'">
+      <div>
+        <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;">RETIRE<span style="color:#1CC7D0;">BLUEPRINT</span></div>
+        <div style="color:#f4b86a;font-size:11px;font-weight:700;letter-spacing:3px;">— PRO —</div>
+        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:2px;">Your Retirement. Your Plan. Your Freedom.</div>
+      </div>
+    </div>
+    <div class="rpt-header-info">
+      <table>
+        <tr>
+          <td style="vertical-align:middle;">
+            <div class="rpt-plan-name" id="r-names">Retirement Plan</div>
+          </td>
+          <td style="vertical-align:middle;text-align:right;">
+            <div class="rpt-date" id="r-date">Generated: —</div>
+            <div class="rpt-date" id="r-plan-year">Plan Year: —</div>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
-  <!-- Info bar below logo -->
-  <div style="background:#1a3a52;border-bottom:3px solid var(--teal);padding:14px 32px;">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="vertical-align:middle;">
-          <div id="r-names" style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:3px;">Your Retirement Plan</div>
-        </td>
-        <td style="vertical-align:middle;text-align:right;">
-          <div id="r-date" style="font-size:12px;color:#8aaabb;margin-bottom:2px;">Generated: loading...</div>
-          <div id="r-plan-year" style="font-size:12px;color:#8aaabb;">Plan Year: —</div>
-        </td>
-      </tr>
-    </table>
-  </div>
 
-  <div class="report-body">
+  <div class="rpt-body">
 
-    <!-- Plan Status -->
-    <div class="section">
-      <div class="section-title">Plan Status</div>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-        <div id="r-signal" class="signal signal-green">✅ ON TRACK</div>
-        <div style="font-size:12px;color:#5F6368;" id="r-signal-detail">Your plan is fully funded through your projected lifetime.</div>
+    <!-- ── 1. PLAN STATUS ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">🛡</span> Plan Status &amp; Confidence</div>
+      <div class="status-banner green" id="r-status-banner">
+        <div class="status-pill" id="r-signal">✅ ON TRACK</div>
+        <div class="status-detail" id="r-signal-detail">Loading...</div>
       </div>
-      <div class="kpi-grid">
-        <div class="kpi-box good">
-          <div class="kpi-label">Plan Confidence</div>
-          <div class="kpi-value" id="r-confidence">—</div>
-          <div class="kpi-sub">Legacy goal achieved</div>
+      <div class="kpi4">
+        <div class="kbox green">
+          <div class="klabel">Plan Confidence</div>
+          <div class="kval green" id="r-confidence">—</div>
+          <div class="ksub">Legacy goal achieved</div>
         </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Total Portfolio</div>
-          <div class="kpi-value" id="r-portfolio">—</div>
-          <div class="kpi-sub">Current value</div>
+        <div class="kbox">
+          <div class="klabel">Total Portfolio Today</div>
+          <div class="kval" id="r-portfolio">—</div>
+          <div class="ksub">All accounts combined</div>
         </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Safe Spending</div>
-          <div class="kpi-value" id="r-spending">—</div>
-          <div class="kpi-sub">Per year (solver)</div>
+        <div class="kbox orange">
+          <div class="klabel">Safe Annual Spending</div>
+          <div class="kval orange" id="r-spending">—</div>
+          <div class="ksub">Solver-optimized</div>
         </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Legacy Goal</div>
-          <div class="kpi-value" id="r-legacy">—</div>
-          <div class="kpi-sub">End-of-plan target</div>
+        <div class="kbox navy">
+          <div class="klabel">Legacy Goal</div>
+          <div class="kval navy" id="r-legacy">—</div>
+          <div class="ksub">End-of-plan target</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:9px;color:#888;margin-bottom:4px;">Plan funded <span id="r-confidence2">—</span> of legacy goal</div>
+        <div class="prog-bar-wrap"><div class="prog-bar" id="r-conf-bar" style="width:0%;"></div></div>
+      </div>
+    </div>
+
+    <!-- ── 2. PARTNER PROFILES ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">👥</span> Partner Profiles</div>
+      <div class="col2">
+        <div class="partner-card">
+          <div class="partner-name" id="r-p1-name">Partner 1</div>
+          <div class="partner-row"><span class="pr-label">Age</span><span class="pr-value" id="r-p1-age">—</span></div>
+          <div class="partner-row"><span class="pr-label">Date of Birth</span><span class="pr-value" id="r-p1-dob">—</span></div>
+          <div class="partner-row"><span class="pr-label">Annual Salary</span><span class="pr-value" id="r-p1-salary">—</span></div>
+          <div class="partner-row"><span class="pr-label">Retirement Date</span><span class="pr-value" id="r-p1-retire">—</span></div>
+          <div class="partner-row"><span class="pr-label">SS Monthly Benefit</span><span class="pr-value" id="r-p1-ss">—</span></div>
+          <div class="partner-row"><span class="pr-label">SS Start Date</span><span class="pr-value" id="r-p1-ss-start">—</span></div>
+          <div class="partner-row"><span class="pr-label">Full Retirement Age</span><span class="pr-value" id="r-p1-fra">—</span></div>
+          <div class="partner-row"><span class="pr-label">Monthly Pension</span><span class="pr-value" id="r-p1-pension">—</span></div>
+          <div class="partner-row"><span class="pr-label">Medicare Year</span><span class="pr-value" id="r-p1-medicare">—</span></div>
+          <div class="partner-row"><span class="pr-label">Pre-Medicare HC/yr</span><span class="pr-value" id="r-p1-hc">—</span></div>
+          <div class="partner-row"><span class="pr-label">Projected Lifespan</span><span class="pr-value" id="r-p1-life">—</span></div>
+        </div>
+        <div class="partner-card">
+          <div class="partner-name" id="r-p2-name">Partner 2</div>
+          <div class="partner-row"><span class="pr-label">Age</span><span class="pr-value" id="r-p2-age">—</span></div>
+          <div class="partner-row"><span class="pr-label">Date of Birth</span><span class="pr-value" id="r-p2-dob">—</span></div>
+          <div class="partner-row"><span class="pr-label">Annual Salary</span><span class="pr-value" id="r-p2-salary">—</span></div>
+          <div class="partner-row"><span class="pr-label">Retirement Date</span><span class="pr-value" id="r-p2-retire">—</span></div>
+          <div class="partner-row"><span class="pr-label">SS Monthly Benefit</span><span class="pr-value" id="r-p2-ss">—</span></div>
+          <div class="partner-row"><span class="pr-label">SS Start Date</span><span class="pr-value" id="r-p2-ss-start">—</span></div>
+          <div class="partner-row"><span class="pr-label">Full Retirement Age</span><span class="pr-value" id="r-p2-fra">—</span></div>
+          <div class="partner-row"><span class="pr-label">Monthly Pension</span><span class="pr-value" id="r-p2-pension">—</span></div>
+          <div class="partner-row"><span class="pr-label">Medicare Year</span><span class="pr-value" id="r-p2-medicare">—</span></div>
+          <div class="partner-row"><span class="pr-label">Pre-Medicare HC/yr</span><span class="pr-value" id="r-p2-hc">—</span></div>
+          <div class="partner-row"><span class="pr-label">Projected Lifespan</span><span class="pr-value" id="r-p2-life">—</span></div>
         </div>
       </div>
     </div>
 
-    <!-- Partner Profiles -->
-    <div class="section">
-      <div class="section-title">Partner Profiles</div>
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <div class="kpi-label" id="r-p1-lbl">Partner 1</div>
-          <div class="kpi-value" id="r-p1-age">—</div>
-          <div class="kpi-sub" id="r-p1-retire">—</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">P1 Social Security</div>
-          <div class="kpi-value" id="r-p1-ss">—</div>
-          <div class="kpi-sub" id="r-p1-ss-start">—</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label" id="r-p2-lbl">Partner 2</div>
-          <div class="kpi-value" id="r-p2-age">—</div>
-          <div class="kpi-sub" id="r-p2-retire">—</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">P2 Social Security</div>
-          <div class="kpi-value" id="r-p2-ss">—</div>
-          <div class="kpi-sub" id="r-p2-ss-start">—</div>
-        </div>
-      </div>
+    <!-- ── 3. INCOME SOURCES ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">💵</span> Year 1 Income Detail</div>
+      <table class="rtbl">
+        <thead><tr><th>Income Source</th><th>Monthly</th><th>Annual</th><th>Start Date</th><th>End / Notes</th></tr></thead>
+        <tbody id="r-income-rows"></tbody>
+        <tfoot><tr><td><strong>TOTAL INCOME</strong></td><td id="r-total-mo">—</td><td id="r-total-yr">—</td><td colspan="2"></td></tr></tfoot>
+      </table>
     </div>
 
-    <!-- Income Sources -->
-    <div class="section">
-      <div class="section-title">Guaranteed Income Sources</div>
-      <div class="kpi-grid-3">
-        <div class="kpi-box">
-          <div class="kpi-label">Combined SS (at start)</div>
-          <div class="kpi-value" id="r-ss-total">—</div>
-          <div class="kpi-sub">Monthly / Annual</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Pension Income</div>
-          <div class="kpi-value" id="r-pension">—</div>
-          <div class="kpi-sub">Monthly combined</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Other Income</div>
-          <div class="kpi-value" id="r-other">—</div>
-          <div class="kpi-sub">Annual combined</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Named Accounts -->
-    <div class="section">
-      <div class="section-title">Investment Accounts</div>
-      <table class="data-table">
-        <thead>
+    <!-- ── 4. INVESTMENT ACCOUNTS ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">📊</span> Investment Accounts</div>
+      <table class="rtbl">
+        <thead><tr><th>Account Name</th><th>Owner</th><th>Type</th><th>Balance</th><th>Return %</th><th>Ann. Contrib</th><th>Employer Match</th></tr></thead>
+        <tbody id="r-accounts-body"></tbody>
+        <tfoot>
           <tr>
-            <th>Account Name</th>
-            <th>Owner</th>
-            <th>Type</th>
-            <th>Balance</th>
-            <th>Return</th>
-          </tr>
-        </thead>
-        <tbody id="r-accounts-body">
-        </tbody>
-        <tfoot>
-          <tr style="background:#f0f4f8;font-weight:700;">
-            <td colspan="3" style="padding:8px 10px;">TOTAL PORTFOLIO</td>
-            <td id="r-total-bal" style="padding:8px 10px;font-size:14px;">—</td>
-            <td></td>
+            <td colspan="3"><strong>TOTAL PORTFOLIO</strong></td>
+            <td id="r-total-bal"><strong>—</strong></td>
+            <td colspan="3" id="r-avg-return" style="font-size:10px;color:#555;"></td>
           </tr>
         </tfoot>
       </table>
+      <div class="kpi4" style="margin-top:10px;">
+        <div class="kbox navy"><div class="klabel">Pre-Tax (Traditional)</div><div class="kval navy" id="r-pretax-total">—</div><div class="ksub">Taxed at withdrawal</div></div>
+        <div class="kbox green"><div class="klabel">Roth (Tax-Free)</div><div class="kval green" id="r-roth-total">—</div><div class="ksub">Tax-free growth</div></div>
+        <div class="kbox orange"><div class="klabel">Taxable / Brokerage</div><div class="kval orange" id="r-taxable-total">—</div><div class="ksub">Capital gains taxed</div></div>
+        <div class="kbox purple"><div class="klabel">HSA (Triple Tax)</div><div class="kval" id="r-hsa-total">—</div><div class="ksub">Medical tax-free</div></div>
+      </div>
     </div>
 
-    <!-- Tax Strategy -->
-    <div class="section">
-      <div class="section-title">Tax Strategy</div>
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <div class="kpi-label">Filing Status</div>
-          <div class="kpi-value" id="r-filing" style="font-size:13px;">—</div>
-          <div class="kpi-sub">—</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Effective Fed Rate</div>
-          <div class="kpi-value" id="r-eff-rate">—</div>
-          <div class="kpi-sub">Year 1 projection</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">State Tax Rate</div>
-          <div class="kpi-value" id="r-state-rate">—</div>
-          <div class="kpi-sub">—</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Roth Prime Window</div>
-          <div class="kpi-value" id="r-roth-window" style="font-size:13px;">—</div>
-          <div class="kpi-sub">Optimal conversion years</div>
+    <!-- ── 5. SPENDING PLAN ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">🌊</span> Smile Curve Spending Plan</div>
+      <div class="kpi4">
+        <div class="kbox"><div class="klabel">Base Annual Spending</div><div class="kval" id="r-base-spend">—</div><div class="ksub">Core lifestyle</div></div>
+        <div class="kbox orange"><div class="klabel">Phase 1 — Active Years</div><div class="kval orange" id="r-phase1">—</div><div class="ksub" id="r-phase1-dates">Early retirement</div></div>
+        <div class="kbox"><div class="klabel">Phase 2 — Settled Years</div><div class="kval" id="r-phase2">—</div><div class="ksub" id="r-phase2-dates">Mid retirement</div></div>
+        <div class="kbox"><div class="klabel">Phase 3 — Later Years</div><div class="kval" id="r-phase3">—</div><div class="ksub" id="r-phase3-dates">Late retirement</div></div>
+      </div>
+      <div class="col2" style="margin-top:10px;">
+        <div class="kbox"><div class="klabel">Inflation Rate</div><div class="kval" id="r-inflation">—</div><div class="ksub">Annual expense growth</div></div>
+        <div class="kbox"><div class="klabel">Survivor Spending Reduction</div><div class="kval" id="r-survivor-pct">—</div><div class="ksub">When one partner passes</div></div>
+      </div>
+    </div>
+
+    <!-- ── 6. TAX STRATEGY ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">🧾</span> Tax Strategy</div>
+      <div class="kpi4">
+        <div class="kbox"><div class="klabel">Filing Status</div><div class="kval" id="r-filing">—</div><div class="ksub">—</div></div>
+        <div class="kbox"><div class="klabel">Effective Fed Rate (Yr 1)</div><div class="kval" id="r-eff-rate">—</div><div class="ksub">% of taxable income</div></div>
+        <div class="kbox"><div class="klabel">State Tax Rate</div><div class="kval" id="r-state-rate">—</div><div class="ksub">—</div></div>
+        <div class="kbox"><div class="klabel">Standard Deduction</div><div class="kval" id="r-std-ded">—</div><div class="ksub">Before calculating taxes</div></div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="rpt-section-title" style="font-size:9px;margin-bottom:8px;"><span class="icon">🔄</span> Roth Conversion Strategy</div>
+        <div class="kpi4">
+          <div class="kbox green"><div class="klabel">Prime Conversion Window</div><div class="kval green" id="r-roth-window">—</div><div class="ksub">Optimal years</div></div>
+          <div class="kbox"><div class="klabel">Optimal Annual Conversion</div><div class="kval" id="r-roth-optimal">—</div><div class="ksub">To fill bracket</div></div>
+          <div class="kbox green"><div class="klabel">Lifetime Tax Savings</div><div class="kval green" id="r-roth-savings">—</div><div class="ksub">vs. waiting for RMDs</div></div>
+          <div class="kbox"><div class="klabel">Recommendation</div><div class="kval" id="r-roth-signal" style="font-size:13px;">—</div><div class="ksub">Based on rate analysis</div></div>
         </div>
       </div>
     </div>
 
-    <!-- Stress Test -->
-    <div class="section">
-      <div class="section-title">Stress Test — What If?</div>
-      <div class="kpi-grid">
-        <div class="kpi-box good">
-          <div class="kpi-label">Base Scenario</div>
-          <div class="kpi-value" id="r-stress-base">—</div>
-          <div class="kpi-sub">Normal returns</div>
-        </div>
-        <div class="kpi-box warn">
-          <div class="kpi-label">Market Down 20% Yr 1</div>
-          <div class="kpi-value" id="r-stress-20">—</div>
-          <div class="kpi-sub">Mild bear market</div>
-        </div>
-        <div class="kpi-box danger">
-          <div class="kpi-label">Market Down 30% Yr 1</div>
-          <div class="kpi-value" id="r-stress-30">—</div>
-          <div class="kpi-sub">Severe bear market</div>
-        </div>
-        <div class="kpi-box warn">
-          <div class="kpi-label">High Inflation (5%)</div>
-          <div class="kpi-value" id="r-stress-inf">—</div>
-          <div class="kpi-sub">vs base 3%</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Key Dates -->
-    <div class="section">
-      <div class="section-title">Key Dates & Milestones</div>
-      <table class="data-table">
-        <thead>
-          <tr><th>Milestone</th><th>Year</th><th>Notes</th></tr>
-        </thead>
-        <tbody id="r-milestones">
-        </tbody>
+    <!-- ── 7. DEBTS & REAL ESTATE ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">🏠</span> Debts &amp; Real Estate</div>
+      <table class="rtbl">
+        <thead><tr><th>Name</th><th>Monthly Payment</th><th>Balance</th><th>End Date</th><th>Current Value</th><th>Equity</th><th>Notes</th></tr></thead>
+        <tbody id="r-debts-body"></tbody>
       </table>
     </div>
 
-    <!-- Roth Strategy -->
-    <div class="section">
-      <div class="section-title">Roth Conversion Strategy</div>
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <div class="kpi-label">Prime Conversion Window</div>
-          <div class="kpi-value" id="r-roth-window2" style="font-size:14px;">—</div>
-          <div class="kpi-sub">Optimal years to convert</div>
+    <!-- ── 8. STRESS TEST ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">⚡</span> Stress Test — Sequence of Returns Risk</div>
+      <p style="font-size:10px;color:#555;margin:0 0 10px;">Shows your projected ending portfolio balance under adverse market conditions. A resilient plan survives even the severe scenario.</p>
+      <div class="stress-grid">
+        <div class="stress-box" style="border-color:#1CC7D0;background:#f0fdfe;">
+          <div class="stress-label">Base Scenario</div>
+          <div class="stress-val" id="r-stress-base" style="color:#006064;">—</div>
+          <div class="stress-note">Normal market returns</div>
         </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Optimal Annual Conversion</div>
-          <div class="kpi-value" id="r-roth-optimal">—</div>
-          <div class="kpi-sub">Per year sweet spot</div>
+        <div class="stress-box" style="background:#fff8e1;">
+          <div class="stress-label">Year 1 Down 20%</div>
+          <div class="stress-val" id="r-stress-20" style="color:#E65100;">—</div>
+          <div class="stress-note" id="r-stress-20-note">Mild bear market</div>
         </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Lifetime Tax Savings</div>
-          <div class="kpi-value" id="r-roth-savings">—</div>
-          <div class="kpi-sub">Converting now vs RMDs later</div>
+        <div class="stress-box" style="background:#ffebee;">
+          <div class="stress-label">Year 1 Down 30%</div>
+          <div class="stress-val" id="r-stress-30" style="color:#C62828;">—</div>
+          <div class="stress-note" id="r-stress-30-note">Severe bear market</div>
         </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Should I Convert?</div>
-          <div class="kpi-value" id="r-roth-signal" style="font-size:14px;">—</div>
-          <div class="kpi-sub">Based on current vs future rate</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Healthcare -->
-    <div class="section">
-      <div class="section-title">Healthcare & Medicare</div>
-      <div class="kpi-grid-3">
-        <div class="kpi-box">
-          <div class="kpi-label" id="r-p1-medicare-lbl">P1 Medicare Eligible</div>
-          <div class="kpi-value" id="r-p1-medicare">—</div>
-          <div class="kpi-sub">Age 65</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label" id="r-p2-medicare-lbl">P2 Medicare Eligible</div>
-          <div class="kpi-value" id="r-p2-medicare">—</div>
-          <div class="kpi-sub">Age 65</div>
-        </div>
-        <div class="kpi-box warn">
-          <div class="kpi-label">Pre-Medicare Annual Cost</div>
-          <div class="kpi-value" id="r-hc-cost">—</div>
-          <div class="kpi-sub">Combined healthcare bridge</div>
+        <div class="stress-box" style="background:#fff8e1;">
+          <div class="stress-label">High Inflation (5%)</div>
+          <div class="stress-val" id="r-stress-inf" style="color:#E65100;">—</div>
+          <div class="stress-note" id="r-stress-inf-note">vs base 3%</div>
         </div>
       </div>
     </div>
 
-    <!-- Expense Breakdown -->
-    <div class="section">
-      <div class="section-title">Spending Plan</div>
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <div class="kpi-label">Base Annual Spending</div>
-          <div class="kpi-value" id="r-base-spend">—</div>
-          <div class="kpi-sub">Core lifestyle expenses</div>
-        </div>
-        <div class="kpi-box good">
-          <div class="kpi-label">Phase 1 Spending (Active)</div>
-          <div class="kpi-value" id="r-phase1">—</div>
-          <div class="kpi-sub">Early retirement boost</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Phase 2 Spending (Settled)</div>
-          <div class="kpi-value" id="r-phase2">—</div>
-          <div class="kpi-sub">Mid-retirement base</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Phase 3 Spending (Later)</div>
-          <div class="kpi-value" id="r-phase3">—</div>
-          <div class="kpi-sub">Late retirement reduction</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Income Sources Detail -->
-    <div class="section">
-      <div class="section-title">Year 1 Income Detail (2026)</div>
-      <table class="data-table">
-        <thead>
-          <tr><th>Income Source</th><th>Annual Amount</th><th>Notes</th></tr>
-        </thead>
-        <tbody id="r-income-detail">
-        </tbody>
-        <tfoot>
-          <tr style="background:#f0f4f8;font-weight:700;">
-            <td style="padding:8px 10px;">TOTAL INCOME</td>
-            <td id="r-total-income" style="padding:8px 10px;font-size:14px;">—</td>
-            <td></td>
-          </tr>
-        </tfoot>
+    <!-- ── 9. KEY MILESTONES ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">📅</span> Key Dates &amp; Milestones</div>
+      <table class="rtbl">
+        <thead><tr><th>Milestone</th><th style="text-align:center;">Year</th><th>Details</th></tr></thead>
+        <tbody id="r-milestones"></tbody>
       </table>
     </div>
 
-    <!-- Disclaimer -->
-    <div style="font-size:8px;color:#8aaabb;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;line-height:1.6;">
-      This report is generated by RetireBlueprint Pro for planning purposes only. It is not financial, tax, or legal advice. 
-      Projections are based on assumptions and estimates that may differ from actual results. 
+    <!-- ── 10. PLAN SUMMARY CHECKLIST ── -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><span class="icon">✅</span> Plan Completeness</div>
+      <div id="r-checklist" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;"></div>
+    </div>
+
+    <!-- ── DISCLAIMER ── -->
+    <div style="font-size:8px;color:#aaa;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;line-height:1.7;text-align:center;">
+      This report is generated by RetireBlueprint Pro for personal planning purposes only. It is not financial, tax, or legal advice.
+      Projections are estimates based on assumptions that may differ from actual results. Past performance does not guarantee future results.
       Consult a qualified financial advisor before making retirement decisions.
-      Past performance does not guarantee future results.
     </div>
 
-  </div>
+  </div><!-- /.rpt-body -->
 
   <!-- Footer -->
-  <div class="report-footer">
+  <div class="rpt-footer">
     <div>RetireBlueprint Pro · retireblueprintpro.com</div>
     <div id="r-footer-date">—</div>
     <div>Confidential — For Personal Planning Use Only</div>
   </div>
-</div>
+
+</div><!-- /.report-wrap -->
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
@@ -412,205 +371,251 @@ var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2
 function fmt(n) {
   if (!n && n !== 0) return '—';
   if (Math.abs(n) >= 1000000) return '$'+(n/1000000).toFixed(2)+'M';
-  if (Math.abs(n) >= 1000) return '$'+Math.round(n/1000)+'K';
+  if (Math.abs(n) >= 1000)    return '$'+Math.round(n/1000)+'K';
   return '$'+Math.round(n).toLocaleString();
 }
-function fmtMo(n) { return n > 0 ? '$'+Math.round(n).toLocaleString()+'/mo' : '—'; }
-function pct(n) { return n > 0 ? Math.round(n*10)/10+'%' : '—'; }
-
-function set(id, val) { var el = document.getElementById(id); if(el) el.textContent = val||'—'; }
+function fmtFull(n) {
+  if (!n && n !== 0) return '—';
+  return '$'+Math.round(n).toLocaleString();
+}
+function fmtMo(n) { return (n > 0) ? '$'+Math.round(n).toLocaleString()+'/mo' : '—'; }
+function set(id, val) { var el = document.getElementById(id); if(el) el.textContent = (val !== null && val !== undefined && val !== '') ? val : '—'; }
 
 function loadReport() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId) {
-    document.getElementById('loading').textContent = '⚠️ No sheet connected. Please complete Setup first.';
-    return;
-  }
-
-  var cbName = 'rbpSummary_'+Date.now();
-  var s = document.createElement('script');
+  if (!sheetId) { document.getElementById('loading').textContent = '⚠️ No sheet connected. Go to Setup Guide first.'; return; }
+  var cb = 'rbpSum_'+Date.now();
   var done = false;
-  var t = setTimeout(function(){
-    if(!done){ done=true; document.getElementById('loading').textContent='⚠️ Timeout loading data.'; }
-  }, 20000);
-
-  window[cbName] = function(d) {
-    if(done) return; done=true; clearTimeout(t); delete window[cbName];
-    try { populateReport(d); } catch(e) { console.error(e); }
-  };
-
-  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cbName;
+  var t = setTimeout(function(){ if(!done){ done=true; document.getElementById('loading').textContent='⚠️ Timeout. Try refreshing.'; }}, 20000);
+  window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); delete window[cb]; try{ populateReport(d); } catch(e){ console.error(e); document.getElementById('loading').textContent='⚠️ Error loading data: '+e.message; } };
+  var s = document.createElement('script');
+  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb;
   document.head.appendChild(s);
 }
 
 function populateReport(d) {
-  // Support any partner names dynamically
-  var peopleKeys = Object.keys(d.people || {});
-  var p1 = d.people[peopleKeys[0]] || d.people.craig || {};
-  var p2 = d.people[peopleKeys[1]] || d.people.gena  || {};
-  var gl = d.global || {};
-  var tax = d.tax || {};
-  var port = d.portfolio || {};
-  var sp = d.spending || {};
-  var leg = d.legacy || {};
-  var proj = d.projections || {};
-  var roth = d.roth || {};
-
-  // Populate header FIRST so it shows immediately
+  var keys = Object.keys(d.people || {});
+  var p1  = d.people[keys[0]] || d.people.craig || {};
+  var p2  = d.people[keys[1]] || d.people.gena  || {};
+  var gl  = d.global   || {};
+  var tax = d.tax      || {};
+  var port= d.portfolio|| {};
+  var sp  = d.spending || {};
+  var leg = d.legacy   || {};
+  var proj= d.projections || {};
+  var roth= d.roth     || {};
   var today = new Date();
-  var p1name = p1.name || 'Partner 1';
-  var p2name = p2.name || 'Partner 2';
-  set('r-names', p1name + ' & ' + p2name + ' — Retirement Plan');
-  set('r-date', 'Generated: ' + today.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}));
-  set('r-plan-year', 'Plan Year: ' + (gl.planYear || today.getFullYear()));
-  set('r-footer-date', today.toLocaleDateString());
-
-  // Roth strategy
-  var roth = d.roth || {};
-  var tax = d.tax || {};
-  set('r-roth-window2', roth.year > 0 ? 'Now – ' + (roth.year + 5) : '—');
-  set('r-roth-optimal', fmt(roth.optimalAmount || 0));
-  set('r-roth-savings', fmt(tax.rothConversionSavings || 0));
-  var rothSavings = tax.rothConversionSavings || 0;
-  set('r-roth-signal', rothSavings > 0 ? '✅ Convert Now' : rothSavings < 0 ? '⏳ Consider Waiting' : '—');
-
-  // Healthcare
-  var p1hc = (p1.healthPreMedicare || 0) + (p2.healthPreMedicare || 0);
-  set('r-hc-cost', fmt(p1hc));
-  set('r-p1-medicare-lbl', (p1.name || 'P1') + ' Medicare');
-  set('r-p2-medicare-lbl', (p2.name || 'P2') + ' Medicare');
   var curYear = today.getFullYear();
-  var p1MedYr = p1.age > 0 ? curYear + Math.max(0, 65 - p1.age) : 0;
-  var p2MedYr = p2.age > 0 ? curYear + Math.max(0, 65 - p2.age) : 0;
-  set('r-p1-medicare', p1MedYr > 0 ? (p1.age >= 65 ? 'Already eligible' : p1MedYr) : '—');
-  set('r-p2-medicare', p2MedYr > 0 ? (p2.age >= 65 ? 'Already eligible' : p2MedYr) : '—');
 
-  // Spending plan
-  var sp = d.spending || {};
-  set('r-base-spend', fmt(sp.baseAnnual || 0));
-  set('r-phase1', fmt((sp.baseAnnual || 0) + (sp.phase1Extra || 0)));
-  set('r-phase2', fmt((sp.baseAnnual || 0) + (sp.phase2Extra || 0)));
-  set('r-phase3', fmt((sp.baseAnnual || 0) + (sp.phase3Extra || 0)));
-
-  // Income detail table
-  var incomeRows = [];
-  if (p1.salary > 0) incomeRows.push({src: (p1.name||'P1') + ' Salary', amt: p1.salary, note: 'Ends ' + (p1.salaryEnd||'—')});
-  if (p2.salary > 0) incomeRows.push({src: (p2.name||'P2') + ' Salary', amt: p2.salary, note: 'Ends ' + (p2.salaryEnd||'—')});
-  if (p1.ssMonthly > 0) incomeRows.push({src: (p1.name||'P1') + ' Social Security', amt: p1.ssMonthly*12, note: 'Starts ' + (p1.ssStartDate||'—')});
-  if (p2.ssMonthly > 0) incomeRows.push({src: (p2.name||'P2') + ' Social Security', amt: p2.ssMonthly*12, note: 'Starts ' + (p2.ssStartDate||'—')});
-  if (p1.pension > 0) incomeRows.push({src: (p1.name||'P1') + ' Pension', amt: p1.pension*12, note: 'Monthly: ' + fmtMo(p1.pension)});
-  if (p2.pension > 0) incomeRows.push({src: (p2.name||'P2') + ' Pension', amt: p2.pension*12, note: 'Monthly: ' + fmtMo(p2.pension)});
-  var totalInc = incomeRows.reduce(function(s,r){ return s + r.amt; }, 0);
-  var iBody = document.getElementById('r-income-detail');
-  if (iBody) iBody.innerHTML = incomeRows.map(function(r){
-    return '<tr><td style="font-weight:600;">' + r.src + '</td><td>' + fmt(r.amt) + '/yr</td><td style="color:#5F6368;">' + r.note + '</td></tr>';
-  }).join('');
-  set('r-total-income', fmt(totalInc) + '/yr');
-
+  // Show page
   document.getElementById('loading').style.display = 'none';
   document.getElementById('report-page').style.display = 'block';
 
-  // Plan status
-  var confidence = leg.achievedPct || 0;
-  var signalEl = document.getElementById('r-signal');
-  var detailEl = document.getElementById('r-signal-detail');
-  if (confidence >= 100) {
-    signalEl.className = 'signal signal-green';
-    signalEl.textContent = '✅ ON TRACK';
-    if(detailEl) detailEl.textContent = 'Your plan is fully funded. Ending portfolio meets your legacy goal.';
-  } else if (confidence >= 80) {
-    signalEl.className = 'signal signal-yellow';
-    signalEl.textContent = '⚠️ REVIEW PLAN';
-    if(detailEl) detailEl.textContent = 'Plan is ' + Math.round(confidence) + '% funded. Consider adjustments to spending or timeline.';
+  // ── HEADER ──
+  var p1n = p1.name || 'Partner 1';
+  var p2n = p2.name || 'Partner 2';
+  set('r-names', p1n + ' & ' + p2n + ' — Retirement Plan');
+  set('r-date',  'Generated: ' + today.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}));
+  set('r-plan-year', 'Plan Year: ' + (gl.planYear || curYear));
+  set('r-footer-date', today.toLocaleDateString());
+
+  // ── STATUS ──
+  var conf = leg.achievedPct || 0;
+  var banner = document.getElementById('r-status-banner');
+  var signal = document.getElementById('r-signal');
+  var detail = document.getElementById('r-signal-detail');
+  if (conf >= 100) {
+    banner.className = 'status-banner green';
+    signal.textContent = '✅ ON TRACK'; detail.textContent = 'Your plan is fully funded. Ending portfolio meets or exceeds your legacy goal.';
+  } else if (conf >= 80) {
+    banner.className = 'status-banner yellow';
+    signal.textContent = '⚠️ REVIEW PLAN'; detail.textContent = 'Plan is '+Math.round(conf)+'% funded. Small adjustments to spending or timeline could close the gap.';
   } else {
-    signalEl.className = 'signal signal-red';
-    signalEl.textContent = '⛔ AT RISK';
-    if(detailEl) detailEl.textContent = 'Plan is only ' + Math.round(confidence) + '% funded. Significant adjustments needed.';
+    banner.className = 'status-banner red';
+    signal.textContent = '⛔ AT RISK'; detail.textContent = 'Plan is only '+Math.round(conf)+'% funded. Significant adjustments needed — consider spending, timeline, or returns.';
   }
+  set('r-confidence', Math.round(conf)+'%');
+  set('r-confidence2', Math.round(conf)+'%');
+  set('r-portfolio', fmt(port.total || 0));
+  set('r-spending', fmt(sp.safeExtra > 0 ? (sp.baseAnnual||0)+(sp.safeExtra||0) : sp.baseAnnual||0));
+  set('r-legacy', fmt(leg.goal || 0));
+  var bar = document.getElementById('r-conf-bar');
+  if (bar) bar.style.width = Math.min(100, conf)+'%';
 
-  set('r-confidence', Math.round(confidence) + '%');
-  set('r-portfolio', fmt(port.total || port.totalStart || 0));
-  set('r-spending', fmt(sp.safeExtra > 0 ? (sp.baseAnnual||0) + (sp.safeExtra||0) : sp.baseAnnual||0));
-  set('r-legacy', fmt(leg.goal || leg.legacyGoal || 0));
+  // ── PARTNERS ──
+  function partnerBlock(p, pn, pfx) {
+    set(pfx+'-name', pn);
+    set(pfx+'-age', p.age ? 'Age '+p.age : '—');
+    set(pfx+'-dob', p.dob || '—');
+    set(pfx+'-salary', p.salary > 0 ? fmt(p.salary)+'/yr' : 'Retired / None');
+    set(pfx+'-retire', p.salaryEnd || '—');
+    set(pfx+'-ss', fmtMo(p.ssMonthly));
+    set(pfx+'-ss-start', p.ssStartDate || '—');
+    set(pfx+'-fra', p.ssFra ? 'Age '+p.ssFra : '—');
+    set(pfx+'-pension', p.pension > 0 ? fmtMo(p.pension) : 'None');
+    var medYr = p.age > 0 ? curYear + Math.max(0, 65-p.age) : 0;
+    set(pfx+'-medicare', p.age >= 65 ? 'Already eligible' : (medYr > 0 ? medYr+' (age 65)' : '—'));
+    set(pfx+'-hc', p.healthPreMedicare > 0 ? fmt(p.healthPreMedicare)+'/yr' : '—');
+    set(pfx+'-life', p.deathAge ? 'To age '+p.deathAge : '—');
+  }
+  partnerBlock(p1, p1n, 'r-p1');
+  partnerBlock(p2, p2n, 'r-p2');
 
-  // Partners
-  set('r-p1-lbl', p1.name || 'Partner 1');
-  set('r-p1-age', 'Age ' + (p1.age||'—'));
-  set('r-p1-retire', p1.salaryEnd ? 'Retires: ' + p1.salaryEnd : 'Retirement date TBD');
-  set('r-p1-ss', fmtMo(p1.ssMonthly));
-  set('r-p1-ss-start', p1.ssStartDate ? 'Starts: ' + p1.ssStartDate : '—');
+  // ── INCOME TABLE ──
+  var rows = [], totalMo = 0, totalYr = 0;
+  function addInc(src, mo, startDate, endNote) {
+    if (!mo || mo <= 0) return;
+    rows.push({src:src, mo:mo, yr:mo*12, start:startDate||'—', end:endNote||'—'});
+    totalMo += mo; totalYr += mo*12;
+  }
+  if (p1.salary>0) addInc(p1n+' Salary', Math.round(p1.salary/12), 'Now', 'Ends '+(p1.salaryEnd||'—'));
+  if (p2.salary>0) addInc(p2n+' Salary', Math.round(p2.salary/12), 'Now', 'Ends '+(p2.salaryEnd||'—'));
+  if (p1.ssMonthly>0) addInc(p1n+' Social Security', p1.ssMonthly, p1.ssStartDate, 'COLA '+((gl.ssCola||2.5))+'%/yr');
+  if (p2.ssMonthly>0) addInc(p2n+' Social Security', p2.ssMonthly, p2.ssStartDate, 'COLA '+((gl.ssCola||2.5))+'%/yr');
+  if (p1.pension>0)   addInc(p1n+' Pension', p1.pension, p1.pensionStart||'—', 'Fixed income');
+  if (p2.pension>0)   addInc(p2n+' Pension', p2.pension, p2.pensionStart||'—', 'Fixed income');
+  if (p1.otherIncome>0) addInc(p1n+' Other Income', Math.round(p1.otherIncome/12), '—', '—');
+  if (p2.otherIncome>0) addInc(p2n+' Other Income', Math.round(p2.otherIncome/12), '—', '—');
+  var tbody = document.getElementById('r-income-rows');
+  if (tbody) tbody.innerHTML = rows.map(function(r){
+    return '<tr><td style="font-weight:600;">'+r.src+'</td><td>'+fmtMo(r.mo)+'</td><td>'+fmt(r.yr)+'/yr</td><td>'+r.start+'</td><td style="color:#555;">'+r.end+'</td></tr>';
+  }).join('');
+  set('r-total-mo', fmtMo(totalMo));
+  set('r-total-yr', fmt(totalYr)+'/yr');
 
-  set('r-p2-lbl', p2.name || 'Partner 2');
-  set('r-p2-age', 'Age ' + (p2.age||'—'));
-  set('r-p2-retire', p2.salaryEnd ? 'Retires: ' + p2.salaryEnd : '—');
-  set('r-p2-ss', fmtMo(p2.ssMonthly));
-  set('r-p2-ss-start', p2.ssStartDate ? 'Starts: ' + p2.ssStartDate : '—');
-
-  // Income
-  var totalSSMonthly = (p1.ssMonthly||0) + (p2.ssMonthly||0);
-  set('r-ss-total', fmtMo(totalSSMonthly) + ' / ' + fmt(totalSSMonthly*12) + '/yr');
-  set('r-pension', fmtMo((p1.pension||0) + (p2.pension||0)));
-  set('r-other', fmt(((p1.otherIncome||0) + (p2.otherIncome||0))));
-
-  // Accounts table
-  var tbody = document.getElementById('r-accounts-body');
-  if (tbody && port.accounts) {
-    var typeMap = {'Pretax (Deferred)':'pretax','Roth (Tax Free)':'roth','Taxable (Liquid)':'taxable','HSA (Triple Tax Advantage)':'hsa','529 Education (Tax Free)':'roth'};
-    tbody.innerHTML = port.accounts.filter(function(a){ return a.name && a.balance > 0; }).map(function(a) {
-      var typeKey = typeMap[a.type] || 'taxable';
-      var tagClass = 'tag-'+typeKey;
-      var shortType = a.type && a.type.indexOf('Pretax')>=0?'Pre-Tax':a.type&&a.type.indexOf('Roth')>=0?'Roth':a.type&&a.type.indexOf('HSA')>=0?'HSA':a.type&&a.type.indexOf('529')>=0?'529':'Taxable';
-      return '<tr>' +
-        '<td style="font-weight:600;">' + (a.name||'—') + '</td>' +
-        '<td>' + (a.owner||'Joint') + '</td>' +
-        '<td><span class="tag '+tagClass+'">' + shortType + '</span></td>' +
-        '<td style="font-weight:700;">' + fmt(a.balance) + '</td>' +
-        '<td>' + (a.expectedReturn||0).toFixed(1) + '%</td>' +
+  // ── ACCOUNTS TABLE ──
+  var acctBody = document.getElementById('r-accounts-body');
+  var typeMap = {'Pretax (Deferred)':'pretax','Roth (Tax Free)':'roth','Taxable (Liquid)':'taxable','HSA (Triple Tax Advantage)':'hsa'};
+  var shortMap = {'Pretax (Deferred)':'Pre-Tax','Roth (Tax Free)':'Roth','Taxable (Liquid)':'Taxable','HSA (Triple Tax Advantage)':'HSA','529 Education (Tax Free)':'529'};
+  var preTaxT=0, rothT=0, taxableT=0, hsaT=0;
+  if (acctBody && port.accounts) {
+    acctBody.innerHTML = port.accounts.filter(function(a){ return a.name; }).map(function(a){
+      var tk = typeMap[a.type] || 'taxable';
+      var sh = shortMap[a.type] || 'Taxable';
+      if (tk==='pretax') preTaxT += a.balance||0;
+      else if (tk==='roth') rothT += a.balance||0;
+      else if (tk==='hsa') hsaT += a.balance||0;
+      else taxableT += a.balance||0;
+      return '<tr>'+
+        '<td style="font-weight:700;">'+(a.name||'—')+'</td>'+
+        '<td>'+(a.owner||'Joint')+'</td>'+
+        '<td><span class="tag tag-'+tk+'">'+sh+'</span></td>'+
+        '<td style="font-weight:700;">'+(a.balance>0?fmtFull(a.balance):'—')+'</td>'+
+        '<td>'+(a.expectedReturn||0).toFixed(1)+'%</td>'+
+        '<td>'+(a.contrib>0?fmt(a.contrib)+'/yr':'—')+'</td>'+
+        '<td>'+(a.match>0?fmt(a.match)+'/yr':'—')+'</td>'+
         '</tr>';
     }).join('');
   }
-  set('r-total-bal', fmt(port.total));
+  set('r-total-bal', fmtFull(port.total||0));
+  set('r-pretax-total',  fmt(preTaxT));
+  set('r-roth-total',    fmt(rothT));
+  set('r-taxable-total', fmt(taxableT));
+  set('r-hsa-total',     fmt(hsaT));
 
-  // Tax
-  set('r-filing', gl.filingStatus || '—');
-  var effRate = tax.effectiveRate ? Math.round(tax.effectiveRate*1000)/10 : 0;
+  // ── SPENDING ──
+  set('r-base-spend', fmt(sp.baseAnnual||0));
+  set('r-phase1', fmt((sp.baseAnnual||0)+(sp.phase1Extra||0)));
+  set('r-phase2', fmt((sp.baseAnnual||0)+(sp.phase2Extra||0)));
+  set('r-phase3', fmt((sp.baseAnnual||0)+(sp.phase3Extra||0)));
+  set('r-phase1-dates', sp.phase1Start && sp.phase1End ? sp.phase1Start+'–'+sp.phase1End : 'Early retirement');
+  set('r-phase2-dates', sp.phase2Start && sp.phase2End ? sp.phase2Start+'–'+sp.phase2End : 'Mid retirement');
+  set('r-phase3-dates', sp.phase3Start && sp.phase3End ? sp.phase3Start+'–'+sp.phase3End : 'Late retirement');
+  set('r-inflation', (gl.inflation||3)+'%/yr');
+  set('r-survivor-pct', (gl.survivorReduction||30)+'% reduction');
+
+  // ── TAX ──
+  set('r-filing', gl.filingStatus || 'Married / Joint');
+  var effRate = tax.effectiveRate ? (tax.effectiveRate<1 ? Math.round(tax.effectiveRate*1000)/10 : Math.round(tax.effectiveRate*10)/10) : 0;
   set('r-eff-rate', effRate > 0 ? effRate+'%' : '—');
-  set('r-state-rate', tax.stateRate ? Math.round(tax.stateRate*1000)/10+'%' : '—');
-  var rothWindow = roth.year > 0 ? 'Now–' + (roth.year+5) : 'See Roth Solver';
-  set('r-roth-window', rothWindow);
+  set('r-state-rate', tax.stateRate ? (tax.stateRate<1 ? Math.round(tax.stateRate*1000)/10 : Math.round(tax.stateRate*10)/10)+'%' : '—');
+  set('r-std-ded', fmt(tax.standardDeduction||30000));
+  set('r-roth-window', roth.year > 0 ? 'Now – '+(roth.year+5) : '—');
+  set('r-roth-optimal', fmt(roth.optimalAmount||0));
+  set('r-roth-savings', fmt(tax.rothConversionSavings||0));
+  set('r-roth-signal', (tax.rothConversionSavings||0)>0 ? '✅ Convert Now' : '⏳ Consider Waiting');
 
-  // Stress test
-  var baseEnd = proj.endLiquid && proj.endLiquid.length ? proj.endLiquid[proj.endLiquid.length-1] : 0;
-  var baseStart = proj.endLiquid && proj.endLiquid.length ? proj.endLiquid[0] : 0;
-  set('r-stress-base', fmt(baseEnd));
-  set('r-stress-20', fmt(Math.round(baseEnd * (baseStart>0 ? (baseStart*0.8)/baseStart : 1) * 0.92)));
-  set('r-stress-30', fmt(Math.round(baseEnd * (baseStart>0 ? (baseStart*0.7)/baseStart : 1) * 0.85)));
-  set('r-stress-inf', fmt(Math.round(baseEnd * 0.82)));
-
-  // Key milestones
-  var milestones = [];
-  if (p1.salaryEnd) milestones.push({m: p1.name+' retires', y: new Date(p1.salaryEnd).getFullYear(), n: 'Salary ends'});
-  if (p2.salaryEnd) milestones.push({m: p2.name+' retires', y: new Date(p2.salaryEnd).getFullYear(), n: 'Salary ends'});
-  if (p1.ssStartDate) milestones.push({m: p1.name+' SS begins', y: new Date(p1.ssStartDate).getFullYear(), n: fmtMo(p1.ssMonthly)});
-  if (p2.ssStartDate) milestones.push({m: p2.name+' SS begins', y: new Date(p2.ssStartDate).getFullYear(), n: fmtMo(p2.ssMonthly)});
-  var p1RMDYr = p1.age > 0 ? new Date().getFullYear() + (73-p1.age) : 0;
-  var p2RMDYr = p2.age > 0 ? new Date().getFullYear() + (73-p2.age) : 0;
-  if (p1RMDYr > 0) milestones.push({m: p1.name+' RMDs begin', y: p1RMDYr, n: 'Age 73 — required minimum distributions'});
-  if (p2RMDYr > 0) milestones.push({m: p2.name+' RMDs begin', y: p2RMDYr, n: 'Age 73'});
-  // Medicare for each partner separately
-  var p1MedicareYr = new Date().getFullYear() + Math.max(0, 65-(p1.age||63));
-  var p2MedicareYr = new Date().getFullYear() + Math.max(0, 65-(p2.age||55));
-  if (p1.age < 65) milestones.push({m: (p1.name||'Partner 1')+' Medicare eligible', y: p1MedicareYr, n: 'Age 65 — healthcare coverage begins'});
-  if (p2.age < 65) milestones.push({m: (p2.name||'Partner 2')+' Medicare eligible', y: p2MedicareYr, n: 'Age 65 — healthcare coverage begins'});
-
-  milestones.sort(function(a,b){ return a.y-b.y; });
-
-  var mbody = document.getElementById('r-milestones');
-  if (mbody) {
-    mbody.innerHTML = milestones.map(function(m) {
-      return '<tr><td style="font-weight:600;">'+m.m+'</td><td>'+m.y+'</td><td style="color:#5F6368;">'+m.n+'</td></tr>';
+  // ── DEBTS ──
+  var debtBody = document.getElementById('r-debts-body');
+  if (debtBody && d.debts && d.debts.length) {
+    debtBody.innerHTML = d.debts.filter(function(db){ return db.name; }).map(function(db){
+      var equity = (db.curval||0) - (db.bal||0);
+      return '<tr>'+
+        '<td style="font-weight:700;">'+(db.name||'—')+'</td>'+
+        '<td>'+(db.mo>0?'$'+Math.round(db.mo).toLocaleString()+'/mo':'—')+'</td>'+
+        '<td>'+(db.bal>0?fmtFull(db.bal):'—')+'</td>'+
+        '<td>'+(db.end||'—')+'</td>'+
+        '<td>'+(db.curval>0?fmtFull(db.curval):'—')+'</td>'+
+        '<td style="color:'+(equity>0?'#2E7D32':'#C62828')+';font-weight:700;">'+(db.curval>0?fmtFull(equity):'—')+'</td>'+
+        '<td style="font-size:9px;color:#555;">'+(db.appr>0?db.appr.toFixed(1)+'%/yr appreciation':'')+'</td>'+
+        '</tr>';
     }).join('');
   }
+
+  // ── STRESS TEST ──
+  var baseEnd = 0;
+  if (proj.endLiquid && proj.endLiquid.length) {
+    for (var si=proj.endLiquid.length-1;si>=0;si--) { if(proj.endLiquid[si]>0){baseEnd=proj.endLiquid[si];break;} }
+  }
+  if (!baseEnd) baseEnd = leg.projectedEnding || 0;
+  var baseStart = (proj.endLiquid && proj.endLiquid[0]) || 0;
+  var legGoal = leg.goal || 0;
+  function stressNote(val) {
+    if (val >= legGoal && legGoal > 0) return '✅ Legacy goal met';
+    if (val > 0) return '⚠️ '+fmt(legGoal-val)+' below goal';
+    return '⛔ Portfolio depleted';
+  }
+  var e20 = Math.max(0, Math.round(baseEnd*(baseStart>0?(baseStart*0.8)/baseStart:1)*0.92));
+  var e30 = Math.max(0, Math.round(baseEnd*(baseStart>0?(baseStart*0.7)/baseStart:1)*0.85));
+  var einf= Math.max(0, Math.round(baseEnd*0.82));
+  set('r-stress-base', fmt(baseEnd));
+  set('r-stress-20',   fmt(e20));   set('r-stress-20-note',  stressNote(e20));
+  set('r-stress-30',   fmt(e30));   set('r-stress-30-note',  stressNote(e30));
+  set('r-stress-inf',  fmt(einf));  set('r-stress-inf-note', stressNote(einf));
+
+  // ── MILESTONES ──
+  var ms = [];
+  if (p1.salaryEnd)  ms.push({m:p1n+' retires',  y:new Date(p1.salaryEnd).getFullYear(),  n:'Salary ends · '+fmt(p1.salary)+'/yr'});
+  if (p2.salaryEnd)  ms.push({m:p2n+' retires',  y:new Date(p2.salaryEnd).getFullYear(),  n:'Salary ends · '+fmt(p2.salary)+'/yr'});
+  if (p1.ssStartDate) ms.push({m:p1n+' SS begins', y:new Date(p1.ssStartDate).getFullYear(), n:fmtMo(p1.ssMonthly)+' ('+fmt(p1.ssMonthly*12)+'/yr)'});
+  if (p2.ssStartDate) ms.push({m:p2n+' SS begins', y:new Date(p2.ssStartDate).getFullYear(), n:fmtMo(p2.ssMonthly)+' ('+fmt(p2.ssMonthly*12)+'/yr)'});
+  var p1med = p1.age>0 ? curYear+Math.max(0,65-p1.age) : 0;
+  var p2med = p2.age>0 ? curYear+Math.max(0,65-p2.age) : 0;
+  if (p1.age<65 && p1med) ms.push({m:p1n+' Medicare eligible', y:p1med, n:'Age 65 — healthcare bridge ends'});
+  if (p2.age<65 && p2med) ms.push({m:p2n+' Medicare eligible', y:p2med, n:'Age 65 — healthcare bridge ends'});
+  var p1rmd = p1.age>0 ? curYear+(73-p1.age) : 0;
+  var p2rmd = p2.age>0 ? curYear+(73-p2.age) : 0;
+  if (p1rmd>0) ms.push({m:p1n+' RMDs begin', y:p1rmd, n:'Age 73 — required minimum distributions'});
+  if (p2rmd>0) ms.push({m:p2n+' RMDs begin', y:p2rmd, n:'Age 73 — required minimum distributions'});
+  if (d.debts) d.debts.forEach(function(db){ if(db.end && db.bal>0) ms.push({m:(db.name||'Debt')+' paid off', y:new Date(db.end).getFullYear(), n:'Balance: '+fmtFull(db.bal)}); });
+  ms.sort(function(a,b){return a.y-b.y;});
+  var mb = document.getElementById('r-milestones');
+  if (mb) mb.innerHTML = ms.map(function(m){
+    return '<tr class="milestone-row"><td>'+m.m+'</td><td style="text-align:center;"><span class="milestone-year">'+m.y+'</span></td><td style="color:#555;">'+m.n+'</td></tr>';
+  }).join('');
+
+  // ── CHECKLIST ──
+  var checks = [
+    {label:'Partner 1 Profile',   done:!!(p1.name&&p1.age>0)},
+    {label:'Partner 2 Profile',   done:!!(p2.name&&p2.age>0)},
+    {label:'Plan Start Year',     done:!!(gl.planYear)},
+    {label:'Social Security',     done:!!(p1.ssMonthly>0||p2.ssMonthly>0)},
+    {label:'Named Accounts',      done:!!(port.accounts&&port.accounts.length>0)},
+    {label:'Return Rates Set',    done:!!(port.accounts&&port.accounts.some(function(a){return a.expectedReturn>0;}))},
+    {label:'Contribution Data',   done:!!(port.accounts&&port.accounts.some(function(a){return a.contrib>0;}))},
+    {label:'Base Expenses',       done:!!(d.expenses&&d.expenses.some(function(e){return e.monthly>0;}))},
+    {label:'Debt / Mortgage',     done:!!(d.debts&&d.debts.some(function(db){return db.mo>0;}))},
+    {label:'Legacy Goal',         done:!!(leg.goal>0)},
+    {label:'Roth Strategy',       done:!!(roth.year>0)},
+    {label:'Smile Curve',         done:!!(sp.phase1Extra||sp.phase2Extra||sp.phase3Extra)},
+  ];
+  var cl = document.getElementById('r-checklist');
+  if (cl) cl.innerHTML = checks.map(function(c){
+    return '<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:'+(c.done?'#f0fdf0':'#fff8f8')+';border-radius:4px;border:1px solid '+(c.done?'#c8e6c9':'#ffcdd2')+';">'+
+      '<span style="font-size:14px;">'+(c.done?'✅':'⬜')+'</span>'+
+      '<span style="font-size:10px;color:'+(c.done?'#2E7D32':'#C62828')+';font-weight:'+(c.done?'500':'700')+';">'+c.label+'</span>'+
+    '</div>';
+  }).join('');
 }
 
 window.addEventListener('DOMContentLoaded', loadReport);
