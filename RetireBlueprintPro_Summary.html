@@ -20,7 +20,7 @@
   /* ── HEADER ────────────────────────────────────────── */
   .rpt-header { background:#041E2F; padding:0; }
   .rpt-header-top { padding:20px 32px; overflow:hidden; max-height:100px; }
-  .rpt-header-info { background:#0A3145; border-top:3px solid #1CC7D0; padding:12px 32px; }
+  .rpt-header-info { background:#0d2d44; border-top:3px solid #1CC7D0; padding:14px 32px; }
   .rpt-header-info table { width:100%; border-collapse:collapse; }
   .rpt-plan-name { font-size:18px; font-weight:800; color:#fff; }
   .rpt-date { font-size:11px; color:#8aaabb; }
@@ -162,14 +162,18 @@
       <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;display:block;flex-shrink:0;" onerror="this.style.display='none'">
     </div>
     <div class="rpt-header-info">
-      <table>
+      <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="vertical-align:middle;">
-            <div class="rpt-plan-name" id="r-names">Retirement Plan</div>
+          <td style="vertical-align:middle;padding:0;">
+            <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+              <div id="r-names" style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:0.5px;line-height:1;">Retirement Plan</div>
+              <div style="width:2px;height:20px;background:#1CC7D0;display:inline-block;vertical-align:middle;margin:0 4px;"></div>
+              <div id="r-plan-year" style="font-size:13px;font-weight:700;color:#1CC7D0;letter-spacing:1px;">Plan Year: —</div>
+            </div>
           </td>
-          <td style="vertical-align:middle;text-align:right;">
-            <div class="rpt-date" id="r-date">Generated: —</div>
-            <div class="rpt-date" id="r-plan-year">Plan Year: —</div>
+          <td style="vertical-align:middle;text-align:right;padding:0;white-space:nowrap;">
+            <div id="r-date" style="font-size:11px;color:#8aaabb;font-weight:500;">Generated: —</div>
+            <div style="font-size:9px;color:#456A73;margin-top:2px;text-transform:uppercase;letter-spacing:1px;">Confidential · For Personal Planning Use Only</div>
           </td>
         </tr>
       </table>
@@ -590,8 +594,38 @@ function populateReport(d) {
     }
     if (p2SalMo > 0) addInc(p2n+' Salary', Math.round(p2.salary/12), Math.round(p2.salary/12*p2SalMo), null, p2.salaryEnd, p2SalNote);
   }
-  if (p1.ssMonthly>0)   addInc(p1n+' Social Security', p1.ssMonthly,             p1.ssMonthly*12,   p1.ssStartDate, null,            'COLA '+(gl.ssCola||2.5)+'%/yr');
-  if (p2.ssMonthly>0)   addInc(p2n+' Social Security', p2.ssMonthly,             p2.ssMonthly*12,   p2.ssStartDate, null,            'COLA '+(gl.ssCola||2.5)+'%/yr');
+  if (p1.ssMonthly>0) {
+    var p1SSAnnual = p1.ssMonthly * 12, p1SSNote = 'COLA '+(gl.ssCola||2.5)+'%/yr';
+    if (p1.ssStartDate) {
+      try {
+        var p1SSStart = new Date(p1.ssStartDate);
+        if (p1SSStart.getFullYear() === planYear) {
+          var p1SSMos = 13 - p1SSStart.getMonth() - 1; // months from start to Dec
+          p1SSAnnual = Math.round(p1.ssMonthly * p1SSMos);
+          p1SSNote = p1SSMos+' months in '+planYear+' (starts '+p1.ssStartDate+') · COLA '+(gl.ssCola||2.5)+'%/yr';
+        } else if (p1SSStart.getFullYear() > planYear) {
+          p1SSAnnual = 0; // not started yet — isActive handles this
+        }
+      } catch(e){}
+    }
+    addInc(p1n+' Social Security', p1.ssMonthly, p1SSAnnual, p1.ssStartDate, null, p1SSNote);
+  }
+  if (p2.ssMonthly>0) {
+    var p2SSAnnual = p2.ssMonthly * 12, p2SSNote = 'COLA '+(gl.ssCola||2.5)+'%/yr';
+    if (p2.ssStartDate) {
+      try {
+        var p2SSStart = new Date(p2.ssStartDate);
+        if (p2SSStart.getFullYear() === planYear) {
+          var p2SSMos = 13 - p2SSStart.getMonth() - 1;
+          p2SSAnnual = Math.round(p2.ssMonthly * p2SSMos);
+          p2SSNote = p2SSMos+' months in '+planYear+' (starts '+p2.ssStartDate+') · COLA '+(gl.ssCola||2.5)+'%/yr';
+        } else if (p2SSStart.getFullYear() > planYear) {
+          p2SSAnnual = 0;
+        }
+      } catch(e){}
+    }
+    addInc(p2n+' Social Security', p2.ssMonthly, p2SSAnnual, p2.ssStartDate, null, p2SSNote);
+  }
   if (p1.pension>0)     addInc(p1n+' Pension',         p1.pension,               p1.pension*12,     p1.pensionStart||null, null,    'Fixed monthly income');
   if (p2.pension>0)     addInc(p2n+' Pension',         p2.pension,               p2.pension*12,     p2.pensionStart||null, null,    'Fixed monthly income');
   if (p1.otherIncome>0) addInc(p1n+' Other Income',   Math.round(p1.otherIncome/12), p1.otherIncome, p1.otherStart||null, p1.otherEnd||null, p1.otherStart ? 'Starts '+(p1.otherStart) : '—');
