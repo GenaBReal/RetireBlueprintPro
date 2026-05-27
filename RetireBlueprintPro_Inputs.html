@@ -309,6 +309,15 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     font-size: 16px !important;
   }
 }
+
+/* ── DASHBOARD-STYLE KPI CARDS (for SS breakeven, rates etc) ── */
+.kpi-card-d{background:#fff;border-radius:6px;padding:11px 13px;border:1px solid #e8eaed;border-top:3px solid #041E2F;display:flex;flex-direction:column;justify-content:space-between;}
+.kc-title-d{font-size:8px;font-weight:700;letter-spacing:1px;color:#37474F;text-transform:uppercase;display:flex;align-items:center;gap:5px;margin-bottom:6px;}
+.kc-dot-d{width:3px;height:12px;border-radius:2px;background:#1CC7D0;flex-shrink:0;display:inline-block;}
+.kc-value-d{font-size:22px;font-weight:800;color:#0B2239;line-height:1.1;}
+.kc-sub-d{font-size:8px;color:#5F6368;margin-top:2px;font-style:italic;}
+.kc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;}
+.kc-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
 </style>
 </head>
 <body>
@@ -625,7 +634,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
               <input type="number" id="f-B43" value="0" readonly><span class="hint">Auto-calculated from SS base + FRA + start date</span>
-              <div id="ss-breakeven-p1" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(28,199,208,0.15);"></div>
+              <div id="ss-breakeven-p1" style="margin-top:10px;"></div>
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
@@ -765,7 +774,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
             <div class="field">
               <label>SS Monthly Benefit ($)</label>
               <input type="number" id="f-D43" value="0" readonly><span class="hint">Auto-calculated from SS base + FRA + start date</span>
-              <div id="ss-breakeven-p2" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(244,184,106,0.15);"></div>
+              <div id="ss-breakeven-p2" style="margin-top:10px;"></div>
               <span class="hint">After early/late adjustment</span>
             </div>
             <div class="field">
@@ -1856,9 +1865,9 @@ function calcSSBreakeven(baseId, fraId, ageId) {
     '<div style="font-size:10px;font-weight:700;color:#0B2239;text-transform:uppercase;margin-bottom:10px;letter-spacing:0.5px;">📊 Social Security Claiming Strategy</div>' +
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;">' +
 
-    '<div style="background:#fff3e0;border-radius:8px;padding:12px;text-align:center;border:1px solid #ffcc80;">' +
+    '<div style="background:#fff3e0;border-radius:6px;padding:12px;text-align:center;border:1px solid #ffcc80;border-top:3px solid #E65100;">' +
       '<div style="font-size:9px;color:#e65100;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Claim at 62</div>' +
-      '<div style="font-size:20px;font-weight:800;color:#bf360c;">$' + Math.round(at62).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
+      '<div style="font-size:26px;font-weight:900;color:#bf360c;line-height:1;">$' + Math.round(at62).toLocaleString() + '<span style="font-size:11px;font-weight:600;color:#e65100;">/mo</span></div>' +
       '<div style="font-size:11px;color:#e65100;margin-top:2px;font-weight:600;">$' + Math.round(at62*12/1000*10)/10 + 'K/yr</div>' +
       '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #ffcc80;">' +
         '<div style="font-size:10px;color:#5d4037;">Lifetime to 85: <strong>$' + Math.round(total62at85/1000) + 'K</strong></div>' +
@@ -1866,9 +1875,9 @@ function calcSSBreakeven(baseId, fraId, ageId) {
       '</div>' +
     '</div>' +
 
-    '<div style="background:#e0f7fa;border-radius:8px;padding:12px;text-align:center;border:2px solid #0097a7;">' +
+    '<div style="background:#e0f7fa;border-radius:6px;padding:12px;text-align:center;border:1px solid #0097a7;border-top:4px solid #006064;box-shadow:0 2px 8px rgba(0,150,164,0.15);">' +
       '<div style="font-size:9px;color:#006064;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Claim at FRA (age ' + fra + ')</div>' +
-      '<div style="font-size:20px;font-weight:800;color:#006064;">$' + Math.round(atFRA).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
+      '<div style="font-size:26px;font-weight:900;color:#006064;line-height:1;">$' + Math.round(atFRA).toLocaleString() + '<span style="font-size:11px;font-weight:600;color:#0097a7;">/mo</span></div>' +
       '<div style="font-size:11px;color:#0097a7;margin-top:2px;font-weight:600;">$' + Math.round(atFRA*12/1000*10)/10 + 'K/yr</div>' +
       '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #80deea;">' +
         '<div style="font-size:10px;color:#004d40;">Lifetime to 85: <strong>$' + Math.round(totalFRAat85/1000) + 'K</strong></div>' +
@@ -1876,9 +1885,9 @@ function calcSSBreakeven(baseId, fraId, ageId) {
       '</div>' +
     '</div>' +
 
-    '<div style="background:#e8f5e9;border-radius:8px;padding:12px;text-align:center;border:1px solid #66bb6a;">' +
+    '<div style="background:#e8f5e9;border-radius:6px;padding:12px;text-align:center;border:1px solid #66bb6a;border-top:3px solid #2E7D32;">' +
       '<div style="font-size:9px;color:#1b5e20;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Delay to 70</div>' +
-      '<div style="font-size:20px;font-weight:800;color:#1b5e20;">$' + Math.round(at70).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
+      '<div style="font-size:26px;font-weight:900;color:#1b5e20;line-height:1;">$' + Math.round(at70).toLocaleString() + '<span style="font-size:11px;font-weight:600;color:#2e7d32;">/mo</span></div>' +
       '<div style="font-size:11px;color:#2e7d32;margin-top:2px;font-weight:600;">$' + Math.round(at70*12/1000*10)/10 + 'K/yr</div>' +
       '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #a5d6a7;">' +
         '<div style="font-size:10px;color:#1b5e20;">To 85: <strong>$' + Math.round(total70at85/1000) + 'K</strong> · To 90: <strong>$' + Math.round(total70at90/1000) + 'K</strong></div>' +

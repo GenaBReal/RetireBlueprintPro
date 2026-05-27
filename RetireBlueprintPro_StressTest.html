@@ -7,85 +7,104 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-  :root{ --navy:#041E2F; --mid:#0A3145; --teal:#1CC7D0; --orange:#f4b86a; --green:#4CAF50; --red:#ff6b6b; }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Montserrat',sans-serif;background:var(--navy);color:#fff;min-height:100vh;}
-  .header{background:#041E2F;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--teal);}
-  .header-logo{display:flex;align-items:center;gap:12px;}
-  .header-title{font-size:13px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:1px;}
-  .nav-back{color:#8aaabb;font-size:11px;text-decoration:none;}
-  .body{max-width:1100px;margin:0 auto;padding:16px;}
+/* ── BASE ── */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,'Montserrat',sans-serif;background:#F8F9FA;color:#1a1a2e;min-height:100vh;overflow-x:hidden;}
 
-  /* Hero */
-  .hero{background:linear-gradient(135deg,#1a0808,#2d1515);border-radius:12px;padding:20px 24px;margin-bottom:16px;border:2px solid rgba(255,107,107,0.3);}
-  .hero h1{font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;}
-  .hero h1 span{color:#ff9f43;}
-  .hero p{font-size:11px;color:#ffcba4;line-height:1.7;max-width:700px;}
+/* ── HEADER / NAV ── */
+.header{background:#041E2F;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1CC7D0;}
+.header-logo{display:flex;align-items:center;gap:12px;}
+.header-title{font-size:13px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;}
+.nav-back{color:#8aaabb;font-size:11px;text-decoration:none;}
+.nav-strip{background:#0A3145;padding:0;display:flex;align-items:stretch;border-bottom:1px solid #1a3a52;overflow-x:auto;scrollbar-width:none;}
+.nav-strip::-webkit-scrollbar{display:none;}
+.nav-strip a{font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;white-space:nowrap;}
+.nav-strip a.active,.nav-strip a:hover{color:#f4b86a;}
+.body{max-width:1100px;margin:0 auto;padding:16px;}
 
-  /* Loading */
-  #loading-msg{text-align:center;padding:40px;color:#8aaabb;font-size:13px;}
+/* ── HERO ── dark accent, same as Dashboard header */
+.hero{background:#041E2F;border-radius:0;padding:16px 20px;margin-bottom:16px;border-bottom:3px solid #f4b86a;}
+.hero h1{font-size:20px;font-weight:900;color:#fff;margin-bottom:4px;}
+.hero h1 span{color:#1CC7D0;}
+.hero p{font-size:11px;color:#8aaabb;line-height:1.6;max-width:700px;}
 
-  /* Scenario tabs */
-  .scenario-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
-  .tab-btn{padding:8px 16px;border-radius:6px;border:2px solid #1a3a52;background:transparent;color:#8aaabb;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;}
-  .tab-btn:hover{border-color:var(--teal);color:var(--teal);}
-  .tab-btn.active{background:var(--teal);border-color:var(--teal);color:var(--navy);}
+/* ── SCENARIO TABS ── */
+.scenario-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.tab-btn{padding:8px 14px;border-radius:6px;border:1px solid #e8eaed;background:#fff;color:#37474F;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;border-top:3px solid #041E2F;}
+.tab-btn:hover{border-color:#1CC7D0;color:#006064;border-top-color:#1CC7D0;}
+.tab-btn.active{background:#041E2F;border-color:#041E2F;border-top-color:#f4b86a;color:#f4b86a;}
 
-  /* Main grid */
-  .main-grid{display:grid;grid-template-columns:340px 1fr;gap:16px;}
-  
-  /* Sliders panel */
-  .sliders-panel{background:var(--mid);border-radius:10px;padding:16px;border:1px solid #1a3a52;}
-  .panel-title{font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
-  
-  .slider-group{margin-bottom:18px;}
-  .slider-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
-  .slider-val{font-size:13px;font-weight:800;color:var(--teal);}
-  input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;}
-  .slider-range{display:flex;justify-content:space-between;font-size:8px;color:#456A73;margin-top:2px;}
+/* ── LAYOUT ── */
+.main-grid{display:grid;grid-template-columns:320px 1fr;gap:14px;}
+.results-panel{display:flex;flex-direction:column;gap:12px;}
 
-  .slider-desc{font-size:9px;color:#5a7a8a;line-height:1.5;margin-top:4px;font-style:italic;}
+/* ── SLIDERS PANEL ── dark like Dashboard engine cards */
+.sliders-panel{background:#041E2F;border-radius:6px;padding:14px;border:1px solid #1a3a52;}
+.panel-title{font-size:9px;font-weight:700;color:#f4b86a;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+.slider-group{margin-bottom:16px;}
+.slider-label{font-size:9px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
+.slider-val{font-size:14px;font-weight:800;color:#fff;}
+input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
+.slider-range{display:flex;justify-content:space-between;font-size:8px;color:#456A73;margin-top:2px;}
+.slider-desc{font-size:9px;color:#5a7a8a;line-height:1.5;margin-top:4px;font-style:italic;}
+.reset-btn{width:100%;padding:7px;background:transparent;border:1px solid #1a3a52;color:#8aaabb;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px;}
+.reset-btn:hover{border-color:#f4b86a;color:#f4b86a;}
 
-  .reset-btn{width:100%;padding:8px;background:transparent;border:1px solid #1a3a52;color:#8aaabb;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
-  .reset-btn:hover{border-color:var(--orange);color:var(--orange);}
+/* ── OUTCOME CARDS ── white kpi-card style */
+.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.outcome-card{background:#fff;border-radius:6px;padding:12px;text-align:center;border:1px solid #e8eaed;border-top:3px solid #041E2F;}
+.outcome-card.base{border-top-color:#1CC7D0;}
+.outcome-card.scenario{border-top-color:#f4b86a;}
+.oc-label{font-size:8px;font-weight:700;letter-spacing:1px;color:#37474F;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:4px;}
+.oc-val{font-size:22px;font-weight:800;color:#0B2239;line-height:1.1;}
+.oc-sub{font-size:9px;color:#5F6368;margin-top:4px;font-style:italic;}
+.oc-diff{font-size:11px;font-weight:700;margin-top:5px;}
 
-  /* Results panel */
-  .results-panel{display:flex;flex-direction:column;gap:12px;}
+/* ── CHART CARD ── white */
+.chart-card{background:#fff;border-radius:6px;padding:14px;border:1px solid #e8eaed;border-top:3px solid #041E2F;}
+.chart-title{font-size:9px;font-weight:700;color:#37474F;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.chart-area{height:200px;position:relative;}
 
-  /* Outcome cards */
-  .outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-  .outcome-card{border-radius:10px;padding:14px;text-align:center;border:2px solid;}
-  .outcome-card.base{background:rgba(28,199,208,0.08);border-color:rgba(28,199,208,0.4);}
-  .outcome-card.scenario{background:rgba(255,159,67,0.08);border-color:rgba(255,159,67,0.4);}
-  .outcome-card.verdict{border:none;display:flex;flex-direction:column;justify-content:center;}
-  .oc-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
-  .oc-val{font-size:22px;font-weight:900;line-height:1;}
-  .oc-sub{font-size:9px;margin-top:5px;line-height:1.4;}
-  .oc-diff{font-size:12px;font-weight:700;margin-top:4px;}
+/* ── VERDICT BANNER ── */
+.verdict-banner{background:#fff;border-radius:6px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;border:1px solid #e8eaed;border-top:3px solid #4CAF50;}
+.verdict-icon{font-size:26px;flex-shrink:0;}
+.verdict-title{font-size:13px;font-weight:800;margin-bottom:4px;}
+.verdict-detail{font-size:11px;line-height:1.7;color:#37474F;}
+.recs{background:#F8F9FA;border-radius:6px;padding:10px 12px;margin-top:8px;border:1px solid #e8eaed;}
+.recs-title{font-size:8px;font-weight:700;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.rec-item{display:flex;gap:8px;font-size:10px;color:#37474F;line-height:1.6;margin-bottom:4px;}
 
-  /* Chart */
-  .chart-card{background:var(--mid);border-radius:10px;padding:16px;border:1px solid #1a3a52;}
-  .chart-title{font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
-  .chart-area{height:200px;position:relative;}
+/* ── FINGERPRINT BAR ── dark engine card style */
+#plan-fingerprint{background:#041E2F;border-radius:6px;padding:12px 16px;margin-bottom:12px;border-left:4px solid #1CC7D0;border-top:3px solid #1CC7D0;}
+.fp-cell{text-align:center;padding:8px;background:rgba(255,255,255,0.05);border-radius:4px;}
+.fp-label{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;font-weight:700;}
+.fp-val{font-size:16px;font-weight:800;color:#fff;line-height:1;}
+.fp-note{font-size:8px;color:#8aaabb;margin-top:3px;}
 
-  /* Verdict banner */
-  .verdict-banner{border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;}
-  .verdict-icon{font-size:28px;flex-shrink:0;}
-  .verdict-title{font-size:14px;font-weight:800;margin-bottom:4px;}
-  .verdict-detail{font-size:11px;line-height:1.7;opacity:0.9;}
+/* ── FIRE PANEL ── dark */
+.fire-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.fire-box{background:#0A3145;border-radius:6px;padding:10px;text-align:center;border:1px solid #1a3a52;}
+.fire-label{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;font-weight:700;}
 
-  /* Recommendations */
-  .recs{background:rgba(0,0,0,0.2);border-radius:8px;padding:12px 14px;margin-top:8px;}
-  .recs-title{font-size:9px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
-  .rec-item{display:flex;gap:8px;font-size:10px;color:#c8dae8;line-height:1.6;margin-bottom:4px;}
+/* ── INFO BOXES ── */
+.info-teal{background:#e0f7fa;border-radius:6px;padding:12px 14px;font-size:11px;color:#004D40;line-height:1.7;border-left:4px solid #00838f;margin-bottom:12px;}
+.info-amber{background:#fff8e1;border-radius:6px;padding:12px 14px;font-size:10px;color:#5d3a00;line-height:1.7;border-left:4px solid #f4b86a;}
+.improve-panel{background:#041E2F;border-radius:6px;padding:16px 20px;margin-top:12px;border-top:3px solid #4CAF50;}
 
-  /* What-if note */
-  .whatif{background:rgba(244,184,106,0.1);border-radius:8px;padding:10px 14px;font-size:10px;color:#f4b86a;line-height:1.6;border-left:3px solid var(--orange);}
+/* ── NOTICES ── */
+#your-data-notice{background:#e8f5e9;border:1px solid #4CAF50;border-radius:6px;padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px;font-size:11px;}
+#sample-notice{background:#fff8e1;border:1px solid #f4b86a;border-radius:6px;padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px;font-size:11px;}
 
-  @media(max-width:768px){
-    .main-grid{grid-template-columns:1fr;}
-    .outcome-grid{grid-template-columns:1fr 1fr;}
-  }
+/* ── LOADING ── */
+@keyframes spin{to{transform:rotate(360deg);}}
+#loading-msg{text-align:center;padding:60px 20px;background:#fff;border-radius:6px;margin-top:20px;}
+
+@media(max-width:768px){
+  .main-grid{grid-template-columns:1fr;}
+  .outcome-grid{grid-template-columns:1fr 1fr;}
+  .fire-grid{grid-template-columns:1fr 1fr;}
+  .hero{border-radius:0;}
+}
 </style>
 </head>
 <body>
@@ -103,7 +122,7 @@
     <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;font-size:11px;text-decoration:none;">🎬 Demo</a>
   </div>
 </div>
-<div style="background:#0A3145;border-bottom:1px solid #1a3a52;padding:0 16px;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;">
+<div class="nav-strip">
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Home</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Dashboard</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Inputs</a>
@@ -117,15 +136,15 @@
 <div class="body">
 
 <div class="hero">
-  <h1>⚡ Interactive <span>Stress Tester</span></h1>
-  <p>Use sliders to simulate real-world scenarios against YOUR actual portfolio data. See instantly how a market crash, high inflation, or reduced spending affects your ending balance and legacy goal. This is where retirement plans get battle-tested.</p>
+  <h1 style="color:#fff;">⚡ Interactive <span style="color:#1CC7D0;">Stress Tester</span></h1>
+  <p style="color:#c8dae8;">Use sliders to simulate real-world scenarios against YOUR actual portfolio data. See instantly how a market crash, high inflation, or reduced spending affects your ending balance and legacy goal. This is where retirement plans get battle-tested.</p>
 </div>
 
 <div id="loading-msg" style="text-align:center;padding:50px 20px;">
   <!-- Spinner -->
   <div style="display:inline-block;width:48px;height:48px;border:4px solid #1a3a52;border-top:4px solid #1CC7D0;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px;"></div>
   <br>
-  <div id="loading-status" style="font-size:14px;font-weight:700;color:#c8dae8;margin-bottom:12px;">Connecting to your Google Sheet...</div>
+  <div id="loading-status" style="font-size:14px;font-weight:700;color:#041E2F;margin-bottom:12px;">Connecting to your Google Sheet...</div>
   
   <!-- Progress bar -->
   <div style="max-width:320px;margin:0 auto 16px;">
@@ -172,37 +191,37 @@
   </div>
 
   <!-- YOUR PLAN FINGERPRINT BAR -->
-  <div id="plan-fingerprint" style="display:none;background:#0A3145;border-radius:10px;padding:12px 18px;margin-bottom:14px;border:2px solid rgba(28,199,208,0.3);">
-    <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">
+  <div id="plan-fingerprint" style="display:none;background:#fff;border-radius:10px;padding:12px 18px;margin-bottom:14px;border:2px solid #1CC7D0;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+    <div style="font-size:9px;font-weight:800;color:#006064;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">
       🔍 Your Plan at a Glance — Confirm This Is Your Data
     </div>
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
-      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
-        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Portfolio</div>
+      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
+        <div class="fp-label">Total Portfolio</div>
         <div style="font-size:16px;font-weight:800;color:#fff;" id="fp-portfolio">—</div>
         <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Starting value</div>
       </div>
-      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
-        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Legacy Goal</div>
+      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
+        <div class="fp-label">Legacy Goal</div>
         <div style="font-size:16px;font-weight:800;color:#f4b86a;" id="fp-legacy">—</div>
         <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Target ending balance</div>
       </div>
-      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
-        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Base Ending Balance</div>
+      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
+        <div class="fp-label">Base Ending Balance</div>
         <div style="font-size:16px;font-weight:800;color:#4CAF50;" id="fp-ending">—</div>
         <div style="font-size:8px;color:#5a7a8a;margin-top:2px;" id="fp-ending-note">Matches Dashboard ✓</div>
       </div>
-      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
-        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Plan Runs Through</div>
+      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
+        <div class="fp-label">Plan Runs Through</div>
         <div style="font-size:16px;font-weight:800;color:#1CC7D0;" id="fp-end-year">—</div>
         <div style="font-size:8px;color:#5a7a8a;margin-top:2px;" id="fp-end-note">Both partners covered</div>
       </div>
-      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
-        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Annual Spending</div>
+      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
+        <div class="fp-label">Annual Spending</div>
         <div style="font-size:16px;font-weight:800;color:#fff;" id="fp-spending">—</div>
         <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Base + solver extra</div>
       </div>
-      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;border:1px solid rgba(255,107,107,0.3);">
+      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;border:1px solid rgba(255,107,107,0.3);">
         <div style="font-size:8px;color:#ff9f43;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">⚡ Stress: -30% Yr1</div>
         <div style="font-size:16px;font-weight:800;" id="fp-stress30">—</div>
         <div style="font-size:8px;margin-top:2px;" id="fp-stress30-note">—</div>
@@ -216,17 +235,17 @@
   </div>
 
   <!-- WHAT DOES THIS MEAN EXPLAINER -->
-  <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px 16px;margin-bottom:12px;border-left:4px solid #1CC7D0;font-size:11px;color:#c8dae8;line-height:1.8;">
-    <strong style="color:#1CC7D0;">📖 How to Read This Page:</strong>
+  <div style="background:#f8f9fa;border-radius:8px;border:1px solid #e8eaed;padding:12px 16px;margin-bottom:12px;border-left:4px solid #1CC7D0;font-size:11px;color:#c8dae8;line-height:1.8;">
+    <strong style="color:#f4b86a;">📖 How to Read This Page:</strong>
     The sliders show what happens if a market crash hits in <strong>Year 1 of retirement</strong> — the worst possible timing.
     Your Dashboard's $250K ending assumes smooth 7% returns every year.
     A Year 1 crash means you sell shares at the bottom while withdrawing living expenses — those shares never recover for you.
     <br>
-    <strong style="color:#f4b86a;">The most powerful lever isn't the market — it's your spending.</strong>
+    <strong style="color:#E65100;">The most powerful lever isn't the market — it's your spending.</strong>
     Try setting the <em>Spending Adjustment</em> slider to <strong>-10%</strong> and watch the outcome improve dramatically.
     Cutting $8,700/yr in a downturn can mean the difference between success and failure.
     <br>
-    <strong style="color:#4CAF50;">Want to change the base numbers?</strong>
+    <strong style="color:#2E7D32;">Want to change the base numbers?</strong>
     Adjust your SS start date, spending phases, or return rates in 
     <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:700;">Inputs</a>, 
     save, then refresh this page to see updated stress results.
@@ -300,7 +319,7 @@
 
       <button class="reset-btn" onclick="resetSliders()">↺ Reset to Base Scenario</button>
 
-      <div class="whatif" style="margin-top:14px;">
+      <div class="info-amber" style="margin-top:14px;">
         💡 <strong>The most powerful action:</strong> Reducing spending by even 10% in the first 3 years of a downturn dramatically improves outcomes. Try setting spending to -10% and watch the ending balance change.
       </div>
     </div>
@@ -322,7 +341,7 @@
           <div class="oc-sub" style="color:#8aaabb;">Ending balance · with stress</div>
           <div class="oc-diff" id="res-stress-conf">—</div>
         </div>
-        <div class="outcome-card" id="verdict-card" style="background:rgba(76,175,80,0.1);border-color:rgba(76,175,80,0.4);">
+        <div class="outcome-card" id="verdict-card" style="background:#e8f5e9;border-color:#4CAF50;">
           <div class="oc-label">📋 Verdict</div>
           <div class="oc-val" id="res-verdict-icon" style="font-size:28px;">✅</div>
           <div class="oc-sub" id="res-verdict-text" style="color:#8aaabb;font-size:10px;">Plan survives</div>
@@ -358,40 +377,40 @@
   </div><!-- /main-grid -->
 
   <!-- IMPROVE YOUR PLAN PANEL -->
-  <div style="background:linear-gradient(135deg,#0d2010,#1a3a20);border-radius:12px;padding:18px 22px;margin-top:16px;border:1px solid rgba(76,175,80,0.3);">
+  <div class="improve-panel">
     <div style="font-size:12px;font-weight:800;color:#4CAF50;margin-bottom:14px;">💡 How to Improve Your Stress Test Results</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
 
       <div>
-        <div style="font-size:10px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🎛️ Try These Slider Combinations</div>
-        <div style="font-size:10px;color:#a5d6a7;line-height:2.0;">
+        <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🎛️ Try These Slider Combinations</div>
+        <div style="font-size:10px;color:#8aaabb;line-height:2.0;">
           <strong style="color:#fff;">Spend -10%</strong> during bad years → biggest single improvement<br>
           <strong style="color:#fff;">Bad Years = 2-3</strong> → tests prolonged downturn (2000-2002 style)<br>
-          <strong style="color:#fff;">COLA 0%</strong> → tests SS reform / no increase scenario<br>
-          <strong style="color:#fff;">Inflation 5%</strong> → 1970s scenario (high inflation + market crash)<br>
-          <strong style="color:#fff;">Bull Market preset</strong> → see your upside if markets cooperate
+          <strong style="color:#f4b86a;">COLA 0%</strong> → tests SS reform / no increase scenario<br>
+          <strong style="color:#f4b86a;">Inflation 5%</strong> → 1970s scenario (high inflation + market crash)<br>
+          <strong style="color:#f4b86a;">Bull Market preset</strong> → see your upside if markets cooperate
         </div>
       </div>
 
       <div>
-        <div style="font-size:10px;font-weight:800;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">⚙️ Change Base Numbers in Inputs</div>
-        <div style="font-size:10px;color:#a5d6a7;line-height:2.0;">
-          <strong style="color:#fff;">Delay SS start date</strong> → bigger guaranteed income floor = less portfolio dependence<br>
-          <strong style="color:#fff;">Lower Phase 1 spending</strong> → less withdrawal in vulnerable early years<br>
-          <strong style="color:#fff;">More Roth conversions</strong> → Roth withdrawals don't increase taxable income<br>
-          <strong style="color:#fff;">Higher return rates</strong> → test optimistic vs conservative assumptions
+        <div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">⚙️ Change Base Numbers in Inputs</div>
+        <div style="font-size:10px;color:#8aaabb;line-height:2.0;">
+          <strong style="color:#f4b86a;">Delay SS start date</strong> → bigger guaranteed income floor = less portfolio dependence<br>
+          <strong style="color:#f4b86a;">Lower Phase 1 spending</strong> → less withdrawal in vulnerable early years<br>
+          <strong style="color:#f4b86a;">More Roth conversions</strong> → Roth withdrawals don't increase taxable income<br>
+          <strong style="color:#f4b86a;">Higher return rates</strong> → test optimistic vs conservative assumptions
         </div>
         <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html"
            style="display:inline-block;margin-top:10px;background:#f4b86a;color:#041E2F;font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;">
           Open Inputs → Make Changes
         </a>
-        <div style="font-size:9px;color:#5a7a8a;margin-top:5px;">Save in Inputs, then press Cmd+Shift+R here</div>
+        <div style="font-size:9px;color:#8aaabb;margin-top:5px;">Save in Inputs, then press Cmd+Shift+R here</div>
       </div>
     </div>
   </div>
 
   <!-- SEQUENCE RISK EXPLAINER -->
-  <div class="whatif" style="margin-top:12px;">
+  <div class="info-amber" style="margin-top:12px;">
     📖 <strong>What is Sequence of Returns Risk?</strong>
     The biggest retirement threat isn't a bad market — it's a bad market at the WRONG TIME.
     A $925K portfolio dropping 20% in Year 1 becomes $740K before you withdraw anything.
@@ -423,6 +442,8 @@ var SCENARIOS = {
 };
 
 function setScenario(key) {
+  var hs = document.getElementById('hero-scenario');
+  if (hs) hs.textContent = SCENARIOS[key].label || key;
   var s = SCENARIOS[key];
   document.querySelectorAll('.tab-btn').forEach(function(b,i){
     b.classList.toggle('active', ['custom','crash2008','dotcom','covid','stagflation','bestcase'][i]===key);
@@ -496,8 +517,8 @@ function project(overrides) {
   var colaRate = (overrides.cola !== undefined ? overrides.cola : baseCola*100) / 100;
   var isBase   = (yr1Shock === 0 && spendAdj === 1 && inflation === baseInfl && colaRate === baseCola);
 
-  // BASE: use actual sheet projections if available
-  if (isBase && projEnds && projEnds.length > 0) {
+  // BASE: always use actual sheet projections when available — never re-calculate
+  if (projEnds && projEnds.length > 0 && yr1Shock === 0 && spendAdj === 1) {
     return projEnds.map(function(bal, i) {
       return { year: (projYears ? projYears[i] : curYear+i), bal: Math.max(0, bal||0) };
     });
@@ -548,13 +569,7 @@ function project(overrides) {
     }
   }
 
-  // If base scenario ending doesn't match sheet, note the calibration
-  if (isBase && baseEndTarget > 0 && results.length > 0) {
-    var lastBal = results[results.length-1].bal;
-    if (Math.abs(lastBal - baseEndTarget) > baseEndTarget * 0.1) {
-      console.log('Base calibration: projected', lastBal, 'vs sheet', baseEndTarget);
-    }
-  }
+  // No calibration warning needed — base always uses real sheet data
 
   return results;
 }
@@ -665,7 +680,10 @@ function recalc() {
   var stressRes = project({yr1:yr1, yrs:yrs, inf:inf, spend:sp, cola:cola});
 
   var legGoal = (planData.legacy||{}).goal || 0;
-  var baseEnd   = baseRes.length>0   ? baseRes[baseRes.length-1].bal   : 0;
+  // Use actual projectedEnding from sheet as base — most accurate
+  var baseEnd = (planData && planData.legacy && planData.legacy.projectedEnding)
+    ? planData.legacy.projectedEnding
+    : (baseRes.length > 0 ? baseRes[baseRes.length-1].bal : 0);
   var stressEnd = stressRes.length>0 ? stressRes[stressRes.length-1].bal : 0;
 
   var baseConf   = legGoal>0 ? Math.min(100,Math.round(baseEnd/legGoal*100))   : 100;
@@ -706,6 +724,8 @@ function recalc() {
   }
 
   document.getElementById('res-verdict-icon').textContent = icon;
+  var hv = document.getElementById('hero-verdict');
+  if (hv) hv.textContent = title.split(' ')[0]+' '+title.split(' ')[1];
   document.getElementById('res-verdict-text').textContent = stressConf+'% funded under this scenario';
   document.getElementById('verdict-title').textContent = title;
   document.getElementById('verdict-title').style.color = color;
@@ -760,10 +780,10 @@ function recalc() {
       ]},
       options:{
         responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:12}}},
+        plugins:{legend:{display:true,labels:{font:{size:10},color:'#5F6368',boxWidth:12}}},
         scales:{
-          x:{ticks:{font:{size:10},color:'#8aaabb'},grid:{display:false}},
-          y:{ticks:{font:{size:10},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.04)'}}
+          x:{ticks:{font:{size:10},color:'#5F6368'},grid:{display:false}},
+          y:{ticks:{font:{size:10},color:'#5F6368',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.04)'}}
         }
       }
     });
