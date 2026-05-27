@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireBlueprint Pro — Long-Term Care Planner</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+function rbpApplyNames(p1,p2){
+  p1=p1||localStorage.getItem('rbp_p1_name')||'Partner 1';
+  p2=p2||localStorage.getItem('rbp_p2_name')||'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el){el.textContent=p1;});
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el){el.textContent=p2;});
+  window.rbpP1Name=p1;window.rbpP2Name=p2;
+}
+document.addEventListener('DOMContentLoaded',rbpApplyNames);
+window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key==='rbp_p2_name')rbpApplyNames();});
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#041E2F;--n2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--border:#1a3a52;--muted:#6a8a9a;--white:#fff;--green:#4CAF50;--red:#ef5350;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
+.header{background:var(--navy);border-bottom:3px solid var(--orange);padding:0 20px;display:flex;align-items:center;gap:16px;}
+.header img{height:32px;padding:10px 0;}
+.nav{background:var(--n2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{padding:10px 13px;font-size:10px;font-weight:700;color:var(--teal);text-decoration:none;text-transform:uppercase;letter-spacing:0.7px;border-right:1px solid var(--border);white-space:nowrap;}
+.nav a:hover{background:var(--border);color:var(--white);}
+.nav a.active{color:var(--orange);}
+.nav-right{margin-left:auto;display:flex;}
+.hero{background:var(--navy);padding:36px 24px 28px;border-bottom:2px solid var(--border);}
+.hero h1{font-size:26px;font-weight:900;color:var(--white);margin-bottom:8px;}
+.hero h1 span{color:var(--teal);}
+.hero p{font-size:13px;color:var(--muted);max-width:660px;line-height:1.8;}
+.page{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
+.card{background:#fff;border-radius:12px;border:1px solid #e8eaed;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.card-hdr{background:var(--navy);padding:14px 20px;}
+.card-title{font-size:14px;font-weight:800;color:var(--white);}
+.card-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.card-body{padding:20px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.kpi{background:var(--n2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.kpi-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.kpi-val{font-size:22px;font-weight:900;color:var(--teal);}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select{background:#f8f9fa;border:1px solid #e0e4e8;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
+.field input:focus{outline:none;border-color:var(--teal);}
+.range-val{font-size:14px;font-weight:800;color:var(--teal);margin-left:8px;}
+.alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:14px;}
+.alert-orange{background:#fff8e1;border-left:3px solid var(--orange);color:#5a4000;}
+.alert-red{background:rgba(239,83,80,0.08);border-left:4px solid var(--red);color:#7f1d1d;}
+.alert-green{background:#e8f5e9;border-left:3px solid var(--green);color:#1B5E20;}
+.alert-teal{background:rgba(28,199,208,0.08);border-left:3px solid var(--teal);color:#0d4a50;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;margin-bottom:8px;}
+.stat-label{font-size:12px;color:#37474F;}
+.stat-val{font-size:13px;font-weight:800;}
+.care-type{border:2px solid #e8eaed;border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;}
+.care-type:hover{border-color:var(--teal);}
+.care-type.selected{border-color:var(--teal);background:rgba(28,199,208,0.05);}
+.care-type-name{font-size:13px;font-weight:800;color:#0B2239;margin-bottom:4px;}
+.care-type-cost{font-size:18px;font-weight:900;color:var(--orange);}
+.care-type-desc{font-size:11px;color:#6a8a9a;margin-top:4px;line-height:1.5;}
+.strategy-card{border-radius:10px;border:1px solid #e8eaed;padding:16px;background:#f8f9fa;}
+.strategy-title{font-size:13px;font-weight:800;color:#0B2239;margin-bottom:8px;}
+.strategy-pros{margin-bottom:8px;}
+.strategy-pro,.strategy-con{font-size:11px;color:#455A64;margin-bottom:3px;padding-left:14px;position:relative;}
+.strategy-pro::before{content:'✓';position:absolute;left:0;color:#4CAF50;font-weight:700;}
+.strategy-con::before{content:'✗';position:absolute;left:0;color:#ef5350;font-weight:700;}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr;}.page{padding:16px 12px 60px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro">
+</div>
+
+<div class="nav">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">🔄 Roth Ladder</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">🏥 Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html" class="active">🏠 LTC Planner</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#ff9f43;font-weight:700;">⚡ Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
+  <div class="nav-right">
+    <a href="#" onclick="loadData();return false;" style="padding:10px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;">🔄 Refresh</a>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="padding:10px 14px;font-size:10px;font-weight:700;color:#8aaabb;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;">📋 What's New</a>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>🏠 Long-Term Care <span>Planner</span></h1>
+  <p>70% of people over 65 will need some form of long-term care. The average cost is $60,000–$150,000/year.
+  Medicare covers almost none of it. This planner helps <strong data-rbp-p1>Partner 1</strong> and
+  <strong data-rbp-p2>Partner 2</strong> estimate the cost, understand the options, and plan accordingly —
+  so this doesn't blindside your retirement portfolio.</p>
+</div>
+
+<div class="page">
+
+  <!-- REALITY CHECK -->
+  <div class="alert alert-red" style="border-radius:12px;padding:16px 20px;">
+    <strong style="font-size:14px;color:#ef5350;">The number most retirement plans ignore:</strong>
+    The median cost of a private nursing home room in the US is <strong>$9,800/month ($117,600/year)</strong>.
+    Home health aides average <strong>$5,600/month</strong>. Medicare covers skilled nursing only after a 3-day hospital stay,
+    and only for the first 20 days at full cost. After day 100, you're entirely on your own.
+    Medicaid covers LTC — but only after you've spent down nearly all your assets.
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="grid3" style="margin-bottom:24px;">
+    <div class="kpi"><div class="kpi-label">Est. LTC Reserve Needed</div><div class="kpi-val" id="k-reserve">—</div><div class="kpi-sub">Total for both partners</div></div>
+    <div class="kpi"><div class="kpi-label">Monthly Set-Aside</div><div class="kpi-val" id="k-monthly">—</div><div class="kpi-sub">To self-fund from now</div></div>
+    <div class="kpi"><div class="kpi-label">Portfolio Impact</div><div class="kpi-val" id="k-impact">—</div><div class="kpi-sub">If unfunded, drawn from savings</div></div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">⚙️ Your LTC Planning Assumptions</div></div>
+    <div class="card-body">
+      <div class="grid2">
+        <div>
+          <div class="field"><label><span data-rbp-p1>P1</span> Current Age</label><input type="number" id="p1-age" value="63" min="40" max="85" onchange="calc()"></div>
+          <div class="field"><label><span data-rbp-p2>P2</span> Current Age</label><input type="number" id="p2-age" value="55" min="40" max="85" onchange="calc()"></div>
+          <div class="field">
+            <label>Age When Care Might Begin: <span class="range-val" id="lbl-start-age">80</span></label>
+            <input type="range" id="start-age" min="70" max="90" value="80" oninput="document.getElementById('lbl-start-age').textContent=this.value;calc()">
+          </div>
+          <div class="field">
+            <label>Years of Care Needed: <span class="range-val" id="lbl-care-years">3</span> years each</label>
+            <input type="range" id="care-years" min="1" max="10" value="3" oninput="document.getElementById('lbl-care-years').textContent=this.value;calc()">
+          </div>
+        </div>
+        <div>
+          <div class="field"><label>Current Portfolio Balance</label><input type="number" id="portfolio" value="1000000" step="50000" onchange="calc()"></div>
+          <div class="field"><label>LTC Insurance? (Monthly Benefit)</label><input type="number" id="ltc-insurance" value="0" step="500" placeholder="0 if no LTC insurance" onchange="calc()"></div>
+          <div class="field">
+            <label>Care Setting</label>
+            <select id="care-setting" onchange="calc()">
+              <option value="55000">In-Home Care (part-time aide, ~$55K/yr)</option>
+              <option value="84000" selected>In-Home Care (full-time aide, ~$84K/yr)</option>
+              <option value="60000">Assisted Living (~$60K/yr)</option>
+              <option value="108000">Memory Care (~$108K/yr)</option>
+              <option value="118000">Nursing Home, semi-private (~$118K/yr)</option>
+              <option value="140000">Nursing Home, private room (~$140K/yr)</option>
+            </select>
+          </div>
+          <div class="field"><label>Expected Portfolio Return (%)</label><input type="number" id="ret-rate" value="6" min="1" max="12" step="0.5" onchange="calc()"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COST BREAKDOWN -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">💰 LTC Cost Analysis</div></div>
+    <div class="card-body" id="cost-breakdown"></div>
+  </div>
+
+  <!-- CHART -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📊 Portfolio Impact: Funded vs. Unfunded LTC</div></div>
+    <div class="card-body">
+      <div style="position:relative;height:260px;">
+        <canvas id="ltc-chart"></canvas>
+      </div>
+      <div style="font-size:11px;color:#6a8a9a;margin-top:8px;text-align:center;">
+        Orange line = with LTC reserve deducted · Teal line = without LTC reserve (optimistic) · Shaded area = the risk gap
+      </div>
+    </div>
+  </div>
+
+  <!-- CARE TYPES -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">🏠 Types of Long-Term Care — 2025 National Median Costs</div></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+        <div class="care-type"><div class="care-type-name">In-Home (Part-Time)</div><div class="care-type-cost">$4,576/mo</div><div class="care-type-desc">Home health aide ~20 hrs/week. Good for early stages. Family provides remaining care.</div></div>
+        <div class="care-type"><div class="care-type-name">In-Home (Full-Time)</div><div class="care-type-cost">$6,864/mo</div><div class="care-type-desc">Home health aide 40+ hrs/week. Allows staying in own home. Often preferred option.</div></div>
+        <div class="care-type"><div class="care-type-name">Assisted Living</div><div class="care-type-cost">$5,350/mo</div><div class="care-type-desc">Residential community with meals, activities, help with daily tasks. Not skilled nursing.</div></div>
+        <div class="care-type"><div class="care-type-name">Memory Care</div><div class="care-type-cost">$9,034/mo</div><div class="care-type-desc">Specialized dementia/Alzheimer's care. Secured environment, specialized staff.</div></div>
+        <div class="care-type"><div class="care-type-name">Nursing Home (Shared)</div><div class="care-type-cost">$9,733/mo</div><div class="care-type-desc">24/7 skilled nursing care. Semi-private room. Medicare covers limited days only.</div></div>
+        <div class="care-type"><div class="care-type-name">Nursing Home (Private)</div><div class="care-type-cost">$11,139/mo</div><div class="care-type-desc">24/7 skilled nursing, private room. Full control, most privacy. Highest cost.</div></div>
+      </div>
+      <div class="alert alert-orange">
+        <strong>These are national medians for 2025.</strong> Costs vary dramatically by location — urban areas in the Northeast and West Coast run 50–100% higher.
+        Costs also rise with medical inflation (~4–5%/year), so a $9,000/month nursing home today may cost $15,000+/month in 20 years.
+      </div>
+    </div>
+  </div>
+
+  <!-- FUNDING STRATEGIES -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">🔑 LTC Funding Strategies — What Are Your Options?</div></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+
+        <div class="strategy-card">
+          <div class="strategy-title">💰 Self-Fund (Dedicated Reserve)</div>
+          <div class="strategy-pros">
+            <div class="strategy-pro">Complete control</div>
+            <div class="strategy-pro">Unused funds go to heirs</div>
+            <div class="strategy-pro">No premiums, no insurer risk</div>
+          </div>
+          <div class="strategy-con">Requires large liquid reserve</div>
+          <div class="strategy-con">Market risk during care period</div>
+          <div style="font-size:11px;color:#6a8a9a;margin-top:8px;">Best for: High net worth ($2M+), disciplined savers</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">📋 Traditional LTC Insurance</div>
+          <div class="strategy-pros">
+            <div class="strategy-pro">Transfers risk to insurer</div>
+            <div class="strategy-pro">Daily/monthly benefit for care costs</div>
+            <div class="strategy-pro">Inflation protection riders available</div>
+          </div>
+          <div class="strategy-con">Expensive — $2,000–$5,000+/yr per person</div>
+          <div class="strategy-con">Use-it-or-lose-it (no payout if no claim)</div>
+          <div class="strategy-con">Insurers have raised premiums significantly</div>
+          <div style="font-size:11px;color:#6a8a9a;margin-top:8px;">Best for: Ages 55–65, good health, middle wealth</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">🔄 Hybrid Life/LTC Policy</div>
+          <div class="strategy-pros">
+            <div class="strategy-pro">Death benefit if care not needed</div>
+            <div class="strategy-pro">Premiums typically guaranteed</div>
+            <div class="strategy-pro">Asset-based — not use-it-or-lose-it</div>
+          </div>
+          <div class="strategy-con">High upfront lump sum often required</div>
+          <div class="strategy-con">Lower LTC benefit per dollar than pure LTC</div>
+          <div style="font-size:11px;color:#6a8a9a;margin-top:8px;">Best for: Those with liquid assets looking to reposition</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">🏠 Home Equity / Reverse Mortgage</div>
+          <div class="strategy-pros">
+            <div class="strategy-pro">Taps into built-up home equity</div>
+            <div class="strategy-pro">Can fund in-home care specifically</div>
+            <div class="strategy-pro">No monthly payments required</div>
+          </div>
+          <div class="strategy-con">Reduces inheritance for heirs</div>
+          <div class="strategy-con">Complex rules, fees, and restrictions</div>
+          <div style="font-size:11px;color:#6a8a9a;margin-top:8px;">Best for: High home equity, want to age in place</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">👨‍👩‍👧 Family Caregiving</div>
+          <div class="strategy-pros">
+            <div class="strategy-pro">Lowest financial cost</div>
+            <div class="strategy-pro">Familiar environment and relationships</div>
+          </div>
+          <div class="strategy-con">Enormous burden on family caregivers</div>
+          <div class="strategy-con">May require one family member to stop working</div>
+          <div class="strategy-con">Not viable for high-acuity care needs</div>
+          <div style="font-size:11px;color:#6a8a9a;margin-top:8px;">Best for: Early stages, strong family support system</div>
+        </div>
+
+        <div class="strategy-card" style="border-color:#ef5350;background:rgba(239,83,80,0.03);">
+          <div class="strategy-title" style="color:#ef5350;">🏛️ Medicaid (Last Resort)</div>
+          <div class="strategy-pros">
+            <div class="strategy-pro">Covers nursing home indefinitely</div>
+            <div class="strategy-pro">No cost to you after spend-down</div>
+          </div>
+          <div class="strategy-con">Must spend down to ~$2,000 in assets</div>
+          <div class="strategy-con">5-year lookback on asset transfers</div>
+          <div class="strategy-con">Limited facility choices, shared rooms</div>
+          <div class="strategy-con">Spouse protections are complex</div>
+          <div style="font-size:11px;color:#6a8a9a;margin-top:8px;">Relevant for: Very low income/assets — plan before you need it</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+var ltcChart = null;
+
+function fmt(n){if(!n&&n!==0)return '—';if(Math.abs(n)>=1000000)return '$'+(n/1000000).toFixed(1)+'M';if(Math.abs(n)>=1000)return '$'+Math.round(n).toLocaleString();return '$'+n.toFixed(0);}
+
+function calc() {
+  var p1Age    = parseInt(document.getElementById('p1-age').value)||63;
+  var p2Age    = parseInt(document.getElementById('p2-age').value)||55;
+  var startAge = parseInt(document.getElementById('start-age').value)||80;
+  var careYrs  = parseInt(document.getElementById('care-years').value)||3;
+  var portfolio= parseInt(document.getElementById('portfolio').value)||1000000;
+  var ltcIns   = parseInt(document.getElementById('ltc-insurance').value)||0;
+  var careCost = parseInt(document.getElementById('care-setting').value)||84000;
+  var retRate  = parseFloat(document.getElementById('ret-rate').value)/100||0.06;
+  var ltcInfl  = 0.04; // LTC costs inflate ~4%/yr
+  var genInfl  = 0.03;
+
+  var curYear = new Date().getFullYear();
+  var p1Name = window.rbpP1Name||'Partner 1';
+  var p2Name = window.rbpP2Name||'Partner 2';
+
+  // Years until care starts (use younger person as base)
+  var youngerAge = Math.min(p1Age, p2Age);
+  var yrsUntilCare = Math.max(0, startAge - youngerAge);
+
+  // Future cost at care start (both partners)
+  var futureCostPerPerson = careCost * Math.pow(1 + ltcInfl, yrsUntilCare);
+  var totalCostPerPerson = futureCostPerPerson * careYrs;
+  var insOffsetPerPerson = ltcIns * 12 * careYrs; // LTC insurance benefit
+  var netCostPerPerson = Math.max(0, totalCostPerPerson - insOffsetPerPerson);
+  var totalBothPartners = netCostPerPerson * 2;
+
+  // PV of that cost (how much to set aside today)
+  var pvReserve = totalBothPartners / Math.pow(1 + retRate, yrsUntilCare);
+  var monthlySetAside = pvReserve / (yrsUntilCare * 12);
+
+  // Portfolio impact: what % of current portfolio
+  var portfolioImpact = totalBothPartners / portfolio * 100;
+
+  document.getElementById('k-reserve').textContent = fmt(pvReserve) + ' today';
+  document.getElementById('k-monthly').textContent = fmt(monthlySetAside) + '/mo';
+  document.getElementById('k-impact').textContent = portfolioImpact.toFixed(0) + '% of portfolio';
+
+  // Cost breakdown
+  var cb = document.getElementById('cost-breakdown');
+  cb.innerHTML =
+    '<div class="grid2"><div>' +
+    statRow('Care cost today', fmt(careCost) + '/yr') +
+    statRow('Care cost at age ' + startAge + ' (4% inflation)', fmt(futureCostPerPerson) + '/yr') +
+    statRow('Years of care each', careYrs + ' years') +
+    statRow('LTC insurance offset', ltcIns > 0 ? fmt(insOffsetPerPerson) + ' per person' : 'None — self-funded') +
+    statRow('Net cost per person', fmt(netCostPerPerson), netCostPerPerson > 200000 ? '#ef5350' : '#f4b86a') +
+    statRow('Net cost BOTH partners', fmt(totalBothPartners), '#ef5350') +
+    '</div><div>' +
+    '<div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;margin-bottom:10px;">What This Means</div>' +
+    '<div style="font-size:13px;color:#37474F;line-height:1.8;">' +
+    'If both <strong>' + p1Name.split(' ')[0] + '</strong> and <strong>' + p2Name.split(' ')[0] + '</strong> each need ' +
+    '<strong>' + careYrs + ' years</strong> of care starting around age <strong>' + startAge + '</strong>, the total out-of-pocket cost ' +
+    (ltcIns > 0 ? 'after insurance ' : '') + 'is estimated at <strong style="color:#ef5350;">' + fmt(totalBothPartners) + '</strong>.<br><br>' +
+    'To have that money ready, set aside <strong style="color:#1CC7D0;">' + fmt(monthlySetAside) + '/month</strong> starting today, ' +
+    'invested at ' + (retRate*100).toFixed(1) + '% return.<br><br>' +
+    '<strong style="color:#f4b86a;">If unfunded:</strong> this would represent ' + portfolioImpact.toFixed(0) + '% of your current portfolio — ' +
+    'a significant unplanned draw that could affect your legacy and income plan.' +
+    '</div></div></div></div>';
+
+  buildChart(portfolio, pvReserve, yrsUntilCare, careYrs, retRate, curYear);
+}
+
+function statRow(label, value, color) {
+  return '<div class="stat-row"><span class="stat-label">' + label + '</span><span class="stat-val" style="color:' + (color||'#0B2239') + ';">' + value + '</span></div>';
+}
+
+function buildChart(portfolio, reserve, yrsUntilCare, careYrs, retRate, curYear) {
+  var years = 40;
+  var labels = [], withLTC = [], withoutLTC = [];
+  var balWith = portfolio - reserve; // set aside reserve immediately
+  var balWithout = portfolio;
+
+  for (var i = 0; i <= years; i++) {
+    labels.push(curYear + i);
+    withLTC.push(Math.max(0, Math.round(balWith)));
+    withoutLTC.push(Math.max(0, Math.round(balWithout)));
+    balWith *= (1 + retRate);
+    balWithout *= (1 + retRate);
+    // At care start years, deduct care costs
+    if (i === yrsUntilCare) {
+      var costAtCare = parseInt(document.getElementById('care-setting').value) * Math.pow(1.04, i);
+      var ltcIns = parseInt(document.getElementById('ltc-insurance').value)||0;
+      var annualDraw = (costAtCare - ltcIns*12) * 2; // both partners
+      for (var j = 0; j < Math.min(careYrs, years - i); j++) {
+        balWithout -= annualDraw;
+        balWithout = Math.max(0, balWithout * (1 + retRate));
+      }
+    }
+  }
+
+  var ctx = document.getElementById('ltc-chart').getContext('2d');
+  if (ltcChart) ltcChart.destroy();
+  ltcChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'With LTC Reserve (funded)',
+          data: withLTC,
+          borderColor: '#1CC7D0',
+          backgroundColor: 'rgba(28,199,208,0.08)',
+          fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.4
+        },
+        {
+          label: 'Without LTC Reserve (unfunded)',
+          data: withoutLTC,
+          borderColor: '#f4b86a',
+          backgroundColor: 'rgba(244,184,106,0.06)',
+          fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4, borderDash: [6,3]
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6a8a9a', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#6a8a9a', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: '#f0f2f4' } },
+        y: {
+          ticks: { color: '#6a8a9a', font: { size: 10 },
+            callback: function(v) { return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K'; }
+          }, grid: { color: '#f0f2f4' }
+        }
+      }
+    }
+  });
+}
+
+function loadData() {
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) { calc(); return; }
+  var cb = 'ltc_' + Date.now();
+  window[cb] = function(data) {
+    delete window[cb];
+    try {
+      var pkeys = Object.keys(data.people||{});
+      var p1 = data.people[pkeys[0]]||{}, p2 = data.people[pkeys[1]]||{};
+      if(p1.name) localStorage.setItem('rbp_p1_name', p1.name.trim());
+      if(p2.name) localStorage.setItem('rbp_p2_name', p2.name.trim());
+      if(typeof rbpApplyNames==='function') rbpApplyNames(p1.name, p2.name);
+      if(p1.age) document.getElementById('p1-age').value = p1.age;
+      if(p2.age) document.getElementById('p2-age').value = p2.age;
+      if(p1.deathAge) document.getElementById('p1-death') && (document.getElementById('p1-death').value = p1.deathAge);
+      var port = data.portfolio||{};
+      if(port.total) document.getElementById('portfolio').value = port.total;
+    } catch(e) {}
+    calc();
+  };
+  var s = document.createElement('script');
+  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&_='+Date.now();
+  s.onerror = function(){ delete window[cb]; calc(); };
+  document.head.appendChild(s);
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+(function(){
+  var _h=0;
+  window.addEventListener('storage',function(e){if(e.key==='rbp_last_saved')setTimeout(loadData,400);});
+  document.addEventListener('visibilitychange',function(){if(document.hidden){_h=Date.now();}else if(_h&&Date.now()-_h>30000)loadData();});
+})();
+</script>
+</body>
+</html>

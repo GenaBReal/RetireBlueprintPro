@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireBlueprint Pro — Roth Access Ladder</title>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1,p2){
+  p1=p1||localStorage.getItem('rbp_p1_name')||'Partner 1';
+  p2=p2||localStorage.getItem('rbp_p2_name')||'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el){el.textContent=p1;});
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el){el.textContent=p2;});
+  window.rbpP1Name=p1; window.rbpP2Name=p2;
+}
+document.addEventListener('DOMContentLoaded',rbpApplyNames);
+window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key==='rbp_p2_name')rbpApplyNames();});
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#041E2F;--n2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;
+  --border:#1a3a52;--muted:#6a8a9a;--white:#fff;--text:#d8eaf5;
+  --green:#4CAF50;--red:#ef5350;--purple:#ab47bc;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
+
+/* NAV */
+.header{background:var(--navy);border-bottom:3px solid var(--orange);padding:0 20px;display:flex;align-items:center;gap:16px;}
+.header img{height:32px;padding:10px 0;}
+.nav{background:var(--n2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{padding:10px 13px;font-size:10px;font-weight:700;color:var(--teal);text-decoration:none;text-transform:uppercase;letter-spacing:0.7px;border-right:1px solid var(--border);white-space:nowrap;}
+.nav a:hover{background:var(--border);color:var(--white);}
+.nav a.active{color:var(--orange);}
+.nav-right{margin-left:auto;display:flex;}
+
+/* HERO */
+.hero{background:var(--navy);padding:36px 24px 28px;border-bottom:2px solid var(--border);}
+.hero h1{font-size:26px;font-weight:900;color:var(--white);margin-bottom:8px;}
+.hero h1 span{color:var(--teal);}
+.hero p{font-size:13px;color:var(--muted);max-width:660px;line-height:1.8;}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:32px 24px 80px;}
+
+/* CARDS */
+.card{background:#fff;border-radius:12px;border:1px solid #e8eaed;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.card-hdr{background:var(--navy);padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.card-title{font-size:14px;font-weight:800;color:var(--white);}
+.card-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.card-body{padding:20px;}
+
+/* LADDER */
+.ladder-wrap{overflow-x:auto;}
+.ladder{min-width:700px;}
+.ladder-row{display:grid;grid-template-columns:100px 1fr;gap:0;margin-bottom:3px;align-items:stretch;}
+.ladder-age{background:var(--n2);border:1px solid var(--border);border-right:none;padding:8px 12px;font-size:12px;font-weight:800;color:var(--orange);display:flex;align-items:center;border-radius:6px 0 0 6px;}
+.ladder-bars{display:flex;gap:3px;padding:6px 8px;background:#f8f9fa;border:1px solid #e8eaed;border-radius:0 6px 6px 0;align-items:center;flex-wrap:wrap;}
+.bucket{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;}
+.bucket-taxable{background:rgba(28,199,208,0.12);border:1px solid rgba(28,199,208,0.3);color:#1CC7D0;}
+.bucket-pretax{background:rgba(244,184,106,0.12);border:1px solid rgba(244,184,106,0.3);color:#f4b86a;}
+.bucket-roth-principal{background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.3);color:#4CAF50;}
+.bucket-roth-growth{background:rgba(171,71,188,0.12);border:1px solid rgba(171,71,188,0.3);color:#ce93d8;}
+.bucket-hsa{background:rgba(239,83,80,0.12);border:1px solid rgba(239,83,80,0.3);color:#ef9a9a;}
+.bucket-lock{opacity:0.35;filter:grayscale(0.5);}
+.lock-icon{font-size:10px;}
+.milestone{background:rgba(244,184,106,0.08);border:1px solid rgba(244,184,106,0.2);border-left:3px solid var(--orange);border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:3px;font-size:11px;color:#f4b86a;font-weight:700;}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select{background:#f8f9fa;border:1px solid #e0e4e8;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
+.field input:focus,.field select:focus{outline:none;border-color:var(--teal);}
+
+/* STRATEGY TABLE */
+.strat-table{width:100%;border-collapse:collapse;font-size:12px;}
+.strat-table th{background:var(--navy);color:var(--orange);padding:10px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+.strat-table td{padding:10px 14px;border-bottom:1px solid #f0f2f4;vertical-align:top;}
+.strat-table tr:last-child td{border:none;}
+.strat-table tr:hover td{background:#f8f9fa;}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-right:4px;}
+.tag-green{background:#e8f5e9;color:#2E7032;}
+.tag-orange{background:#fff3e0;color:#e65100;}
+.tag-blue{background:#e3f2fd;color:#1565c0;}
+.tag-red{background:#fce4ec;color:#c62828;}
+.tag-purple{background:#f3e5f5;color:#6a1b9a;}
+
+/* CONVERSION PLANNER */
+.conv-row{display:grid;grid-template-columns:80px 1fr 140px 180px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f0f2f4;}
+.conv-row:last-child{border:none;}
+.conv-year{font-size:12px;font-weight:800;color:#0B2239;}
+.conv-bar-wrap{background:#f0f2f4;border-radius:4px;height:20px;overflow:hidden;position:relative;}
+.conv-bar{height:100%;background:linear-gradient(90deg,#4CAF50,#1CC7D0);border-radius:4px;transition:width .4s;}
+.conv-amount{font-size:12px;font-weight:700;color:#4CAF50;text-align:right;}
+.conv-note{font-size:10px;color:var(--muted);}
+
+/* RULE OF 55 BANNER */
+.rule55-banner{background:linear-gradient(135deg,#041E2F,#0d2d45);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:16px;}
+
+/* ALERT BOXES */
+.alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:12px;}
+.alert-green{background:#e8f5e9;border:1px solid #a5d6a7;color:#1B5E20;}
+.alert-orange{background:#fff8e1;border-left:3px solid var(--orange);color:#5a4000;}
+.alert-teal{background:rgba(28,199,208,0.08);border:1px solid rgba(28,199,208,0.25);color:#0d4a50;}
+
+@media(max-width:600px){.page{padding:16px 12px 60px;}.settings-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro">
+</div>
+
+<div class="nav">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html" class="active">🔄 Roth Ladder</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">🏥 Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">🏠 LTC Planner</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#ff9f43;font-weight:700;">⚡ Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
+  <div class="nav-right">
+    <a href="#" onclick="loadData();return false;" style="padding:10px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;">🔄 Refresh</a>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="padding:10px 14px;font-size:10px;font-weight:700;color:#8aaabb;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;">📋 What's New</a>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>🔄 Roth Access <span>Ladder</span></h1>
+  <p>Visualize exactly when each bucket of your retirement money becomes accessible — penalty-free.
+  This is the roadmap every early retiree needs: which accounts to draw from, in what order, and why.
+  Your plan for <strong data-rbp-p1>Partner 1</strong> and <strong data-rbp-p2>Partner 2</strong> — built from your actual data.</p>
+</div>
+
+<div id="loading-msg" style="text-align:center;padding:60px 24px;color:#6a8a9a;font-size:14px;">
+  Loading your plan data...
+</div>
+
+<div id="ladder-content" style="display:none;">
+<div class="page">
+
+  <!-- QUICK SETTINGS -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <div class="card-title">⚙️ Your Numbers</div>
+        <div class="card-sub">Pulled from your Inputs — adjust below if needed</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="settings-grid">
+        <div class="field">
+          <label><span data-rbp-p1>P1</span> Current Age</label>
+          <input type="number" id="p1-age" value="63" min="25" max="80" onchange="buildLadder()">
+        </div>
+        <div class="field">
+          <label><span data-rbp-p2>P2</span> Current Age</label>
+          <input type="number" id="p2-age" value="55" min="25" max="80" onchange="buildLadder()">
+        </div>
+        <div class="field">
+          <label><span data-rbp-p1>P1</span> Retire Age</label>
+          <input type="number" id="p1-retire" value="65" min="30" max="80" onchange="buildLadder()">
+        </div>
+        <div class="field">
+          <label><span data-rbp-p2>P2</span> Retire Age</label>
+          <input type="number" id="p2-retire" value="57" min="30" max="80" onchange="buildLadder()">
+        </div>
+        <div class="field">
+          <label>First Roth Conversion Year</label>
+          <input type="number" id="first-conversion" value="2026" min="2024" max="2040" onchange="buildLadder()">
+        </div>
+        <div class="field">
+          <label>Taxable Brokerage Balance</label>
+          <input type="number" id="taxable-bal" value="0" min="0" step="10000" onchange="buildLadder()">
+        </div>
+        <div class="field">
+          <label>Roth IRA Balance (existing)</label>
+          <input type="number" id="roth-bal" value="0" min="0" step="10000" onchange="buildLadder()">
+        </div>
+        <div class="field">
+          <label>Pre-Tax 401k/IRA Balance</label>
+          <input type="number" id="pretax-bal" value="500000" min="0" step="10000" onchange="buildLadder()">
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:#6a8a9a;">💡 These update automatically when you load data from your sheet. Changes here are local only.</div>
+    </div>
+  </div>
+
+  <!-- ACCESS LADDER VISUALIZATION -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <div class="card-title">🪜 Year-by-Year Access Ladder</div>
+        <div class="card-sub">What you can access penalty-free each year — and in what order to draw</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#1CC7D0;"></div> Taxable Brokerage (no restrictions)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f4b86a;"></div> Pre-Tax 401k/IRA (age 59½+ or Rule of 55)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4CAF50;"></div> Roth Principal (5yr wait after conversion)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ce93d8;"></div> Roth Growth (fully unlocked at 59½)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef9a9a;"></div> HSA (tax-free medical after 65)</div>
+        <div class="legend-item" style="opacity:0.5;"><div class="legend-dot" style="background:#888;"></div> 🔒 Locked (penalty applies)</div>
+      </div>
+
+      <div class="ladder-wrap">
+        <div class="ladder" id="access-ladder"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERSION WINDOW PLANNER -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📅 Roth Conversion Window Planner</div></div>
+    <div class="card-body">
+      <div class="alert alert-teal" style="margin-bottom:16px;">
+        <strong>The Roth Conversion Window</strong> is the period between your retirement date and age 73 (when RMDs begin).
+        During this window your taxable income is lower — making conversions cheaper. Each conversion starts its own 5-year clock
+        before the principal can be withdrawn penalty-free.
+      </div>
+      <div id="conversion-planner"></div>
+    </div>
+  </div>
+
+  <!-- STRATEGY GUIDE -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📖 Withdrawal Order Strategy</div></div>
+    <div class="card-body">
+
+      <div class="alert alert-orange" style="margin-bottom:16px;">
+        <strong>The right withdrawal order</strong> can save tens of thousands in taxes and extend your portfolio by years.
+        The general rule: draw from accounts in the order that keeps your overall tax bill lowest — but it depends on your specific situation.
+      </div>
+
+      <table class="strat-table">
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>Your Age Range</th>
+            <th>Primary Source</th>
+            <th>Why This Order</th>
+            <th>Watch Out For</th>
+          </tr>
+        </thead>
+        <tbody id="strat-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EARLY ACCESS METHODS -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">🔑 Early Access Methods (Before Age 59½)</div></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">⚡ Rule of 55</div>
+          <div style="font-size:12px;color:#455A64;line-height:1.7;">
+            If you leave your employer at <strong>age 55 or older</strong>, you can withdraw from <em>that employer's</em> 401k immediately without penalty.
+            IRAs and old 401ks from previous employers don't qualify.
+            <div class="tag tag-green" style="margin-top:8px;display:inline-block;">No penalty</div>
+            <div class="tag tag-orange" style="margin-top:4px;display:inline-block;">Income taxed</div>
+          </div>
+        </div>
+
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">🔄 Roth Conversion Ladder</div>
+          <div style="font-size:12px;color:#455A64;line-height:1.7;">
+            Convert pre-tax money to Roth each year. After <strong>5 years</strong>, that converted principal can be withdrawn penalty-free.
+            The trick: start converting early so the 5-year clocks run while you still have other income sources.
+            <div class="tag tag-green" style="margin-top:8px;display:inline-block;">No penalty after 5yr</div>
+            <div class="tag tag-orange" style="margin-top:4px;display:inline-block;">Tax due on conversion</div>
+          </div>
+        </div>
+
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">📋 72(t) SEPP</div>
+          <div style="font-size:12px;color:#455A64;line-height:1.7;">
+            Substantially Equal Periodic Payments — withdraw a fixed calculated amount from your IRA for at least 5 years or to age 59½.
+            <strong>Cannot modify once started</strong> — very inflexible.
+            <div class="tag tag-green" style="margin-top:8px;display:inline-block;">No penalty</div>
+            <div class="tag tag-red" style="margin-top:4px;display:inline-block;">Rigid — can't stop early</div>
+          </div>
+        </div>
+
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">💰 Taxable Brokerage</div>
+          <div style="font-size:12px;color:#455A64;line-height:1.7;">
+            No age restrictions whatsoever. Pay capital gains tax on gains (0%, 15%, or 20% depending on your income).
+            For FIRE retirees with low income, <strong>long-term capital gains at 0% is achievable</strong>.
+            <div class="tag tag-green" style="margin-top:8px;display:inline-block;">No penalties, ever</div>
+            <div class="tag tag-blue" style="margin-top:4px;display:inline-block;">Capital gains tax</div>
+          </div>
+        </div>
+
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">🏥 HSA Bridge</div>
+          <div style="font-size:12px;color:#455A64;line-height:1.7;">
+            Save all medical receipts. After years of accumulation, you can reimburse yourself from your HSA — even years later.
+            No time limit on reimbursements. Tax-free cash from a large balance with zero penalty.
+            <div class="tag tag-green" style="margin-top:8px;display:inline-block;">Tax-free</div>
+            <div class="tag tag-purple" style="margin-top:4px;display:inline-block;">Medical expenses only</div>
+          </div>
+        </div>
+
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">🏠 Roth Contributions</div>
+          <div style="font-size:12px;color:#455A64;line-height:1.7;">
+            Your <em>original contributions</em> (not earnings) to a Roth IRA can be withdrawn at any time, any age, for any reason — <strong>zero tax, zero penalty</strong>.
+            Only the growth is locked until 59½.
+            <div class="tag tag-green" style="margin-top:8px;display:inline-block;">Completely free</div>
+            <div class="tag tag-blue" style="margin-top:4px;display:inline-block;">Contributions only</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /ladder-content -->
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+
+function fmt(n){
+  if(!n&&n!==0)return '—';
+  if(Math.abs(n)>=1000000)return '$'+(n/1000000).toFixed(1)+'M';
+  if(Math.abs(n)>=1000)return '$'+(n/1000).toFixed(0)+'K';
+  return '$'+Math.round(n).toLocaleString();
+}
+
+function buildLadder() {
+  var p1Age   = parseInt(document.getElementById('p1-age').value)||63;
+  var p2Age   = parseInt(document.getElementById('p2-age').value)||55;
+  var p1Ret   = parseInt(document.getElementById('p1-retire').value)||65;
+  var p2Ret   = parseInt(document.getElementById('p2-retire').value)||57;
+  var firstConv= parseInt(document.getElementById('first-conversion').value)||2026;
+  var taxable = parseInt(document.getElementById('taxable-bal').value)||0;
+  var rothBal = parseInt(document.getElementById('roth-bal').value)||0;
+  var pretax  = parseInt(document.getElementById('pretax-bal').value)||0;
+
+  var curYear = new Date().getFullYear();
+  var p1Name  = window.rbpP1Name || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  var p2Name  = window.rbpP2Name || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+
+  // Determine youngest retiree (who drives the ladder start)
+  var earliestRetireAge = Math.min(p1Ret, p2Ret);
+  var youngestAge = Math.min(p1Age, p2Age);
+  var youngestPerson = p1Age <= p2Age ? p1Name : p2Name;
+  var olderPerson = p1Age > p2Age ? p1Name : p2Name;
+
+  var ladder = document.getElementById('access-ladder');
+  ladder.innerHTML = '';
+
+  // Build year range: retirement year to max 85 of younger person
+  var retireYear = curYear + (Math.min(p1Ret - p1Age, p2Ret - p2Age));
+  var endYear = curYear + (85 - youngestAge);
+
+  // Track which Roth conversions have passed their 5-year window
+  var conversionYears = [];
+  for (var cy = firstConv; cy <= curYear + 20; cy++) {
+    conversionYears.push(cy);
+  }
+
+  for (var yr = retireYear; yr <= endYear; yr += 1) {
+    var p1AgeNow = p1Age + (yr - curYear);
+    var p2AgeNow = p2Age + (yr - curYear);
+
+    // Determine what's accessible this year
+    var row = document.createElement('div');
+    row.className = 'ladder-row';
+
+    // Age label
+    var ageDiv = document.createElement('div');
+    ageDiv.className = 'ladder-age';
+    ageDiv.innerHTML = yr + '<br><span style="font-size:9px;font-weight:400;color:#6a8a9a;">' +
+      (p1Name.split(' ')[0]||'P1') + ':' + p1AgeNow + ' ' +
+      (p2Name.split(' ')[0]||'P2') + ':' + p2AgeNow + '</span>';
+    row.appendChild(ageDiv);
+
+    var barsDiv = document.createElement('div');
+    barsDiv.className = 'ladder-bars';
+
+    // Taxable brokerage - always open
+    if (taxable > 0) {
+      barsDiv.innerHTML += '<div class="bucket bucket-taxable">💼 Taxable Brokerage <span class="tag tag-green" style="font-size:9px;">Open</span></div>';
+    }
+
+    // Pre-tax 401k: age 59.5+, or Rule of 55 if retired at 55+
+    var p1CanPreTax = p1AgeNow >= 59.5 || (p1Ret >= 55 && p1AgeNow >= p1Ret);
+    var p2CanPreTax = p2AgeNow >= 59.5 || (p2Ret >= 55 && p2AgeNow >= p2Ret);
+    if (pretax > 0) {
+      if (p1CanPreTax || p2CanPreTax) {
+        var who = (p1CanPreTax && p2CanPreTax) ? 'Both' : (p1CanPreTax ? p1Name.split(' ')[0] : p2Name.split(' ')[0]);
+        barsDiv.innerHTML += '<div class="bucket bucket-pretax">🏦 Pre-Tax 401k/IRA <span style="font-size:9px;opacity:0.8;">(' + who + ')</span> <span class="tag tag-green" style="font-size:9px;">Open</span></div>';
+      } else {
+        var p1YrsLeft = Math.max(0, Math.ceil(59.5 - p1AgeNow));
+        var p2YrsLeft = Math.max(0, Math.ceil(59.5 - p2AgeNow));
+        var minYrs = Math.min(p1YrsLeft, p2YrsLeft);
+        barsDiv.innerHTML += '<div class="bucket bucket-pretax bucket-lock">🔒 Pre-Tax 401k/IRA <span style="font-size:9px;">' + minYrs + 'yr until 59½</span></div>';
+      }
+    }
+
+    // Roth conversion principal: locked 5 years from conversion date
+    var openConversions = conversionYears.filter(function(cy){ return yr - cy >= 5; });
+    var lockedConversions = conversionYears.filter(function(cy){ return yr - cy >= 0 && yr - cy < 5; });
+
+    if (openConversions.length > 0 || rothBal > 0) {
+      var rothNote = rothBal > 0 ? 'Original contributions always open · ' : '';
+      barsDiv.innerHTML += '<div class="bucket bucket-roth-principal">🟢 Roth Principal <span style="font-size:9px;opacity:0.8;">' + rothNote + openConversions.length + ' conversion yr(s) open</span> <span class="tag tag-green" style="font-size:9px;">Open</span></div>';
+    }
+    if (lockedConversions.length > 0) {
+      barsDiv.innerHTML += '<div class="bucket bucket-roth-principal bucket-lock">🔒 Roth Conversions <span style="font-size:9px;">' + lockedConversions.length + ' batch(es) in 5yr window</span></div>';
+    }
+
+    // Roth growth: fully open at 59.5 AND account 5+ years old
+    var p1RothGrowthOpen = p1AgeNow >= 59.5 && (yr - (firstConv - 1)) >= 5;
+    var p2RothGrowthOpen = p2AgeNow >= 59.5 && (yr - (firstConv - 1)) >= 5;
+    if (p1RothGrowthOpen || p2RothGrowthOpen) {
+      barsDiv.innerHTML += '<div class="bucket bucket-roth-growth">✨ Roth Growth (tax-free) <span class="tag tag-green" style="font-size:9px;">Fully Open</span></div>';
+    } else {
+      var p1GrowthYrs = Math.max(Math.ceil(59.5 - p1AgeNow), Math.max(0, 5 - (yr - firstConv + 1)));
+      var p2GrowthYrs = Math.max(Math.ceil(59.5 - p2AgeNow), Math.max(0, 5 - (yr - firstConv + 1)));
+      var minGrowthYrs = Math.min(p1GrowthYrs, p2GrowthYrs);
+      if (minGrowthYrs > 0) {
+        barsDiv.innerHTML += '<div class="bucket bucket-roth-growth bucket-lock">🔒 Roth Growth <span style="font-size:9px;">' + minGrowthYrs + 'yr to fully open</span></div>';
+      }
+    }
+
+    // HSA: tax-free medical withdrawals always, penalty-free non-medical at 65
+    var p1HsaMedFree = true; // always open for medical
+    var p1HsaFull = p1AgeNow >= 65;
+    var p2HsaFull = p2AgeNow >= 65;
+    if (p1HsaFull || p2HsaFull) {
+      barsDiv.innerHTML += '<div class="bucket bucket-hsa">🏥 HSA (medical + non-medical) <span class="tag tag-green" style="font-size:9px;">Fully Open</span></div>';
+    } else {
+      barsDiv.innerHTML += '<div class="bucket bucket-hsa">🏥 HSA (medical only) <span class="tag tag-blue" style="font-size:9px;">Medical Only</span></div>';
+    }
+
+    // RMD milestone
+    var p1Rmd = p1AgeNow >= 73;
+    var p2Rmd = p2AgeNow >= 73;
+    if (p1Rmd || p2Rmd) {
+      var rmdWho = (p1Rmd && p2Rmd) ? 'Both' : (p1Rmd ? p1Name.split(' ')[0] : p2Name.split(' ')[0]);
+      barsDiv.innerHTML += '<div style="background:rgba(239,83,80,0.1);border:1px solid rgba(239,83,80,0.3);border-radius:5px;padding:4px 9px;font-size:10px;font-weight:700;color:#ef9a9a;white-space:nowrap;">⚠️ RMDs Required (' + rmdWho + ')</div>';
+    }
+
+    row.appendChild(barsDiv);
+    ladder.appendChild(row);
+
+    // Add milestone markers at key ages
+    var milestones = [];
+    if (p1AgeNow === 55 && p1Ret <= 55) milestones.push('📍 ' + p1Name.split(' ')[0] + ' hits Rule of 55 — pre-tax 401k open penalty-free');
+    if (p2AgeNow === 55 && p2Ret <= 55) milestones.push('📍 ' + p2Name.split(' ')[0] + ' hits Rule of 55 — pre-tax 401k open penalty-free');
+    if (p1AgeNow === 59) milestones.push('🎯 ' + p1Name.split(' ')[0] + ' approaching 59½ — all accounts open soon');
+    if (p2AgeNow === 59) milestones.push('🎯 ' + p2Name.split(' ')[0] + ' approaching 59½ — all accounts open soon');
+    if (p1AgeNow === 62) milestones.push('📋 ' + p1Name.split(' ')[0] + ' Social Security eligible (earliest claiming age)');
+    if (p2AgeNow === 62) milestones.push('📋 ' + p2Name.split(' ')[0] + ' Social Security eligible (earliest claiming age)');
+    if (p1AgeNow === 65) milestones.push('🏥 ' + p1Name.split(' ')[0] + ' Medicare eligible — healthcare bridge ends');
+    if (p2AgeNow === 65) milestones.push('🏥 ' + p2Name.split(' ')[0] + ' Medicare eligible — healthcare bridge ends');
+    if (p1AgeNow === 67) milestones.push('💰 ' + p1Name.split(' ')[0] + ' Full Retirement Age (FRA) for Social Security');
+    if (p2AgeNow === 67) milestones.push('💰 ' + p2Name.split(' ')[0] + ' Full Retirement Age (FRA) for Social Security');
+    if (p1AgeNow === 70) milestones.push('⬆️ ' + p1Name.split(' ')[0] + ' SS max delay benefit — no more increases after 70');
+    if (p2AgeNow === 70) milestones.push('⬆️ ' + p2Name.split(' ')[0] + ' SS max delay benefit — no more increases after 70');
+    if (p1AgeNow === 73) milestones.push('⚠️ ' + p1Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
+    if (p2AgeNow === 73) milestones.push('⚠️ ' + p2Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
+
+    milestones.forEach(function(m) {
+      var mDiv = document.createElement('div');
+      mDiv.className = 'milestone';
+      mDiv.textContent = m;
+      ladder.appendChild(mDiv);
+    });
+  }
+
+  // Build conversion planner
+  buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, p1Name, p2Name);
+
+  // Build strategy table
+  buildStrategyTable(p1Age, p2Age, p1Ret, p2Ret, taxable, rothBal, pretax, p1Name, p2Name, curYear);
+}
+
+function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, p1Name, p2Name) {
+  var retireYear = curYear + Math.min(p1Ret - p1Age, p2Ret - p2Age);
+  var rmd1Year = curYear + (73 - Math.min(p1Age, p2Age));
+  var el = document.getElementById('conversion-planner');
+  var html = '';
+
+  var prevEndBal = 500000; // placeholder - uses pretax bal
+  var pretax = parseInt(document.getElementById('pretax-bal').value) || 500000;
+  var annualConv = Math.round(pretax * 0.08); // rough 8% per year conversion suggestion
+
+  for (var yr = Math.max(firstConv, retireYear); yr < Math.min(rmd1Year, retireYear + 20); yr++) {
+    var p1AgeNow = p1Age + (yr - curYear);
+    var p2AgeNow = p2Age + (yr - curYear);
+    var fiveYrReady = yr + 5;
+    var pct = Math.min(100, Math.round(annualConv / pretax * 100));
+    var note = 'Penalty-free from ' + fiveYrReady;
+    if (p1AgeNow >= 73 || p2AgeNow >= 73) note = '⚠️ RMDs begun — convert carefully';
+
+    html += '<div class="conv-row">';
+    html += '<div class="conv-year">' + yr + '</div>';
+    html += '<div class="conv-bar-wrap"><div class="conv-bar" style="width:' + pct + '%"></div></div>';
+    html += '<div class="conv-amount">' + fmt(annualConv) + '</div>';
+    html += '<div class="conv-note">' + note + '</div>';
+    html += '</div>';
+  }
+
+  if (!html) {
+    html = '<div style="color:#6a8a9a;font-size:12px;padding:12px 0;">No conversion window identified — adjust your ages above.</div>';
+  }
+  el.innerHTML = html;
+}
+
+function buildStrategyTable(p1Age, p2Age, p1Ret, p2Ret, taxable, rothBal, pretax, p1Name, p2Name, curYear) {
+  var earliestRetire = Math.min(p1Ret, p2Ret);
+  var youngestAge = Math.min(p1Age, p2Age);
+  var el = document.getElementById('strat-table-body');
+
+  var phases = [
+    {
+      phase: '1 — Early Retirement Bridge',
+      ageRange: (earliestRetire) + '–59',
+      primary: 'Taxable brokerage + Roth contributions + Roth conversions (5yr ladder)',
+      why: 'Pre-tax accounts are locked (unless Rule of 55). Live on taxable and Roth contributions while building the Roth ladder.',
+      watch: '<span class="tag tag-orange">Healthcare costs</span> <span class="tag tag-blue">Capital gains tax</span>'
+    },
+    {
+      phase: '2 — Post 59½ Flexibility',
+      ageRange: '59½–72',
+      primary: 'Roth growth + Pre-tax 401k/IRA + Roth conversions',
+      why: 'All accounts now accessible. This is your prime Roth conversion window — income is low, RMDs haven\'t started. Convert aggressively to reduce future RMD burden.',
+      watch: '<span class="tag tag-red">IRMAA thresholds</span> <span class="tag tag-orange">Bracket creep</span>'
+    },
+    {
+      phase: '3 — RMD Management',
+      ageRange: '73+',
+      primary: 'RMD withdrawals (required) + Roth for supplemental',
+      why: 'IRS forces pre-tax withdrawals. Use Roth accounts to supplement without increasing taxable income. Consider QCDs (Qualified Charitable Distributions) if charitable.',
+      watch: '<span class="tag tag-red">RMD tax shock</span> <span class="tag tag-orange">SS taxation</span>'
+    }
+  ];
+
+  el.innerHTML = phases.map(function(p) {
+    return '<tr><td><strong>' + p.phase + '</strong></td><td>' + p.ageRange + '</td><td>' + p.primary + '</td><td style="font-size:11px;color:#455A64;">' + p.why + '</td><td>' + p.watch + '</td></tr>';
+  }).join('');
+}
+
+// ── DATA LOADING ──────────────────────────────────────────
+function loadData() {
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) {
+    document.getElementById('loading-msg').innerHTML = '⚠️ No sheet connected — showing default values. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html" style="color:#1CC7D0;">Setup Guide</a>';
+    document.getElementById('loading-msg').style.display = 'block';
+    document.getElementById('ladder-content').style.display = 'block';
+    buildLadder();
+    return;
+  }
+
+  var cb = 'rl_' + Date.now();
+  window[cb] = function(data) {
+    delete window[cb];
+    try {
+      var pkeys = Object.keys(data.people || {});
+      var p1 = data.people[pkeys[0]] || {};
+      var p2 = data.people[pkeys[1]] || {};
+      var port = data.portfolio || {};
+
+      // Set names
+      if (p1.name) localStorage.setItem('rbp_p1_name', p1.name.trim());
+      if (p2.name) localStorage.setItem('rbp_p2_name', p2.name.trim());
+      if (typeof rbpApplyNames === 'function') rbpApplyNames(p1.name, p2.name);
+
+      // Populate fields from sheet data
+      if (p1.age) document.getElementById('p1-age').value = p1.age;
+      if (p2.age) document.getElementById('p2-age').value = p2.age;
+
+      // Get retirement ages from salary end date
+      var curYear = new Date().getFullYear();
+      if (p1.salaryEnd) {
+        var p1RetYr = new Date(p1.salaryEnd).getFullYear();
+        if (p1RetYr > curYear) document.getElementById('p1-retire').value = p1.age + (p1RetYr - curYear);
+      }
+      if (p2.salaryEnd) {
+        var p2RetYr = new Date(p2.salaryEnd).getFullYear();
+        if (p2RetYr > curYear) document.getElementById('p2-retire').value = p2.age + (p2RetYr - curYear);
+      }
+
+      // Get account balances by type
+      var taxable = 0, roth = 0, pretax = 0;
+      if (port.accounts) {
+        port.accounts.forEach(function(a) {
+          var t = (a.type || '').toLowerCase();
+          if (t.indexOf('taxable') >= 0 || t.indexOf('brokerage') >= 0) taxable += (a.balance || 0);
+          else if (t.indexOf('roth') >= 0) roth += (a.balance || 0);
+          else if (t.indexOf('traditional') >= 0 || t.indexOf('401k') >= 0 || t.indexOf('ira') >= 0 || t.indexOf('pre') >= 0) pretax += (a.balance || 0);
+        });
+      }
+      if (taxable) document.getElementById('taxable-bal').value = taxable;
+      if (roth)    document.getElementById('roth-bal').value = roth;
+      if (pretax)  document.getElementById('pretax-bal').value = pretax;
+
+    } catch(e) {}
+
+    document.getElementById('loading-msg').style.display = 'none';
+    document.getElementById('ladder-content').style.display = 'block';
+    buildLadder();
+  };
+
+  var s = document.createElement('script');
+  s.src = SCRIPT_URL + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&_=' + Date.now();
+  s.onerror = function() {
+    delete window[cb];
+    document.getElementById('loading-msg').innerHTML = '⚠️ Could not load sheet — showing defaults. <button onclick="loadData()" style="background:#1CC7D0;color:#041E2F;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-weight:700;">Retry</button>';
+    document.getElementById('ladder-content').style.display = 'block';
+    buildLadder();
+  };
+  document.head.appendChild(s);
+}
+
+loadData();
+
+// Auto-refresh
+(function(){
+  var _hiddenAt=0;
+  window.addEventListener('storage',function(e){if(e.key==='rbp_last_saved')setTimeout(loadData,400);});
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){_hiddenAt=Date.now();}
+    else if(_hiddenAt&&Date.now()-_hiddenAt>30000)loadData();
+  });
+})();
+</script>
+</body>
+</html>

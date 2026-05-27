@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireBlueprint Pro — Medicare Planner</title>
+<script>
+function rbpApplyNames(p1,p2){
+  p1=p1||localStorage.getItem('rbp_p1_name')||'Partner 1';
+  p2=p2||localStorage.getItem('rbp_p2_name')||'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el){el.textContent=p1;});
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el){el.textContent=p2;});
+  window.rbpP1Name=p1;window.rbpP2Name=p2;
+}
+document.addEventListener('DOMContentLoaded',rbpApplyNames);
+window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key==='rbp_p2_name')rbpApplyNames();});
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#041E2F;--n2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--border:#1a3a52;--muted:#6a8a9a;--white:#fff;--green:#4CAF50;--red:#ef5350;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
+.header{background:var(--navy);border-bottom:3px solid var(--orange);padding:0 20px;display:flex;align-items:center;gap:16px;}
+.header img{height:32px;padding:10px 0;}
+.nav{background:var(--n2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{padding:10px 13px;font-size:10px;font-weight:700;color:var(--teal);text-decoration:none;text-transform:uppercase;letter-spacing:0.7px;border-right:1px solid var(--border);white-space:nowrap;}
+.nav a:hover{background:var(--border);color:var(--white);}
+.nav a.active{color:var(--orange);}
+.nav-right{margin-left:auto;display:flex;}
+.hero{background:var(--navy);padding:36px 24px 28px;border-bottom:2px solid var(--border);}
+.hero h1{font-size:26px;font-weight:900;color:var(--white);margin-bottom:8px;}
+.hero h1 span{color:var(--teal);}
+.hero p{font-size:13px;color:var(--muted);max-width:660px;line-height:1.8;}
+.page{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
+.card{background:#fff;border-radius:12px;border:1px solid #e8eaed;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.card-hdr{background:var(--navy);padding:14px 20px;}
+.card-title{font-size:14px;font-weight:800;color:var(--white);}
+.card-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.card-body{padding:20px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.kpi{background:var(--n2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.kpi-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.kpi-val{font-size:22px;font-weight:900;color:var(--teal);}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select{background:#f8f9fa;border:1px solid #e0e4e8;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
+.field input:focus,.field select:focus{outline:none;border-color:var(--teal);}
+.alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:14px;}
+.alert-orange{background:#fff8e1;border-left:3px solid var(--orange);color:#5a4000;}
+.alert-red{background:#fce4ec;border-left:3px solid var(--red);color:#7f1d1d;}
+.alert-green{background:#e8f5e9;border-left:3px solid var(--green);color:#1B5E20;}
+.alert-teal{background:rgba(28,199,208,0.08);border-left:3px solid var(--teal);color:#0d4a50;}
+
+/* IRMAA TABLE */
+.irmaa-table{width:100%;border-collapse:collapse;font-size:12px;}
+.irmaa-table th{background:var(--navy);color:var(--orange);padding:10px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+.irmaa-table td{padding:10px 14px;border-bottom:1px solid #f0f2f4;}
+.irmaa-table tr:last-child td{border:none;}
+.irmaa-table tr.irmaa-hit{background:rgba(239,83,80,0.06);}
+.irmaa-table tr.irmaa-current{background:rgba(28,199,208,0.08);}
+
+/* PARTS GRID */
+.parts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+.part-card{border-radius:10px;border:2px solid;padding:16px;}
+.part-a{border-color:#1CC7D0;background:rgba(28,199,208,0.05);}
+.part-b{border-color:#f4b86a;background:rgba(244,184,106,0.05);}
+.part-c{border-color:#4CAF50;background:rgba(76,175,80,0.05);}
+.part-d{border-color:#ab47bc;background:rgba(171,71,188,0.05);}
+.part-medigap{border-color:#ef5350;background:rgba(239,83,80,0.05);}
+.part-title{font-size:14px;font-weight:900;margin-bottom:4px;}
+.part-a .part-title{color:#1CC7D0;}
+.part-b .part-title{color:#f4b86a;}
+.part-c .part-title{color:#4CAF50;}
+.part-d .part-title{color:#ab47bc;}
+.part-medigap .part-title{color:#ef5350;}
+.part-cost{font-size:18px;font-weight:800;margin:8px 0 4px;}
+.part-desc{font-size:11px;color:#455A64;line-height:1.6;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:28px;}
+.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:20px;}
+.tl-dot{position:absolute;left:-22px;width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:var(--n2);display:flex;align-items:center;justify-content:center;font-size:9px;}
+.tl-dot.active{border-color:var(--teal);background:var(--teal);}
+.tl-dot.milestone{border-color:var(--orange);background:var(--orange);}
+.tl-content{background:#f8f9fa;border-radius:8px;padding:12px 14px;border:1px solid #e8eaed;}
+.tl-year{font-size:11px;font-weight:800;color:var(--orange);margin-bottom:4px;}
+.tl-text{font-size:12px;color:#37474F;line-height:1.6;}
+
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr;}.parts-grid{grid-template-columns:1fr 1fr;}.page{padding:16px 12px 60px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro">
+</div>
+
+<div class="nav">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">🔄 Roth Ladder</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html" class="active">🏥 Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">🏠 LTC Planner</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#ff9f43;font-weight:700;">⚡ Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
+  <div class="nav-right">
+    <a href="#" onclick="loadData();return false;" style="padding:10px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;">🔄 Refresh</a>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="padding:10px 14px;font-size:10px;font-weight:700;color:#8aaabb;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;">📋 What's New</a>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>🏥 Medicare <span>Planner</span></h1>
+  <p>Most people underestimate Medicare costs by thousands per year. This page breaks down every part of Medicare,
+  calculates your IRMAA surcharges based on your planned income, and shows your total estimated healthcare cost in retirement —
+  for <strong data-rbp-p1>Partner 1</strong> and <strong data-rbp-p2>Partner 2</strong>.</p>
+</div>
+
+<div class="page">
+
+  <!-- KPI STRIP -->
+  <div class="grid3" style="margin-bottom:24px;" id="kpi-strip">
+    <div class="kpi"><div class="kpi-label">Est. Monthly (Both)</div><div class="kpi-val" id="k-monthly">—</div><div class="kpi-sub">Part B + D + Medigap</div></div>
+    <div class="kpi"><div class="kpi-label">Est. Annual (Both)</div><div class="kpi-val" id="k-annual">—</div><div class="kpi-sub">All parts combined</div></div>
+    <div class="kpi"><div class="kpi-label">Lifetime Total</div><div class="kpi-val" id="k-lifetime">—</div><div class="kpi-sub">From age 65 to end of plan</div></div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">⚙️ Your Numbers</div></div>
+    <div class="card-body">
+      <div class="grid2">
+        <div>
+          <div class="field"><label><span data-rbp-p1>P1</span> Current Age</label><input type="number" id="p1-age" value="63" min="40" max="80" onchange="calc()"></div>
+          <div class="field"><label><span data-rbp-p2>P2</span> Current Age</label><input type="number" id="p2-age" value="55" min="40" max="80" onchange="calc()"></div>
+          <div class="field"><label>Expected Retirement Income (Annual)</label><input type="number" id="ret-income" value="80000" min="0" step="5000" onchange="calc()"><span style="font-size:10px;color:#6a8a9a;">Include SS, pension, Roth conversions, RMDs</span></div>
+        </div>
+        <div>
+          <div class="field"><label>Medigap Plan</label>
+            <select id="medigap-plan" onchange="calc()">
+              <option value="0">No Medigap (Original Medicare only)</option>
+              <option value="100" selected>Plan G (most popular — ~$100/mo each)</option>
+              <option value="130">Plan F (highest coverage — ~$130/mo each)</option>
+              <option value="70">Plan N (lower premium, some copays — ~$70/mo)</option>
+              <option value="200">Medicare Advantage (replaces Parts A+B — ~$0-200/mo)</option>
+            </select>
+          </div>
+          <div class="field"><label>Part D Drug Plan (monthly)</label><input type="number" id="part-d" value="40" min="0" max="300" onchange="calc()"></div>
+          <div class="field"><label><span data-rbp-p1>P1</span> Life Expectancy</label><input type="number" id="p1-death" value="88" min="65" max="105" onchange="calc()"></div>
+          <div class="field"><label><span data-rbp-p2>P2</span> Life Expectancy</label><input type="number" id="p2-death" value="92" min="65" max="105" onchange="calc()"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDICARE PARTS GUIDE -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📚 The Parts of Medicare — Plain English</div></div>
+    <div class="card-body">
+      <div class="parts-grid">
+        <div class="part-card part-a">
+          <div class="part-title">Part A — Hospital</div>
+          <div class="part-cost" style="color:#1CC7D0;">$0/mo</div>
+          <div class="part-desc">Hospital stays, skilled nursing, hospice. <strong>Free</strong> if you or spouse paid Medicare taxes for 10+ years (most people qualify). Still has deductibles per hospital stay.</div>
+        </div>
+        <div class="part-card part-b">
+          <div class="part-title">Part B — Medical</div>
+          <div class="part-cost" id="partb-base-display" style="color:#f4b86a;">$185/mo</div>
+          <div class="part-desc">Doctor visits, outpatient care, preventive services, lab tests. The standard premium in 2025 is <strong>$185/month per person</strong>. Subject to IRMAA surcharges if income exceeds $212K/yr (married).</div>
+        </div>
+        <div class="part-card part-c">
+          <div class="part-title">Part C — Medicare Advantage</div>
+          <div class="part-cost" style="color:#4CAF50;">$0–$200/mo</div>
+          <div class="part-desc">Private insurer alternative to Original Medicare. Bundles Parts A, B, and usually D. Often includes dental and vision. Lower premium but restricted networks and prior authorization.</div>
+        </div>
+        <div class="part-card part-d">
+          <div class="part-title">Part D — Prescriptions</div>
+          <div class="part-cost" style="color:#ce93d8;">$20–$100/mo</div>
+          <div class="part-desc">Prescription drug coverage. Separate plan you add to Original Medicare. The $2,000 out-of-pocket cap (starting 2025) limits your annual drug costs regardless of how expensive your medications are.</div>
+        </div>
+        <div class="part-card part-medigap">
+          <div class="part-title">Medigap Supplement</div>
+          <div class="part-cost" style="color:#ef9a9a;">$70–$200/mo</div>
+          <div class="part-desc">Private policy that fills the "gaps" in Original Medicare — deductibles, copays, coinsurance. Plan G is the most popular for new enrollees. <strong>Cannot be used with Medicare Advantage.</strong></div>
+        </div>
+      </div>
+
+      <div class="alert alert-orange">
+        <strong>Key Medicare dates to know:</strong> You have a 7-month enrollment window (3 months before your 65th birthday, your birthday month, 3 months after).
+        Miss it and you may pay a <strong>10% permanent penalty on Part B</strong> for every 12-month period you were eligible but not enrolled.
+        If you have employer coverage through age 65, you have a special enrollment period.
+      </div>
+    </div>
+  </div>
+
+  <!-- IRMAA CALCULATOR -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title">⚠️ IRMAA Surcharge Calculator</div>
+      <div class="card-sub">Income-Related Monthly Adjustment Amount — extra Medicare charges for higher incomes</div>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-teal" style="margin-bottom:16px;">
+        IRMAA is calculated on your income from <strong>2 years ago</strong> (called the "look-back" period).
+        So your 2027 Medicare premium is based on your 2025 income. A large Roth conversion in a single year can trigger IRMAA surcharges 2 years later.
+        Your Tax Engine page shows the exact thresholds.
+      </div>
+      <div id="irmaa-result" style="margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#f8f9fa;border:1px solid #e8eaed;font-size:13px;"></div>
+      <table class="irmaa-table" id="irmaa-table">
+        <thead>
+          <tr>
+            <th>2025 Income (Married Filing Jointly)</th>
+            <th>Part B Surcharge (per person/mo)</th>
+            <th>Part D Surcharge (per person/mo)</th>
+            <th>Total Extra (couple/yr)</th>
+            <th>Your Status</th>
+          </tr>
+        </thead>
+        <tbody id="irmaa-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LIFETIME COST PROJECTION -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📊 Lifetime Medicare Cost Breakdown</div></div>
+    <div class="card-body" id="lifetime-breakdown"></div>
+  </div>
+
+  <!-- ENROLLMENT TIMELINE -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📅 Your Medicare Enrollment Timeline</div></div>
+    <div class="card-body">
+      <div class="timeline" id="enrollment-timeline"></div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">💡 Medicare Strategy Tips</div></div>
+    <div class="card-body">
+      <div class="grid2">
+        <div>
+          <div class="alert alert-green"><strong>Keep your income below $212K (married) in retirement</strong> if possible. Even one dollar over the IRMAA threshold adds $888/year per person. Time large Roth conversions to avoid crossing thresholds.</div>
+          <div class="alert alert-orange"><strong>Enroll in Part B on time.</strong> The late enrollment penalty is 10% per year forever — a $185/mo premium becomes $204/mo permanently if you're 1 year late.</div>
+          <div class="alert alert-teal"><strong>Consider Plan G Medigap.</strong> Plan F was closed to new enrollees after 2020. Plan G covers everything Plan F did except the Part B deductible ($257/yr in 2025) — often the better value.</div>
+        </div>
+        <div>
+          <div class="alert alert-green"><strong>HSA dollars can pay Medicare premiums.</strong> Part B, Part D, and Medicare Advantage premiums are all qualified HSA expenses — but NOT Medigap premiums. Build your HSA before 65 for this purpose.</div>
+          <div class="alert alert-orange"><strong>If you retire before 65</strong>, you need bridge coverage. Budget for ACA marketplace insurance — with income management, you may qualify for significant subsidies. See Healthcare Bridge on your Inputs page.</div>
+          <div class="alert alert-teal"><strong>IRMAA can be appealed</strong> if your income drops due to a "life-changing event" (retirement, divorce, death of spouse). File Form SSA-44 with Social Security to request a reduction.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+
+// 2025 IRMAA thresholds (MFJ)
+var IRMAA = [
+  {maxIncome: 212000, partB: 0,     partD: 0,    label: 'Standard'},
+  {maxIncome: 266000, partB: 74.0,  partD: 12.90, label: 'Tier 1'},
+  {maxIncome: 334000, partB: 185.0, partD: 33.30, label: 'Tier 2'},
+  {maxIncome: 400000, partB: 295.9, partD: 53.80, label: 'Tier 3'},
+  {maxIncome: 750000, partB: 406.9, partD: 74.20, label: 'Tier 4'},
+  {maxIncome: Infinity,partB:443.9, partD: 81.00, label: 'Tier 5'}
+];
+var PARTB_BASE = 185.00;
+
+function fmt(n){if(!n&&n!==0)return '—';if(Math.abs(n)>=1000000)return '$'+(n/1000000).toFixed(1)+'M';if(Math.abs(n)>=1000)return '$'+Math.round(n).toLocaleString();return '$'+n.toFixed(0);}
+function fmtM(n){return '$'+n.toFixed(0)+'/mo';}
+
+function calc() {
+  var income    = parseInt(document.getElementById('ret-income').value)||80000;
+  var medigap   = parseInt(document.getElementById('medigap-plan').value)||100;
+  var partD     = parseInt(document.getElementById('part-d').value)||40;
+  var p1Age     = parseInt(document.getElementById('p1-age').value)||63;
+  var p2Age     = parseInt(document.getElementById('p2-age').value)||55;
+  var p1Death   = parseInt(document.getElementById('p1-death').value)||88;
+  var p2Death   = parseInt(document.getElementById('p2-death').value)||92;
+
+  // Find IRMAA tier
+  var tier = IRMAA[0];
+  for (var i = 0; i < IRMAA.length; i++) {
+    if (income <= IRMAA[i].maxIncome) { tier = IRMAA[i]; break; }
+  }
+
+  var partBPerPerson = PARTB_BASE + tier.partB;
+  var partDPerPerson = partD + tier.partD;
+  var monthlyPerPerson = partBPerPerson + partDPerPerson + medigap;
+  var monthlyCouple = monthlyPerPerson * 2;
+  var annualCouple = monthlyCouple * 12;
+
+  // Lifetime: from each person's 65th birthday
+  var curYear = new Date().getFullYear();
+  var p1Years = Math.max(0, p1Death - Math.max(65, p1Age + (65 - p1Age)));
+  var p2Years = Math.max(0, p2Death - Math.max(65, p2Age + (65 - p2Age)));
+  var p1Yrs65 = Math.max(0, p1Death - 65);
+  var p2Yrs65 = Math.max(0, p2Death - 65);
+  var lifetime = (monthlyPerPerson * 12 * p1Yrs65) + (monthlyPerPerson * 12 * p2Yrs65);
+  // Add 3% medical inflation
+  lifetime = lifetime * 1.15; // simplified inflation adjustment
+
+  document.getElementById('k-monthly').textContent = fmt(monthlyCouple) + '/mo';
+  document.getElementById('k-annual').textContent = fmt(annualCouple);
+  document.getElementById('k-lifetime').textContent = fmt(lifetime);
+
+  // IRMAA result banner
+  var irmaaBanner = document.getElementById('irmaa-result');
+  if (tier.partB === 0) {
+    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#e8f5e9;border:1px solid #a5d6a7;font-size:13px;color:#1B5E20;';
+    irmaaBanner.innerHTML = '✅ <strong>No IRMAA surcharge</strong> at your income level ($' + income.toLocaleString() + '/yr). Your income is below the $212,000 threshold. Standard Part B premium applies: $' + PARTB_BASE + '/mo per person.';
+  } else {
+    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fce4ec;border:1px solid #f48fb1;font-size:13px;color:#7f1d1d;';
+    irmaaBanner.innerHTML = '⚠️ <strong>IRMAA ' + tier.label + ' applies</strong> at $' + income.toLocaleString() + '/yr income. Your Part B premium is <strong>$' + partBPerPerson.toFixed(0) + '/mo per person</strong> (standard $' + PARTB_BASE + ' + $' + tier.partB.toFixed(0) + ' surcharge). Combined extra cost for a couple: <strong>$' + Math.round(tier.partB * 2 * 12).toLocaleString() + '/year</strong> just from IRMAA.';
+  }
+
+  // IRMAA table
+  var tbody = document.getElementById('irmaa-tbody');
+  tbody.innerHTML = '';
+  var thresholds = [
+    ['$0 – $212,000',         0,     0,    'Standard — no surcharge'],
+    ['$212,001 – $266,000',   74.0,  12.90,'Tier 1'],
+    ['$266,001 – $334,000',   185.0, 33.30,'Tier 2'],
+    ['$334,001 – $400,000',   295.9, 53.80,'Tier 3'],
+    ['$400,001 – $750,000',   406.9, 74.20,'Tier 4'],
+    ['$750,001+',             443.9, 81.00,'Tier 5 (maximum)']
+  ];
+  thresholds.forEach(function(t, i) {
+    var extra = t[1] * 2 * 12; // couple annual
+    var isCurrent = (i === IRMAA.findIndex(function(x){return income <= x.maxIncome;}));
+    var tr = document.createElement('tr');
+    tr.className = isCurrent ? 'irmaa-current' : (t[1] > 0 ? 'irmaa-hit' : '');
+    tr.innerHTML = '<td><strong>' + t[0] + '</strong></td>' +
+      '<td>' + (t[1] === 0 ? '$' + PARTB_BASE + '/mo (standard)' : '+$' + t[1].toFixed(0) + '/mo surcharge = $' + (PARTB_BASE + t[1]).toFixed(0) + '/mo') + '</td>' +
+      '<td>' + (t[2] === 0 ? 'No surcharge' : '+$' + t[2].toFixed(2) + '/mo') + '</td>' +
+      '<td style="font-weight:700;color:' + (t[1]===0?'#2E7032':'#c62828') + ';">' + (extra === 0 ? '$0' : '+$' + extra.toLocaleString() + '/yr') + '</td>' +
+      '<td>' + (isCurrent ? '<span style="background:#1CC7D0;color:#041E2F;font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;">← YOUR INCOME</span>' : '') + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  // Lifetime breakdown
+  var p1Name = window.rbpP1Name || 'Partner 1';
+  var p2Name = window.rbpP2Name || 'Partner 2';
+  var lbEl = document.getElementById('lifetime-breakdown');
+  lbEl.innerHTML = '<div class="grid2">' +
+    '<div><div style="font-size:12px;color:#455A64;margin-bottom:12px;line-height:1.7;">Based on <strong>' + p1Name + '</strong> living to <strong>' + p1Death + '</strong> and <strong>' + p2Name + '</strong> living to <strong>' + p2Death + '</strong>, enrolled in Medicare from age 65.</div>' +
+    '<div style="display:grid;gap:8px;">' +
+    makeBreakdownRow('Part B (both)', fmt(partBPerPerson * 24) + '/yr', 'var(--orange)') +
+    makeBreakdownRow('Medigap Supplement (both)', fmt(medigap * 24) + '/yr', '#4CAF50') +
+    makeBreakdownRow('Part D Prescriptions (both)', fmt((partDPerPerson) * 24) + '/yr', '#ab47bc') +
+    makeBreakdownRow('IRMAA Surcharges (both)', tier.partB > 0 ? fmt(tier.partB * 24 * 12) + '/yr' : '$0 (none)', tier.partB > 0 ? '#ef5350' : '#2E7032') +
+    '</div></div>' +
+    '<div>' +
+    '<div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Lifetime Estimate (with 3% medical inflation)</div>' +
+    '<div style="font-size:32px;font-weight:900;color:#ef5350;margin-bottom:4px;">' + fmt(lifetime) + '</div>' +
+    '<div style="font-size:11px;color:#6a8a9a;">This is ' + fmt(lifetime) + ' that needs to come from your portfolio or dedicated savings. Make sure your plan accounts for it.</div>' +
+    '<div style="margin-top:12px;font-size:11px;color:#455A64;line-height:1.7;"><strong>Note:</strong> This estimate does not include out-of-pocket costs (deductibles, copays, dental, vision, hearing) which can add $2,000–$8,000/year per person.</div>' +
+    '</div></div></div>';
+
+  // Enrollment timeline
+  buildTimeline(p1Age, p2Age, p1Name, p2Name);
+}
+
+function makeBreakdownRow(label, value, color) {
+  return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fff;border-radius:6px;border:1px solid #e8eaed;">' +
+    '<span style="font-size:12px;color:#37474F;">' + label + '</span>' +
+    '<span style="font-size:12px;font-weight:800;color:' + color + ';">' + value + '</span>' +
+    '</div>';
+}
+
+function buildTimeline(p1Age, p2Age, p1Name, p2Name) {
+  var curYear = new Date().getFullYear();
+  var el = document.getElementById('enrollment-timeline');
+  var items = [];
+
+  var p1_65 = curYear + (65 - p1Age);
+  var p2_65 = curYear + (65 - p2Age);
+  var p1_67 = curYear + (67 - p1Age);
+  var p2_67 = curYear + (67 - p2Age);
+  var p1_70 = curYear + (70 - p1Age);
+  var p2_70 = curYear + (70 - p2Age);
+  var p1_73 = curYear + (73 - p1Age);
+  var p2_73 = curYear + (73 - p2Age);
+
+  if (p1_65 > curYear) items.push({year: p1_65, active: true, text: '<strong>' + p1Name + ' turns 65</strong> — Medicare eligible. 7-month enrollment window opens. Enroll in Parts A, B, and D. Choose Original Medicare + Medigap, or Medicare Advantage.'});
+  if (p2_65 > curYear) items.push({year: p2_65, active: true, text: '<strong>' + p2Name + ' turns 65</strong> — Medicare eligible. Same enrollment window and choices apply.'});
+  if (Math.max(p1_65, p2_65) < Math.min(p1_67, p2_67)) {
+    items.push({year: Math.min(p1_67, p2_67) - 1, active: false, text: 'Monitor income carefully for IRMAA look-back years. A large Roth conversion now = higher premiums 2 years later.'});
+  }
+  items.push({year: Math.min(p1_67, p2_67), active: false, text: '<strong>Social Security Full Retirement Age.</strong> Coordinate SS start date with Medicare enrollment — SS benefit automatically deducts Part B premiums.'});
+  items.push({year: Math.min(p1_70, p2_70), active: false, text: '<strong>Maximum SS delay benefit.</strong> No further increases after 70. If not already collecting, start now.'});
+  items.push({year: Math.min(p1_73, p2_73), active: false, text: '<strong>RMDs begin.</strong> Required withdrawals increase taxable income — may trigger IRMAA. Consider accelerating Roth conversions before this year.'});
+
+  items.sort(function(a, b) { return a.year - b.year; });
+  el.innerHTML = items.map(function(it) {
+    return '<div class="tl-item"><div class="tl-dot ' + (it.active ? 'milestone' : 'active') + '">' + (it.active ? '★' : '·') + '</div>' +
+      '<div class="tl-content"><div class="tl-year">' + it.year + '</div><div class="tl-text">' + it.text + '</div></div></div>';
+  }).join('');
+}
+
+function loadData() {
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) { calc(); return; }
+  var cb = 'med_' + Date.now();
+  window[cb] = function(data) {
+    delete window[cb];
+    try {
+      var pkeys = Object.keys(data.people||{});
+      var p1 = data.people[pkeys[0]]||{}, p2 = data.people[pkeys[1]]||{};
+      if(p1.name){localStorage.setItem('rbp_p1_name',p1.name.trim());}
+      if(p2.name){localStorage.setItem('rbp_p2_name',p2.name.trim());}
+      if(typeof rbpApplyNames==='function') rbpApplyNames(p1.name,p2.name);
+      if(p1.age) document.getElementById('p1-age').value = p1.age;
+      if(p2.age) document.getElementById('p2-age').value = p2.age;
+      if(p1.deathAge) document.getElementById('p1-death').value = p1.deathAge;
+      if(p2.deathAge) document.getElementById('p2-death').value = p2.deathAge;
+      // Set income from retirement spending as proxy for retirement income
+      var sp = data.spending||{};
+      if(sp.baseAnnual) document.getElementById('ret-income').value = Math.round(sp.baseAnnual);
+    } catch(e) {}
+    calc();
+  };
+  var s = document.createElement('script');
+  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&_='+Date.now();
+  s.onerror = function(){ delete window[cb]; calc(); };
+  document.head.appendChild(s);
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+(function(){
+  var _h=0;
+  window.addEventListener('storage',function(e){if(e.key==='rbp_last_saved')setTimeout(loadData,400);});
+  document.addEventListener('visibilitychange',function(){if(document.hidden){_h=Date.now();}else if(_h&&Date.now()-_h>30000)loadData();});
+})();
+</script>
+</body>
+</html>
