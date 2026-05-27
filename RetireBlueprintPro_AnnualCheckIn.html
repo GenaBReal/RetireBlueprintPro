@@ -172,6 +172,26 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1, p2) {
+  p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el) { el.textContent = p1; });
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el) { el.textContent = p2; });
+  document.querySelectorAll('[data-rbp-p1-of]').forEach(function(el) {
+    el.textContent = p1 + (p1.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p1-of');
+  });
+  document.querySelectorAll('[data-rbp-p2-of]').forEach(function(el) {
+    el.textContent = p2 + (p2.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p2-of');
+  });
+  window.rbpP1Name = p1; window.rbpP2Name = p2;
+}
+document.addEventListener('DOMContentLoaded', rbpApplyNames);
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
+});
+</script>
 </head>
 <body>
 
@@ -200,6 +220,9 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
   <a onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;" href="#" target="_blank">Master Sheet</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
+  
+    <a href="#" onclick="loadData();return false;" style="padding:10px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;margin-left:auto;" title="Reload data from your Google Sheet">🔄 Refresh</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">📋 What's New</a>
   </div>
 </div>
 </div>
@@ -293,6 +316,9 @@ function loadData() {
     if (data.people) {
       var _pKeys=Object.keys(data.people||{}); window._p1Name=(data.people[_pKeys[0]]||{}).name||'Partner 1';
       window._p2Name=(data.people[_pKeys[1]]||{}).name||'Partner 2';
+      try{if(window._p1Name!=='Partner 1')localStorage.setItem('rbp_p1_name',window._p1Name);}catch(e){}
+      try{if(window._p2Name!=='Partner 2')localStorage.setItem('rbp_p2_name',window._p2Name);}catch(e){}
+      if(typeof rbpApplyNames==='function') rbpApplyNames(window._p1Name, window._p2Name);
       window._p1Age=(data.people[_pKeys[0]]||{}).age||63;
       window._p2Age=(data.people[_pKeys[1]]||{}).age||55;
     }
@@ -574,5 +600,31 @@ renderTable = function(data) {
 </script>
 
 <div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;">Not financial advice. Not legal advice. For personal planning purposes only. Always consult a licensed financial advisor before making major retirement decisions. © 2026 RetireBlueprint Pro</div>
+
+<script>
+// ── AUTO-REFRESH: reloads data when Inputs saves ──────────────────
+(function() {
+  var _loadFn = 'loadData';
+  var _hiddenAt = 0;
+
+  // When Inputs page saves → rbp_last_saved changes → reload here
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'rbp_last_saved' && typeof window[_loadFn] === 'function') {
+      setTimeout(function() { window[_loadFn](); }, 400);
+    }
+  });
+
+  // When user returns to this tab after 30+ seconds → reload
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      _hiddenAt = Date.now();
+    } else {
+      if (_hiddenAt && (Date.now() - _hiddenAt) > 30000) {
+        if (typeof window[_loadFn] === 'function') window[_loadFn]();
+      }
+    }
+  });
+})();
+</script>
 </body>
 </html>

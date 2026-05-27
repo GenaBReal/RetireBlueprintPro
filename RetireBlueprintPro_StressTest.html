@@ -102,12 +102,32 @@ input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;}
   .nav-strip{overflow-x:auto;}
 }
 </style>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1, p2) {
+  p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el) { el.textContent = p1; });
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el) { el.textContent = p2; });
+  document.querySelectorAll('[data-rbp-p1-of]').forEach(function(el) {
+    el.textContent = p1 + (p1.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p1-of');
+  });
+  document.querySelectorAll('[data-rbp-p2-of]').forEach(function(el) {
+    el.textContent = p2 + (p2.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p2-of');
+  });
+  window.rbpP1Name = p1; window.rbpP2Name = p2;
+}
+document.addEventListener('DOMContentLoaded', rbpApplyNames);
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
+});
+</script>
 </head>
 <body>
 
 <div class="header">
   <div class="header-logo">
-    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:44px;width:auto;flex-shrink:0;" onerror="this.style.display='none'">
+    <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro" style="height:44px;width:auto;flex-shrink:0;" onerror="this.style.display='none'">
     <div>
       <div class="header-title">⚡ Stress Tester</div>
       <div style="font-size:9px;color:#ff9f43;margin-top:2px;">Interactive Scenario Analysis · Your Real Data</div>
@@ -127,6 +147,8 @@ input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;}
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" class="active">⚡ Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">🎬 Demo</a>
+  <a href="#" onclick="loadData();return false;" style="margin-left:auto;padding:8px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;" title="Reload data from your Google Sheet">🔄 Refresh</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">📋 What's New</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
 </div>
@@ -384,6 +406,9 @@ function project(overrides) {
   var pkeys = Object.keys(planData.people || {});
   var p1    = planData.people[pkeys[0]] || {};
   var p2    = planData.people[pkeys[1]] || {};
+  try{if(p1.name)localStorage.setItem('rbp_p1_name',p1.name.trim());}catch(e){}
+  try{if(p2.name)localStorage.setItem('rbp_p2_name',p2.name.trim());}catch(e){}
+  if(typeof rbpApplyNames==='function') rbpApplyNames(p1.name||'Partner 1',p2.name||'Partner 2');
 
   var totalPF  = port.total || 0;
   var baseSpend= (sp.baseAnnual||0) + (sp.safeExtra||0);
@@ -683,6 +708,32 @@ function loadData() {
 }
 
 window.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+<script>
+// ── AUTO-REFRESH: reloads data when Inputs saves ──────────────────
+(function() {
+  var _loadFn = 'loadData';
+  var _hiddenAt = 0;
+
+  // When Inputs page saves → rbp_last_saved changes → reload here
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'rbp_last_saved' && typeof window[_loadFn] === 'function') {
+      setTimeout(function() { window[_loadFn](); }, 400);
+    }
+  });
+
+  // When user returns to this tab after 30+ seconds → reload
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      _hiddenAt = Date.now();
+    } else {
+      if (_hiddenAt && (Date.now() - _hiddenAt) > 30000) {
+        if (typeof window[_loadFn] === 'function') window[_loadFn]();
+      }
+    }
+  });
+})();
 </script>
 </body>
 </html>

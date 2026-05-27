@@ -159,12 +159,32 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
   }
 }
 </style>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1, p2) {
+  p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el) { el.textContent = p1; });
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el) { el.textContent = p2; });
+  document.querySelectorAll('[data-rbp-p1-of]').forEach(function(el) {
+    el.textContent = p1 + (p1.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p1-of');
+  });
+  document.querySelectorAll('[data-rbp-p2-of]').forEach(function(el) {
+    el.textContent = p2 + (p2.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p2-of');
+  });
+  window.rbpP1Name = p1; window.rbpP2Name = p2;
+}
+document.addEventListener('DOMContentLoaded', rbpApplyNames);
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
+});
+</script>
 </head>
 <body>
 
 <nav>
   <div style="padding:6px 16px;border-right:1px solid #1a3a52;display:flex;align-items:center;flex-shrink:0;">
-    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:55px;width:auto;" onerror="this.style.display='none'">
+    <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro" style="height:55px;width:auto;" onerror="this.style.display='none'">
   </div>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" class="nav-link">Home</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" class="nav-link">Inputs</a>
@@ -175,6 +195,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" class="nav-link" style="color:#f4b86a;">🎬 Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html" class="nav-link">📄 Summary</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first.'); return false;" class="nav-link">Master Sheet</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">📋 What's New</a>
 </nav>
 
 <div style="background:linear-gradient(135deg,#f4b86a,#e09320);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
@@ -763,9 +784,9 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
               their own SS benefit OR their deceased spouse's benefit — as long as they are age 60 or older.
               This is the real Social Security survivor rule and your plan applies it automatically in every
               projection year after the first spouse's death.<br><br>
-              Example: If Craig's SS is $2,544/mo and Gena's is $2,493/mo, after Craig passes
-              Gena's Projected SS automatically becomes $2,544/mo (Craig's higher amount) for
-              the remainder of her life. This is reflected in the Survivor Plan chart on your Dashboard.
+              Example: If Partner 1's SS is $2,544/mo and Partner 2's is $2,493/mo, after Partner 1 passes,
+              Partner 2's Projected SS automatically becomes $2,544/mo (the higher amount) for
+              the remainder of their life. This is reflected in the Survivor Plan chart on your Dashboard.
             </div>
           </details>
 

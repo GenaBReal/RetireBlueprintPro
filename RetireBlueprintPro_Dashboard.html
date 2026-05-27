@@ -193,6 +193,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
   }
 }
 </style>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1, p2) {
+  p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el) { el.textContent = p1; });
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el) { el.textContent = p2; });
+  document.querySelectorAll('[data-rbp-p1-of]').forEach(function(el) {
+    el.textContent = p1 + (p1.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p1-of');
+  });
+  document.querySelectorAll('[data-rbp-p2-of]').forEach(function(el) {
+    el.textContent = p2 + (p2.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p2-of');
+  });
+  window.rbpP1Name = p1; window.rbpP2Name = p2;
+}
+document.addEventListener('DOMContentLoaded', rbpApplyNames);
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
+});
+</script>
 </head>
 <body>
 
@@ -249,6 +269,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;">🎬 Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;">Master Sheet</a>
+  <a href="#" onclick="loadData();return false;" style="margin-left:auto;padding:10px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;" title="Reload data from your Google Sheet">🔄 Refresh</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">📋 What's New</a>
   <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;"></span>
   <button onclick="reloadData()" style="margin:4px 8px;background:#0A3145;border:1px solid #1a3a52;color:#1CC7D0;font-size:9px;font-weight:700;padding:4px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.5px;">↺ Refresh Data</button>
 </div>
@@ -679,6 +701,10 @@ function populate(d){
   var _pk = Object.keys(d.people||{});
   var p1 = d.people[_pk[0]] || d.people.craig || d.people.person1 || {};
   var p2 = d.people[_pk[1]] || d.people.gena  || d.people.person2 || {};
+  // Cache names for all other pages
+  try { if(p1.name) localStorage.setItem('rbp_p1_name',p1.name.trim()); } catch(e){}
+  try { if(p2.name) localStorage.setItem('rbp_p2_name',p2.name.trim()); } catch(e){}
+  if (typeof rbpApplyNames==='function') rbpApplyNames(p1.name||'Partner 1', p2.name||'Partner 2');
 
   // ── EMPTY SHEET GUARD ────────────────────────────────────
   // If no names and no portfolio data, show setup prompt instead
@@ -1420,5 +1446,31 @@ function loadHomeEquity(sheetData) {
   </div>
 </div>
 <div class="disclaimer" style="font-size:11px;padding:10px;text-align:center;background:#f0f4f8;color:#5F6368;margin:0 -14px;">RetireBlueprint Pro · All values sourced directly from your personal Google Sheet · Not financial advice · For personal planning use only</div>
+
+<script>
+// ── AUTO-REFRESH: reloads data when Inputs saves ──────────────────
+(function() {
+  var _loadFn = 'loadData';
+  var _hiddenAt = 0;
+
+  // When Inputs page saves → rbp_last_saved changes → reload here
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'rbp_last_saved' && typeof window[_loadFn] === 'function') {
+      setTimeout(function() { window[_loadFn](); }, 400);
+    }
+  });
+
+  // When user returns to this tab after 30+ seconds → reload
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      _hiddenAt = Date.now();
+    } else {
+      if (_hiddenAt && (Date.now() - _hiddenAt) > 30000) {
+        if (typeof window[_loadFn] === 'function') window[_loadFn]();
+      }
+    }
+  });
+})();
+</script>
 </body>
 </html>

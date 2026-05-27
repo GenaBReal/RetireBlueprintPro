@@ -361,6 +361,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;">🎬 Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;" target="_blank">Master Sheet</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">📋 What's New</a>
   <div class="nav-right">
     <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
   </div>
@@ -2107,6 +2108,9 @@ function updatePartnerNames() {
   ['p1-section-name','p2-section-name'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.textContent = [p1name,p2name][i]; });
   var p1 = document.getElementById('f-B31').value || 'Partner 1';
   var p2 = document.getElementById('f-D31').value || 'Partner 2';
+  // Live-update name cache as user types
+  try{localStorage.setItem('rbp_p1_name',p1||'Partner 1');}catch(e){}
+  try{localStorage.setItem('rbp_p2_name',p2||'Partner 2');}catch(e){}
   document.getElementById('p1-label').textContent = p1;
   document.getElementById('p2-label').textContent = p2;
   var oldP1 = ownerOptions[0];
@@ -2307,6 +2311,9 @@ function populateFromData(d) {
   var _ik=Object.keys(p||{});
   var craig = p[_ik[0]] || p.craig || {};
   var gena  = p[_ik[1]] || p.gena  || {};
+  // Cache names for all pages
+  try{if(craig.name)localStorage.setItem('rbp_p1_name',craig.name.trim());}catch(e){}
+  try{if(gena.name)localStorage.setItem('rbp_p2_name',gena.name.trim());}catch(e){}
   var leg   = d.legacy  || {};
   var sp    = d.spending || {};
   var roth  = d.roth    || {};
@@ -2861,7 +2868,8 @@ function saveAll() {
       var t = setTimeout(function() {
         if (!done) { done=true; delete window[cbName];
           setStatus('✅ Save sent — open your sheet to confirm.', 'success');
-          isDirty = false; document.getElementById('save-btn').disabled = false; }
+          isDirty = false; document.getElementById('save-btn').disabled = false;
+          localStorage.setItem('rbp_last_saved', Date.now().toString()); }
       }, 10000);
       window[cbName] = function(d) {
         if (done) return; done=true; clearTimeout(t); delete window[cbName];
@@ -2873,6 +2881,7 @@ function saveAll() {
           setStatus('✅ Save sent — check your sheet to confirm.', 'success');
         }
         isDirty = false; document.getElementById('save-btn').disabled = false;
+        localStorage.setItem('rbp_last_saved', Date.now().toString());
       };
       var s = document.createElement('script');
       s.src = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName;

@@ -213,6 +213,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   }
 }
 </style>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1, p2) {
+  p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el) { el.textContent = p1; });
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el) { el.textContent = p2; });
+  document.querySelectorAll('[data-rbp-p1-of]').forEach(function(el) {
+    el.textContent = p1 + (p1.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p1-of');
+  });
+  document.querySelectorAll('[data-rbp-p2-of]').forEach(function(el) {
+    el.textContent = p2 + (p2.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p2-of');
+  });
+  window.rbpP1Name = p1; window.rbpP2Name = p2;
+}
+document.addEventListener('DOMContentLoaded', rbpApplyNames);
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
+});
+</script>
 </head>
 <body>
 
@@ -244,7 +264,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
   <a onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;" href="#" target="_blank">Master Sheet</a>
   <div class="nav-right">
-    <a href="onboard.html" class="orange">✏️ Create/Update My Plan</a>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" class="orange">✏️ Update My Plan</a>
+  
+    <a href="#" onclick="loadData();return false;" style="padding:10px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;margin-left:auto;" title="Reload data from your Google Sheet">🔄 Refresh</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">📋 What's New</a>
   </div>
 </div>
 
@@ -518,6 +541,9 @@ function loadData(){
       var p=d.people,port=d.portfolio,sp=d.spending,leg=d.legacy,tax=d.tax,meta=d.meta;
       var p1=p.craig||p.person1||{},p2=p.gena||p.person2||{};
       var craig=p1,gena=p2;
+  try { if(craig.name) localStorage.setItem("rbp_p1_name",craig.name.trim()); } catch(e){}
+  try { if(gena.name) localStorage.setItem("rbp_p2_name",gena.name.trim()); } catch(e){}
+  if (typeof rbpApplyNames==="function") rbpApplyNames(craig.name||"Partner 1", gena.name||"Partner 2");
       var runway=gena.projectedDeathYear-meta.planYear;
       set('k-confidence',Math.round(leg.achievedPct)+'%');
       set('k-portfolio',fmt(port.total));
@@ -581,6 +607,32 @@ function loadData(){
   document.head.appendChild(s);
 }
 loadData();
+</script>
+
+<script>
+// ── AUTO-REFRESH: reloads data when Inputs saves ──────────────────
+(function() {
+  var _loadFn = 'loadData';
+  var _hiddenAt = 0;
+
+  // When Inputs page saves → rbp_last_saved changes → reload here
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'rbp_last_saved' && typeof window[_loadFn] === 'function') {
+      setTimeout(function() { window[_loadFn](); }, 400);
+    }
+  });
+
+  // When user returns to this tab after 30+ seconds → reload
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      _hiddenAt = Date.now();
+    } else {
+      if (_hiddenAt && (Date.now() - _hiddenAt) > 30000) {
+        if (typeof window[_loadFn] === 'function') window[_loadFn]();
+      }
+    }
+  });
+})();
 </script>
 </body>
 </html>

@@ -84,12 +84,32 @@
     .demo-hero h1 { font-size:18px; }
   }
 </style>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1, p2) {
+  p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el) { el.textContent = p1; });
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el) { el.textContent = p2; });
+  document.querySelectorAll('[data-rbp-p1-of]').forEach(function(el) {
+    el.textContent = p1 + (p1.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p1-of');
+  });
+  document.querySelectorAll('[data-rbp-p2-of]').forEach(function(el) {
+    el.textContent = p2 + (p2.slice(-1)==='s' ? "'" : "'s") + ' ' + el.getAttribute('data-rbp-p2-of');
+  });
+  window.rbpP1Name = p1; window.rbpP2Name = p2;
+}
+document.addEventListener('DOMContentLoaded', rbpApplyNames);
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
+});
+</script>
 </head>
 <body>
 
 <div class="demo-header">
   <div style="display:flex;align-items:center;gap:14px;">
-    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:44px;width:auto;flex-shrink:0;" onerror="this.style.display='none'">
+    <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro" style="height:44px;width:auto;flex-shrink:0;" onerror="this.style.display='none'">
     <div>
       <div style="font-size:9px;color:#1CC7D0;margin-top:2px;text-transform:uppercase;letter-spacing:1px;font-weight:700;">Interactive Demo</div>
     </div>

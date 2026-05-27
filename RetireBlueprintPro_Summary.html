@@ -231,13 +231,31 @@
   }
 }
 </style>
+<script>
+// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+function rbpApplyNames(p1, p2) {
+  p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  document.querySelectorAll('[data-rbp-p1]').forEach(function(el) { el.textContent = p1; });
+  document.querySelectorAll('[data-rbp-p2]').forEach(function(el) { el.textContent = p2; });
+  window.rbpP1Name = p1; window.rbpP2Name = p2;
+}
+document.addEventListener('DOMContentLoaded', rbpApplyNames);
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
+});
+</script>
 </head>
 <body>
+<div style="position:fixed;top:8px;right:12px;z-index:999;">
+  <button onclick="loadReport();" style="background:#f4b86a;color:#041E2F;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🔄 Refresh</button>
+</div>
 
 <div class="toolbar">
   <div class="toolbar-title">📄 Retirement Summary Report</div>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;font-size:11px;text-decoration:none;padding:0 8px;">📋 What's New</a>
   <div>
-    <button class="btn btn-outline" onclick="window.history.back()">← Back</button>
+    <button class="btn btn-outline" onclick="window.location='https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html'">← Back</button>
     <button class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
   </div>
 </div>
@@ -249,7 +267,7 @@
   
   <div class="rpt-header">
     <div class="rpt-header-top" style="overflow:hidden;">
-      <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;display:block;flex-shrink:0;" onerror="this.style.display='none'">
+      <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;display:block;flex-shrink:0;" onerror="this.style.display='none'">
     </div>
     <div class="rpt-header-info">
       <table width="100%" cellpadding="0" cellspacing="0">
@@ -686,6 +704,9 @@ function populateReport(d) {
   // ── HEADER ──
   var p1n = p1.name || 'Partner 1';
   var p2n = p2.name || 'Partner 2';
+  try{if(p1.name)localStorage.setItem('rbp_p1_name',p1.name.trim());}catch(e){}
+  try{if(p2.name)localStorage.setItem('rbp_p2_name',p2.name.trim());}catch(e){}
+  if(typeof rbpApplyNames==='function') rbpApplyNames(p1n, p2n);
   set('r-names', p1n + ' & ' + p2n + ' — Retirement Plan');
   set('r-date',  'Generated: ' + today.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}));
   set('r-plan-year', 'Plan Year: ' + (gl.planYear || curYear));
@@ -1205,6 +1226,25 @@ function populateReport(d) {
   }
 
 window.addEventListener('DOMContentLoaded', loadReport);
+</script>
+
+<script>
+// ── AUTO-REFRESH: reloads data when Inputs saves ──────────────────
+(function() {
+  var _loadFn = 'loadReport';
+  var _hiddenAt = 0;
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'rbp_last_saved' && typeof window[_loadFn] === 'function') {
+      setTimeout(function() { window[_loadFn](); }, 400);
+    }
+  });
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) { _hiddenAt = Date.now(); }
+    else if (_hiddenAt && (Date.now() - _hiddenAt) > 30000) {
+      if (typeof window[_loadFn] === 'function') window[_loadFn]();
+    }
+  });
+})();
 </script>
 </body>
 </html>
