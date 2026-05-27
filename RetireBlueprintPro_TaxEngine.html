@@ -694,7 +694,103 @@ renderBrackets(0); // Will be updated when data loads
 loadData();
 </script>
 
-<div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;"><div style="background:#f0f4f8;border-radius:8px;padding:16px 20px;margin:16px 0;border-left:4px solid #1CC7D0;">
+<div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;"><!-- ANNUAL UPDATE RESOURCES -->
+<div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:20px 24px;margin:16px 0;border:1px solid rgba(28,199,208,0.25);">
+  <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:4px;">📅 Annual Update Guide — Keep Your Plan Current</div>
+  <div style="font-size:10px;color:#8aaabb;margin-bottom:16px;">These values change each year. Bookmark this page and check each January to keep your plan accurate.</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏛️ Tax Brackets & Deductions</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.irs.gov/newsroom/irs-provides-tax-inflation-adjustments-for-tax-year-2025" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS Tax Year 2025 Adjustments</a><br>
+        <a href="https://www.irs.gov/pub/irs-drop/rp-24-40.pdf" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS Rev. Proc. — Annual Bracket Updates</a><br>
+        <a href="https://taxfoundation.org/research/all/federal/2025-tax-brackets/" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 Tax Foundation 2025 Brackets (plain English)</a><br>
+        <span style="color:#8aaabb;font-size:10px;">Update in: Tax Engine sheet → Brackets tab</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏥 IRMAA Thresholds (Medicare)</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.medicare.gov/your-medicare-costs/part-b-costs" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 Medicare.gov — Official Part B Costs</a><br>
+        <a href="https://www.cms.gov/newsroom/fact-sheets/2025-medicare-parts-b-premiums-deductibles" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 CMS 2025 Part B Premiums & IRMAA</a><br>
+        <a href="https://www.ssa.gov/pubs/EN-05-10536.pdf" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 SSA IRMAA Fact Sheet</a><br>
+        <span style="color:#8aaabb;font-size:10px;">Update in: Tax Engine sheet → IRMAA table</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">📈 RMD Life Expectancy Tables</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.irs.gov/publications/p590b" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS Pub 590-B — RMD Calculations</a><br>
+        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/required-minimum-distributions" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 IRS RMD Overview Page</a><br>
+        <a href="https://www.fidelity.com/calculators-tools/required-minimum-distribution" target="_blank" style="color:#1CC7D0;text-decoration:none;">🧮 Fidelity RMD Calculator (verify amounts)</a><br>
+        <span style="color:#8aaabb;font-size:10px;">RMD tables change rarely — last updated 2022</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🔐 Social Security</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.ssa.gov/myaccount/" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 ssa.gov/myaccount — Your SS Statement</a><br>
+        <a href="https://www.ssa.gov/OACT/COLA/colasummary.html" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 SSA COLA History & Current Rate</a><br>
+        <a href="https://www.ssa.gov/benefits/retirement/planner/ageincrease.html" target="_blank" style="color:#1CC7D0;text-decoration:none;">📅 Full Retirement Age by Birth Year</a><br>
+        <span style="color:#8aaabb;font-size:10px;">Update SS COLA rate in Inputs → Plan Settings</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">💼 401k / IRA Contribution Limits</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-401k-and-profit-sharing-plan-contribution-limits" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS 401k Contribution Limits</a><br>
+        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-ira-contribution-limits" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS IRA Contribution Limits</a><br>
+        <a href="https://www.irs.gov/retirement-plans/retirement-plans-faqs-regarding-iras" target="_blank" style="color:#1CC7D0;text-decoration:none;">❓ IRS Roth IRA FAQ</a><br>
+        <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Named Accounts → Annual Contrib</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏥 ACA / Healthcare Costs</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.healthcare.gov/see-plans/" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 HealthCare.gov — Browse Plans & Costs</a><br>
+        <a href="https://www.kff.org/health-reform/state-indicator/marketplace-average-benchmark-premiums/" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 KFF Benchmark Premium Data by State</a><br>
+        <a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 HHS Federal Poverty Level Guidelines</a><br>
+        <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Healthcare section</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">📉 Inflation Rate</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.bls.gov/cpi/" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 BLS Consumer Price Index (CPI) — Official</a><br>
+        <a href="https://fred.stlouisfed.org/series/CPIAUCSL" target="_blank" style="color:#1CC7D0;text-decoration:none;">📈 FRED CPI Chart (St. Louis Fed)</a><br>
+        <a href="https://www.clevelandfed.org/indicators-and-data/inflation-expectations" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔮 Cleveland Fed Inflation Expectations</a><br>
+        <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Plan Settings → Inflation Rate</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏠 Real Estate Values</div>
+      <div style="font-size:11px;color:#c8dae8;line-height:2;">
+        <a href="https://www.zillow.com" target="_blank" style="color:#1CC7D0;text-decoration:none;">🏠 Zillow — Current Home Estimates</a><br>
+        <a href="https://www.redfin.com" target="_blank" style="color:#1CC7D0;text-decoration:none;">🏠 Redfin — Home Values & Market Data</a><br>
+        <a href="https://www.fhfa.gov/hpi" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 FHFA House Price Index (annual appreciation)</a><br>
+        <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Debts & Real Estate</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:14px;padding:10px 14px;background:rgba(244,184,106,0.1);border-radius:6px;border-left:3px solid #f4b86a;font-size:10px;color:#f4b86a;line-height:1.7;">
+    💡 <strong>Annual Check-In Tip:</strong> Each January, spend 30 minutes updating: (1) SS COLA rate, (2) tax brackets if changed,
+    (3) IRMAA thresholds, (4) account balances, (5) home value from Zillow, (6) mortgage balance from your statement.
+    Your whole plan recalculates automatically. This is the whole point of having a live-connected plan!
+  </div>
+</div>
+
+<div style="background:#f0f4f8;border-radius:8px;padding:16px 20px;margin:16px 0;border-left:4px solid #1CC7D0;">
   <div style="font-size:12px;font-weight:700;color:#041E2F;margin-bottom:8px;">💡 How to Use This Page</div>
   <div style="font-size:11px;color:#444;line-height:1.7;">
     <strong>Step 1:</strong> Check your effective tax rate — if it's under 15%, you're in great shape for Roth conversions.<br>
