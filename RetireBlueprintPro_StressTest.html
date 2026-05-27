@@ -7,103 +7,99 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-/* ── BASE ── */
+:root{ --navy:#041E2F; --mid:#0A3145; --teal:#1CC7D0; --orange:#f4b86a; --green:#4CAF50; --red:#ff6b6b; }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',system-ui,'Montserrat',sans-serif;background:#F8F9FA;color:#1a1a2e;min-height:100vh;overflow-x:hidden;}
+body{font-family:'Montserrat',sans-serif;background:var(--navy);color:#fff;min-height:100vh;overflow-x:hidden;}
 
-/* ── HEADER / NAV ── */
-.header{background:#041E2F;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1CC7D0;}
+/* HEADER */
+.header{background:#041E2F;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--teal);}
 .header-logo{display:flex;align-items:center;gap:12px;}
-.header-title{font-size:13px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;}
-.nav-back{color:#8aaabb;font-size:11px;text-decoration:none;}
+.header-title{font-size:13px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:1px;}
+
+/* NAV */
 .nav-strip{background:#0A3145;padding:0;display:flex;align-items:stretch;border-bottom:1px solid #1a3a52;overflow-x:auto;scrollbar-width:none;}
 .nav-strip::-webkit-scrollbar{display:none;}
 .nav-strip a{font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;white-space:nowrap;}
 .nav-strip a.active,.nav-strip a:hover{color:#f4b86a;}
+
 .body{max-width:1100px;margin:0 auto;padding:16px;}
 
-/* ── HERO ── dark accent, same as Dashboard header */
-.hero{background:#041E2F;border-radius:0;padding:16px 20px;margin-bottom:16px;border-bottom:3px solid #f4b86a;}
+/* HERO */
+.hero{background:linear-gradient(135deg,#1a0808,#2d1515);border-radius:12px;padding:20px 24px;margin-bottom:16px;border:2px solid rgba(255,107,107,0.3);}
 .hero h1{font-size:20px;font-weight:900;color:#fff;margin-bottom:4px;}
-.hero h1 span{color:#1CC7D0;}
-.hero p{font-size:11px;color:#8aaabb;line-height:1.6;max-width:700px;}
+.hero h1 span{color:var(--teal);}
+.hero p{font-size:11px;color:#8aaabb;line-height:1.7;max-width:700px;}
 
-/* ── SCENARIO TABS ── */
-.scenario-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-.tab-btn{padding:8px 14px;border-radius:6px;border:1px solid #e8eaed;background:#fff;color:#37474F;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;border-top:3px solid #041E2F;}
-.tab-btn:hover{border-color:#1CC7D0;color:#006064;border-top-color:#1CC7D0;}
-.tab-btn.active{background:#041E2F;border-color:#041E2F;border-top-color:#f4b86a;color:#f4b86a;}
+/* LOADING */
+@keyframes spin{to{transform:rotate(360deg);}}
+#loading-msg{text-align:center;padding:60px 20px;}
 
-/* ── LAYOUT ── */
-.main-grid{display:grid;grid-template-columns:320px 1fr;gap:14px;}
-.results-panel{display:flex;flex-direction:column;gap:12px;}
+/* NOTICES */
+#your-data-notice{display:none;background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;}
+#sample-notice{display:none;background:rgba(244,184,106,0.12);border:1px solid rgba(244,184,106,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;}
 
-/* ── SLIDERS PANEL ── dark like Dashboard engine cards */
-.sliders-panel{background:#041E2F;border-radius:6px;padding:14px;border:1px solid #1a3a52;}
-.panel-title{font-size:9px;font-weight:700;color:#f4b86a;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
-.slider-group{margin-bottom:16px;}
-.slider-label{font-size:9px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
-.slider-val{font-size:14px;font-weight:800;color:#fff;}
-input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
-.slider-range{display:flex;justify-content:space-between;font-size:8px;color:#456A73;margin-top:2px;}
-.slider-desc{font-size:9px;color:#5a7a8a;line-height:1.5;margin-top:4px;font-style:italic;}
-.reset-btn{width:100%;padding:7px;background:transparent;border:1px solid #1a3a52;color:#8aaabb;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px;}
-.reset-btn:hover{border-color:#f4b86a;color:#f4b86a;}
-
-/* ── OUTCOME CARDS ── white kpi-card style */
-.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.outcome-card{background:#fff;border-radius:6px;padding:12px;text-align:center;border:1px solid #e8eaed;border-top:3px solid #041E2F;}
-.outcome-card.base{border-top-color:#1CC7D0;}
-.outcome-card.scenario{border-top-color:#f4b86a;}
-.oc-label{font-size:8px;font-weight:700;letter-spacing:1px;color:#37474F;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:4px;}
-.oc-val{font-size:22px;font-weight:800;color:#0B2239;line-height:1.1;}
-.oc-sub{font-size:9px;color:#5F6368;margin-top:4px;font-style:italic;}
-.oc-diff{font-size:11px;font-weight:700;margin-top:5px;}
-
-/* ── CHART CARD ── white */
-.chart-card{background:#fff;border-radius:6px;padding:14px;border:1px solid #e8eaed;border-top:3px solid #041E2F;}
-.chart-title{font-size:9px;font-weight:700;color:#37474F;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
-.chart-area{height:200px;position:relative;}
-
-/* ── VERDICT BANNER ── */
-.verdict-banner{background:#fff;border-radius:6px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;border:1px solid #e8eaed;border-top:3px solid #4CAF50;}
-.verdict-icon{font-size:26px;flex-shrink:0;}
-.verdict-title{font-size:13px;font-weight:800;margin-bottom:4px;}
-.verdict-detail{font-size:11px;line-height:1.7;color:#37474F;}
-.recs{background:#F8F9FA;border-radius:6px;padding:10px 12px;margin-top:8px;border:1px solid #e8eaed;}
-.recs-title{font-size:8px;font-weight:700;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-.rec-item{display:flex;gap:8px;font-size:10px;color:#37474F;line-height:1.6;margin-bottom:4px;}
-
-/* ── FINGERPRINT BAR ── dark engine card style */
-#plan-fingerprint{background:#041E2F;border-radius:6px;padding:12px 16px;margin-bottom:12px;border-left:4px solid #1CC7D0;border-top:3px solid #1CC7D0;}
-.fp-cell{text-align:center;padding:8px;background:rgba(255,255,255,0.05);border-radius:4px;}
+/* FINGERPRINT BAR */
+#plan-fingerprint{display:none;background:#061620;border-radius:10px;padding:12px 18px;margin-bottom:14px;border-left:4px solid var(--teal);border:1px solid rgba(28,199,208,0.25);}
+.fp-cell{text-align:center;padding:8px;background:rgba(255,255,255,0.04);border-radius:6px;}
 .fp-label{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;font-weight:700;}
 .fp-val{font-size:16px;font-weight:800;color:#fff;line-height:1;}
 .fp-note{font-size:8px;color:#8aaabb;margin-top:3px;}
 
-/* ── FIRE PANEL ── dark */
-.fire-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.fire-box{background:#0A3145;border-radius:6px;padding:10px;text-align:center;border:1px solid #1a3a52;}
-.fire-label{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;font-weight:700;}
+/* SCENARIO TABS */
+.scenario-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.tab-btn{padding:8px 16px;border-radius:6px;border:2px solid #1a3a52;background:transparent;color:#8aaabb;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.tab-btn:hover{border-color:var(--teal);color:var(--teal);}
+.tab-btn.active{background:var(--teal);border-color:var(--teal);color:var(--navy);}
 
-/* ── INFO BOXES ── */
-.info-teal{background:#e0f7fa;border-radius:6px;padding:12px 14px;font-size:11px;color:#004D40;line-height:1.7;border-left:4px solid #00838f;margin-bottom:12px;}
-.info-amber{background:#fff8e1;border-radius:6px;padding:12px 14px;font-size:10px;color:#5d3a00;line-height:1.7;border-left:4px solid #f4b86a;}
-.improve-panel{background:#041E2F;border-radius:6px;padding:16px 20px;margin-top:12px;border-top:3px solid #4CAF50;}
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:320px 1fr;gap:16px;}
+.results-panel{display:flex;flex-direction:column;gap:12px;}
 
-/* ── NOTICES ── */
-#your-data-notice{background:#e8f5e9;border:1px solid #4CAF50;border-radius:6px;padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px;font-size:11px;}
-#sample-notice{background:#fff8e1;border:1px solid #f4b86a;border-radius:6px;padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px;font-size:11px;}
+/* SLIDERS */
+.sliders-panel{background:#061620;border-radius:10px;padding:16px;border:1px solid #1a3a52;}
+.panel-title{font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.slider-group{margin-bottom:18px;}
+.slider-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.slider-val{font-size:14px;font-weight:800;color:var(--teal);}
+input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;}
+.slider-range{display:flex;justify-content:space-between;font-size:8px;color:#456A73;margin-top:2px;}
+.slider-desc{font-size:9px;color:#5a7a8a;line-height:1.5;margin-top:4px;font-style:italic;}
+.reset-btn{width:100%;padding:8px;background:transparent;border:1px solid #1a3a52;color:#8aaabb;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
+.reset-btn:hover{border-color:var(--orange);color:var(--orange);}
 
-/* ── LOADING ── */
-@keyframes spin{to{transform:rotate(360deg);}}
-#loading-msg{text-align:center;padding:60px 20px;background:#fff;border-radius:6px;margin-top:20px;}
+/* OUTCOME CARDS */
+.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.outcome-card{background:#061620;border-radius:10px;padding:14px;text-align:center;border:2px solid #1a3a52;}
+.outcome-card.base{border-color:rgba(28,199,208,0.4);}
+.outcome-card.scenario{border-color:rgba(244,184,106,0.4);}
+.oc-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-weight:700;}
+.oc-val{font-size:22px;font-weight:900;line-height:1;color:#fff;}
+.oc-sub{font-size:9px;color:#8aaabb;margin-top:5px;line-height:1.4;}
+.oc-diff{font-size:12px;font-weight:700;margin-top:4px;}
+
+/* CHART */
+.chart-card{background:#061620;border-radius:10px;padding:16px;border:1px solid #1a3a52;}
+.chart-title{font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.chart-area{height:200px;position:relative;}
+
+/* VERDICT */
+.verdict-banner{border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;}
+.verdict-icon{font-size:28px;flex-shrink:0;}
+.verdict-title{font-size:14px;font-weight:800;margin-bottom:4px;}
+.verdict-detail{font-size:11px;line-height:1.7;}
+.recs{background:rgba(0,0,0,0.2);border-radius:8px;padding:12px 14px;margin-top:8px;}
+.recs-title{font-size:9px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.rec-item{display:flex;gap:8px;font-size:10px;color:#c8dae8;line-height:1.6;margin-bottom:4px;}
+
+/* INFO BOXES */
+.info-teal{background:rgba(28,199,208,0.08);border-radius:8px;padding:12px 16px;margin-bottom:12px;border-left:4px solid var(--teal);font-size:11px;color:#c8dae8;line-height:1.8;}
+.info-amber{background:rgba(244,184,106,0.08);border-radius:8px;padding:12px 14px;font-size:10px;color:#f4b86a;line-height:1.7;border-left:4px solid var(--orange);}
+.improve-panel{background:#061620;border-radius:12px;padding:18px 22px;margin-top:12px;border:1px solid rgba(76,175,80,0.3);}
 
 @media(max-width:768px){
   .main-grid{grid-template-columns:1fr;}
   .outcome-grid{grid-template-columns:1fr 1fr;}
-  .fire-grid{grid-template-columns:1fr 1fr;}
-  .hero{border-radius:0;}
+  .nav-strip{overflow-x:auto;}
 }
 </style>
 </head>
@@ -117,146 +113,96 @@ input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
       <div style="font-size:9px;color:#ff9f43;margin-top:2px;">Interactive Scenario Analysis · Your Real Data</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" class="nav-back">← Dashboard</a>
-    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;font-size:11px;text-decoration:none;">🎬 Demo</a>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button onclick="loadData()" style="background:rgba(28,199,208,0.15);border:1px solid #1CC7D0;color:#1CC7D0;font-size:10px;font-weight:700;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:inherit;">🔄 Reload Data</button>
+    <a href="RetireBlueprintPro_Dashboard.html" style="color:#8aaabb;font-size:11px;text-decoration:none;">← Dashboard</a>
   </div>
 </div>
+
 <div class="nav-strip">
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Home</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Dashboard</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Inputs</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Tax Engine</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#ff9f43;font-size:10px;font-weight:800;padding:8px 12px;text-decoration:none;white-space:nowrap;border-bottom:2px solid #ff9f43;">⚡ Stress Test</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">🎬 Demo</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">📄 Summary</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Setup Guide</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" class="active">⚡ Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">🎬 Demo</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
 </div>
 
 <div class="body">
 
 <div class="hero">
-  <h1 style="color:#fff;">⚡ Interactive <span style="color:#1CC7D0;">Stress Tester</span></h1>
-  <p style="color:#c8dae8;">Use sliders to simulate real-world scenarios against YOUR actual portfolio data. See instantly how a market crash, high inflation, or reduced spending affects your ending balance and legacy goal. This is where retirement plans get battle-tested.</p>
+  <h1>⚡ Interactive <span>Stress Tester</span></h1>
+  <p>Use sliders to simulate real-world scenarios against YOUR actual portfolio data. See instantly how a market crash, high inflation, or reduced spending affects your ending balance and legacy goal.</p>
 </div>
 
-<div id="loading-msg" style="text-align:center;padding:50px 20px;">
-  <!-- Spinner -->
+<!-- LOADING -->
+<div id="loading-msg" style="text-align:center;padding:60px 20px;">
   <div style="display:inline-block;width:48px;height:48px;border:4px solid #1a3a52;border-top:4px solid #1CC7D0;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px;"></div>
   <br>
-  <div id="loading-status" style="font-size:14px;font-weight:700;color:#041E2F;margin-bottom:12px;">Connecting to your Google Sheet...</div>
-  
-  <!-- Progress bar -->
+  <div id="loading-status" style="font-size:14px;font-weight:700;color:#c8dae8;margin-bottom:12px;">Connecting to your Google Sheet...</div>
   <div style="max-width:320px;margin:0 auto 16px;">
     <div style="background:#1a3a52;border-radius:10px;height:8px;overflow:hidden;">
       <div id="loading-progress" style="height:8px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);border-radius:10px;width:0%;transition:width 0.5s ease;"></div>
     </div>
     <div id="loading-pct" style="font-size:10px;color:#8aaabb;margin-top:6px;">0%</div>
   </div>
-  
-  <div id="loading-detail" style="font-size:11px;color:#5a7a8a;max-width:320px;margin:0 auto;line-height:1.6;">
-    Reading projections &amp; portfolio data...
-  </div>
+  <div id="loading-detail" style="font-size:11px;color:#5a7a8a;max-width:320px;margin:0 auto;line-height:1.6;">Reading projections &amp; portfolio data...</div>
 </div>
-
-<style>
-@keyframes spin { to { transform: rotate(360deg); } }
-</style>
 
 <div id="stress-content" style="display:none;">
 
-  <!-- YOUR DATA NOTICE (shown when real sheet loads) -->
-  <div id="your-data-notice" style="display:none;background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;">
+  <!-- NOTICES -->
+  <div id="your-data-notice">
     <div style="font-size:20px;">✅</div>
     <div style="flex:1;">
-      <div style="font-size:12px;font-weight:800;color:#4CAF50;margin-bottom:2px;">
-        Your Real Plan Loaded — <span id="loaded-names">—</span>
-      </div>
-      <div style="font-size:10px;color:#8aaabb;">
-        <span id="loaded-portfolio">—</span> · All stress scenarios use your actual numbers
-      </div>
+      <div style="font-weight:800;color:#4CAF50;margin-bottom:2px;">Your Real Plan Loaded — <span id="loaded-names">—</span></div>
+      <div style="font-size:10px;color:#8aaabb;"><span id="loaded-portfolio">—</span> · All stress scenarios use your actual numbers · <button onclick="loadData()" style="background:transparent;border:none;color:#1CC7D0;font-size:10px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0;">🔄 Reload</button></div>
     </div>
-    <div style="font-size:10px;color:#8aaabb;text-align:right;">
-      Base scenario ending balance should match your Dashboard legacy goal ✓
-    </div>
+    <div style="font-size:10px;color:#8aaabb;text-align:right;">Base ending should match Dashboard ✓</div>
   </div>
 
-  <!-- SAMPLE DATA NOTICE -->
-  <div id="sample-notice" style="display:none;background:rgba(244,184,106,0.12);border:1px solid rgba(244,184,106,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;">
+  <div id="sample-notice">
     <div style="font-size:20px;">📊</div>
     <div style="flex:1;">
-      <div style="font-size:11px;font-weight:700;color:#f4b86a;margin-bottom:2px;">Showing Sample Data (Alex & Jordan)</div>
-      <div style="font-size:10px;color:#8aaabb;">Connect your Google Sheet to stress-test YOUR actual numbers. <a href="RetireBlueprintPro_Home.html" style="color:#1CC7D0;">Set up your sheet →</a></div>
+      <div style="font-weight:700;color:#f4b86a;margin-bottom:2px;">Showing Sample Data</div>
+      <div style="font-size:10px;color:#8aaabb;">Connect your sheet to stress-test YOUR numbers. <a href="RetireBlueprintPro_Home.html" style="color:#1CC7D0;">Set up →</a></div>
     </div>
   </div>
 
-  <!-- YOUR PLAN FINGERPRINT BAR -->
-  <div id="plan-fingerprint" style="display:none;background:#fff;border-radius:10px;padding:12px 18px;margin-bottom:14px;border:2px solid #1CC7D0;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
-    <div style="font-size:9px;font-weight:800;color:#006064;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">
-      🔍 Your Plan at a Glance — Confirm This Is Your Data
+  <!-- FINGERPRINT -->
+  <div id="plan-fingerprint">
+    <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔍 Your Plan Fingerprint — Confirm This Is Your Data</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
+      <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
+      <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:var(--orange);">—</div><div class="fp-note">Target end</div></div>
+      <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:var(--green);">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
+      <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:var(--teal);">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
+      <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Base + extra</div></div>
+      <div class="fp-cell" style="border:1px solid rgba(255,107,107,0.3);"><div class="fp-label" style="color:#ff9f43;">⚡ -30% Yr1</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
-      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
-        <div class="fp-label">Total Portfolio</div>
-        <div style="font-size:16px;font-weight:800;color:#fff;" id="fp-portfolio">—</div>
-        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Starting value</div>
-      </div>
-      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
-        <div class="fp-label">Legacy Goal</div>
-        <div style="font-size:16px;font-weight:800;color:#f4b86a;" id="fp-legacy">—</div>
-        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Target ending balance</div>
-      </div>
-      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
-        <div class="fp-label">Base Ending Balance</div>
-        <div style="font-size:16px;font-weight:800;color:#4CAF50;" id="fp-ending">—</div>
-        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;" id="fp-ending-note">Matches Dashboard ✓</div>
-      </div>
-      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
-        <div class="fp-label">Plan Runs Through</div>
-        <div style="font-size:16px;font-weight:800;color:#1CC7D0;" id="fp-end-year">—</div>
-        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;" id="fp-end-note">Both partners covered</div>
-      </div>
-      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;">
-        <div class="fp-label">Annual Spending</div>
-        <div style="font-size:16px;font-weight:800;color:#fff;" id="fp-spending">—</div>
-        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Base + solver extra</div>
-      </div>
-      <div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;border:1px solid rgba(255,107,107,0.3);">
-        <div style="font-size:8px;color:#ff9f43;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">⚡ Stress: -30% Yr1</div>
-        <div style="font-size:16px;font-weight:800;" id="fp-stress30">—</div>
-        <div style="font-size:8px;margin-top:2px;" id="fp-stress30-note">—</div>
-      </div>
-    </div>
-    <div style="margin-top:10px;font-size:9px;color:#456A73;text-align:center;">
-      If these numbers match what you see on your Dashboard, your real plan is loaded. 
-      If you see "Alex" or generic numbers, you're on sample data — 
-      <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">open on GitHub Pages to load your sheet →</a>
-    </div>
+    <div style="margin-top:8px;font-size:9px;color:#456A73;text-align:center;">If these numbers match your Dashboard, your real plan is loaded. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">Need real data? Open on GitHub Pages →</a></div>
   </div>
 
-  <!-- WHAT DOES THIS MEAN EXPLAINER -->
-  <div style="background:#f8f9fa;border-radius:8px;border:1px solid #e8eaed;padding:12px 16px;margin-bottom:12px;border-left:4px solid #1CC7D0;font-size:11px;color:#c8dae8;line-height:1.8;">
-    <strong style="color:#f4b86a;">📖 How to Read This Page:</strong>
-    The sliders show what happens if a market crash hits in <strong>Year 1 of retirement</strong> — the worst possible timing.
-    Your Dashboard's $250K ending assumes smooth 7% returns every year.
-    A Year 1 crash means you sell shares at the bottom while withdrawing living expenses — those shares never recover for you.
-    <br>
-    <strong style="color:#E65100;">The most powerful lever isn't the market — it's your spending.</strong>
-    Try setting the <em>Spending Adjustment</em> slider to <strong>-10%</strong> and watch the outcome improve dramatically.
-    Cutting $8,700/yr in a downturn can mean the difference between success and failure.
-    <br>
-    <strong style="color:#2E7D32;">Want to change the base numbers?</strong>
-    Adjust your SS start date, spending phases, or return rates in 
-    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:700;">Inputs</a>, 
-    save, then refresh this page to see updated stress results.
+  <!-- HOW TO READ -->
+  <div class="info-teal">
+    <strong style="color:#1CC7D0;">📖 How to Read This Page:</strong>
+    Sliders show what happens if a crash hits in <strong>Year 1 of retirement</strong> — the worst possible timing.
+    Your Dashboard assumes smooth returns every year. A Year 1 crash means selling shares at the bottom while withdrawing — those shares never recover.
+    <br><strong style="color:#f4b86a;">The most powerful lever: Spending Adjustment.</strong>
+    Try <strong>-10%</strong> and watch outcomes improve dramatically.
+    <strong style="color:#4CAF50;">Changed something in Inputs?</strong>
+    Save there, then click 🔄 Reload Data above.
   </div>
 
   <!-- SCENARIO TABS -->
   <div class="scenario-tabs">
-    <button class="tab-btn active" onclick="setScenario('custom')">🎛️ Custom Scenario</button>
-    <button class="tab-btn" onclick="setScenario('crash2008')">📉 2008 Financial Crisis</button>
-    <button class="tab-btn" onclick="setScenario('dotcom')">💻 2000 Dot-Com Bust</button>
-    <button class="tab-btn" onclick="setScenario('covid')">🦠 2020 COVID Crash</button>
+    <button class="tab-btn active" onclick="setScenario('custom')">🎛️ Custom</button>
+    <button class="tab-btn" onclick="setScenario('crash2008')">📉 2008 Crisis</button>
+    <button class="tab-btn" onclick="setScenario('dotcom')">💻 Dot-Com Bust</button>
+    <button class="tab-btn" onclick="setScenario('covid')">🦠 COVID 2020</button>
     <button class="tab-btn" onclick="setScenario('stagflation')">📈 1970s Stagflation</button>
     <button class="tab-btn" onclick="setScenario('bestcase')">🚀 Bull Market</button>
   </div>
@@ -265,185 +211,157 @@ input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
 
     <!-- SLIDERS -->
     <div class="sliders-panel">
-      <div class="panel-title">🎛️ Adjust Scenario Parameters</div>
+      <div class="panel-title">🎛️ Scenario Parameters</div>
 
       <div class="slider-group">
-        <div class="slider-label">
-          Year 1 Market Return
-          <span class="slider-val" id="lbl-yr1">-20%</span>
-        </div>
+        <div class="slider-label">Year 1 Market Return <span class="slider-val" id="lbl-yr1">-20%</span></div>
         <input type="range" id="sl-yr1" min="-50" max="30" step="1" value="-20" oninput="recalc()">
         <div class="slider-range"><span>-50%</span><span>0%</span><span>+30%</span></div>
-        <div class="slider-desc">A severe crash in the FIRST year of retirement is the worst possible scenario — you're selling shares at the bottom to fund living expenses.</div>
+        <div class="slider-desc">A crash in your first retirement year is the worst scenario — you sell at the bottom to fund living expenses.</div>
       </div>
 
       <div class="slider-group">
-        <div class="slider-label">
-          Years of Poor Returns
-          <span class="slider-val" id="lbl-yrs">1</span>
-        </div>
+        <div class="slider-label">Years of Poor Returns <span class="slider-val" id="lbl-yrs">1</span></div>
         <input type="range" id="sl-yrs" min="1" max="5" step="1" value="1" oninput="recalc()">
         <div class="slider-range"><span>1 yr</span><span>3 yrs</span><span>5 yrs</span></div>
-        <div class="slider-desc">How many years the bad market persists before recovery. Even 2008 recovered fully within 5 years.</div>
+        <div class="slider-desc">How long the downturn lasts. Even 2008 fully recovered within 5 years.</div>
       </div>
 
       <div class="slider-group">
-        <div class="slider-label">
-          Inflation Rate
-          <span class="slider-val" id="lbl-inf">3.0%</span>
-        </div>
+        <div class="slider-label">Inflation Rate <span class="slider-val" id="lbl-inf">3.0%</span></div>
         <input type="range" id="sl-inf" min="1" max="10" step="0.5" value="3" oninput="recalc()">
         <div class="slider-range"><span>1%</span><span>3%</span><span>10%</span></div>
-        <div class="slider-desc">Higher inflation erodes purchasing power and increases expenses every year. 1970s saw 8-12% inflation for several years.</div>
+        <div class="slider-desc">Higher inflation erodes purchasing power every year. 1970s saw 8-12%.</div>
       </div>
 
       <div class="slider-group">
-        <div class="slider-label">
-          Spending Adjustment
-          <span class="slider-val" id="lbl-spend">0%</span>
-        </div>
+        <div class="slider-label">Spending Adjustment <span class="slider-val" id="lbl-spend">0%</span></div>
         <input type="range" id="sl-spend" min="-30" max="20" step="5" value="0" oninput="recalc()">
         <div class="slider-range"><span>-30%</span><span>0%</span><span>+20%</span></div>
-        <div class="slider-desc">Test what happens if you cut spending during a downturn (-20%) or if lifestyle inflation kicks in (+10%). This is your most powerful lever.</div>
+        <div class="slider-desc">Your most powerful lever. Cutting 10% in a downturn dramatically changes outcomes.</div>
       </div>
 
       <div class="slider-group">
-        <div class="slider-label">
-          SS COLA Rate
-          <span class="slider-val" id="lbl-cola">2.5%</span>
-        </div>
+        <div class="slider-label">SS COLA Rate <span class="slider-val" id="lbl-cola">2.5%</span></div>
         <input type="range" id="sl-cola" min="0" max="5" step="0.5" value="2.5" oninput="recalc()">
         <div class="slider-range"><span>0%</span><span>2.5%</span><span>5%</span></div>
-        <div class="slider-desc">Lower COLA means SS buys less over time. Zero models a worst-case SS reform scenario.</div>
+        <div class="slider-desc">Zero models a worst-case SS reform scenario.</div>
       </div>
 
-      <button class="reset-btn" onclick="resetSliders()">↺ Reset to Base Scenario</button>
-
-      <div class="info-amber" style="margin-top:14px;">
-        💡 <strong>The most powerful action:</strong> Reducing spending by even 10% in the first 3 years of a downturn dramatically improves outcomes. Try setting spending to -10% and watch the ending balance change.
-      </div>
+      <button class="reset-btn" onclick="setScenario('custom')">↺ Reset to Base</button>
     </div>
 
     <!-- RESULTS -->
     <div class="results-panel">
 
-      <!-- Outcome comparison -->
       <div class="outcome-grid">
         <div class="outcome-card base">
           <div class="oc-label">📊 Base Plan</div>
-          <div class="oc-val teal" id="res-base-end" style="color:var(--teal);">—</div>
-          <div class="oc-sub" style="color:#8aaabb;">Ending balance · no stress</div>
+          <div class="oc-val" id="res-base-end" style="color:var(--teal);">—</div>
+          <div class="oc-sub">No stress · your projection</div>
           <div class="oc-diff" id="res-base-conf" style="color:var(--green);">—</div>
         </div>
         <div class="outcome-card scenario">
           <div class="oc-label">⚡ Stress Scenario</div>
           <div class="oc-val" id="res-stress-end" style="color:var(--orange);">—</div>
-          <div class="oc-sub" style="color:#8aaabb;">Ending balance · with stress</div>
+          <div class="oc-sub">With applied stress</div>
           <div class="oc-diff" id="res-stress-conf">—</div>
         </div>
-        <div class="outcome-card" id="verdict-card" style="background:#e8f5e9;border-color:#4CAF50;">
+        <div class="outcome-card" id="verdict-card" style="border-color:rgba(76,175,80,0.4);">
           <div class="oc-label">📋 Verdict</div>
           <div class="oc-val" id="res-verdict-icon" style="font-size:28px;">✅</div>
-          <div class="oc-sub" id="res-verdict-text" style="color:#8aaabb;font-size:10px;">Plan survives</div>
+          <div class="oc-sub" id="res-verdict-text" style="font-size:10px;">—</div>
           <div class="oc-diff" id="res-delta">—</div>
         </div>
       </div>
 
-      <!-- Chart -->
       <div class="chart-card">
-        <div class="chart-title">Portfolio Over Time — Base vs Stress Scenario</div>
+        <div class="chart-title">Portfolio Over Time — Base vs Stress</div>
         <div class="chart-area"><canvas id="stress-chart"></canvas></div>
         <div style="display:flex;gap:16px;margin-top:8px;font-size:9px;color:#8aaabb;">
-          <span>── Teal = Base plan</span>
-          <span>── Orange = Stress scenario</span>
-          <span>- - Gold = Legacy goal</span>
+          <span>── Teal = Base</span><span>── Orange = Stress</span><span>- - Gold = Legacy goal</span>
         </div>
       </div>
 
-      <!-- Verdict banner -->
       <div class="verdict-banner" id="verdict-banner" style="background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);">
         <div class="verdict-icon" id="verdict-icon">✅</div>
-        <div>
+        <div style="flex:1;">
           <div class="verdict-title" id="verdict-title" style="color:var(--green);">Plan is Resilient</div>
-          <div class="verdict-detail" id="verdict-detail" style="color:#a5d6a7;">Loading...</div>
+          <div class="verdict-detail" id="verdict-detail" style="color:#c8dae8;">Loading...</div>
           <div class="recs" id="recs-section" style="display:none;">
-            <div class="recs-title">💡 How to Improve Your Resilience</div>
+            <div class="recs-title">💡 How to Improve Resilience</div>
             <div id="recs-list"></div>
           </div>
         </div>
       </div>
 
     </div>
-  </div><!-- /main-grid -->
+  </div>
 
-  <!-- IMPROVE YOUR PLAN PANEL -->
+  <!-- IMPROVE PANEL -->
   <div class="improve-panel">
     <div style="font-size:12px;font-weight:800;color:#4CAF50;margin-bottom:14px;">💡 How to Improve Your Stress Test Results</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-
       <div>
-        <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🎛️ Try These Slider Combinations</div>
+        <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🎛️ Try These Slider Combos</div>
         <div style="font-size:10px;color:#8aaabb;line-height:2.0;">
-          <strong style="color:#fff;">Spend -10%</strong> during bad years → biggest single improvement<br>
-          <strong style="color:#fff;">Bad Years = 2-3</strong> → tests prolonged downturn (2000-2002 style)<br>
-          <strong style="color:#f4b86a;">COLA 0%</strong> → tests SS reform / no increase scenario<br>
-          <strong style="color:#f4b86a;">Inflation 5%</strong> → 1970s scenario (high inflation + market crash)<br>
-          <strong style="color:#f4b86a;">Bull Market preset</strong> → see your upside if markets cooperate
+          <strong style="color:#fff;">Spend -10%</strong> → biggest single improvement<br>
+          <strong style="color:#fff;">Bad Years = 2-3</strong> → prolonged downturn test<br>
+          <strong style="color:#fff;">COLA 0%</strong> → SS reform worst case<br>
+          <strong style="color:#fff;">Inflation 5%</strong> → 1970s combo<br>
+          <strong style="color:#fff;">Bull Market preset</strong> → see your upside
         </div>
       </div>
-
       <div>
-        <div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">⚙️ Change Base Numbers in Inputs</div>
+        <div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">⚙️ Change in Inputs → Reload</div>
         <div style="font-size:10px;color:#8aaabb;line-height:2.0;">
-          <strong style="color:#f4b86a;">Delay SS start date</strong> → bigger guaranteed income floor = less portfolio dependence<br>
-          <strong style="color:#f4b86a;">Lower Phase 1 spending</strong> → less withdrawal in vulnerable early years<br>
-          <strong style="color:#f4b86a;">More Roth conversions</strong> → Roth withdrawals don't increase taxable income<br>
-          <strong style="color:#f4b86a;">Higher return rates</strong> → test optimistic vs conservative assumptions
+          <strong style="color:#fff;">Delay SS</strong> → bigger guaranteed income floor<br>
+          <strong style="color:#fff;">Lower Phase 1 spending</strong> → less early withdrawal<br>
+          <strong style="color:#fff;">More Roth</strong> → tax-free, no RMDs<br>
+          <strong style="color:#fff;">Adjust return rates</strong> → conservative vs optimistic
         </div>
         <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html"
-           style="display:inline-block;margin-top:10px;background:#f4b86a;color:#041E2F;font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;">
+           style="display:inline-block;margin-top:10px;background:var(--orange);color:var(--navy);font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;">
           Open Inputs → Make Changes
         </a>
-        <div style="font-size:9px;color:#8aaabb;margin-top:5px;">Save in Inputs, then press Cmd+Shift+R here</div>
+        <div style="font-size:9px;color:#5a7a8a;margin-top:5px;">Save in Inputs → click 🔄 Reload Data above</div>
       </div>
     </div>
   </div>
 
-  <!-- SEQUENCE RISK EXPLAINER -->
   <div class="info-amber" style="margin-top:12px;">
-    📖 <strong>What is Sequence of Returns Risk?</strong>
-    The biggest retirement threat isn't a bad market — it's a bad market at the WRONG TIME.
-    A $925K portfolio dropping 20% in Year 1 becomes $740K before you withdraw anything.
-    Then you withdraw $87K for living expenses = $653K. That $272K gap compounds against you for 50 years.
+    📖 <strong>Sequence of Returns Risk:</strong>
+    A $925K portfolio dropping 20% in Year 1 = $740K before any withdrawal.
+    Then $87K withdrawn = $653K. That $272K gap compounds against you for 50 years.
     The same crash in Year 20 barely affects you — your portfolio had 20 years to grow first.
-    <br><br>
-    <strong>Your three defenses:</strong>
-    (1) <strong>Guaranteed income floor</strong> — SS + pension reduces how much you need from the portfolio.
-    (2) <strong>Roth allocation</strong> — Roth grows tax-free and has no RMDs; more Roth = more flexibility.
-    (3) <strong>Spending flexibility</strong> — cutting 10-15% for 2-3 years after a crash is the single most powerful move.
+    <strong>Your three defenses:</strong> (1) Guaranteed income floor (SS + pension), (2) Roth allocation, (3) Spending flexibility.
   </div>
 
 </div><!-- /stress-content -->
-</div>
+</div><!-- /body -->
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 var planData = null;
 var stressChart = null;
 
-// ── SCENARIOS ──────────────────────────────────────────────────────
 var SCENARIOS = {
-  custom:      {yr1:-20, yrs:1, inf:3.0,  spend:0,   cola:2.5, label:'Custom'},
-  crash2008:   {yr1:-37, yrs:2, inf:0.1,  spend:-5,  cola:0,   label:'2008 Crisis (-37%)'},
-  dotcom:      {yr1:-22, yrs:3, inf:2.8,  spend:-10, cola:2.5, label:'2000 Dot-Com Bust'},
-  covid:       {yr1:-34, yrs:1, inf:1.2,  spend:-8,  cola:0,   label:'2020 COVID (-34%)'},
-  stagflation: {yr1:-14, yrs:4, inf:9.0,  spend:10,  cola:5.0, label:'1970s Stagflation'},
-  bestcase:    {yr1:25,  yrs:1, inf:2.5,  spend:5,   cola:2.5, label:'Bull Market (+25%)'},
+  custom:      {yr1:-20, yrs:1, inf:3.0, spend:0,   cola:2.5, label:'Custom'},
+  crash2008:   {yr1:-37, yrs:2, inf:0.1, spend:-5,  cola:0,   label:'2008 Crisis'},
+  dotcom:      {yr1:-22, yrs:3, inf:2.8, spend:-10, cola:2.5, label:'Dot-Com Bust'},
+  covid:       {yr1:-34, yrs:1, inf:1.2, spend:-8,  cola:0,   label:'COVID 2020'},
+  stagflation: {yr1:-14, yrs:4, inf:9.0, spend:10,  cola:5.0, label:'Stagflation'},
+  bestcase:    {yr1:25,  yrs:1, inf:2.5, spend:5,   cola:2.5, label:'Bull Market'},
 };
 
+function fmt(n) {
+  if (!n && n!==0) return '—';
+  if (Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
+  if (Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
+  return '$'+Math.round(n).toLocaleString();
+}
+
 function setScenario(key) {
-  var hs = document.getElementById('hero-scenario');
-  if (hs) hs.textContent = SCENARIOS[key].label || key;
   var s = SCENARIOS[key];
   document.querySelectorAll('.tab-btn').forEach(function(b,i){
     b.classList.toggle('active', ['custom','crash2008','dotcom','covid','stagflation','bestcase'][i]===key);
@@ -456,492 +374,311 @@ function setScenario(key) {
   recalc();
 }
 
-function resetSliders() { setScenario('custom'); }
-
-function fmt(n) {
-  if(!n&&n!==0) return '—';
-  if(Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
-  if(Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
-  return '$'+Math.round(n).toLocaleString();
-}
-
-// ── PROJECTION ENGINE ──────────────────────────────────────────────
-// Uses your actual Master Sheet projection data as the BASE,
-// then applies stress shocks on top of it.
 function project(overrides) {
   if (!planData) return [];
   var port  = planData.portfolio || {};
   var sp    = planData.spending  || {};
   var gl    = planData.global    || {};
-  var leg   = planData.legacy   || {};
+  var leg   = planData.legacy    || {};
   var proj  = planData.projections || {};
   var pkeys = Object.keys(planData.people || {});
   var p1    = planData.people[pkeys[0]] || {};
   var p2    = planData.people[pkeys[1]] || {};
 
-  var totalPF   = port.total || 0;
-  var baseSpend = (sp.baseAnnual || 0) + (sp.safeExtra || 0);
-  var legGoal   = leg.goal || 0;
-  var curYear   = new Date().getFullYear();
-
-  // Average return from actual accounts
-  var baseRet = 0.07;
+  var totalPF  = port.total || 0;
+  var baseSpend= (sp.baseAnnual||0) + (sp.safeExtra||0);
+  var baseRet  = 0.07;
   if (port.accounts && port.accounts.length) {
     var rs=0,rc=0;
-    port.accounts.forEach(function(a){ if(a.expectedReturn>0){rs+=a.expectedReturn/100;rc++;} });
-    if(rc>0) baseRet = rs/rc;
+    port.accounts.forEach(function(a){if(a.expectedReturn>0){rs+=a.expectedReturn/100;rc++;}});
+    if(rc>0) baseRet=rs/rc;
   }
-
   var baseInfl = gl.inflation  || 0.03;
   var baseCola = gl.ssCola     || 0.025;
+  var ssYear1  = (p1.ssYear1||0)+(p2.ssYear1||0);
+  var pension  = ((p1.pension||0)+(p2.pension||0))*12;
+  var projYears= (proj.years     && proj.years.length)     ? proj.years     : null;
+  var projEnds = (proj.endLiquid && proj.endLiquid.length) ? proj.endLiquid : null;
+  var projIncome=(proj.income    && proj.income.length)    ? proj.income    : null;
+  var yrs      = projYears ? projYears.length : 50;
+  var curYear  = new Date().getFullYear();
 
-  // Use actual SS year 1 from GS (already prorated for start month)
-  var ssYear1  = (p1.ssYear1||0) + (p2.ssYear1||0);
-  var pension  = ((p1.pension||0) + (p2.pension||0)) * 12;
-
-  // Use actual projection years from sheet if available
-  var projYears   = (proj.years     && proj.years.length)     ? proj.years     : null;
-  var projEnds    = (proj.endLiquid && proj.endLiquid.length) ? proj.endLiquid : null;
-  var projIncome  = (proj.income    && proj.income.length)    ? proj.income    : null;
-
-  // If we have real projection data, calibrate base return to match it
-  // The base plan MUST end at leg.projectedEnding to match Dashboard
-  var baseEndTarget = leg.projectedEnding || 0;
-  var yrs = projYears ? projYears.length : 50;
-
-  // Apply overrides
-  var yr1Shock = (overrides.yr1 !== undefined ? overrides.yr1 : 0) / 100;
+  var yr1Shock = (overrides.yr1 !== undefined ? overrides.yr1 : 0)/100;
   var badYrs   = overrides.yrs || 1;
-  var inflation= (overrides.inf !== undefined ? overrides.inf : baseInfl*100) / 100;
-  var spendAdj = 1 + (overrides.spend || 0) / 100;
-  var colaRate = (overrides.cola !== undefined ? overrides.cola : baseCola*100) / 100;
-  var isBase   = (yr1Shock === 0 && spendAdj === 1 && inflation === baseInfl && colaRate === baseCola);
+  var inflation= (overrides.inf !== undefined ? overrides.inf : baseInfl*100)/100;
+  var spendAdj = 1+(overrides.spend||0)/100;
+  var colaRate = (overrides.cola !== undefined ? overrides.cola : baseCola*100)/100;
 
-  // BASE: always use actual sheet projections when available — never re-calculate
-  if (projEnds && projEnds.length > 0 && yr1Shock === 0 && spendAdj === 1) {
-    return projEnds.map(function(bal, i) {
-      return { year: (projYears ? projYears[i] : curYear+i), bal: Math.max(0, bal||0) };
+  // BASE: use real sheet data directly
+  if (yr1Shock===0 && spendAdj===1 && projEnds && projEnds.length>0) {
+    return projEnds.map(function(bal,i){
+      return {year:(projYears?projYears[i]:curYear+i), bal:Math.max(0,bal||0)};
     });
   }
 
-  // STRESS: run simulation on top of base numbers
   var bal = totalPF;
-  var results = [{year: (projYears ? projYears[0] : curYear), bal: bal}];
+  var results = [{year:(projYears?projYears[0]:curYear), bal:bal}];
 
-  for (var i=1; i<yrs; i++) {
-    var yr = projYears ? projYears[i] : curYear + i;
-
-    // Use actual income from sheet if available, otherwise estimate
+  for (var i=1;i<yrs;i++) {
+    var yr = projYears ? projYears[i] : curYear+i;
     var guaranteed;
-    if (projIncome && projIncome[i] > 0) {
-      // Real income from sheet — apply COLA adjustment vs base
-      var colaAdj = Math.pow(1+colaRate, i) / Math.pow(1+baseCola, i);
-      guaranteed = projIncome[i] * Math.min(colaAdj, 1.5);
+    if (projIncome && projIncome[i]>0) {
+      var colaAdj = Math.pow(1+colaRate,i)/Math.pow(1+baseCola,i);
+      guaranteed = projIncome[i]*Math.min(colaAdj,1.5);
     } else {
-      guaranteed = (ssYear1 * Math.pow(1+colaRate, i)) + pension;
+      guaranteed = ssYear1*Math.pow(1+colaRate,i)+pension;
     }
-
-    // Spending
-    var spend = baseSpend * spendAdj * Math.pow(1+inflation, i);
-    var withdrawal = Math.max(0, spend - guaranteed);
-    bal -= withdrawal;
-
-    // Return — shock in bad years then normal
+    var spend = baseSpend*spendAdj*Math.pow(1+inflation,i);
+    bal -= Math.max(0, spend-guaranteed);
     var ret;
-    if (i === 1) {
-      ret = yr1Shock;
-    } else if (i <= badYrs) {
-      // Gradual recovery during bad period
-      var recoveryPct = (i - 1) / badYrs;
-      ret = yr1Shock * (1 - recoveryPct) + baseRet * recoveryPct;
-    } else {
-      ret = baseRet;
-    }
-
-    bal = Math.max(0, bal * (1 + ret));
-    results.push({year: yr, bal: Math.round(bal)});
-
-    if (bal <= 0) {
-      for (var j=i+1; j<yrs; j++) {
-        results.push({year: (projYears ? projYears[j] : curYear+j)||curYear+j, bal:0});
-      }
+    if(i===1) ret=yr1Shock;
+    else if(i<=badYrs) ret=yr1Shock*(1-(i-1)/badYrs)+baseRet*((i-1)/badYrs);
+    else ret=baseRet;
+    bal=Math.max(0,bal*(1+ret));
+    results.push({year:yr, bal:Math.round(bal)});
+    if(bal<=0){
+      for(var j=i+1;j<yrs;j++) results.push({year:(projYears?projYears[j]:curYear+j)||curYear+j,bal:0});
       break;
     }
   }
-
-  // No calibration warning needed — base always uses real sheet data
-
   return results;
 }
 
-// ── RECALCULATE ─────────────────────────────────────────────────────
-function updateFingerprint(baseRes, stressRes, baseEnd) {
+function updateFingerprint(baseRes, stressRes) {
   if (!planData) return;
-  var port = planData.portfolio || {};
-  var sp   = planData.spending  || {};
-  var leg  = planData.legacy    || {};
-  var proj = planData.projections || {};
-  var pkeys = Object.keys(planData.people || {});
-  var p1   = planData.people[pkeys[0]] || {};
-  var p2   = planData.people[pkeys[1]] || {};
-
-  // Show fingerprint panel
-  var fp = document.getElementById('plan-fingerprint');
-  if (fp) fp.style.display = 'block';
-
-  // Portfolio
-  var fpp = document.getElementById('fp-portfolio');
-  if (fpp) fpp.textContent = fmt(port.total || 0);
-
-  // Legacy goal
-  var fpl = document.getElementById('fp-legacy');
-  if (fpl) fpl.textContent = fmt(leg.goal || 0);
-
-  // Base ending — use actual sheet projection if available
-  var actualEnding = leg.projectedEnding || baseEnd;
-  var fpEnd = document.getElementById('fp-ending');
-  var fpEndNote = document.getElementById('fp-ending-note');
-  if (fpEnd) {
-    fpEnd.textContent = fmt(actualEnding);
-    fpEnd.style.color = actualEnding >= (leg.goal||0) ? '#4CAF50' : '#f4b86a';
-  }
-  if (fpEndNote) {
-    fpEndNote.textContent = actualEnding >= (leg.goal||0) ? '✅ Matches Dashboard' : '⚠️ Below legacy goal';
-    fpEndNote.style.color = actualEnding >= (leg.goal||0) ? '#4CAF50' : '#f4b86a';
-  }
-
-  // Plan end year — from actual projection years
-  var endYr = '';
-  var endNote = '';
-  if (proj.years && proj.years.length > 0) {
-    endYr = proj.years[proj.years.length-1];
-    var p1DeathYr = p1.age ? new Date().getFullYear() + ((p1.deathAge||90) - (p1.age||63)) : 0;
-    var p2DeathYr = p2.age ? new Date().getFullYear() + ((p2.deathAge||90) - (p2.age||55)) : 0;
-    var longestYr = Math.max(p1DeathYr, p2DeathYr);
-    endNote = longestYr > 0 ? 'Through age ' + (p1DeathYr >= p2DeathYr ? (p1.deathAge||90) : (p2.deathAge||90)) + ' (' + longestYr + ')' : 'Both partners covered';
-  } else if (baseRes && baseRes.length > 0) {
-    endYr = baseRes[baseRes.length-1].year;
-    endNote = 'Based on projection';
-  }
-  var fpYr = document.getElementById('fp-end-year');
-  var fpYrNote = document.getElementById('fp-end-note');
-  if (fpYr) fpYr.textContent = endYr || '—';
-  if (fpYrNote) fpYrNote.textContent = endNote;
-
-  // Annual spending
-  var fpSpend = document.getElementById('fp-spending');
-  if (fpSpend) fpSpend.textContent = fmt((sp.baseAnnual||0) + (sp.safeExtra||0));
-
-  // Stress -30% ending
-  var stress30End = stressRes && stressRes.length > 0 ? stressRes[stressRes.length-1].bal : 0;
-  // Quick calculate -30% if not current scenario
-  var yr1Current = parseInt(document.getElementById('sl-yr1').value);
-  if (yr1Current !== -30) {
-    // Run quick -30 projection
-    var gi = planData.global || {};
-    var quick30 = project({yr1:-30, yrs:1, inf:(gi.inflation||0.03)*100, spend:0, cola:(gi.ssCola||0.025)*100});
-    stress30End = quick30.length > 0 ? quick30[quick30.length-1].bal : 0;
-  }
-  var fp30 = document.getElementById('fp-stress30');
-  var fp30Note = document.getElementById('fp-stress30-note');
-  if (fp30) {
-    fp30.textContent = fmt(stress30End);
-    fp30.style.color = stress30End >= (leg.goal||0) ? '#4CAF50' : stress30End > 0 ? '#f4b86a' : '#ff6b6b';
-  }
-  if (fp30Note) {
-    fp30Note.style.color = fp30.style.color;
-    fp30Note.textContent = stress30End >= (leg.goal||0) ? '✅ Goal met' : stress30End > 0 ? '⚠️ Below goal' : '⛔ Depleted';
-  }
+  var port=planData.portfolio||{}, sp=planData.spending||{}, leg=planData.legacy||{};
+  var proj=planData.projections||{}, pkeys=Object.keys(planData.people||{});
+  var p1=planData.people[pkeys[0]]||{}, p2=planData.people[pkeys[1]]||{};
+  var fp=document.getElementById('plan-fingerprint');
+  if(fp) fp.style.display='block';
+  set('fp-portfolio', fmt(port.total||0));
+  set('fp-legacy', fmt(leg.goal||0));
+  var actualEnd = leg.projectedEnding || (baseRes.length>0?baseRes[baseRes.length-1].bal:0);
+  var fpEnd=document.getElementById('fp-ending');
+  var fpEndNote=document.getElementById('fp-ending-note');
+  if(fpEnd){fpEnd.textContent=fmt(actualEnd);fpEnd.style.color=actualEnd>=(leg.goal||0)?'#4CAF50':'#f4b86a';}
+  if(fpEndNote){fpEndNote.textContent=actualEnd>=(leg.goal||0)?'✅ Matches Dashboard':'⚠️ Below goal';fpEndNote.style.color=fpEnd.style.color;}
+  var endYr='—';
+  if(proj.years&&proj.years.length>0) endYr=proj.years[proj.years.length-1];
+  else if(baseRes.length>0) endYr=baseRes[baseRes.length-1].year;
+  set('fp-end-year', endYr);
+  var p1DeathYr=p1.age?new Date().getFullYear()+((p1.deathAge||90)-(p1.age||63)):0;
+  var p2DeathYr=p2.age?new Date().getFullYear()+((p2.deathAge||90)-(p2.age||55)):0;
+  var longestAge=p1DeathYr>=p2DeathYr?(p1.deathAge||90):(p2.deathAge||90);
+  set('fp-end-note','Through age '+longestAge);
+  set('fp-spending', fmt((sp.baseAnnual||0)+(sp.safeExtra||0)));
+  var gi=planData.global||{};
+  var quick30=project({yr1:-30,yrs:1,inf:(gi.inflation||0.03)*100,spend:0,cola:(gi.ssCola||0.025)*100});
+  var s30End=quick30.length>0?quick30[quick30.length-1].bal:0;
+  var fp30=document.getElementById('fp-stress30');
+  var fp30n=document.getElementById('fp-stress30-note');
+  if(fp30){fp30.textContent=fmt(s30End);fp30.style.color=s30End>=(leg.goal||0)?'#4CAF50':s30End>0?'#f4b86a':'#ff6b6b';}
+  if(fp30n){fp30n.textContent=s30End>=(leg.goal||0)?'✅ Goal met':s30End>0?'⚠️ Below':'⛔ Depleted';fp30n.style.color=fp30.style.color;}
 }
 
+function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+
 function recalc() {
-  // Update labels
-  var yr1 = parseInt(document.getElementById('sl-yr1').value);
-  var yrs = parseInt(document.getElementById('sl-yrs').value);
-  var inf = parseFloat(document.getElementById('sl-inf').value);
-  var sp  = parseInt(document.getElementById('sl-spend').value);
-  var cola= parseFloat(document.getElementById('sl-cola').value);
+  var yr1=parseInt(document.getElementById('sl-yr1').value);
+  var yrs=parseInt(document.getElementById('sl-yrs').value);
+  var inf=parseFloat(document.getElementById('sl-inf').value);
+  var sp=parseInt(document.getElementById('sl-spend').value);
+  var cola=parseFloat(document.getElementById('sl-cola').value);
 
-  document.getElementById('lbl-yr1').textContent = (yr1>=0?'+':'')+yr1+'%';
-  document.getElementById('lbl-yr1').style.color = yr1<0?'#ff6b6b':yr1>10?'#4CAF50':'#1CC7D0';
-  document.getElementById('lbl-yrs').textContent = yrs+' yr'+(yrs>1?'s':'');
-  document.getElementById('lbl-inf').textContent = inf.toFixed(1)+'%';
-  document.getElementById('lbl-inf').style.color = inf>5?'#ff6b6b':inf>3?'#f4b86a':'#1CC7D0';
-  document.getElementById('lbl-spend').textContent = (sp>=0?'+':'')+sp+'%';
-  document.getElementById('lbl-spend').style.color = sp<0?'#4CAF50':sp>0?'#f4b86a':'#8aaabb';
-  document.getElementById('lbl-cola').textContent = cola.toFixed(1)+'%';
+  set('lbl-yr1',(yr1>=0?'+':'')+yr1+'%');
+  document.getElementById('lbl-yr1').style.color=yr1<0?'#ff6b6b':yr1>10?'#4CAF50':'#1CC7D0';
+  set('lbl-yrs',yrs+' yr'+(yrs>1?'s':''));
+  set('lbl-inf',inf.toFixed(1)+'%');
+  document.getElementById('lbl-inf').style.color=inf>5?'#ff6b6b':inf>3?'#f4b86a':'#1CC7D0';
+  set('lbl-spend',(sp>=0?'+':'')+sp+'%');
+  document.getElementById('lbl-spend').style.color=sp<0?'#4CAF50':sp>0?'#f4b86a':'#8aaabb';
+  set('lbl-cola',cola.toFixed(1)+'%');
 
-  if (!planData) return;
+  if(!planData) return;
 
-  // Run both projections
-  // Base uses actual sheet settings — result should match Dashboard
-  var gi = planData.global || {};
-  var baseRes = project({yr1:0, yrs:1, inf:(gi.inflation||0.03)*100, spend:0, cola:(gi.ssCola||0.025)*100});
-  var stressRes = project({yr1:yr1, yrs:yrs, inf:inf, spend:sp, cola:cola});
+  var gi=planData.global||{};
+  var baseRes=project({yr1:0,yrs:1,inf:(gi.inflation||0.03)*100,spend:0,cola:(gi.ssCola||0.025)*100});
+  var stressRes=project({yr1:yr1,yrs:yrs,inf:inf,spend:sp,cola:cola});
+  var leg=planData.legacy||{};
+  var legGoal=leg.goal||0;
+  var baseEnd=leg.projectedEnding||(baseRes.length>0?baseRes[baseRes.length-1].bal:0);
+  var stressEnd=stressRes.length>0?stressRes[stressRes.length-1].bal:0;
+  var baseConf=legGoal>0?Math.min(100,Math.round(baseEnd/legGoal*100)):100;
+  var stressConf=legGoal>0?Math.min(100,Math.round(stressEnd/legGoal*100)):100;
+  var delta=stressEnd-baseEnd;
+  var deltaPct=baseEnd>0?Math.round(delta/baseEnd*100):0;
 
-  var legGoal = (planData.legacy||{}).goal || 0;
-  // Use actual projectedEnding from sheet as base — most accurate
-  var baseEnd = (planData && planData.legacy && planData.legacy.projectedEnding)
-    ? planData.legacy.projectedEnding
-    : (baseRes.length > 0 ? baseRes[baseRes.length-1].bal : 0);
-  var stressEnd = stressRes.length>0 ? stressRes[stressRes.length-1].bal : 0;
+  var beEl=document.getElementById('res-base-end');
+  if(beEl){beEl.textContent=fmt(baseEnd);}
+  set('res-base-conf',baseConf+'% of legacy goal');
+  var seEl=document.getElementById('res-stress-end');
+  if(seEl){seEl.textContent=fmt(stressEnd);seEl.style.color=stressEnd>=baseEnd?'#4CAF50':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';}
+  var scEl=document.getElementById('res-stress-conf');
+  if(scEl){scEl.textContent=stressConf+'% of legacy goal';scEl.style.color=stressConf>=100?'#4CAF50':stressConf>=80?'#f4b86a':'#ff6b6b';}
+  var dEl=document.getElementById('res-delta');
+  if(dEl){dEl.textContent=(delta>=0?'+':'')+fmt(delta)+' ('+deltaPct+'%)';dEl.style.color=delta>=0?'#4CAF50':'#ff6b6b';}
 
-  var baseConf   = legGoal>0 ? Math.min(100,Math.round(baseEnd/legGoal*100))   : 100;
-  var stressConf = legGoal>0 ? Math.min(100,Math.round(stressEnd/legGoal*100)) : 100;
-  var delta = stressEnd - baseEnd;
-  var deltaPct = baseEnd>0 ? Math.round(delta/baseEnd*100) : 0;
-
-  // Update KPIs
-  // ── UPDATE FINGERPRINT BAR ──────────────────────────────
-  updateFingerprint(baseRes, stressRes, baseEnd);
-
-  document.getElementById('res-base-end').textContent   = fmt(baseEnd);
-  document.getElementById('res-base-conf').textContent  = baseConf+'% of legacy goal';
-  document.getElementById('res-stress-end').textContent = fmt(stressEnd);
-  document.getElementById('res-stress-end').style.color = stressEnd>=baseEnd?'#4CAF50':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';
-  document.getElementById('res-stress-conf').textContent = stressConf+'% of legacy goal';
-  document.getElementById('res-stress-conf').style.color = stressConf>=100?'#4CAF50':stressConf>=80?'#f4b86a':'#ff6b6b';
-  document.getElementById('res-delta').textContent = (delta>=0?'+':'')+fmt(delta)+' ('+deltaPct+'%)';
-  document.getElementById('res-delta').style.color = delta>=0?'#4CAF50':'#ff6b6b';
-
-  // Verdict
-  var icon, title, detail, color, bg, recommendations=[];
-  if (stressEnd >= legGoal && legGoal > 0) {
-    icon='✅'; title='Plan is Resilient'; color='#4CAF50'; bg='rgba(76,175,80,0.1)';
-    detail='Your plan survives this scenario with the legacy goal intact. Ending balance of '+fmt(stressEnd)+' meets or exceeds your '+fmt(legGoal)+' target.';
-  } else if (stressEnd > 0 && stressConf >= 70) {
-    icon='⚠️'; title='Plan Under Stress'; color='#f4b86a'; bg='rgba(244,184,106,0.1)';
-    detail='Your plan survives but ends '+fmt(legGoal-stressEnd)+' below the legacy goal ('+stressConf+'% funded). Manageable with adjustments.';
-    recommendations=['Reduce Phase 1 spending by 10-15% during the downturn years','Delay any large purchases for 2-3 years','Consider a small part-time income bridge'];
-  } else if (stressEnd > 0) {
-    icon='🚨'; title='Plan At Risk'; color='#ff6b6b'; bg='rgba(255,107,107,0.1)';
-    detail='This scenario significantly depletes your portfolio. Only '+stressConf+'% of the legacy goal is funded. Meaningful action would be needed.';
-    recommendations=['Cut spending by 20%+ for the first 3-5 years of retirement','Delay Social Security to maximize guaranteed income','Consider working 1-2 more years to add buffer','Shift more assets to Roth before retirement — reduces forced selling at low prices'];
+  var icon,title,detail,color,bg,bg2,recs=[];
+  if(stressEnd>=legGoal&&legGoal>0){
+    icon='✅';title='Plan is Resilient';color='#4CAF50';bg='rgba(76,175,80,0.12)';bg2='rgba(76,175,80,0.3)';
+    detail='Ending balance of '+fmt(stressEnd)+' meets or exceeds the '+fmt(legGoal)+' legacy goal even under this scenario.';
+  } else if(stressEnd>0&&stressConf>=70){
+    icon='⚠️';title='Plan Under Stress';color='#f4b86a';bg='rgba(244,184,106,0.12)';bg2='rgba(244,184,106,0.3)';
+    detail='Plan survives but ends '+fmt(legGoal-stressEnd)+' below the legacy goal ('+stressConf+'% funded). Manageable with small adjustments.';
+    recs=['Reduce Phase 1 spending by 10-15% during downturn years','Delay any large purchases 2-3 years','Consider a small part-time income bridge'];
+  } else if(stressEnd>0){
+    icon='🚨';title='Plan At Risk';color='#ff6b6b';bg='rgba(255,107,107,0.12)';bg2='rgba(255,107,107,0.3)';
+    detail='Only '+stressConf+'% of the legacy goal is funded. Meaningful action needed.';
+    recs=['Cut spending 20%+ for first 3-5 years','Delay SS to maximize guaranteed income','Consider 1-2 more working years for buffer','Shift more to Roth before retirement'];
   } else {
-    icon='⛔'; title='Portfolio Depleted'; color='#ff6b6b'; bg='rgba(255,0,0,0.1)';
-    detail='Under this scenario, the portfolio runs out before the end of the plan. This is an extreme scenario — focus on building more guaranteed income (SS, pension) and reducing dependence on portfolio withdrawals.';
-    recommendations=['Maximize Social Security by delaying to age 70','Consider annuitizing a portion of portfolio for guaranteed income','Reduce planned legacy goal to zero and spend only guaranteed income','Add part-time income for the first 5-7 years of retirement'];
+    icon='⛔';title='Portfolio Depleted';color='#ff6b6b';bg='rgba(255,0,0,0.1)';bg2='rgba(255,0,0,0.3)';
+    detail='Portfolio runs out under this scenario. Focus on maximizing guaranteed income and reducing portfolio dependence.';
+    recs=['Maximize SS by delaying to 70','Consider annuitizing a portion','Reduce legacy goal to zero','Add part-time income for first 5-7 years'];
   }
 
-  document.getElementById('res-verdict-icon').textContent = icon;
-  var hv = document.getElementById('hero-verdict');
-  if (hv) hv.textContent = title.split(' ')[0]+' '+title.split(' ')[1];
-  document.getElementById('res-verdict-text').textContent = stressConf+'% funded under this scenario';
-  document.getElementById('verdict-title').textContent = title;
-  document.getElementById('verdict-title').style.color = color;
-  document.getElementById('verdict-detail').textContent = detail;
-  document.getElementById('verdict-banner').style.background = bg;
-  document.getElementById('verdict-banner').style.borderColor = color.replace(')',',0.3)').replace('rgb','rgba');
-
-  var recsSection = document.getElementById('recs-section');
-  var recsList = document.getElementById('recs-list');
-  if (recommendations.length > 0) {
-    recsSection.style.display = 'block';
-    recsList.innerHTML = recommendations.map(function(r){
-      return '<div class="rec-item"><span>→</span><span>'+r+'</span></div>';
-    }).join('');
-  } else {
-    recsSection.style.display = 'none';
+  set('res-verdict-icon',icon);set('res-verdict-text',stressConf+'% funded');
+  set('verdict-title',title);
+  document.getElementById('verdict-title').style.color=color;
+  document.getElementById('verdict-detail').textContent=detail;
+  var vb=document.getElementById('verdict-banner');
+  if(vb){vb.style.background=bg;vb.style.borderColor=bg2;}
+  var vc=document.getElementById('verdict-card');
+  if(vc){vc.style.borderColor=bg2;}
+  var rs2=document.getElementById('recs-section');
+  var rl=document.getElementById('recs-list');
+  if(rs2&&rl){
+    rs2.style.display=recs.length>0?'block':'none';
+    rl.innerHTML=recs.map(function(r){return '<div class="rec-item"><span>→</span><span>'+r+'</span></div>';}).join('');
   }
-
-  // Verdict card color
-  var vcard = document.getElementById('verdict-card');
-  vcard.style.background = bg;
-  vcard.style.borderColor = color;
-  document.getElementById('verdict-icon').textContent = icon;
 
   // Update chart
-  var dispStep = Math.ceil(baseRes.length / 10);
-  var labels=[], baseData=[], stressData=[], goalData=[];
-  for (var i=0; i<baseRes.length; i+=dispStep) {
-    labels.push(baseRes[i].year);
-    baseData.push(baseRes[i].bal);
-    stressData.push(stressRes[i] ? stressRes[i].bal : 0);
-    goalData.push(legGoal);
+  var dispStep=Math.ceil(baseRes.length/10);
+  var labels=[],baseData=[],stressData=[],goalData=[];
+  for(var i=0;i<baseRes.length;i+=dispStep){
+    labels.push(baseRes[i].year);baseData.push(baseRes[i].bal);
+    stressData.push(stressRes[i]?stressRes[i].bal:0);goalData.push(legGoal);
   }
-  // Always include last point
-  var last = baseRes.length-1;
-  if (labels[labels.length-1] !== baseRes[last].year) {
-    labels.push(baseRes[last].year);
-    baseData.push(baseRes[last].bal);
-    stressData.push(stressRes[last]?stressRes[last].bal:0);
-    goalData.push(legGoal);
+  var last=baseRes.length-1;
+  if(labels[labels.length-1]!==baseRes[last].year){
+    labels.push(baseRes[last].year);baseData.push(baseRes[last].bal);
+    stressData.push(stressRes[last]?stressRes[last].bal:0);goalData.push(legGoal);
   }
-
-  if (stressChart) stressChart.destroy();
-  var ctx = document.getElementById('stress-chart');
-  if (ctx) {
-    stressChart = new Chart(ctx, {
+  if(stressChart) stressChart.destroy();
+  var ctx=document.getElementById('stress-chart');
+  if(ctx){
+    stressChart=new Chart(ctx,{
       type:'line',
-      data:{labels:labels, datasets:[
-        {label:'Base Plan',     data:baseData,   borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.08)',fill:true, tension:0.3,pointRadius:0,borderWidth:2.5},
-        {label:'Stress Scenario',data:stressData,borderColor:'#f4b86a',backgroundColor:'rgba(244,184,106,0.06)',fill:true, tension:0.3,pointRadius:0,borderWidth:2.5},
-        {label:'Legacy Goal',   data:goalData,   borderColor:'#456A73',borderDash:[5,3],fill:false,pointRadius:0,borderWidth:1.5},
+      data:{labels:labels,datasets:[
+        {label:'Base Plan',data:baseData,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.08)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
+        {label:'Stress Scenario',data:stressData,borderColor:'#f4b86a',backgroundColor:'rgba(244,184,106,0.06)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
+        {label:'Legacy Goal',data:goalData,borderColor:'#456A73',borderDash:[5,3],fill:false,pointRadius:0,borderWidth:1.5},
       ]},
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,labels:{font:{size:10},color:'#5F6368',boxWidth:12}}},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:12}}},
         scales:{
-          x:{ticks:{font:{size:10},color:'#5F6368'},grid:{display:false}},
-          y:{ticks:{font:{size:10},color:'#5F6368',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.04)'}}
+          x:{ticks:{font:{size:10},color:'#8aaabb'},grid:{display:false}},
+          y:{ticks:{font:{size:10},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.04)'}}
         }
       }
     });
   }
+
+  updateFingerprint(baseRes, stressRes);
 }
 
-// ── LOAD DATA ────────────────────────────────────────────────────────
-// ── SAMPLE DATA (shown when no sheet connected) ──────────────────
+// ── SAMPLE DATA ───────────────────────────────────────────────
 function loadSampleData() {
   planData = {
-    people: {
-      partner1: {name:'Alex', age:63, ssMonthly:2544, ssYear1:15263, salary:72000, salaryEnd:'6/30/2026', pension:343, deathAge:92},
-      partner2: {name:'Jordan', age:55, ssMonthly:2493, ssYear1:0, salary:80230, salaryEnd:'6/30/2028', pension:0, deathAge:105},
+    people:{
+      partner1:{name:'Alex',age:63,ssMonthly:2544,ssYear1:15263,salary:72000,salaryEnd:'6/30/2026',pension:343,deathAge:92},
+      partner2:{name:'Jordan',age:55,ssMonthly:2493,ssYear1:0,salary:80230,salaryEnd:'6/30/2028',pension:0,deathAge:105},
     },
-    portfolio: {
-      total: 925000,
-      accounts: [
-        {name:"401k",expectedReturn:7,balance:437000,type:'Pretax (Deferred)'},
-        {name:"Roth IRA",expectedReturn:8,balance:32000,type:'Roth (Tax Free)'},
-        {name:"Brokerage",expectedReturn:7,balance:99000,type:'Taxable (Liquid)'},
-        {name:"Partner 2 401k",expectedReturn:7,balance:357000,type:'Pretax (Deferred)'},
-      ]
-    },
-    spending: { baseAnnual: 60000, safeExtra: 27000 },
-    legacy: { goal: 250000, projectedEnding: 250000, achievedPct: 100 },
-    global: { planYear: 2026, inflation: 0.03, ssCola: 0.025 },
-    projections: null
+    portfolio:{total:925000,accounts:[
+      {name:'401k',expectedReturn:7,balance:437000,type:'Pretax (Deferred)'},
+      {name:'Roth IRA',expectedReturn:8,balance:32000,type:'Roth (Tax Free)'},
+      {name:'Brokerage',expectedReturn:7,balance:99000,type:'Taxable (Liquid)'},
+      {name:'Partner 2 401k',expectedReturn:7,balance:357000,type:'Pretax (Deferred)'},
+    ]},
+    spending:{baseAnnual:60000,safeExtra:27000},
+    legacy:{goal:250000,projectedEnding:250000,achievedPct:100},
+    global:{planYear:2026,inflation:0.03,ssCola:0.025},
+    projections:null
   };
-
-  // Show sample data banner
-  document.getElementById('loading-msg').style.display = 'none';
-  document.getElementById('stress-content').style.display = 'block';
-
-  // Add sample data notice
-  var notice = document.getElementById('sample-notice');
-  if (notice) notice.style.display = 'flex';
-
+  document.getElementById('loading-msg').style.display='none';
+  document.getElementById('stress-content').style.display='block';
+  var notice=document.getElementById('sample-notice');
+  if(notice) notice.style.display='flex';
   recalc();
 }
 
+// ── LOAD DATA ─────────────────────────────────────────────────
 function loadData() {
-  var sheetId = localStorage.getItem('rbp_sheet_id');
-  
-  // If viewing in preview (file://, localhost, or Claude preview) — use sample data
-  var host = window.location.hostname || '';
-  var isPreview = (window.location.protocol === 'file:' || 
-                   host === 'localhost' || 
-                   host === '127.0.0.1' ||
-                   host.indexOf('claude.ai') >= 0 ||
-                   host === '');
-  
-  if (!sheetId || isPreview) {
-    if (isPreview && sheetId) {
-      // Has sheet but in preview — show note
-      var statusEl = document.getElementById('loading-status');
-      var detailEl = document.getElementById('loading-detail');
-      if (statusEl) statusEl.textContent = '📊 Preview Mode — Sample Data';
-      if (detailEl) detailEl.innerHTML = 
-        'Sheet connections only work when hosted on GitHub Pages.<br>' +
-        '<a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" ' +
-        'style="color:#1CC7D0;">Open on GitHub Pages to use your real data →</a>';
-      setTimeout(loadSampleData, 800);
-    } else {
-      loadSampleData();
-    }
+  // Reset UI
+  var oldScripts=document.querySelectorAll('script[data-rbp-stress]');
+  oldScripts.forEach(function(s){s.parentNode.removeChild(s);});
+  planData=null;
+  document.getElementById('loading-msg').style.display='block';
+  document.getElementById('stress-content').style.display='none';
+  var bar=document.getElementById('loading-progress');
+  if(bar){bar.style.width='0%';bar.style.background='linear-gradient(90deg,#1CC7D0,#f4b86a)';}
+  var pctEl=document.getElementById('loading-pct');if(pctEl)pctEl.textContent='0%';
+  var statusEl=document.getElementById('loading-status');if(statusEl)statusEl.textContent='Connecting to your Google Sheet...';
+
+  var sheetId=localStorage.getItem('rbp_sheet_id');
+  var host=window.location.hostname||'';
+  var isPreview=(window.location.protocol==='file:'||host===''||host==='localhost'||host.indexOf('claude.ai')>=0);
+
+  if(!sheetId||isPreview){
+    setTimeout(loadSampleData,600);
     return;
   }
 
-  // Animate progress bar
-  var pct = 0;
-  var msgs = [
-    'Connecting to your Google Sheet...',
-    'Reading account balances...',
-    'Loading projection data...',
-    'Calculating stress scenarios...',
-    'Almost ready...'
-  ];
-  var msgIdx = 0;
-  var progressInterval = setInterval(function() {
-    pct = Math.min(90, pct + (pct < 30 ? 3 : pct < 60 ? 2 : 1));
-    var bar = document.getElementById('loading-progress');
-    var pctEl = document.getElementById('loading-pct');
-    var statusEl = document.getElementById('loading-status');
-    var detailEl = document.getElementById('loading-detail');
-    if (bar) bar.style.width = pct + '%';
-    if (pctEl) pctEl.textContent = pct + '%';
-    if (statusEl && pct > msgIdx * 20) {
-      if (msgIdx < msgs.length) statusEl.textContent = msgs[msgIdx++];
-    }
-    if (pct >= 90 && detailEl) detailEl.textContent = 'This can take 20-30 seconds on first load — your sheet is being read for the first time.';
-  }, 400);
+  // Progress animation
+  var pct=0,msgIdx=0;
+  var msgs=['Connecting to your Google Sheet...','Reading account balances...','Loading projection data...','Calculating stress scenarios...','Almost ready...'];
+  var prog=setInterval(function(){
+    pct=Math.min(90,pct+(pct<30?3:pct<60?2:1));
+    if(bar) bar.style.width=pct+'%';
+    if(pctEl) pctEl.textContent=pct+'%';
+    if(statusEl&&pct>msgIdx*20&&msgIdx<msgs.length) statusEl.textContent=msgs[msgIdx++];
+    if(pct>=90&&document.getElementById('loading-detail')) document.getElementById('loading-detail').textContent='This can take 20-30 seconds on first load...';
+  },400);
 
-  var cb = 'rbpStress_'+Date.now();
-  var done = false;
+  var cb='rbpStress_'+Date.now(),done=false;
+  var t=setTimeout(function(){if(!done){done=true;clearInterval(prog);loadSampleData();}},90000);
 
-  var t = setTimeout(function(){
-    if(!done){
-      done=true;
-      clearInterval(progressInterval);
-      console.log('Timeout, using sample data');
-      loadSampleData();
-    }
-  }, 90000);  // 90 seconds — plenty of time
-  window[cb] = function(d){
-    if(done) return; done=true;
-    clearTimeout(t); clearInterval(progressInterval); delete window[cb];
-    // Complete the progress bar
-    var bar = document.getElementById('loading-progress');
-    var pctEl = document.getElementById('loading-pct');
-    var statusEl = document.getElementById('loading-status');
-    if (bar) bar.style.width = '100%';
-    if (pctEl) pctEl.textContent = '100%';
-    if (statusEl) statusEl.textContent = '✅ Plan loaded!';
-    setTimeout(function() {
-      planData = d;
+  window[cb]=function(d){
+    if(done)return;done=true;clearTimeout(t);clearInterval(prog);delete window[cb];
+    if(bar){bar.style.width='100%';}
+    if(pctEl)pctEl.textContent='100%';
+    if(statusEl)statusEl.textContent='✅ Plan loaded!';
+    setTimeout(function(){
+      planData=d;
       document.getElementById('loading-msg').style.display='none';
       document.getElementById('stress-content').style.display='block';
-      // Show YOUR DATA banner
-      var notice = document.getElementById('sample-notice');
-      var yourNotice = document.getElementById('your-data-notice');
-      if (notice) notice.style.display = 'none';
-      if (yourNotice) yourNotice.style.display = 'flex';
-      // Update title to show real names
-      var pkeys = Object.keys(d.people || {});
-      var p1 = d.people[pkeys[0]] || {};
-      var p2 = d.people[pkeys[1]] || {};
-      var names = (p1.name || 'Partner 1') + (p2.name ? ' & ' + p2.name : '');
-      var nameEl = document.getElementById('loaded-names');
-      if (nameEl) nameEl.textContent = names;
-      var portEl = document.getElementById('loaded-portfolio');
-      if (portEl && d.portfolio) portEl.textContent = '$' + Math.round((d.portfolio.total||0)/1000) + 'K portfolio';
+      var sn=document.getElementById('sample-notice');if(sn)sn.style.display='none';
+      var yn=document.getElementById('your-data-notice');if(yn)yn.style.display='flex';
+      var pk=Object.keys(d.people||{});
+      var p1=d.people[pk[0]]||{},p2=d.people[pk[1]]||{};
+      var nameEl=document.getElementById('loaded-names');
+      if(nameEl)nameEl.textContent=(p1.name||'Partner 1')+(p2.name?' & '+p2.name:'');
+      var portEl=document.getElementById('loaded-portfolio');
+      if(portEl&&d.portfolio)portEl.textContent='$'+Math.round((d.portfolio.total||0)/1000)+'K portfolio';
       recalc();
-    }, 400);
+    },400);
   };
-  var s = document.createElement('script');
-  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&t='+Date.now();
-  s.onerror = function(){
-    if(!done){
-      done=true; clearTimeout(t); clearInterval(progressInterval);
-      // Show retry option on GitHub Pages, go to sample in preview
-      var isGitHub = window.location.hostname.indexOf('github.io') >= 0;
-      if (isGitHub) {
-        // Real failure on GitHub — show retry
-        var statusEl = document.getElementById('loading-status');
-        var detailEl = document.getElementById('loading-detail');
-        var barEl = document.getElementById('loading-progress');
-        if (statusEl) statusEl.textContent = '⚠️ Connection failed';
-        if (detailEl) detailEl.innerHTML = 
-          'Could not reach your Google Sheet. <br>' +
-          '<button onclick="loadData()" style="margin-top:10px;padding:8px 20px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-family:inherit;">Try Again</button>' +
-          '&nbsp;&nbsp;<button onclick="loadSampleData()" style="margin-top:10px;padding:8px 16px;background:transparent;color:#8aaabb;border:1px solid #1a3a52;border-radius:4px;font-weight:600;cursor:pointer;font-family:inherit;">Use Sample Data</button>';
-        if (barEl) barEl.style.background = '#ff6b6b';
-      } else {
-        // Preview/local mode — expected, just use sample quietly
-        loadSampleData();
-      }
-    }
-  };
+
+  var s=document.createElement('script');
+  s.setAttribute('data-rbp-stress','true');
+  s.src=SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
+  s.onerror=function(){if(!done){done=true;clearTimeout(t);clearInterval(prog);
+    var isGH=window.location.hostname.indexOf('github.io')>=0;
+    if(isGH){
+      if(statusEl)statusEl.textContent='⚠️ Connection failed';
+      var det=document.getElementById('loading-detail');
+      if(det)det.innerHTML='Could not reach your sheet. <button onclick="loadData()" style="margin-top:8px;padding:6px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-family:inherit;">Try Again</button> <button onclick="loadSampleData()" style="padding:6px 12px;background:transparent;color:#8aaabb;border:1px solid #1a3a52;border-radius:4px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:4px;">Use Sample</button>';
+    } else { loadSampleData(); }
+  }};
   document.head.appendChild(s);
 }
 
