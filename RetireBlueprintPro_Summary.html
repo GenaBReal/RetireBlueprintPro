@@ -814,7 +814,10 @@ function populateReport(d) {
   set('r-phase2-dates', sp.phase2Start && sp.phase2End ? sp.phase2Start+'–'+sp.phase2End : 'Mid retirement');
   set('r-phase3-dates', sp.phase3Start && sp.phase3End ? sp.phase3Start+'–'+sp.phase3End : 'Late retirement');
   set('r-inflation', (gl.inflation||3)+'%/yr');
-  set('r-survivor-pct', (gl.survivorReduction||30)+'% reduction');
+  // survivorReduction may be decimal (0.25) or whole number (25)
+  var _survRed = gl.survivorReduction || 0;
+  if (_survRed > 0 && _survRed < 1) _survRed = Math.round(_survRed * 100);
+  set('r-survivor-pct', _survRed > 0 ? _survRed+'% reduction' : '—');
 
   // ── TAX ──
   set('r-filing', gl.filingStatus || 'Married / Joint');

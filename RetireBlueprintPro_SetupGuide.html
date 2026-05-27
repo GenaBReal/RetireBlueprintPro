@@ -501,22 +501,53 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
       <div class="section-num">7</div>
       <div>
         <div class="section-title">❓ Beginner Questions — Plain English Answers</div>
+
+        <!-- FAQ SEARCH -->
+        <div style="margin-bottom:16px;position:relative;">
+          <input id="faq-search" type="text" placeholder="🔍  Search FAQs — e.g. Social Security, Roth, IRMAA, RMD..."
+            style="width:100%;box-sizing:border-box;padding:12px 16px;border-radius:8px;border:2px solid #1a3a52;background:#0A3145;color:#c8dae8;font-size:12px;font-family:inherit;outline:none;"
+            oninput="searchFAQs(this.value)">
+          <div id="faq-no-results" style="display:none;padding:12px 16px;color:#8aaabb;font-size:11px;background:#061E2F;border-radius:0 0 8px 8px;border:1px solid #1a3a52;border-top:none;">
+            No FAQs match your search. Try different keywords.
+          </div>
+        </div>
+        <script>
+        function searchFAQs(query) {
+          var q = query.toLowerCase().trim();
+          var details = document.querySelectorAll('.faq-item');
+          var anyVisible = false;
+          details.forEach(function(d) {
+            var text = d.textContent.toLowerCase();
+            var match = !q || text.indexOf(q) >= 0;
+            d.style.display = match ? '' : 'none';
+            if (match) { anyVisible = true; if (q) d.open = true; }
+          });
+          var noRes = document.getElementById('faq-no-results');
+          if (noRes) noRes.style.display = (q && !anyVisible) ? 'block' : 'none';
+        }
+        </script>
+        <div style="display:grid;gap:8px;margin-top:0;" id="faq-container">
         <div style="display:grid;gap:8px;margin-top:12px;">
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🔐 Do I need to know spreadsheets or coding?
             </summary>
             <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               No. Everything is entered through the web-based Inputs page — you never need to open
-              or touch your Google Sheet directly. The sheet is your data engine running silently in the
-              background. Just go to Inputs, fill in your numbers, click Save, and your plan updates.
-              You can optionally view the Master Timeline in your sheet to see the raw year-by-year
-              calculations, but you never need to enter anything there.
+              or touch your Google Sheet directly. The sheet is your data engine running silently in the background.<br><br>
+              <strong style="color:#f4b86a;">How to find the Inputs page:</strong><br>
+              • From the <strong>Home page</strong> → click <strong>Inputs</strong> in the Planning Tools section<br>
+              • From any page → click <strong>INPUTS</strong> in the top navigation bar<br>
+              • Direct link: it's <code style="background:#0d2d44;padding:2px 6px;border-radius:3px;">RetireBlueprintPro_Inputs.html</code> in your GitHub Pages URL<br>
+              • <strong>Can't find it?</strong> Check your Etsy purchase confirmation email — it contains your direct link to all pages<br><br>
+              Just fill in your numbers, click <strong>Save</strong> at the bottom, and your plan updates automatically.
+              You can optionally click <strong>Master Sheet</strong> in the nav to view the raw year-by-year calculations,
+              but you never need to enter anything there.
             </div>
           </details>
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               💰 How do I find my Social Security benefit amount?
             </summary>
@@ -539,7 +570,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🔄 What's a Roth conversion and should I do one?
             </summary>
@@ -553,7 +584,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               📋 What are RMDs and why do they matter?
             </summary>
@@ -568,7 +599,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🏥 What is IRMAA?
             </summary>
@@ -580,7 +611,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               😊 What's the Smile Curve spending plan?
             </summary>
@@ -595,7 +626,26 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              📊 What's the difference between the SS column and the Projected SS column?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              In the Income Engine on your Dashboard you'll see two Social Security columns:<br><br>
+              <strong style="color:#f4b86a;">SS (Social Security)</strong> — This is your actual confirmed monthly benefit amount
+              that you entered in the Inputs page. It's the real number from ssa.gov.<br><br>
+              <strong style="color:#f4b86a;">Projected SS</strong> — This is what the plan actually uses in the year-by-year
+              calculation. It may differ from your SS amount because:<br>
+              • In the <strong>start year</strong>, it's prorated by how many months you'll receive it
+                (e.g. July start = 6 months counted)<br>
+              • In <strong>future years</strong>, it's grown by your SS COLA rate (default 2.5%/yr)<br>
+              • If SS <strong>hasn't started yet</strong> in a given year, Projected SS shows $0 for that year<br><br>
+              This distinction ensures your income projections are accurate — you see both what your
+              base benefit is AND what it actually contributes each specific year of your plan.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🔧 My numbers look wrong — what do I check first?
             </summary>
@@ -609,7 +659,32 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-          <details style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              ⚡ What does the Stress Test show and how do I use it?
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              The Stress Test on your Dashboard shows how your plan holds up under four scenarios:<br><br>
+              <strong style="color:#f4b86a;">Base Scenario</strong> — Normal market returns as projected. This is your plan as entered.<br><br>
+              <strong style="color:#f4b86a;">Year 1 Down 20% (Mild Bear Market)</strong> — Your entire portfolio drops 20% in the first year
+              of retirement. This is historically the most dangerous scenario — a crash right when you start
+              withdrawing is called "sequence of returns risk." The plan calculates your projected ending balance
+              if this happens.<br><br>
+              <strong style="color:#f4b86a;">Year 1 Down 30% (Severe Bear Market)</strong> — A crash the size of 2008-2009 or the early
+              2020 COVID crash. If your plan still shows ✅ here, you have a very resilient strategy.<br><br>
+              <strong style="color:#f4b86a;">High Inflation (5%)</strong> — If inflation runs at 5% instead of your planned 3%, your expenses
+              grow faster and your real purchasing power drops. This tests whether your spending plan
+              can absorb higher-than-expected inflation.<br><br>
+              <strong style="color:#1CC7D0;">How to improve your stress test results:</strong><br>
+              • Increase your Roth allocation (Roth withdrawals don't create taxable income)<br>
+              • Keep 2-3 years of expenses in cash/stable value (reduces sequence risk)<br>
+              • Lower your planned spending in Phase 1 of the Smile Curve<br>
+              • Delay Social Security to maximize guaranteed income (reduces portfolio dependency)<br><br>
+              You can test different strategies by changing numbers in Inputs and refreshing the Dashboard.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
             <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               📄 How do I share this with my financial advisor?
             </summary>
@@ -623,7 +698,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-        </div>
+                </div><!-- /faq-container -->
 
         <div class="section-title" style="margin-top:24px;">Key Concepts — Plain English</div>
         <div class="section-sub">Retirement planning terms explained without the jargon</div>
@@ -771,7 +846,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
         <div class="step-icon">4️⃣</div>
         <div class="step-content">
           <div class="step-title">Enter Your Planned Conversions</div>
-          <div class="step-desc">In the Roth Conversion Plan table below the solver, enter the dollar amount you plan to actually convert each year — for each partner. These amounts feed directly into your Master spreadsheet and affect your projections. The table runs 50 years (2026–2075) so you can plan your full conversion window. The grand total at the bottom shows your lifetime planned conversions for each partner and combined.</div>
+          <div class="step-desc">In the Roth Conversion Plan table below the solver, enter the dollar amount you plan to actually convert each year — for each partner. These amounts feed directly into your Master spreadsheet and affect your projections. The table runs up to 100 years from your plan start date, covering your full conversion window through both partners' projected lifespans. The grand total at the bottom shows your lifetime planned conversions for each partner and combined.</div>
         </div>
       </div>
 
