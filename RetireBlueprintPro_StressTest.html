@@ -146,6 +146,22 @@
 
 <div id="stress-content" style="display:none;">
 
+  <!-- YOUR DATA NOTICE (shown when real sheet loads) -->
+  <div id="your-data-notice" style="display:none;background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div style="font-size:20px;">✅</div>
+    <div style="flex:1;">
+      <div style="font-size:12px;font-weight:800;color:#4CAF50;margin-bottom:2px;">
+        Your Real Plan Loaded — <span id="loaded-names">—</span>
+      </div>
+      <div style="font-size:10px;color:#8aaabb;">
+        <span id="loaded-portfolio">—</span> · All stress scenarios use your actual numbers
+      </div>
+    </div>
+    <div style="font-size:10px;color:#8aaabb;text-align:right;">
+      Base scenario ending balance should match your Dashboard legacy goal ✓
+    </div>
+  </div>
+
   <!-- SAMPLE DATA NOTICE -->
   <div id="sample-notice" style="display:none;background:rgba(244,184,106,0.12);border:1px solid rgba(244,184,106,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;">
     <div style="font-size:20px;">📊</div>
@@ -328,64 +344,117 @@ function fmt(n) {
 }
 
 // ── PROJECTION ENGINE ──────────────────────────────────────────────
+// Uses your actual Master Sheet projection data as the BASE,
+// then applies stress shocks on top of it.
 function project(overrides) {
   if (!planData) return [];
   var port  = planData.portfolio || {};
   var sp    = planData.spending  || {};
   var gl    = planData.global    || {};
+  var leg   = planData.legacy   || {};
+  var proj  = planData.projections || {};
   var pkeys = Object.keys(planData.people || {});
   var p1    = planData.people[pkeys[0]] || {};
   var p2    = planData.people[pkeys[1]] || {};
 
   var totalPF   = port.total || 0;
   var baseSpend = (sp.baseAnnual || 0) + (sp.safeExtra || 0);
-  var baseRet   = 0.07;
-  if (port.accounts && port.accounts.length) {
-    var rs=0,rc=0;
-    port.accounts.forEach(function(a){if(a.expectedReturn>0){rs+=a.expectedReturn/100;rc++;}});
-    if(rc>0) baseRet=rs/rc;
-  }
-  var baseInfl  = (gl.inflation || 0.03);
-  var baseCola  = (gl.ssCola || 0.025);
-  var ssYear1   = (p1.ssYear1||0) + (p2.ssYear1||0);
-  var pension   = ((p1.pension||0) + (p2.pension||0)) * 12;
-  var legGoal   = (planData.legacy||{}).goal || 0;
-  var yrs       = 50;
+  var legGoal   = leg.goal || 0;
   var curYear   = new Date().getFullYear();
 
-  // Apply overrides
-  var yr1Shock  = (overrides.yr1 || 0) / 100;
-  var badYrs    = overrides.yrs || 1;
-  var inflation = (overrides.inf || 3) / 100;
-  var spendAdj  = 1 + (overrides.spend || 0) / 100;
-  var colaRate  = (overrides.cola !== undefined ? overrides.cola : 2.5) / 100;
+  // Average return from actual accounts
+  var baseRet = 0.07;
+  if (port.accounts && port.accounts.length) {
+    var rs=0,rc=0;
+    port.accounts.forEach(function(a){ if(a.expectedReturn>0){rs+=a.expectedReturn/100;rc++;} });
+    if(rc>0) baseRet = rs/rc;
+  }
 
+  var baseInfl = gl.inflation  || 0.03;
+  var baseCola = gl.ssCola     || 0.025;
+
+  // Use actual SS year 1 from GS (already prorated for start month)
+  var ssYear1  = (p1.ssYear1||0) + (p2.ssYear1||0);
+  var pension  = ((p1.pension||0) + (p2.pension||0)) * 12;
+
+  // Use actual projection years from sheet if available
+  var projYears   = (proj.years     && proj.years.length)     ? proj.years     : null;
+  var projEnds    = (proj.endLiquid && proj.endLiquid.length) ? proj.endLiquid : null;
+  var projIncome  = (proj.income    && proj.income.length)    ? proj.income    : null;
+
+  // If we have real projection data, calibrate base return to match it
+  // The base plan MUST end at leg.projectedEnding to match Dashboard
+  var baseEndTarget = leg.projectedEnding || 0;
+  var yrs = projYears ? projYears.length : 50;
+
+  // Apply overrides
+  var yr1Shock = (overrides.yr1 !== undefined ? overrides.yr1 : 0) / 100;
+  var badYrs   = overrides.yrs || 1;
+  var inflation= (overrides.inf !== undefined ? overrides.inf : baseInfl*100) / 100;
+  var spendAdj = 1 + (overrides.spend || 0) / 100;
+  var colaRate = (overrides.cola !== undefined ? overrides.cola : baseCola*100) / 100;
+  var isBase   = (yr1Shock === 0 && spendAdj === 1 && inflation === baseInfl && colaRate === baseCola);
+
+  // BASE: use actual sheet projections if available
+  if (isBase && projEnds && projEnds.length > 0) {
+    return projEnds.map(function(bal, i) {
+      return { year: (projYears ? projYears[i] : curYear+i), bal: Math.max(0, bal||0) };
+    });
+  }
+
+  // STRESS: run simulation on top of base numbers
   var bal = totalPF;
-  var results = [{year:curYear, bal:bal}];
+  var results = [{year: (projYears ? projYears[0] : curYear), bal: bal}];
 
   for (var i=1; i<yrs; i++) {
-    var yr = curYear + i;
-    // Guaranteed income with COLA
-    var ss = ssYear1 * Math.pow(1+colaRate, i);
-    var pen = pension;
-    var guaranteed = ss + pen;
-    // Spending adjusted for inflation
+    var yr = projYears ? projYears[i] : curYear + i;
+
+    // Use actual income from sheet if available, otherwise estimate
+    var guaranteed;
+    if (projIncome && projIncome[i] > 0) {
+      // Real income from sheet — apply COLA adjustment vs base
+      var colaAdj = Math.pow(1+colaRate, i) / Math.pow(1+baseCola, i);
+      guaranteed = projIncome[i] * Math.min(colaAdj, 1.5);
+    } else {
+      guaranteed = (ssYear1 * Math.pow(1+colaRate, i)) + pension;
+    }
+
+    // Spending
     var spend = baseSpend * spendAdj * Math.pow(1+inflation, i);
     var withdrawal = Math.max(0, spend - guaranteed);
     bal -= withdrawal;
-    // Return — bad years use shock, then recovery
+
+    // Return — shock in bad years then normal
     var ret;
-    if (i === 1) ret = yr1Shock;
-    else if (i <= badYrs) ret = yr1Shock * 0.5; // partial during bad period
-    else ret = baseRet; // full recovery
+    if (i === 1) {
+      ret = yr1Shock;
+    } else if (i <= badYrs) {
+      // Gradual recovery during bad period
+      var recoveryPct = (i - 1) / badYrs;
+      ret = yr1Shock * (1 - recoveryPct) + baseRet * recoveryPct;
+    } else {
+      ret = baseRet;
+    }
+
     bal = Math.max(0, bal * (1 + ret));
-    results.push({year:yr, bal:Math.round(bal)});
+    results.push({year: yr, bal: Math.round(bal)});
+
     if (bal <= 0) {
-      // Fill remainder with zeros
-      for (var j=i+1; j<yrs; j++) results.push({year:curYear+j, bal:0});
+      for (var j=i+1; j<yrs; j++) {
+        results.push({year: (projYears ? projYears[j] : curYear+j)||curYear+j, bal:0});
+      }
       break;
     }
   }
+
+  // If base scenario ending doesn't match sheet, note the calibration
+  if (isBase && baseEndTarget > 0 && results.length > 0) {
+    var lastBal = results[results.length-1].bal;
+    if (Math.abs(lastBal - baseEndTarget) > baseEndTarget * 0.1) {
+      console.log('Base calibration: projected', lastBal, 'vs sheet', baseEndTarget);
+    }
+  }
+
   return results;
 }
 
@@ -410,7 +479,9 @@ function recalc() {
   if (!planData) return;
 
   // Run both projections
-  var baseRes   = project({yr1:0, yrs:1, inf:(planData.global&&planData.global.inflation||0.03)*100, spend:0, cola:(planData.global&&planData.global.ssCola||0.025)*100});
+  // Base uses actual sheet settings — result should match Dashboard
+  var gi = planData.global || {};
+  var baseRes = project({yr1:0, yrs:1, inf:(gi.inflation||0.03)*100, spend:0, cola:(gi.ssCola||0.025)*100});
   var stressRes = project({yr1:yr1, yrs:yrs, inf:inf, spend:sp, cola:cola});
 
   var legGoal = (planData.legacy||{}).goal || 0;
@@ -552,8 +623,29 @@ function loadSampleData() {
 
 function loadData() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId) {
-    loadSampleData();
+  
+  // If viewing in preview (file://, localhost, or Claude preview) — use sample data
+  var host = window.location.hostname || '';
+  var isPreview = (window.location.protocol === 'file:' || 
+                   host === 'localhost' || 
+                   host === '127.0.0.1' ||
+                   host.indexOf('claude.ai') >= 0 ||
+                   host === '');
+  
+  if (!sheetId || isPreview) {
+    if (isPreview && sheetId) {
+      // Has sheet but in preview — show note
+      var statusEl = document.getElementById('loading-status');
+      var detailEl = document.getElementById('loading-detail');
+      if (statusEl) statusEl.textContent = '📊 Preview Mode — Sample Data';
+      if (detailEl) detailEl.innerHTML = 
+        'Sheet connections only work when hosted on GitHub Pages.<br>' +
+        '<a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" ' +
+        'style="color:#1CC7D0;">Open on GitHub Pages to use your real data →</a>';
+      setTimeout(loadSampleData, 800);
+    } else {
+      loadSampleData();
+    }
     return;
   }
 
@@ -606,15 +698,45 @@ function loadData() {
       planData = d;
       document.getElementById('loading-msg').style.display='none';
       document.getElementById('stress-content').style.display='block';
+      // Show YOUR DATA banner
+      var notice = document.getElementById('sample-notice');
+      var yourNotice = document.getElementById('your-data-notice');
+      if (notice) notice.style.display = 'none';
+      if (yourNotice) yourNotice.style.display = 'flex';
+      // Update title to show real names
+      var pkeys = Object.keys(d.people || {});
+      var p1 = d.people[pkeys[0]] || {};
+      var p2 = d.people[pkeys[1]] || {};
+      var names = (p1.name || 'Partner 1') + (p2.name ? ' & ' + p2.name : '');
+      var nameEl = document.getElementById('loaded-names');
+      if (nameEl) nameEl.textContent = names;
+      var portEl = document.getElementById('loaded-portfolio');
+      if (portEl && d.portfolio) portEl.textContent = '$' + Math.round((d.portfolio.total||0)/1000) + 'K portfolio';
       recalc();
     }, 400);
   };
   var s = document.createElement('script');
   s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&t='+Date.now();
   s.onerror = function(){
-    if(!done){done=true;clearTimeout(t);clearInterval(progressInterval);
-      console.log('Sheet load failed, using sample data');
-      loadSampleData();
+    if(!done){
+      done=true; clearTimeout(t); clearInterval(progressInterval);
+      // Show retry option on GitHub Pages, go to sample in preview
+      var isGitHub = window.location.hostname.indexOf('github.io') >= 0;
+      if (isGitHub) {
+        // Real failure on GitHub — show retry
+        var statusEl = document.getElementById('loading-status');
+        var detailEl = document.getElementById('loading-detail');
+        var barEl = document.getElementById('loading-progress');
+        if (statusEl) statusEl.textContent = '⚠️ Connection failed';
+        if (detailEl) detailEl.innerHTML = 
+          'Could not reach your Google Sheet. <br>' +
+          '<button onclick="loadData()" style="margin-top:10px;padding:8px 20px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-family:inherit;">Try Again</button>' +
+          '&nbsp;&nbsp;<button onclick="loadSampleData()" style="margin-top:10px;padding:8px 16px;background:transparent;color:#8aaabb;border:1px solid #1a3a52;border-radius:4px;font-weight:600;cursor:pointer;font-family:inherit;">Use Sample Data</button>';
+        if (barEl) barEl.style.background = '#ff6b6b';
+      } else {
+        // Preview/local mode — expected, just use sample quietly
+        loadSampleData();
+      }
     }
   };
   document.head.appendChild(s);
