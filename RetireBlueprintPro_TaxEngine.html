@@ -169,6 +169,68 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   .kpi2 { grid-template-columns: 1fr !important; }
   .stress-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ── MOBILE NAV & HEADER FIX ──────────────────────────── */
+@media (max-width: 768px) {
+  /* Nav bar - scrollable horizontal on mobile */
+  .nav-bar, .nav, [class*="nav"] {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+  }
+  .nav-bar::-webkit-scrollbar, .nav::-webkit-scrollbar { display: none; }
+  
+  /* Hero - prevent overflow */
+  .hero, [class*="hero"] {
+    overflow: hidden !important;
+  }
+  
+  /* Header stats - hide on very small screens */
+  .hero-right, .header-right, .hero-stats, .hstat {
+    display: none !important;
+  }
+  
+  /* Logo area - constrain */
+  .hero-left, .header-left, .hero-logo {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  
+  /* Logo image - never overflow */
+  .hero img, .header img, nav img {
+    max-height: 40px !important;
+    width: auto !important;
+  }
+  
+  /* Force page container to not overflow */
+  .page, .section, .body, main {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Nav links - smaller on mobile */
+  .nav-link, .nav a, [class*="nav"] a {
+    font-size: 9px !important;
+    padding: 8px 8px !important;
+    white-space: nowrap;
+  }
+  
+  /* KPI/stat strips - 2 columns max */
+  .hstat-row, .kpi-strip, [class*="stat-row"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .hstat-row, .kpi-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .hero-title, [class*="hero"] h1, [class*="hero"] h2 {
+    font-size: 16px !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -206,7 +268,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 <div class="page">
 
-<!-- ROTH CONVERSION HERO -->
 <div class="roth-hero">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;">
     <div>
@@ -244,7 +305,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 <div class="grid-3">
 
-  <!-- BRACKET VISUALIZER -->
+  
   <div class="card" style="grid-column:1/3;">
     <div class="card-hdr">
       <div class="card-title">I. Federal Tax Brackets — Married Filing Jointly 2026</div>
@@ -255,7 +316,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
     </div>
   </div>
 
-  <!-- YOUR TAX PROFILE -->
+  
   <div class="card">
     <div class="card-hdr">
       <div class="card-title">Your Tax Profile</div>
@@ -278,12 +339,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 </div>
 
-<!-- EXPLAINERS ROW -->
 <div class="section-lbl">How It Works — Understanding Your Tax Engine</div>
 <div class="grid-3">
 
   <div>
-    <!-- BEGINNER TIPS -->
+    
     <div class="explainer" style="background:#f0f7ff;border-left-color:#1565C0;margin-bottom:16px;">
       <div class="explainer-title" style="color:#1565C0;">🌟 New to Tax Planning? Start Here</div>
       <div class="explainer-body">
@@ -317,7 +377,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   </div>
 
   <div>
-    <!-- Gross-up demo calculator -->
+    
     <div class="card" style="margin-bottom:12px;">
       <div class="card-hdr">
         <div class="card-title">II. Gross-Up Solver Demo</div>
@@ -349,7 +409,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 </div>
 
-<!-- IRMAA + LT CAPITAL GAINS -->
 <div class="grid-2">
 
   <div class="card">
@@ -417,7 +476,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 </div>
 
-<!-- TAX TIMELINE + RMD TABLE -->
 <div class="grid-2-1">
 
   <div class="card">
@@ -498,7 +556,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 
 </div>
 
-</div><!-- end .page -->
+</div>
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
@@ -685,8 +743,7 @@ function populate(data) {
     document.getElementById('status-msg').textContent = '✅ Tax data loaded — ' + (data.meta&&data.meta.generated||'May 2026');
   document.getElementById('status-msg').className = 'status-msg ok';
   } catch(e) {
-    console.error('Tax Engine error:', e.message);
-    document.getElementById('status-msg').textContent = '⚠️ Error displaying data: ' + e.message;
+document.getElementById('status-msg').textContent = '⚠️ Error displaying data: ' + e.message;
     document.getElementById('status-msg').className = 'status-msg';
   }
 }
@@ -707,7 +764,7 @@ renderBrackets(0); // Will be updated when data loads
 loadData();
 </script>
 
-<div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;"><!-- ANNUAL UPDATE RESOURCES -->
+<div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;">
 <div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:20px 24px;margin:16px 0;border:1px solid rgba(28,199,208,0.25);">
   <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:4px;">📅 Annual Update Guide — Keep Your Plan Current</div>
   <div style="font-size:10px;color:#8aaabb;margin-bottom:16px;">These values change each year. Bookmark this page and check each January to keep your plan accurate.</div>
