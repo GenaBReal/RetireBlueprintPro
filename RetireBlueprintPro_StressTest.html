@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireBlueprint Pro — Interactive Stress Tester</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{ --navy:#041E2F; --mid:#0A3145; --teal:#1CC7D0; --orange:#f4b86a; --green:#4CAF50; --red:#ff6b6b; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Montserrat',sans-serif;background:var(--navy);color:#fff;min-height:100vh;}
+  .header{background:#041E2F;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--teal);}
+  .header-logo{display:flex;align-items:center;gap:12px;}
+  .header-title{font-size:13px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:1px;}
+  .nav-back{color:#8aaabb;font-size:11px;text-decoration:none;}
+  .body{max-width:1100px;margin:0 auto;padding:16px;}
+
+  /* Hero */
+  .hero{background:linear-gradient(135deg,#1a0808,#2d1515);border-radius:12px;padding:20px 24px;margin-bottom:16px;border:2px solid rgba(255,107,107,0.3);}
+  .hero h1{font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;}
+  .hero h1 span{color:#ff9f43;}
+  .hero p{font-size:11px;color:#ffcba4;line-height:1.7;max-width:700px;}
+
+  /* Loading */
+  #loading-msg{text-align:center;padding:40px;color:#8aaabb;font-size:13px;}
+
+  /* Scenario tabs */
+  .scenario-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab-btn{padding:8px 16px;border-radius:6px;border:2px solid #1a3a52;background:transparent;color:#8aaabb;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+  .tab-btn:hover{border-color:var(--teal);color:var(--teal);}
+  .tab-btn.active{background:var(--teal);border-color:var(--teal);color:var(--navy);}
+
+  /* Main grid */
+  .main-grid{display:grid;grid-template-columns:340px 1fr;gap:16px;}
+  
+  /* Sliders panel */
+  .sliders-panel{background:var(--mid);border-radius:10px;padding:16px;border:1px solid #1a3a52;}
+  .panel-title{font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+  
+  .slider-group{margin-bottom:18px;}
+  .slider-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+  .slider-val{font-size:13px;font-weight:800;color:var(--teal);}
+  input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;}
+  .slider-range{display:flex;justify-content:space-between;font-size:8px;color:#456A73;margin-top:2px;}
+
+  .slider-desc{font-size:9px;color:#5a7a8a;line-height:1.5;margin-top:4px;font-style:italic;}
+
+  .reset-btn{width:100%;padding:8px;background:transparent;border:1px solid #1a3a52;color:#8aaabb;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
+  .reset-btn:hover{border-color:var(--orange);color:var(--orange);}
+
+  /* Results panel */
+  .results-panel{display:flex;flex-direction:column;gap:12px;}
+
+  /* Outcome cards */
+  .outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .outcome-card{border-radius:10px;padding:14px;text-align:center;border:2px solid;}
+  .outcome-card.base{background:rgba(28,199,208,0.08);border-color:rgba(28,199,208,0.4);}
+  .outcome-card.scenario{background:rgba(255,159,67,0.08);border-color:rgba(255,159,67,0.4);}
+  .outcome-card.verdict{border:none;display:flex;flex-direction:column;justify-content:center;}
+  .oc-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+  .oc-val{font-size:22px;font-weight:900;line-height:1;}
+  .oc-sub{font-size:9px;margin-top:5px;line-height:1.4;}
+  .oc-diff{font-size:12px;font-weight:700;margin-top:4px;}
+
+  /* Chart */
+  .chart-card{background:var(--mid);border-radius:10px;padding:16px;border:1px solid #1a3a52;}
+  .chart-title{font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+  .chart-area{height:200px;position:relative;}
+
+  /* Verdict banner */
+  .verdict-banner{border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;}
+  .verdict-icon{font-size:28px;flex-shrink:0;}
+  .verdict-title{font-size:14px;font-weight:800;margin-bottom:4px;}
+  .verdict-detail{font-size:11px;line-height:1.7;opacity:0.9;}
+
+  /* Recommendations */
+  .recs{background:rgba(0,0,0,0.2);border-radius:8px;padding:12px 14px;margin-top:8px;}
+  .recs-title{font-size:9px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+  .rec-item{display:flex;gap:8px;font-size:10px;color:#c8dae8;line-height:1.6;margin-bottom:4px;}
+
+  /* What-if note */
+  .whatif{background:rgba(244,184,106,0.1);border-radius:8px;padding:10px 14px;font-size:10px;color:#f4b86a;line-height:1.6;border-left:3px solid var(--orange);}
+
+  @media(max-width:768px){
+    .main-grid{grid-template-columns:1fr;}
+    .outcome-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:38px;width:auto;" onerror="this.style.display='none'">
+    <div>
+      <div class="header-title">Stress Tester</div>
+      <div style="font-size:9px;color:#456A73;">Interactive Scenario Analysis · Your Real Data</div>
+    </div>
+  </div>
+  <a href="RetireBlueprintPro_Dashboard.html" class="nav-back">← Back to Dashboard</a>
+</div>
+
+<div class="body">
+
+<div class="hero">
+  <h1>⚡ Interactive <span>Stress Tester</span></h1>
+  <p>Use sliders to simulate real-world scenarios against YOUR actual portfolio data. See instantly how a market crash, high inflation, or reduced spending affects your ending balance and legacy goal. This is where retirement plans get battle-tested.</p>
+</div>
+
+<div id="loading-msg">⏳ Loading your plan data... <br><small style="color:#5a7a8a;">Connect your sheet on the Home page first</small></div>
+
+<div id="stress-content" style="display:none;">
+
+  <!-- SCENARIO TABS -->
+  <div class="scenario-tabs">
+    <button class="tab-btn active" onclick="setScenario('custom')">🎛️ Custom Scenario</button>
+    <button class="tab-btn" onclick="setScenario('crash2008')">📉 2008 Financial Crisis</button>
+    <button class="tab-btn" onclick="setScenario('dotcom')">💻 2000 Dot-Com Bust</button>
+    <button class="tab-btn" onclick="setScenario('covid')">🦠 2020 COVID Crash</button>
+    <button class="tab-btn" onclick="setScenario('stagflation')">📈 1970s Stagflation</button>
+    <button class="tab-btn" onclick="setScenario('bestcase')">🚀 Bull Market</button>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- SLIDERS -->
+    <div class="sliders-panel">
+      <div class="panel-title">🎛️ Adjust Scenario Parameters</div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          Year 1 Market Return
+          <span class="slider-val" id="lbl-yr1">-20%</span>
+        </div>
+        <input type="range" id="sl-yr1" min="-50" max="30" step="1" value="-20" oninput="recalc()">
+        <div class="slider-range"><span>-50%</span><span>0%</span><span>+30%</span></div>
+        <div class="slider-desc">A severe crash in the FIRST year of retirement is the worst possible scenario — you're selling shares at the bottom to fund living expenses.</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          Years of Poor Returns
+          <span class="slider-val" id="lbl-yrs">1</span>
+        </div>
+        <input type="range" id="sl-yrs" min="1" max="5" step="1" value="1" oninput="recalc()">
+        <div class="slider-range"><span>1 yr</span><span>3 yrs</span><span>5 yrs</span></div>
+        <div class="slider-desc">How many years the bad market persists before recovery. Even 2008 recovered fully within 5 years.</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          Inflation Rate
+          <span class="slider-val" id="lbl-inf">3.0%</span>
+        </div>
+        <input type="range" id="sl-inf" min="1" max="10" step="0.5" value="3" oninput="recalc()">
+        <div class="slider-range"><span>1%</span><span>3%</span><span>10%</span></div>
+        <div class="slider-desc">Higher inflation erodes purchasing power and increases expenses every year. 1970s saw 8-12% inflation for several years.</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          Spending Adjustment
+          <span class="slider-val" id="lbl-spend">0%</span>
+        </div>
+        <input type="range" id="sl-spend" min="-30" max="20" step="5" value="0" oninput="recalc()">
+        <div class="slider-range"><span>-30%</span><span>0%</span><span>+20%</span></div>
+        <div class="slider-desc">Test what happens if you cut spending during a downturn (-20%) or if lifestyle inflation kicks in (+10%). This is your most powerful lever.</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          SS COLA Rate
+          <span class="slider-val" id="lbl-cola">2.5%</span>
+        </div>
+        <input type="range" id="sl-cola" min="0" max="5" step="0.5" value="2.5" oninput="recalc()">
+        <div class="slider-range"><span>0%</span><span>2.5%</span><span>5%</span></div>
+        <div class="slider-desc">Lower COLA means SS buys less over time. Zero models a worst-case SS reform scenario.</div>
+      </div>
+
+      <button class="reset-btn" onclick="resetSliders()">↺ Reset to Base Scenario</button>
+
+      <div class="whatif" style="margin-top:14px;">
+        💡 <strong>The most powerful action:</strong> Reducing spending by even 10% in the first 3 years of a downturn dramatically improves outcomes. Try setting spending to -10% and watch the ending balance change.
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results-panel">
+
+      <!-- Outcome comparison -->
+      <div class="outcome-grid">
+        <div class="outcome-card base">
+          <div class="oc-label">📊 Base Plan</div>
+          <div class="oc-val teal" id="res-base-end" style="color:var(--teal);">—</div>
+          <div class="oc-sub" style="color:#8aaabb;">Ending balance · no stress</div>
+          <div class="oc-diff" id="res-base-conf" style="color:var(--green);">—</div>
+        </div>
+        <div class="outcome-card scenario">
+          <div class="oc-label">⚡ Stress Scenario</div>
+          <div class="oc-val" id="res-stress-end" style="color:var(--orange);">—</div>
+          <div class="oc-sub" style="color:#8aaabb;">Ending balance · with stress</div>
+          <div class="oc-diff" id="res-stress-conf">—</div>
+        </div>
+        <div class="outcome-card" id="verdict-card" style="background:rgba(76,175,80,0.1);border-color:rgba(76,175,80,0.4);">
+          <div class="oc-label">📋 Verdict</div>
+          <div class="oc-val" id="res-verdict-icon" style="font-size:28px;">✅</div>
+          <div class="oc-sub" id="res-verdict-text" style="color:#8aaabb;font-size:10px;">Plan survives</div>
+          <div class="oc-diff" id="res-delta">—</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-card">
+        <div class="chart-title">Portfolio Over Time — Base vs Stress Scenario</div>
+        <div class="chart-area"><canvas id="stress-chart"></canvas></div>
+        <div style="display:flex;gap:16px;margin-top:8px;font-size:9px;color:#8aaabb;">
+          <span>── Teal = Base plan</span>
+          <span>── Orange = Stress scenario</span>
+          <span>- - Gold = Legacy goal</span>
+        </div>
+      </div>
+
+      <!-- Verdict banner -->
+      <div class="verdict-banner" id="verdict-banner" style="background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);">
+        <div class="verdict-icon" id="verdict-icon">✅</div>
+        <div>
+          <div class="verdict-title" id="verdict-title" style="color:var(--green);">Plan is Resilient</div>
+          <div class="verdict-detail" id="verdict-detail" style="color:#a5d6a7;">Loading...</div>
+          <div class="recs" id="recs-section" style="display:none;">
+            <div class="recs-title">💡 How to Improve Your Resilience</div>
+            <div id="recs-list"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /main-grid -->
+
+  <div class="whatif" style="margin-top:16px;">
+    📖 <strong>What is Sequence of Returns Risk?</strong> The biggest threat to early retirees isn't a bad market — it's a bad market at the WRONG TIME.
+    Retiring into a crash means you're selling assets at low prices to fund living expenses. Those sold shares never recover for you.
+    A portfolio losing 30% in year 1 while withdrawing 5%/yr can run out decades earlier than a portfolio that has the same crash in year 20.
+    Your plan's Roth allocation, SS income floor, and spending flexibility are your three main defenses.
+  </div>
+
+</div><!-- /stress-content -->
+</div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+var planData = null;
+var stressChart = null;
+
+// ── SCENARIOS ──────────────────────────────────────────────────────
+var SCENARIOS = {
+  custom:      {yr1:-20, yrs:1, inf:3.0,  spend:0,   cola:2.5, label:'Custom'},
+  crash2008:   {yr1:-37, yrs:2, inf:0.1,  spend:-5,  cola:0,   label:'2008 Crisis (-37%)'},
+  dotcom:      {yr1:-22, yrs:3, inf:2.8,  spend:-10, cola:2.5, label:'2000 Dot-Com Bust'},
+  covid:       {yr1:-34, yrs:1, inf:1.2,  spend:-8,  cola:0,   label:'2020 COVID (-34%)'},
+  stagflation: {yr1:-14, yrs:4, inf:9.0,  spend:10,  cola:5.0, label:'1970s Stagflation'},
+  bestcase:    {yr1:25,  yrs:1, inf:2.5,  spend:5,   cola:2.5, label:'Bull Market (+25%)'},
+};
+
+function setScenario(key) {
+  var s = SCENARIOS[key];
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){
+    b.classList.toggle('active', ['custom','crash2008','dotcom','covid','stagflation','bestcase'][i]===key);
+  });
+  document.getElementById('sl-yr1').value   = s.yr1;
+  document.getElementById('sl-yrs').value   = s.yrs;
+  document.getElementById('sl-inf').value   = s.inf;
+  document.getElementById('sl-spend').value = s.spend;
+  document.getElementById('sl-cola').value  = s.cola;
+  recalc();
+}
+
+function resetSliders() { setScenario('custom'); }
+
+function fmt(n) {
+  if(!n&&n!==0) return '—';
+  if(Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
+  if(Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
+  return '$'+Math.round(n).toLocaleString();
+}
+
+// ── PROJECTION ENGINE ──────────────────────────────────────────────
+function project(overrides) {
+  if (!planData) return [];
+  var port  = planData.portfolio || {};
+  var sp    = planData.spending  || {};
+  var gl    = planData.global    || {};
+  var pkeys = Object.keys(planData.people || {});
+  var p1    = planData.people[pkeys[0]] || {};
+  var p2    = planData.people[pkeys[1]] || {};
+
+  var totalPF   = port.total || 0;
+  var baseSpend = (sp.baseAnnual || 0) + (sp.safeExtra || 0);
+  var baseRet   = 0.07;
+  if (port.accounts && port.accounts.length) {
+    var rs=0,rc=0;
+    port.accounts.forEach(function(a){if(a.expectedReturn>0){rs+=a.expectedReturn/100;rc++;}});
+    if(rc>0) baseRet=rs/rc;
+  }
+  var baseInfl  = (gl.inflation || 0.03);
+  var baseCola  = (gl.ssCola || 0.025);
+  var ssYear1   = (p1.ssYear1||0) + (p2.ssYear1||0);
+  var pension   = ((p1.pension||0) + (p2.pension||0)) * 12;
+  var legGoal   = (planData.legacy||{}).goal || 0;
+  var yrs       = 50;
+  var curYear   = new Date().getFullYear();
+
+  // Apply overrides
+  var yr1Shock  = (overrides.yr1 || 0) / 100;
+  var badYrs    = overrides.yrs || 1;
+  var inflation = (overrides.inf || 3) / 100;
+  var spendAdj  = 1 + (overrides.spend || 0) / 100;
+  var colaRate  = (overrides.cola !== undefined ? overrides.cola : 2.5) / 100;
+
+  var bal = totalPF;
+  var results = [{year:curYear, bal:bal}];
+
+  for (var i=1; i<yrs; i++) {
+    var yr = curYear + i;
+    // Guaranteed income with COLA
+    var ss = ssYear1 * Math.pow(1+colaRate, i);
+    var pen = pension;
+    var guaranteed = ss + pen;
+    // Spending adjusted for inflation
+    var spend = baseSpend * spendAdj * Math.pow(1+inflation, i);
+    var withdrawal = Math.max(0, spend - guaranteed);
+    bal -= withdrawal;
+    // Return — bad years use shock, then recovery
+    var ret;
+    if (i === 1) ret = yr1Shock;
+    else if (i <= badYrs) ret = yr1Shock * 0.5; // partial during bad period
+    else ret = baseRet; // full recovery
+    bal = Math.max(0, bal * (1 + ret));
+    results.push({year:yr, bal:Math.round(bal)});
+    if (bal <= 0) {
+      // Fill remainder with zeros
+      for (var j=i+1; j<yrs; j++) results.push({year:curYear+j, bal:0});
+      break;
+    }
+  }
+  return results;
+}
+
+// ── RECALCULATE ─────────────────────────────────────────────────────
+function recalc() {
+  // Update labels
+  var yr1 = parseInt(document.getElementById('sl-yr1').value);
+  var yrs = parseInt(document.getElementById('sl-yrs').value);
+  var inf = parseFloat(document.getElementById('sl-inf').value);
+  var sp  = parseInt(document.getElementById('sl-spend').value);
+  var cola= parseFloat(document.getElementById('sl-cola').value);
+
+  document.getElementById('lbl-yr1').textContent = (yr1>=0?'+':'')+yr1+'%';
+  document.getElementById('lbl-yr1').style.color = yr1<0?'#ff6b6b':yr1>10?'#4CAF50':'#1CC7D0';
+  document.getElementById('lbl-yrs').textContent = yrs+' yr'+(yrs>1?'s':'');
+  document.getElementById('lbl-inf').textContent = inf.toFixed(1)+'%';
+  document.getElementById('lbl-inf').style.color = inf>5?'#ff6b6b':inf>3?'#f4b86a':'#1CC7D0';
+  document.getElementById('lbl-spend').textContent = (sp>=0?'+':'')+sp+'%';
+  document.getElementById('lbl-spend').style.color = sp<0?'#4CAF50':sp>0?'#f4b86a':'#8aaabb';
+  document.getElementById('lbl-cola').textContent = cola.toFixed(1)+'%';
+
+  if (!planData) return;
+
+  // Run both projections
+  var baseRes   = project({yr1:0, yrs:1, inf:(planData.global&&planData.global.inflation||0.03)*100, spend:0, cola:(planData.global&&planData.global.ssCola||0.025)*100});
+  var stressRes = project({yr1:yr1, yrs:yrs, inf:inf, spend:sp, cola:cola});
+
+  var legGoal = (planData.legacy||{}).goal || 0;
+  var baseEnd   = baseRes.length>0   ? baseRes[baseRes.length-1].bal   : 0;
+  var stressEnd = stressRes.length>0 ? stressRes[stressRes.length-1].bal : 0;
+
+  var baseConf   = legGoal>0 ? Math.min(100,Math.round(baseEnd/legGoal*100))   : 100;
+  var stressConf = legGoal>0 ? Math.min(100,Math.round(stressEnd/legGoal*100)) : 100;
+  var delta = stressEnd - baseEnd;
+  var deltaPct = baseEnd>0 ? Math.round(delta/baseEnd*100) : 0;
+
+  // Update KPIs
+  document.getElementById('res-base-end').textContent   = fmt(baseEnd);
+  document.getElementById('res-base-conf').textContent  = baseConf+'% of legacy goal';
+  document.getElementById('res-stress-end').textContent = fmt(stressEnd);
+  document.getElementById('res-stress-end').style.color = stressEnd>=baseEnd?'#4CAF50':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';
+  document.getElementById('res-stress-conf').textContent = stressConf+'% of legacy goal';
+  document.getElementById('res-stress-conf').style.color = stressConf>=100?'#4CAF50':stressConf>=80?'#f4b86a':'#ff6b6b';
+  document.getElementById('res-delta').textContent = (delta>=0?'+':'')+fmt(delta)+' ('+deltaPct+'%)';
+  document.getElementById('res-delta').style.color = delta>=0?'#4CAF50':'#ff6b6b';
+
+  // Verdict
+  var icon, title, detail, color, bg, recommendations=[];
+  if (stressEnd >= legGoal && legGoal > 0) {
+    icon='✅'; title='Plan is Resilient'; color='#4CAF50'; bg='rgba(76,175,80,0.1)';
+    detail='Your plan survives this scenario with the legacy goal intact. Ending balance of '+fmt(stressEnd)+' meets or exceeds your '+fmt(legGoal)+' target.';
+  } else if (stressEnd > 0 && stressConf >= 70) {
+    icon='⚠️'; title='Plan Under Stress'; color='#f4b86a'; bg='rgba(244,184,106,0.1)';
+    detail='Your plan survives but ends '+fmt(legGoal-stressEnd)+' below the legacy goal ('+stressConf+'% funded). Manageable with adjustments.';
+    recommendations=['Reduce Phase 1 spending by 10-15% during the downturn years','Delay any large purchases for 2-3 years','Consider a small part-time income bridge'];
+  } else if (stressEnd > 0) {
+    icon='🚨'; title='Plan At Risk'; color='#ff6b6b'; bg='rgba(255,107,107,0.1)';
+    detail='This scenario significantly depletes your portfolio. Only '+stressConf+'% of the legacy goal is funded. Meaningful action would be needed.';
+    recommendations=['Cut spending by 20%+ for the first 3-5 years of retirement','Delay Social Security to maximize guaranteed income','Consider working 1-2 more years to add buffer','Shift more assets to Roth before retirement — reduces forced selling at low prices'];
+  } else {
+    icon='⛔'; title='Portfolio Depleted'; color='#ff6b6b'; bg='rgba(255,0,0,0.1)';
+    detail='Under this scenario, the portfolio runs out before the end of the plan. This is an extreme scenario — focus on building more guaranteed income (SS, pension) and reducing dependence on portfolio withdrawals.';
+    recommendations=['Maximize Social Security by delaying to age 70','Consider annuitizing a portion of portfolio for guaranteed income','Reduce planned legacy goal to zero and spend only guaranteed income','Add part-time income for the first 5-7 years of retirement'];
+  }
+
+  document.getElementById('res-verdict-icon').textContent = icon;
+  document.getElementById('res-verdict-text').textContent = stressConf+'% funded under this scenario';
+  document.getElementById('verdict-title').textContent = title;
+  document.getElementById('verdict-title').style.color = color;
+  document.getElementById('verdict-detail').textContent = detail;
+  document.getElementById('verdict-banner').style.background = bg;
+  document.getElementById('verdict-banner').style.borderColor = color.replace(')',',0.3)').replace('rgb','rgba');
+
+  var recsSection = document.getElementById('recs-section');
+  var recsList = document.getElementById('recs-list');
+  if (recommendations.length > 0) {
+    recsSection.style.display = 'block';
+    recsList.innerHTML = recommendations.map(function(r){
+      return '<div class="rec-item"><span>→</span><span>'+r+'</span></div>';
+    }).join('');
+  } else {
+    recsSection.style.display = 'none';
+  }
+
+  // Verdict card color
+  var vcard = document.getElementById('verdict-card');
+  vcard.style.background = bg;
+  vcard.style.borderColor = color;
+  document.getElementById('verdict-icon').textContent = icon;
+
+  // Update chart
+  var dispStep = Math.ceil(baseRes.length / 10);
+  var labels=[], baseData=[], stressData=[], goalData=[];
+  for (var i=0; i<baseRes.length; i+=dispStep) {
+    labels.push(baseRes[i].year);
+    baseData.push(baseRes[i].bal);
+    stressData.push(stressRes[i] ? stressRes[i].bal : 0);
+    goalData.push(legGoal);
+  }
+  // Always include last point
+  var last = baseRes.length-1;
+  if (labels[labels.length-1] !== baseRes[last].year) {
+    labels.push(baseRes[last].year);
+    baseData.push(baseRes[last].bal);
+    stressData.push(stressRes[last]?stressRes[last].bal:0);
+    goalData.push(legGoal);
+  }
+
+  if (stressChart) stressChart.destroy();
+  var ctx = document.getElementById('stress-chart');
+  if (ctx) {
+    stressChart = new Chart(ctx, {
+      type:'line',
+      data:{labels:labels, datasets:[
+        {label:'Base Plan',     data:baseData,   borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.08)',fill:true, tension:0.3,pointRadius:0,borderWidth:2.5},
+        {label:'Stress Scenario',data:stressData,borderColor:'#f4b86a',backgroundColor:'rgba(244,184,106,0.06)',fill:true, tension:0.3,pointRadius:0,borderWidth:2.5},
+        {label:'Legacy Goal',   data:goalData,   borderColor:'#456A73',borderDash:[5,3],fill:false,pointRadius:0,borderWidth:1.5},
+      ]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:12}}},
+        scales:{
+          x:{ticks:{font:{size:10},color:'#8aaabb'},grid:{display:false}},
+          y:{ticks:{font:{size:10},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.04)'}}
+        }
+      }
+    });
+  }
+}
+
+// ── LOAD DATA ────────────────────────────────────────────────────────
+function loadData() {
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) {
+    document.getElementById('loading-msg').innerHTML =
+      '⚠️ No sheet connected.<br><a href="RetireBlueprintPro_Home.html" style="color:var(--teal);">Go to Home page to connect your sheet →</a>';
+    return;
+  }
+  var cb = 'rbpStress_'+Date.now();
+  var done = false;
+  var t = setTimeout(function(){
+    if(!done){done=true;document.getElementById('loading-msg').textContent='⚠️ Timeout — please refresh';}
+  }, 60000);
+  window[cb] = function(d){
+    if(done) return; done=true; clearTimeout(t); delete window[cb];
+    planData = d;
+    document.getElementById('loading-msg').style.display='none';
+    document.getElementById('stress-content').style.display='block';
+    recalc();
+  };
+  var s = document.createElement('script');
+  s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&t='+Date.now();
+  s.onerror = function(){
+    if(!done){done=true;clearTimeout(t);
+      document.getElementById('loading-msg').textContent='⚠️ Could not load data. Check connection and refresh.';
+    }
+  };
+  document.head.appendChild(s);
+}
+
+window.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>

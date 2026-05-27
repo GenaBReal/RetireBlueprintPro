@@ -663,7 +663,7 @@ function populate(data) {
   set('t-bracket', roth.bracket||'12%');
 
   // Update partner-specific SS note
-  set('tax-p2-ss-note', _p2n + ''s');
+  set('tax-p2-ss-note', _p2n + '\'s');
 
   // Update RMD planning window note with real partner names
   var rmdNote = document.getElementById('rmd-partner-note');
@@ -671,7 +671,7 @@ function populate(data) {
     var p1rmdAge = 73 - _p1.age;
     var p2rmdAge = 73 - _p2.age;
     var curYr = new Date().getFullYear();
-    rmdNote.textContent = _p1n + ' RMDs begin at age 75, ' + _p2n + ' at age 75. The years between now and RMD start are your window to reduce pre-tax balances through Roth conversions.';
+    rmdNote.textContent = _p1n + ' RMDs begin at age 73, ' + _p2n + ' at age 73. The years before then are your window to reduce pre-tax balances through Roth conversions.';
   }
 
   if (taxable1 > 0) {
