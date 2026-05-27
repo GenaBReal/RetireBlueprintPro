@@ -396,6 +396,44 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 </div>
 
 
+<!-- FIRE INTELLIGENCE PANEL -->
+<div id="fire-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:14px 18px;margin-bottom:10px;border:1px solid rgba(28,199,208,0.25);display:none;">
+  <div style="font-size:11px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">
+    🔥 FIRE Intelligence
+    <span class="tooltip-icon" data-tip="FIRE = Financial Independence, Retire Early. These metrics show your plan through the FIRE community's key benchmarks.">?</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #1CC7D0;">
+      <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Safe Withdrawal Rate
+        <span class="tooltip-icon" data-tip="Your planned annual withdrawal from portfolio divided by total portfolio. The 4% rule says this should be at or under 4% for a 30-year retirement. Lower = safer.">?</span>
+      </div>
+      <div style="font-size:20px;font-weight:800;" id="fire-swr">—</div>
+      <div style="font-size:9px;margin-top:3px;" id="fire-swr-note">—</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #f4b86a;">
+      <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">FI Date
+        <span class="tooltip-icon" data-tip="Financial Independence Date — when your portfolio can sustain all expenses without any salary income. The FIRE milestone.">?</span>
+      </div>
+      <div style="font-size:18px;font-weight:800;color:#f4b86a;" id="fire-fi-date">—</div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="fire-fi-note">—</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #4CAF50;">
+      <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">FIRE Type
+        <span class="tooltip-icon" data-tip="Lean FIRE: under $40K/yr spending. Regular FIRE: $40K-$100K/yr. Fat FIRE: over $100K/yr. Based on your planned annual spending.">?</span>
+      </div>
+      <div style="font-size:18px;font-weight:800;color:#4CAF50;" id="fire-type">—</div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="fire-type-note">—</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #9b59b6;">
+      <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Coast FIRE Number
+        <span class="tooltip-icon" data-tip="The portfolio size at which you could stop ALL contributions and let compound growth alone carry you to your target retirement portfolio. If you're past this — you've Coasted!">?</span>
+      </div>
+      <div style="font-size:18px;font-weight:800;color:#c39bd3;" id="fire-coast">—</div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="fire-coast-note">—</div>
+    </div>
+  </div>
+</div>
+
 <!-- HOME EQUITY -->
 <div id="home-equity-panel" style="background:#fff;border-top:3px solid #f4b86a;border-bottom:1px solid #e8eaed;padding:12px 16px;margin:0 -14px 16px;display:none;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -781,6 +819,94 @@ function populate(d){
   loadHomeEquity(d);
   updateCompletionScore(d);
   updateStressTest(d); // Uses sheet debt data for mortgage + localStorage for home value
+  populateFIRE(d);
+}
+
+function populateFIRE(d) {
+  try {
+    var port = d.portfolio || {};
+    var sp   = d.spending  || {};
+    var proj = d.projections || {};
+    var gl   = d.global    || {};
+    var pkeys = Object.keys(d.people || {});
+    var p1   = d.people[pkeys[0]] || {};
+    var p2   = d.people[pkeys[1]] || {};
+    var totalPortfolio = port.total || 0;
+    var annualSpend = Math.max(sp.baseAnnual||0, (sp.baseAnnual||0)+(sp.safeExtra||0));
+    var guaranteedIncome = ((p1.ssMonthly||0)+(p2.ssMonthly||0)+(p1.pension||0)+(p2.pension||0))*12;
+    var portfolioNeeded = Math.max(0, annualSpend - guaranteedIncome);
+    var planYear = gl.planYear || new Date().getFullYear();
+    var panel = document.getElementById('fire-panel');
+    if (panel && totalPortfolio > 0) panel.style.display = 'block';
+
+    // Safe Withdrawal Rate
+    var swr = totalPortfolio > 0 && portfolioNeeded > 0 ? Math.round(portfolioNeeded/totalPortfolio*1000)/10 : 0;
+    var swrEl = document.getElementById('fire-swr');
+    var swrNoteEl = document.getElementById('fire-swr-note');
+    if (swrEl) {
+      swrEl.textContent = swr > 0 ? swr.toFixed(1)+'%' : '0%';
+      swrEl.style.color = swr <= 3 ? '#4CAF50' : swr <= 4 ? '#1CC7D0' : swr <= 5 ? '#f4b86a' : '#ff6b6b';
+      if (swrNoteEl) swrNoteEl.style.color = swrEl.style.color;
+    }
+    if (swrNoteEl) swrNoteEl.textContent = swr <= 3 ? '✅ Very safe (<3%)' : swr <= 4 ? '✅ 4% rule met' : swr <= 5 ? '⚠️ Slightly elevated' : '⛔ Above 5% — review';
+
+    // FI Date
+    var targetFI = portfolioNeeded > 0 ? portfolioNeeded / 0.04 : 0;
+    var fiYear = null;
+    if (proj.years && proj.endLiquid && targetFI > 0) {
+      for (var i=0; i<proj.years.length; i++) {
+        if ((proj.endLiquid[i]||0) >= targetFI) { fiYear = proj.years[i]; break; }
+      }
+    }
+    if (!fiYear && totalPortfolio >= targetFI && targetFI > 0) fiYear = planYear;
+    var fiEl = document.getElementById('fire-fi-date');
+    var fiNoteEl = document.getElementById('fire-fi-note');
+    if (fiEl) {
+      if (fiYear && fiYear <= planYear) {
+        fiEl.textContent = 'Already FI! 🎉'; fiEl.style.color='#4CAF50';
+        if(fiNoteEl) fiNoteEl.textContent = 'Portfolio sustains expenses at 4% SWR';
+      } else if (fiYear) {
+        fiEl.textContent = fiYear;
+        if(fiNoteEl) fiNoteEl.textContent = (p1.name||'P1')+' age '+((p1.age||0)+(fiYear-planYear))+' · '+(p2.name||'P2')+' age '+((p2.age||0)+(fiYear-planYear));
+      } else {
+        fiEl.textContent = '—';
+        if(fiNoteEl) fiNoteEl.textContent = 'Target: '+fmt(targetFI);
+      }
+    }
+
+    // FIRE Type
+    var typeEl = document.getElementById('fire-type');
+    var typeNoteEl = document.getElementById('fire-type-note');
+    if (typeEl) {
+      if (annualSpend < 30000)       { typeEl.textContent='Lean FIRE';    typeEl.style.color='#1CC7D0'; if(typeNoteEl) typeNoteEl.textContent='Under $30K/yr'; }
+      else if (annualSpend < 60000)  { typeEl.textContent='Regular FIRE'; typeEl.style.color='#4CAF50'; if(typeNoteEl) typeNoteEl.textContent='$30K–$60K/yr'; }
+      else if (annualSpend < 100000) { typeEl.textContent='FIRE';         typeEl.style.color='#f4b86a'; if(typeNoteEl) typeNoteEl.textContent='$60K–$100K/yr'; }
+      else                           { typeEl.textContent='Fat FIRE 🥩';  typeEl.style.color='#ff9f43'; if(typeNoteEl) typeNoteEl.textContent='Over $100K/yr'; }
+    }
+
+    // Coast FIRE
+    var avgRet = 0.07;
+    if (port.accounts && port.accounts.length) {
+      var rs=0,rc=0; port.accounts.forEach(function(a){if(a.expectedReturn>0){rs+=a.expectedReturn/100;rc++;}});
+      if(rc>0) avgRet=rs/rc;
+    }
+    var latestRet=planYear+5;
+    if(p1.salaryEnd){var e1=new Date(p1.salaryEnd).getFullYear();if(e1>latestRet)latestRet=e1;}
+    if(p2.salaryEnd){var e2=new Date(p2.salaryEnd).getFullYear();if(e2>latestRet)latestRet=e2;}
+    var yrs=Math.max(1,latestRet-planYear);
+    var coastNum = targetFI > 0 ? Math.round(targetFI/Math.pow(1+avgRet,yrs)) : 0;
+    var coastEl = document.getElementById('fire-coast');
+    var coastNoteEl = document.getElementById('fire-coast-note');
+    if (coastEl) {
+      coastEl.textContent = coastNum > 0 ? fmt(coastNum) : '—';
+      if (totalPortfolio >= coastNum && coastNum > 0) {
+        coastEl.style.color='#4CAF50';
+        if(coastNoteEl) coastNoteEl.textContent='✅ Already coasting!';
+      } else if (coastNum > 0) {
+        if(coastNoteEl) coastNoteEl.textContent=fmt(coastNum-totalPortfolio)+' more to coast';
+      }
+    }
+  } catch(e) { console.log('FIRE error:',e.message); }
 }
 
 function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){

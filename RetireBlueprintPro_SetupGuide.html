@@ -632,16 +632,20 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </summary>
             <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               In the Income Engine on your Dashboard you'll see two Social Security columns:<br><br>
-              <strong style="color:#f4b86a;">SS (Social Security)</strong> — This is your actual confirmed monthly benefit amount
-              that you entered in the Inputs page. It's the real number from ssa.gov.<br><br>
-              <strong style="color:#f4b86a;">Projected SS</strong> — This is what the plan actually uses in the year-by-year
-              calculation. It may differ from your SS amount because:<br>
-              • In the <strong>start year</strong>, it's prorated by how many months you'll receive it
-                (e.g. July start = 6 months counted)<br>
-              • In <strong>future years</strong>, it's grown by your SS COLA rate (default 2.5%/yr)<br>
-              • If SS <strong>hasn't started yet</strong> in a given year, Projected SS shows $0 for that year<br><br>
-              This distinction ensures your income projections are accurate — you see both what your
-              base benefit is AND what it actually contributes each specific year of your plan.
+              <strong style="color:#f4b86a;">SS (Social Security)</strong> — Your actual confirmed monthly benefit amount
+              entered in Inputs. The real number from ssa.gov at your Full Retirement Age.<br><br>
+              <strong style="color:#f4b86a;">Projected SS</strong> — What the plan actually uses each year. It differs because:<br>
+              • <strong>Start year proration</strong>: July start = 6 months counted, not 12<br>
+              • <strong>COLA growth</strong>: grown by your SS COLA rate (default 2.5%/yr) every year<br>
+              • <strong>Not started yet</strong>: shows $0 in years before your SS start date<br><br>
+              <strong style="color:#1CC7D0;">🏛️ Survivor Benefit — Automatically Handled</strong><br>
+              When one spouse passes, the survivor automatically receives whichever is higher —
+              their own SS benefit OR their deceased spouse's benefit — as long as they are age 60 or older.
+              This is the real Social Security survivor rule and your plan applies it automatically in every
+              projection year after the first spouse's death.<br><br>
+              Example: If Craig's SS is $2,544/mo and Gena's is $2,493/mo, after Craig passes
+              Gena's Projected SS automatically becomes $2,544/mo (Craig's higher amount) for
+              the remainder of her life. This is reflected in the Survivor Plan chart on your Dashboard.
             </div>
           </details>
 
@@ -698,7 +702,68 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
             </div>
           </details>
 
-                </div><!-- /faq-container -->
+                  <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#f4b86a;list-style:none;">
+              🔥 FIRE Planning — Safe Withdrawal Rate, FI Date, Coast FIRE
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              Your Dashboard's <strong style="color:#f4b86a;">FIRE Intelligence panel</strong> shows four key FIRE metrics:<br><br>
+              <strong style="color:#f4b86a;">Safe Withdrawal Rate (SWR)</strong> — Your planned portfolio withdrawal divided by total portfolio.
+              The famous <strong>4% rule</strong> says withdrawing 4% per year sustains a 30-year retirement.
+              Under 3% = very safe. Over 5% = consider adjusting spending or timeline.<br><br>
+              <strong style="color:#f4b86a;">FI Date (Financial Independence)</strong> — The year your portfolio can sustain all expenses
+              without any salary. This is the FIRE milestone — when work becomes optional, not mandatory.<br><br>
+              <strong style="color:#f4b86a;">FIRE Type</strong> — Based on your annual spending:
+              Lean FIRE (&lt;$30K) · Regular FIRE ($30-60K) · FIRE ($60-100K) · Fat FIRE (&gt;$100K)<br><br>
+              <strong style="color:#f4b86a;">Coast FIRE Number</strong> — The portfolio size at which you could stop ALL contributions
+              today and let compound growth alone reach your FI number by retirement. If you're past this number —
+              you've "coasted" and can stop saving without impacting your retirement timeline!
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#f4b86a;list-style:none;">
+              🔥 Early Retirement — Rule of 55, 72(t) SEPP, Roth Ladder
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              Retiring before 59½ creates a challenge: most retirement accounts charge a 10% penalty for
+              early withdrawals. Here are the main workarounds:<br><br>
+              <strong style="color:#f4b86a;">Rule of 55</strong> — If you leave your employer at age 55 or older, you can withdraw from
+              THAT employer's 401k penalty-free immediately. Doesn't apply to IRAs or old 401ks from
+              previous employers. Very useful for traditional early retirees (55-59).<br><br>
+              <strong style="color:#f4b86a;">72(t) SEPP</strong> — Substantially Equal Periodic Payments. You commit to withdrawing a
+              calculated equal amount from your IRA every year for at least 5 years or until age 59½
+              (whichever is longer). No penalty, but you CANNOT change the amount once started.
+              Use this for very early retirees who need IRA income before 55.<br><br>
+              <strong style="color:#f4b86a;">Roth Conversion Ladder</strong> — Convert pre-tax money to Roth each year during a low-income
+              period. After 5 years, those conversions can be withdrawn penalty-free (not the growth, just
+              the converted principal). This is the most flexible FIRE strategy and your Roth Conversion
+              Solver helps you optimize it.<br><br>
+              <strong style="color:#f4b86a;">Taxable Brokerage</strong> — No age restrictions. Many FIRE retirees bridge ages 40-59 with
+              taxable brokerage accounts, then switch to retirement accounts at 59½.
+              Your plan accounts for all account types in its withdrawal hierarchy.
+            </div>
+          </details>
+
+          <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
+              🏥 HSA — The Triple Tax Advantage
+            </summary>
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
+              The HSA (Health Savings Account) is the most tax-advantaged account in the US tax code:<br><br>
+              <strong style="color:#f4b86a;">Tax #1 — Contributions are pre-tax</strong> (deducted from income, like a 401k)<br>
+              <strong style="color:#f4b86a;">Tax #2 — Growth is tax-free</strong> (invest it like a brokerage, no capital gains)<br>
+              <strong style="color:#f4b86a;">Tax #3 — Withdrawals for medical expenses are tax-free</strong> forever<br><br>
+              <strong>Advanced strategy:</strong> Pay all medical expenses out-of-pocket while working,
+              save every receipt, and reimburse yourself years later tax-free. Meanwhile the HSA
+              compounds untouched for decades.<br><br>
+              After age 65, HSA withdrawals for non-medical purposes are taxed like a Traditional IRA
+              (no penalty, just ordinary income tax) — making it an excellent supplemental retirement account.
+              Your plan tracks HSA separately in the account mix so you can see it grow and plan its use.
+            </div>
+          </details>
+
+        </div><!-- /faq-container -->
 
         <div class="section-title" style="margin-top:24px;">Key Concepts — Plain English</div>
         <div class="section-sub">Retirement planning terms explained without the jargon</div>
