@@ -239,7 +239,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot"></span>Safe Spending Capacity</div>
+      <div class="kc-title"><span class="kc-dot"></span>Safe Spending Capacity <span class="tooltip-icon" data-tip="Maximum annual spending — base lifestyle PLUS optional extras — while still meeting your legacy goal. Calculated by the solver. Higher = more lifestyle flexibility." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-spend">—</div>
       <div class="kc-sub">Base lifestyle · solver-optimized</div>
       <div class="kc-delta-up" id="kpi-spend-extra">—</div>
@@ -252,7 +252,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Survivor Runway</div>
+      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Survivor Runway <span class="tooltip-icon" data-tip="Years the plan covers the longer-lived partner after the first spouse passes. SS survivor benefit (keeping the higher of two SS amounts) is automatically included." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-runway">—</div>
       <div class="kc-sub" id="kpi-runway-sub">—</div>
       <div class="kc-delta-up" id="kpi-runway-delta">—</div>
@@ -265,7 +265,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#1CC7D0;"></span>Household Income This Year</div>
+      <div class="kc-title"><span class="kc-dot" style="background:#1CC7D0;"></span>Household Income This Year <span class="tooltip-icon" data-tip="Total guaranteed income this year from all sources: salaries, Social Security, pensions, and other income. This is money coming in regardless of market performance." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-income">—</div>
       <div class="kc-sub">Total guaranteed income</div>
       <div class="kc-delta-watch" id="kpi-income-note">—</div>
@@ -278,7 +278,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#6A4A6D;"></span>Tax Efficiency</div>
+      <div class="kc-title"><span class="kc-dot" style="background:#6A4A6D;"></span>Tax Efficiency <span class="tooltip-icon" data-tip="Your effective federal tax rate: taxes paid ÷ gross income. The Roth conversion window aims to keep this low NOW before RMDs force higher rates at age 73." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-tax">—</div>
       <div class="kc-sub">Effective federal rate · MFJ</div>
       <div class="kc-delta-up" id="kpi-tax-delta">—</div>
@@ -291,7 +291,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Legacy Goal</div>
+      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Legacy Goal <span class="tooltip-icon" data-tip="Target ending portfolio balance to leave as inheritance or estate. Set to $0 to maximize lifetime spending instead. The solver optimizes all spending around this goal." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-legacy">—</div>
       <div class="kc-sub">Projected ending liquid assets</div>
       <div class="kc-delta-up" id="kpi-legacy-delta">—</div>
@@ -398,9 +398,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 
 <!-- FIRE INTELLIGENCE PANEL -->
 <div id="fire-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:14px 18px;margin-bottom:10px;border:1px solid rgba(28,199,208,0.25);display:none;">
-  <div style="font-size:11px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">
-    🔥 FIRE Intelligence
-    <span class="tooltip-icon" data-tip="FIRE = Financial Independence, Retire Early. These metrics show your plan through the FIRE community's key benchmarks.">?</span>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+    <div>
+      <div style="font-size:11px;font-weight:800;color:#ff9f43;text-transform:uppercase;letter-spacing:1px;">
+        🔥 FIRE Intelligence
+        <span class="tooltip-icon" data-tip="FIRE = Financial Independence, Retire Early — a movement built on saving aggressively and retiring on your own timeline. Even traditional retirees benefit from these metrics. See Setup Guide for a full FIRE explainer.">?</span>
+      </div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:2px;">Financial Independence metrics for your plan</div>
+    </div>
+    <a href="RetireBlueprintPro_SetupGuide.html#fire" style="font-size:9px;color:#ff9f43;text-decoration:none;white-space:nowrap;">What is FIRE? →</a>
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #1CC7D0;">
