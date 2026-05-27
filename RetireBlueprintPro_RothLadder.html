@@ -23,11 +23,11 @@ window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key===
   --border:#1a3a52;--muted:#6a8a9a;--white:#fff;--text:#d8eaf5;
   --green:#4CAF50;--red:#ef5350;--purple:#ab47bc;
 }
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
+body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
 
 /* NAV */
-.header{background:var(--navy);border-bottom:3px solid var(--orange);padding:0 20px;display:flex;align-items:center;gap:16px;}
-.header img{height:32px;padding:10px 0;}
+.header{background:var(--navy);border-bottom:3px solid var(--orange);padding:0 20px;display:flex;align-items:center;gap:16px;overflow:hidden;}
+.header img{height:32px;padding:10px 0;max-width:200px;width:auto;flex-shrink:0;}
 .nav{background:var(--n2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;}
 .nav::-webkit-scrollbar{display:none;}
 .nav a{padding:10px 13px;font-size:10px;font-weight:700;color:var(--teal);text-decoration:none;text-transform:uppercase;letter-spacing:0.7px;border-right:1px solid var(--border);white-space:nowrap;}
@@ -116,7 +116,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B223
 <body>
 
 <div class="header">
-  <img src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro">
+  <img style="max-width:100%;width:auto;height:auto;display:block;" src="https://genabreal.github.io/RetireBlueprintPro/rbp-logo.png" alt="RetireBlueprint Pro">
 </div>
 
 <div class="nav">
