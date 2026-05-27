@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireBlueprint Pro — Interactive Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy:#041E2F; --teal:#1CC7D0; --orange:#f4b86a; --green:#4CAF50;
+    --red:#ff6b6b; --mid:#0A3145; --light:#f8f9fa;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Montserrat',sans-serif; background:var(--navy); color:#fff; min-height:100vh; }
+
+  /* ── HEADER ── */
+  .demo-header { background:#041E2F; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid var(--teal); }
+  .demo-title { font-size:14px; font-weight:800; color:var(--teal); text-transform:uppercase; letter-spacing:1px; }
+  .demo-badge { background:var(--orange); color:var(--navy); font-size:10px; font-weight:800; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:1px; }
+  .buy-btn { background:var(--teal); color:var(--navy); font-weight:800; padding:10px 20px; border-radius:6px; text-decoration:none; font-size:12px; white-space:nowrap; }
+
+  /* ── HERO ── */
+  .demo-hero { background:linear-gradient(135deg,#041E2F,#0d2d44); padding:30px 24px; text-align:center; border-bottom:1px solid #1a3a52; }
+  .demo-hero h1 { font-size:26px; font-weight:900; margin-bottom:8px; }
+  .demo-hero h1 span { color:var(--teal); }
+  .demo-hero p { font-size:13px; color:#8aaabb; max-width:600px; margin:0 auto 20px; line-height:1.7; }
+  .persona-tabs { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .persona-btn { padding:10px 20px; border-radius:8px; border:2px solid #1a3a52; background:transparent; color:#8aaabb; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .persona-btn:hover { border-color:var(--teal); color:var(--teal); }
+  .persona-btn.active { background:var(--teal); border-color:var(--teal); color:var(--navy); }
+
+  /* ── LAYOUT ── */
+  .demo-body { max-width:1200px; margin:0 auto; padding:20px; }
+  .demo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
+  .demo-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+  .demo-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+
+  /* ── CARDS ── */
+  .card { background:#0A3145; border-radius:10px; padding:16px; border:1px solid #1a3a52; }
+  .card-title { font-size:10px; font-weight:800; color:var(--teal); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+  .big-num { font-size:28px; font-weight:900; color:#fff; line-height:1; }
+  .big-num.teal { color:var(--teal); }
+  .big-num.orange { color:var(--orange); }
+  .big-num.green { color:var(--green); }
+  .sub { font-size:10px; color:#8aaabb; margin-top:4px; }
+  .badge-green { background:rgba(76,175,80,0.2); color:#4CAF50; font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
+  .badge-orange { background:rgba(244,184,106,0.2); color:var(--orange); font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
+
+  /* ── CHART AREA ── */
+  .chart-area { height:180px; position:relative; }
+
+  /* ── CONTROLS ── */
+  .controls { background:#061620; border-radius:10px; padding:16px; margin-bottom:16px; border:2px solid var(--orange); }
+  .controls-title { font-size:11px; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+  .ctrl-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .ctrl-item label { font-size:9px; color:#8aaabb; text-transform:uppercase; letter-spacing:0.8px; display:block; margin-bottom:4px; }
+  .ctrl-item input[type=range] { width:100%; accent-color:var(--teal); }
+  .ctrl-val { font-size:14px; font-weight:700; color:var(--teal); margin-top:2px; }
+
+  /* ── FIRE PANEL ── */
+  .fire-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .fire-box { background:rgba(0,0,0,0.3); border-radius:8px; padding:10px; text-align:center; }
+  .fire-label { font-size:8px; color:#8aaabb; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+  .fire-val { font-size:18px; font-weight:800; }
+
+  /* ── CTA ── */
+  .cta-banner { background:linear-gradient(135deg,#1a4a1a,#0d2d0d); border-radius:12px; padding:24px; text-align:center; margin-top:20px; border:2px solid var(--green); }
+  .cta-banner h2 { font-size:20px; font-weight:900; color:#fff; margin-bottom:8px; }
+  .cta-banner p { font-size:12px; color:#a5d6a7; margin-bottom:16px; line-height:1.7; }
+  .cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .cta-btn-primary { background:var(--green); color:#fff; font-weight:800; padding:14px 30px; border-radius:8px; text-decoration:none; font-size:13px; }
+  .cta-btn-secondary { background:transparent; color:var(--green); border:2px solid var(--green); font-weight:700; padding:14px 24px; border-radius:8px; text-decoration:none; font-size:13px; }
+
+  /* ── FEATURE LIST ── */
+  .feature-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .feature-item { display:flex; align-items:center; gap:8px; font-size:11px; color:#a5d6a7; }
+
+  .disclaimer { font-size:9px; color:#456A73; text-align:center; padding:12px; margin-top:12px; }
+
+  @media(max-width:768px) {
+    .demo-grid, .demo-grid-4, .ctrl-grid, .fire-grid { grid-template-columns:1fr 1fr; }
+    .demo-grid-2 { grid-template-columns:1fr; }
+    .demo-hero h1 { font-size:18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-header">
+  <div>
+    <div class="demo-title">RetireBlueprint Pro</div>
+    <div style="font-size:9px;color:#456A73;margin-top:2px;">Interactive Demo — Sample Data</div>
+  </div>
+  <div class="demo-badge">🎬 Live Demo</div>
+  <a href="https://www.etsy.com/your-listing-url" target="_blank" class="buy-btn">Get Your Copy →</a>
+</div>
+
+<div class="demo-hero">
+  <h1>See Your Retirement Plan <span>Come to Life</span></h1>
+  <p>This is a live interactive demo using sample data. Drag the sliders to see how your plan changes in real-time. Your real plan connects to your own Google Sheet.</p>
+  <div class="persona-tabs">
+    <button class="persona-btn active" onclick="loadPersona('traditional')">👔 Traditional Retiree<br><span style="font-size:9px;font-weight:400;">Age 63/55 · SS + 401k</span></button>
+    <button class="persona-btn" onclick="loadPersona('fire')">🔥 Early FIRE Retiree<br><span style="font-size:9px;font-weight:400;">Age 45/42 · Retiring Now</span></button>
+    <button class="persona-btn" onclick="loadPersona('single')">👤 Single Retiree<br><span style="font-size:9px;font-weight:400;">Age 60 · Pension + IRA</span></button>
+    <button class="persona-btn" onclick="loadPersona('fatfire')">🥩 Fat FIRE<br><span style="font-size:9px;font-weight:400;">Age 55/52 · $3M Portfolio</span></button>
+  </div>
+</div>
+
+<div class="demo-body">
+
+  <!-- LIVE CONTROLS -->
+  <div class="controls">
+    <div class="controls-title">🎛️ Play With It — Drag Sliders to See Your Plan Change Live</div>
+    <div class="ctrl-grid">
+      <div class="ctrl-item">
+        <label>Annual Spending ($)</label>
+        <input type="range" id="ctrl-spend" min="30000" max="150000" step="5000" value="87000" oninput="recalc()">
+        <div class="ctrl-val" id="ctrl-spend-val">$87,000</div>
+      </div>
+      <div class="ctrl-item">
+        <label>Portfolio Return (%)</label>
+        <input type="range" id="ctrl-return" min="3" max="12" step="0.5" value="7" oninput="recalc()">
+        <div class="ctrl-val" id="ctrl-return-val">7.0%</div>
+      </div>
+      <div class="ctrl-item">
+        <label>Inflation Rate (%)</label>
+        <input type="range" id="ctrl-inflation" min="1" max="7" step="0.5" value="3" oninput="recalc()">
+        <div class="ctrl-val" id="ctrl-inflation-val">3.0%</div>
+      </div>
+      <div class="ctrl-item">
+        <label>Retirement Age (P1)</label>
+        <input type="range" id="ctrl-retage" min="45" max="70" step="1" value="63" oninput="recalc()">
+        <div class="ctrl-val" id="ctrl-retage-val">Age 63</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="demo-grid-4">
+    <div class="card">
+      <div class="card-title">Plan Confidence</div>
+      <div class="big-num green" id="d-confidence">100%</div>
+      <div class="sub" id="d-confidence-sub">Legacy goal fully funded</div>
+      <div style="margin-top:8px;"><span class="badge-green" id="d-status">✅ ON TRACK</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Total Portfolio</div>
+      <div class="big-num teal" id="d-portfolio">$925K</div>
+      <div class="sub">Starting value · all accounts</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Safe Annual Spending</div>
+      <div class="big-num orange" id="d-spending">$87K</div>
+      <div class="sub" id="d-spending-sub">Solver-optimized</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Projected Ending Balance</div>
+      <div class="big-num green" id="d-ending">$250K</div>
+      <div class="sub" id="d-ending-sub">At end of plan · legacy goal</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="demo-grid">
+    <div class="card">
+      <div class="card-title">📊 Portfolio Sustainability</div>
+      <div class="chart-area"><canvas id="chart-portfolio"></canvas></div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;" id="chart-portfolio-note">—</div>
+    </div>
+    <div class="card">
+      <div class="card-title">🪣 Tax Bucket Evolution</div>
+      <div class="chart-area"><canvas id="chart-buckets"></canvas></div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;">Pre-Tax heavy → Roth grows via conversions</div>
+    </div>
+    <div class="card">
+      <div class="card-title">💵 Income Bridge</div>
+      <div class="chart-area"><canvas id="chart-income"></canvas></div>
+      <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;" id="chart-income-note">—</div>
+    </div>
+  </div>
+
+  <!-- FIRE PANEL -->
+  <div class="card" style="margin-bottom:16px;border-color:rgba(255,159,67,0.4);">
+    <div class="card-title">🔥 FIRE Intelligence</div>
+    <div class="fire-grid">
+      <div class="fire-box">
+        <div class="fire-label">Safe Withdrawal Rate</div>
+        <div class="fire-val" id="d-swr" style="color:var(--teal);">—</div>
+        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-swr-note">—</div>
+      </div>
+      <div class="fire-box">
+        <div class="fire-label">FI Date</div>
+        <div class="fire-val" id="d-fi-date" style="color:var(--orange);">—</div>
+        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-fi-note">—</div>
+      </div>
+      <div class="fire-box">
+        <div class="fire-label">FIRE Type</div>
+        <div class="fire-val" id="d-fire-type" style="color:var(--green);">—</div>
+        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-fire-type-note">—</div>
+      </div>
+      <div class="fire-box">
+        <div class="fire-label">Coast FIRE Number</div>
+        <div class="fire-val" id="d-coast" style="color:#c39bd3;">—</div>
+        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-coast-note">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRESS TEST -->
+  <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,#1a0808,#2a1010);border-color:rgba(255,107,107,0.3);">
+    <div class="card-title" style="color:#ff6b6b;">⚡ Stress Test — Sequence of Returns Risk</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
+        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">Base Scenario</div>
+        <div style="font-size:22px;font-weight:800;" id="d-stress-base">—</div>
+        <div style="font-size:9px;margin-top:4px;" id="d-stress-base-note">—</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
+        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">Year 1 Down 20%</div>
+        <div style="font-size:22px;font-weight:800;" id="d-stress-20">—</div>
+        <div style="font-size:9px;margin-top:4px;" id="d-stress-20-note">Mild bear market</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
+        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">Year 1 Down 30%</div>
+        <div style="font-size:22px;font-weight:800;" id="d-stress-30">—</div>
+        <div style="font-size:9px;margin-top:4px;" id="d-stress-30-note">Severe bear market</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
+        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">High Inflation (5%)</div>
+        <div style="font-size:22px;font-weight:800;" id="d-stress-inf">—</div>
+        <div style="font-size:9px;margin-top:4px;" id="d-stress-inf-note">vs base 3%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <h2>Ready to See YOUR Numbers?</h2>
+    <p>This demo uses sample data. Your real plan connects to your own private Google Sheet — your actual accounts, your Social Security, your spending, your legacy goal. Up to 100-year projection, Roth conversion optimizer, stress testing, and a printable PDF summary your financial advisor will actually read.</p>
+    <div class="cta-btns">
+      <a href="https://www.etsy.com/your-listing-url" target="_blank" class="cta-btn-primary">🛒 Get RetireBlueprint Pro on Etsy</a>
+      <a href="RetireBlueprintPro_SetupGuide.html" class="cta-btn-secondary">📖 See Full Feature List</a>
+    </div>
+    <div class="feature-list" style="max-width:500px;margin:16px auto 0;">
+      <div class="feature-item">✅ Up to 100-year projection</div>
+      <div class="feature-item">✅ Roth conversion optimizer</div>
+      <div class="feature-item">✅ SS survivor benefit modeling</div>
+      <div class="feature-item">✅ Medicare IRMAA planning</div>
+      <div class="feature-item">✅ Sequence of returns stress test</div>
+      <div class="feature-item">✅ FIRE metrics (SWR, FI Date, Coast)</div>
+      <div class="feature-item">✅ Print-ready PDF summary</div>
+      <div class="feature-item">✅ Annual update guide with links</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    RetireBlueprint Pro Demo · Sample data for illustration only · Not financial advice · Your real plan uses your actual Google Sheet data
+  </div>
+
+</div>
+
+<script>
+// ── PERSONAS ──────────────────────────────────────────────────────
+var PERSONAS = {
+  traditional: {
+    name:'Alex & Jordan', p1age:63, p2age:55, portfolio:925000,
+    spend:87000, ss:60000, pension:4000, retAge:63,
+    pretax:793000, roth:32000, taxable:100000,
+    legacyGoal:250000, ret:0.07, inflation:0.03, label:'Traditional Retiree'
+  },
+  fire: {
+    name:'Sam & Casey', p1age:45, p2age:42, portfolio:1200000,
+    spend:72000, ss:0, pension:0, retAge:45,
+    pretax:600000, roth:400000, taxable:200000,
+    legacyGoal:500000, ret:0.07, inflation:0.03, label:'Early FIRE'
+  },
+  single: {
+    name:'Morgan', p1age:60, p2age:60, portfolio:650000,
+    spend:55000, ss:24000, pension:18000, retAge:62,
+    pretax:500000, roth:80000, taxable:70000,
+    legacyGoal:100000, ret:0.065, inflation:0.03, label:'Single Retiree'
+  },
+  fatfire: {
+    name:'Riley & Quinn', p1age:55, p2age:52, portfolio:3200000,
+    spend:180000, ss:0, pension:0, retAge:55,
+    pretax:1800000, roth:800000, taxable:600000,
+    legacyGoal:1000000, ret:0.07, inflation:0.03, label:'Fat FIRE'
+  }
+};
+
+var current = 'traditional';
+var charts = {};
+
+function fmt(n) {
+  if (!n && n!==0) return '—';
+  if (Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
+  if (Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
+  return '$'+Math.round(n).toLocaleString();
+}
+
+function loadPersona(key) {
+  current = key;
+  document.querySelectorAll('.persona-btn').forEach(function(b,i){
+    b.classList.toggle('active', ['traditional','fire','single','fatfire'][i]===key);
+  });
+  var p = PERSONAS[key];
+  document.getElementById('ctrl-spend').value = p.spend;
+  document.getElementById('ctrl-return').value = p.ret*100;
+  document.getElementById('ctrl-inflation').value = p.inflation*100;
+  document.getElementById('ctrl-retage').value = p.retAge;
+  recalc();
+}
+
+function recalc() {
+  var p = Object.assign({}, PERSONAS[current]);
+  p.spend = parseInt(document.getElementById('ctrl-spend').value);
+  p.ret = parseFloat(document.getElementById('ctrl-return').value)/100;
+  p.inflation = parseFloat(document.getElementById('ctrl-inflation').value)/100;
+  p.retAge = parseInt(document.getElementById('ctrl-retage').value);
+
+  // Update slider displays
+  document.getElementById('ctrl-spend-val').textContent = '$'+p.spend.toLocaleString();
+  document.getElementById('ctrl-return-val').textContent = (p.ret*100).toFixed(1)+'%';
+  document.getElementById('ctrl-inflation-val').textContent = (p.inflation*100).toFixed(1)+'%';
+  document.getElementById('ctrl-retage-val').textContent = 'Age '+p.retAge;
+
+  // ── PROJECTION ──────────────────────────────────────────────────
+  var yrs = 50;
+  var years = [], portfolioVals = [], preTaxVals = [], rothVals = [], taxableVals = [];
+  var bal = p.portfolio;
+  var preTax = p.pretax, roth = p.roth, taxable = p.taxable;
+  var curYear = new Date().getFullYear();
+
+  for (var i=0; i<yrs; i++) {
+    var yr = curYear + i;
+    years.push(yr);
+
+    // Guaranteed income grows with COLA
+    var ssThisYr = i > 5 ? p.ss * Math.pow(1.025, i-5) : (i < 2 ? p.ss*0.5 : p.ss);
+    var penThisYr = p.pension * 12;
+    var guaranteed = ssThisYr + penThisYr;
+
+    // Inflation-adjusted spending
+    var spendThisYr = p.spend * Math.pow(1+p.inflation, i);
+    var withdrawal = Math.max(0, spendThisYr - guaranteed);
+
+    // Draw from taxable first, then pre-tax, then roth
+    var fromTaxable = Math.min(withdrawal, taxable);
+    taxable -= fromTaxable;
+    var fromPreTax = Math.min(withdrawal - fromTaxable, preTax);
+    preTax -= fromPreTax;
+    var fromRoth = Math.min(withdrawal - fromTaxable - fromPreTax, roth);
+    roth -= fromRoth;
+
+    // Growth
+    preTax  = Math.max(0, preTax  * (1 + p.ret));
+    roth    = Math.max(0, roth    * (1 + p.ret));
+    taxable = Math.max(0, taxable * (1 + p.ret));
+    // Small Roth conversion each year during low-income years
+    if (i < 15 && preTax > 0) {
+      var conv = Math.min(preTax * 0.05, 30000);
+      preTax -= conv; roth += conv * 0.85; // after tax
+    }
+
+    bal = preTax + roth + taxable;
+    portfolioVals.push(Math.round(bal));
+    preTaxVals.push(Math.round(preTax));
+    rothVals.push(Math.round(roth));
+    taxableVals.push(Math.round(taxable));
+  }
+
+  var endBal = portfolioVals[portfolioVals.length-1];
+  var conf = p.legacyGoal > 0 ? Math.min(100, Math.round(endBal/p.legacyGoal*100)) : 100;
+
+  // ── KPIs ──────────────────────────────────────────────────────
+  document.getElementById('d-confidence').textContent = conf+'%';
+  document.getElementById('d-confidence').style.color = conf>=100?'#4CAF50':conf>=80?'#f4b86a':'#ff6b6b';
+  document.getElementById('d-confidence-sub').textContent = conf>=100?'Legacy goal fully funded':conf+'% of legacy goal funded';
+  document.getElementById('d-status').textContent = conf>=100?'✅ ON TRACK':conf>=80?'⚠️ REVIEW':'⛔ AT RISK';
+  document.getElementById('d-status').className = conf>=100?'badge-green':'badge-orange';
+  document.getElementById('d-portfolio').textContent = fmt(p.portfolio);
+  document.getElementById('d-spending').textContent = fmt(p.spend);
+  document.getElementById('d-spending-sub').textContent = '$'+Math.round(p.spend/12/1000)+'K/mo equivalent';
+  document.getElementById('d-ending').textContent = fmt(endBal);
+  document.getElementById('d-ending').style.color = endBal >= p.legacyGoal ? '#4CAF50' : '#f4b86a';
+  document.getElementById('d-ending-sub').textContent = endBal>=p.legacyGoal ? '✅ Legacy goal met' : '⚠️ '+fmt(p.legacyGoal)+' goal';
+
+  // ── FIRE METRICS ────────────────────────────────────────────────
+  var gap = Math.max(0, p.spend - (p.ss + p.pension*12));
+  var swr = p.portfolio > 0 && gap > 0 ? Math.round(gap/p.portfolio*1000)/10 : 0;
+  var swrEl = document.getElementById('d-swr');
+  swrEl.textContent = swr > 0 ? swr.toFixed(1)+'%' : '0%';
+  swrEl.style.color = swr<=3?'#4CAF50':swr<=4?'#1CC7D0':swr<=5?'#f4b86a':'#ff6b6b';
+  document.getElementById('d-swr-note').textContent = swr<=3?'✅ Very safe':swr<=4?'✅ 4% rule met':swr<=5?'⚠️ Slightly high':'⛔ Review spending';
+
+  var fiTarget = gap > 0 ? gap/0.04 : 0;
+  var fiYear = null;
+  for (var fi=0;fi<portfolioVals.length;fi++) { if(portfolioVals[fi]>=fiTarget){fiYear=curYear+fi;break;} }
+  if (!fiYear && p.portfolio>=fiTarget) fiYear = curYear;
+  var fiEl = document.getElementById('d-fi-date');
+  if (fiYear && fiYear<=curYear) { fiEl.textContent='Already FI! 🎉'; fiEl.style.color='#4CAF50'; document.getElementById('d-fi-note').textContent='You have reached financial independence'; }
+  else if (fiYear) { fiEl.textContent=fiYear; fiEl.style.color='#f4b86a'; document.getElementById('d-fi-note').textContent=p.label+' · age '+(p.p1age+(fiYear-curYear)); }
+  else { fiEl.textContent='—'; fiEl.style.color='#ff6b6b'; document.getElementById('d-fi-note').textContent='Target: '+fmt(fiTarget); }
+
+  var ftEl = document.getElementById('d-fire-type');
+  if(p.spend<30000){ftEl.textContent='Lean FIRE';ftEl.style.color='#1CC7D0';document.getElementById('d-fire-type-note').textContent='Under $30K/yr';}
+  else if(p.spend<60000){ftEl.textContent='Regular FIRE';ftEl.style.color='#4CAF50';document.getElementById('d-fire-type-note').textContent='$30K–$60K/yr';}
+  else if(p.spend<100000){ftEl.textContent='FIRE';ftEl.style.color='#f4b86a';document.getElementById('d-fire-type-note').textContent='$60K–$100K/yr';}
+  else{ftEl.textContent='Fat FIRE 🥩';ftEl.style.color='#ff9f43';document.getElementById('d-fire-type-note').textContent='Over $100K/yr';}
+
+  var yrsToRet = Math.max(1, p.retAge - p.p1age + 5);
+  var coast = fiTarget > 0 ? Math.round(fiTarget/Math.pow(1+p.ret,yrsToRet)) : 0;
+  var coastEl = document.getElementById('d-coast');
+  coastEl.textContent = coast>0?fmt(coast):'—';
+  if(p.portfolio>=coast&&coast>0){coastEl.style.color='#4CAF50';document.getElementById('d-coast-note').textContent='✅ Already coasting!';}
+  else{coastEl.style.color='#c39bd3';document.getElementById('d-coast-note').textContent=coast>0?fmt(coast-p.portfolio)+' to coast':'—';}
+
+  // ── STRESS TEST ─────────────────────────────────────────────────
+  var stressNote = function(val,goal) {
+    if(val>=goal&&goal>0) return {txt:'✅ Goal met',col:'#4CAF50'};
+    if(val>0) return {txt:'⚠️ '+fmt(goal-val)+' short',col:'#f4b86a'};
+    return {txt:'⛔ Depleted',col:'#ff6b6b'};
+  };
+  var e20 = Math.max(0, Math.round(endBal*(p.portfolio*0.8/p.portfolio)*0.92));
+  var e30 = Math.max(0, Math.round(endBal*(p.portfolio*0.7/p.portfolio)*0.85));
+  var einf = Math.max(0, Math.round(endBal*0.82));
+
+  [['d-stress-base',endBal],['d-stress-20',e20],['d-stress-30',e30],['d-stress-inf',einf]].forEach(function(item,i){
+    var el = document.getElementById(item[0]);
+    var note = stressNote(item[1],p.legacyGoal);
+    el.textContent = fmt(item[1]);
+    el.style.color = note.col;
+    if(i>0) document.getElementById(item[0]+'-note').textContent = note.txt;
+    else document.getElementById('d-stress-base-note').textContent = note.txt;
+  });
+
+  // ── CHARTS ──────────────────────────────────────────────────────
+  var step = Math.ceil(yrs/10);
+  var dispIdx = [], dispYrs = [];
+  for(var i=0;i<yrs;i+=step){dispIdx.push(i);dispYrs.push(years[i]);}
+  if(dispIdx[dispIdx.length-1]!==yrs-1){dispIdx.push(yrs-1);dispYrs.push(years[yrs-1]);}
+
+  function mkLine(id,labels,datasets) {
+    if(charts[id]) charts[id].destroy();
+    var ctx = document.getElementById(id);
+    if(!ctx) return;
+    charts[id] = new Chart(ctx, {
+      type:'line', data:{labels:labels,datasets:datasets},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:10}}},
+        scales:{
+          x:{ticks:{font:{size:9},color:'#8aaabb'},grid:{display:false}},
+          y:{ticks:{font:{size:9},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.05)'}}
+        }
+      }
+    });
+  }
+
+  // Portfolio chart
+  mkLine('chart-portfolio', dispYrs, [
+    {label:'Portfolio',data:dispIdx.map(function(i){return portfolioVals[i];}),borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.1)',fill:true,tension:0.3,pointRadius:3,borderWidth:2.5},
+    {label:'Legacy Goal',data:dispIdx.map(function(){return p.legacyGoal;}),borderColor:'#f4b86a',borderDash:[5,3],fill:false,pointRadius:0,borderWidth:1.5}
+  ]);
+  document.getElementById('chart-portfolio-note').textContent = 'Ends: '+fmt(endBal)+' · Goal: '+fmt(p.legacyGoal)+' · '+(conf>=100?'✅ Met':'⚠️ '+conf+'%');
+
+  // Bucket chart
+  if(charts['chart-buckets']) charts['chart-buckets'].destroy();
+  var bcCtx = document.getElementById('chart-buckets');
+  if(bcCtx) {
+    charts['chart-buckets'] = new Chart(bcCtx, {
+      type:'bar',
+      data:{labels:dispYrs,datasets:[
+        {label:'Pre-Tax',data:dispIdx.map(function(i){return preTaxVals[i];}),backgroundColor:'#5b8fa8',stack:'s'},
+        {label:'Roth',data:dispIdx.map(function(i){return rothVals[i];}),backgroundColor:'#1CC7D0',stack:'s'},
+        {label:'Taxable',data:dispIdx.map(function(i){return taxableVals[i];}),backgroundColor:'#f4b86a',stack:'s'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:10}}},
+        scales:{x:{stacked:true,ticks:{font:{size:9},color:'#8aaabb'},grid:{display:false}},y:{stacked:true,ticks:{font:{size:9},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.05)'}}}
+      }
+    });
+  }
+
+  // Income bridge
+  var incomeData = dispIdx.map(function(i){
+    var ss = i>5?p.ss*Math.pow(1.025,i-5):(i<2?p.ss*0.5:p.ss);
+    return Math.round(ss + p.pension*12);
+  });
+  var spendData = dispIdx.map(function(i){
+    return Math.round(p.spend * Math.pow(1+p.inflation,i));
+  });
+  mkLine('chart-income', dispYrs, [
+    {label:'Guaranteed Income',data:incomeData,borderColor:'#4CAF50',backgroundColor:'rgba(76,175,80,0.1)',fill:true,tension:0.3,pointRadius:2,borderWidth:2},
+    {label:'Total Expenses',data:spendData,borderColor:'#ff6b6b',borderDash:[4,2],fill:false,tension:0.3,pointRadius:0,borderWidth:1.5}
+  ]);
+  var yr1gap = p.spend - (p.ss + p.pension*12);
+  document.getElementById('chart-income-note').textContent = yr1gap > 0 ? 'Year 1 gap: '+fmt(yr1gap)+' funded by portfolio' : 'Income covers all expenses ✅';
+}
+
+// ── INIT ────────────────────────────────────────────────────────
+loadPersona('traditional');
+</script>
+</body>
+</html>

@@ -635,8 +635,9 @@ function mkChart(id,type,labels,datasets,stacked,legend){
 }
 
 function populate(d){
-  var p1 = d.people.craig || d.people.person1 || {};
-  var p2 = d.people.gena  || d.people.person2 || {};
+  var _pk = Object.keys(d.people||{});
+  var p1 = d.people[_pk[0]] || d.people.craig || d.people.person1 || {};
+  var p2 = d.people[_pk[1]] || d.people.gena  || d.people.person2 || {};
 
   // ── EMPTY SHEET GUARD ────────────────────────────────────
   // If no names and no portfolio data, show setup prompt instead
@@ -1104,8 +1105,9 @@ function dismissDashWelcome() {
 // ── PLAN COMPLETION SCORE ────────────────────────────────────
 function updateCompletionScore(d) {
   try {
-    var p1 = d.people.craig || {};
-    var p2 = d.people.gena  || {};
+    var _ck=Object.keys(d.people||{});
+    var p1=d.people[_ck[0]]||{};
+    var p2=d.people[_ck[1]]||{};
     var gl = d.global || {};
     var tax = d.tax || {};
     var port = d.portfolio || {};
@@ -1155,8 +1157,9 @@ function updateStressTest(d) {
   try {
     var proj = d.projections;
     var leg = d.legacy || {};
-    var p1 = d.people.craig || {};
-    var p2 = d.people.gena  || {};
+    var _sk=Object.keys(d.people||{});
+    var p1=d.people[_sk[0]]||{};
+    var p2=d.people[_sk[1]]||{};
     if (!proj || !proj.endLiquid || !proj.endLiquid.length) return;
 
     // Find last non-zero ending balance

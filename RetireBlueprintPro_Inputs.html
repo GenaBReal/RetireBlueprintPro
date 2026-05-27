@@ -2254,8 +2254,9 @@ function populateFromData(d) {
   var gl = d.global || {};
   var tax = d.tax || {};
   var p = d.people || {};
-  var craig = p.craig || {};
-  var gena  = p.gena  || {};
+  var _ik=Object.keys(p||{});
+  var craig = p[_ik[0]] || p.craig || {};
+  var gena  = p[_ik[1]] || p.gena  || {};
   var leg   = d.legacy  || {};
   var sp    = d.spending || {};
   var roth  = d.roth    || {};
@@ -3113,8 +3114,7 @@ function dismissWelcome() {
 }
 function checkShowWelcome(data) {
   var hasData = data && data.people && (
-    (data.people.craig && data.people.craig.name && data.people.craig.name.trim() !== '') ||
-    (data.people.gena  && data.people.gena.name  && data.people.gena.name.trim()  !== '') ||
+    (data.people && Object.values(data.people).some(function(p){ return p && p.name && p.name.trim() !== ''; })) ||
     (data.portfolio    && data.portfolio.total > 0)
   );
   if (!hasData) {
