@@ -228,7 +228,7 @@ function rbpApplyNames(p1, p2) {
   });
   window.rbpP1Name = p1; window.rbpP2Name = p2;
 }
-document.addEventListener('DOMContentLoaded', rbpApplyNames);
+document.addEventListener('DOMContentLoaded', function(){ rbpApplyNames(); });
 window.addEventListener('storage', function(e) {
   if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
 });
