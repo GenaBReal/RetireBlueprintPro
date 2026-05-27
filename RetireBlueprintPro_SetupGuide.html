@@ -29,13 +29,13 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
 .section-num{background:var(--orange);color:var(--navy);font-size:16px;font-weight:900;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .section-title{font-size:17px;font-weight:800;color:var(--white);}
 .section-sub{font-size:11px;color:var(--teal);margin-top:2px;}
-.section-body{padding:24px;overflow-x:hidden;word-wrap:break-word;}
+.section-body{padding:24px;overflow-x:hidden;word-wrap:break-word;display:block;width:100%;}
 
 /* STEPS */
-.step{display:flex;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #f0f2f4;}
+.step{display:flex;flex-direction:row;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #f0f2f4;width:100%;box-sizing:border-box;}
 .step:last-child{border:none;margin-bottom:0;padding-bottom:0;}
 .step-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;margin-top:2px;}
-.step-content{}
+.step-content{flex:1;min-width:0;}
 .step-title{font-size:14px;font-weight:700;color:#0B2239;margin-bottom:4px;}
 .step-desc{font-size:13px;color:#455A64;line-height:1.7;}
 .step-desc strong{color:#0B2239;}
@@ -53,16 +53,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
 
 /* FAQ */
 .faq{margin-top:8px;}
-.faq-item{border:1px solid #1a3a52;border-radius:8px;margin-bottom:8px;overflow:hidden;}
-/* Kill browser default disclosure triangle on all browsers */
-.faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:8px;list-style:none;cursor:pointer;}
-.faq-item summary::-webkit-details-marker{display:none;}
-.faq-item summary::marker{display:none;content:'';}
-/* Add our own arrow */
-.faq-item summary::after{content:'▼';font-size:10px;color:#1CC7D0;opacity:0.7;flex-shrink:0;transition:transform 0.2s;}
-.faq-item[open] summary::after{transform:rotate(180deg);}
-/* Ensure all text in summary is teal */
-.faq-item summary *{color:inherit;}
+.faq-item{border:1px solid #e8eaed;border-radius:8px;margin-bottom:8px;overflow:hidden;}
 .faq-q{padding:14px 16px;font-size:13px;font-weight:700;color:#0B2239;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#f8f9fa;}
 .faq-q:hover{background:#f0f2f4;}
 .faq-a{padding:0 16px;font-size:13px;color:#455A64;line-height:1.7;max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;}
@@ -175,7 +166,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
   <div style="padding:6px 16px;border-right:1px solid #1a3a52;display:flex;align-items:center;flex-shrink:0;">
     <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:55px;width:auto;" onerror="this.style.display='none'">
   </div>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/index.html" class="nav-link">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" class="nav-link">Home</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" class="nav-link">Inputs</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html" class="nav-link">Annual Check-In</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html" class="nav-link">Tax Engine</a>
@@ -194,57 +185,8 @@ nav{background:var(--navy);border-bottom:2px solid var(--orange);display:flex;al
       <div style="font-size:11px;color:#5d3a00;">Step 1: Copy sheet → Step 2: Go to Inputs → Enter names + plan year + account balances → Step 3: See your Dashboard</div>
     </div>
   </div>
-  <a href="RetireBlueprintPro_Inputs.html" style="background:#041E2F;color:#f4b86a;font-size:12px;font-weight:700;padding:10px 20px;border-radius:6px;text-decoration:none;white-space:nowrap;flex-shrink:0;">Open Inputs → Start Now</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="background:#041E2F;color:#f4b86a;font-size:12px;font-weight:700;padding:10px 20px;border-radius:6px;text-decoration:none;white-space:nowrap;flex-shrink:0;">Open Inputs → Start Now</a>
 </div>
-
-<!-- GLOBAL SEARCH BAR -->
-<div style="background:#041E2F;padding:12px 20px;border-bottom:1px solid #1a3a52;">
-  <div style="max-width:900px;margin:0 auto;position:relative;">
-    <input id="global-search" type="text" placeholder="🔍  Search the entire Setup Guide — try: Social Security, Roth, IRMAA, stress test, accounts..."
-      style="width:100%;box-sizing:border-box;padding:12px 16px 12px 42px;border-radius:8px;border:2px solid #1a3a52;background:#0A3145;color:#fff;font-size:12px;font-family:inherit;outline:none;"
-      oninput="globalSearch(this.value)">
-    <div id="search-results-count" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:10px;color:#8aaabb;"></div>
-  </div>
-  <div id="global-search-banner" style="display:none;max-width:900px;margin:8px auto 0;padding:8px 12px;background:#0A3145;border-radius:6px;border:1px solid #1a3a52;font-size:11px;color:#c8dae8;"></div>
-</div>
-<script>
-function globalSearch(q) {
-  q = q.toLowerCase().trim();
-  var banner = document.getElementById('global-search-banner');
-  var count = document.getElementById('search-results-count');
-  if (!q) {
-    document.querySelectorAll('.section-card,.step,.faq-item,[class*="step-"]').forEach(function(el){ el.style.display=''; });
-    if (banner) banner.style.display='none';
-    if (count) count.textContent='';
-    return;
-  }
-  // Search all text content
-  var allSections = document.querySelectorAll('.section-card');
-  var hits = 0;
-  allSections.forEach(function(sec) {
-    var text = sec.textContent.toLowerCase();
-    if (text.indexOf(q) >= 0) {
-      sec.style.display = '';
-      hits++;
-      // Highlight matching text by scrolling to first match
-    } else {
-      sec.style.display = 'none';
-    }
-  });
-  if (banner) {
-    if (hits > 0) {
-      banner.style.display = 'block';
-      banner.textContent = 'Found "' + q + '" in ' + hits + ' section' + (hits>1?'s':'') + '. Scroll down to see results.';
-      banner.style.color = '#4CAF50';
-    } else {
-      banner.style.display = 'block';
-      banner.textContent = 'No sections found for "' + q + '". Try different keywords.';
-      banner.style.color = '#f4b86a';
-    }
-  }
-  if (count) count.textContent = hits > 0 ? hits + ' found' : '';
-}
-</script>
 
 <div class="hero">
   <h1>RetireBlueprint Pro<br><span>Setup Guide</span></h1>
@@ -704,14 +646,14 @@ function globalSearch(q) {
           if (noRes) noRes.style.display = (q && !anyVisible) ? 'block' : 'none';
         }
         </script>
-        <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:0;" id="faq-container">
-        <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px;">
+        <div style="display:grid;gap:8px;margin-top:0;" id="faq-container">
+        <div style="display:grid;gap:8px;margin-top:12px;">
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🔐 Do I need to know spreadsheets or coding?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               No. Everything is entered through the web-based Inputs page — you never need to open
               or touch your Google Sheet directly. The sheet is your data engine running silently in the background.<br><br>
               <strong style="color:#f4b86a;">How to find the Inputs page:</strong><br>
@@ -726,10 +668,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               💰 How do I find my Social Security benefit amount?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Go to <strong style="color:#f4b86a;">ssa.gov/myaccount</strong> and create a free account.
               Under "My Home" → "View estimated benefits" you'll see your monthly benefit at different retirement ages.
               <br><br>
@@ -749,10 +691,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🔄 What's a Roth conversion and should I do one?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               A Roth conversion moves money from a Traditional IRA/401k (pre-tax) to a Roth IRA (tax-free).
               You pay income tax now, but the money grows tax-free forever with no Required Minimum Distributions.
               <br><br>
@@ -763,10 +705,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               📋 What are RMDs and why do they matter?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Required Minimum Distributions — the IRS requires withdrawals from pre-tax accounts (Traditional IRA, 401k)
               starting at age 73. The amount is your account balance divided by an IRS life expectancy factor.
               <br><br>
@@ -778,10 +720,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🏥 What is IRMAA?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Income-Related Monthly Adjustment Amount — extra Medicare premiums triggered when your income
               exceeds $212,000 (married, 2025). A large Roth conversion could temporarily push you over this
               threshold, adding $74-$444/month per person to Medicare costs.
@@ -790,10 +732,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               😊 What's the Smile Curve spending plan?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Research shows retirees typically spend MORE early in retirement (travel, activities),
               LESS in the middle years (settled lifestyle), and slightly more again late in life (healthcare).
               Graphed over time this looks like a smile. Your plan sets three spending phases:
@@ -805,10 +747,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               📊 What's the difference between the SS column and the Projected SS column?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               In the Income Engine on your Dashboard you'll see two Social Security columns:<br><br>
               <strong style="color:#f4b86a;">SS (Social Security)</strong> — Your actual confirmed monthly benefit amount
               entered in Inputs. The real number from ssa.gov at your Full Retirement Age.<br><br>
@@ -828,10 +770,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🔧 My numbers look wrong — what do I check first?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Check these five things in order:<br><br>
               <strong style="color:#f4b86a;">1.</strong> Named Accounts in Inputs (Section VI) — are account balances entered for each account?<br>
               <strong style="color:#f4b86a;">2.</strong> Column A of Named Accounts — is "Include?" set to <strong>Yes</strong> for each active account?<br>
@@ -842,10 +784,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               ⚡ What does the Stress Test show and how do I use it?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               The Stress Test on your Dashboard shows how your plan holds up under four scenarios:<br><br>
               <strong style="color:#f4b86a;">Base Scenario</strong> — Normal market returns as projected. This is your plan as entered.<br><br>
               <strong style="color:#f4b86a;">Year 1 Down 20% (Mild Bear Market)</strong> — Your entire portfolio drops 20% in the first year
@@ -867,10 +809,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               📄 How do I share this with my financial advisor?
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               The easiest way: go to the <strong style="color:#f4b86a;">Summary page</strong> and click <strong>🖨️ Print / Save PDF</strong>.
               This creates a professional 4-page PDF with all your plan details, income, accounts, tax strategy,
               stress test results, and key milestones — everything a financial advisor needs to review your plan.
@@ -881,10 +823,10 @@ function globalSearch(q) {
           </details>
 
                   <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#f4b86a;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#f4b86a;list-style:none;">
               🔥 FIRE Planning — Safe Withdrawal Rate, FI Date, Coast FIRE
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Your Dashboard's <strong style="color:#f4b86a;">FIRE Intelligence panel</strong> shows four key FIRE metrics:<br><br>
               <strong style="color:#f4b86a;">Safe Withdrawal Rate (SWR)</strong> — Your planned portfolio withdrawal divided by total portfolio.
               The famous <strong>4% rule</strong> says withdrawing 4% per year sustains a 30-year retirement.
@@ -900,10 +842,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#f4b86a;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#f4b86a;list-style:none;">
               🔥 Early Retirement — Rule of 55, 72(t) SEPP, Roth Ladder
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               Retiring before 59½ creates a challenge: most retirement accounts charge a 10% penalty for
               early withdrawals. Here are the main workarounds:<br><br>
               <strong style="color:#f4b86a;">Rule of 55</strong> — If you leave your employer at age 55 or older, you can withdraw from
@@ -924,10 +866,10 @@ function globalSearch(q) {
           </details>
 
           <details class="faq-item" style="border:1px solid #1a3a52;border-radius:8px;overflow:hidden;">
-            <summary style="padding:14px 18px;background:#061E2F;font-size:12px;font-weight:700;color:#1CC7D0;">
+            <summary style="padding:12px 16px;background:#0A3145;cursor:pointer;font-size:12px;font-weight:700;color:#1CC7D0;list-style:none;">
               🏥 HSA — The Triple Tax Advantage
             </summary>
-            <div style="padding:16px 18px;font-size:12px;color:#e8f4f8;line-height:1.9;background:#0A3145;border-top:1px solid #1a3a52;">
+            <div style="padding:14px 16px;font-size:11px;color:#c8dae8;line-height:1.8;background:#061E2F;">
               The HSA (Health Savings Account) is the most tax-advantaged account in the US tax code:<br><br>
               <strong style="color:#f4b86a;">Tax #1 — Contributions are pre-tax</strong> (deducted from income, like a 401k)<br>
               <strong style="color:#f4b86a;">Tax #2 — Growth is tax-free</strong> (invest it like a brokerage, no capital gains)<br>
@@ -943,116 +885,125 @@ function globalSearch(q) {
 
         </div>
 
-        <div class="section-title">📚 Key Concepts — Plain English</div>
+      </div>
+    </div>
+  </div>
 
-        
-        <div style="background:linear-gradient(135deg,#1a0a0a,#2d1515);border-radius:10px;padding:16px 20px;margin-bottom:14px;border:1px solid rgba(255,159,67,0.3);">
-          <div style="font-size:12px;font-weight:800;color:#ff9f43;margin-bottom:8px;">🔥 What is FIRE? (New to this concept?)</div>
-          <div style="font-size:11px;color:#ffcba4;line-height:1.8;">
-            <strong>FIRE = Financial Independence, Retire Early.</strong> It's a financial philosophy built on
-            accumulating enough invested assets that your portfolio's returns can cover your living expenses indefinitely —
-            making paid work optional. The key formula: <strong>Annual Expenses ÷ 0.04 = Your FI Number</strong>
-            (the 4% Safe Withdrawal Rate rule).<br><br>
-            <strong style="color:#ff9f43;">The FIRE Spectrum:</strong><br>
-            🥬 <strong>Lean FIRE</strong> — Retire on under $40K/yr. Frugal lifestyle, often in a low cost-of-living area.<br>
-            🔥 <strong>Regular FIRE</strong> — $40K-$80K/yr. Comfortable middle-class retirement lifestyle.<br>
-            🥩 <strong>Fat FIRE</strong> — $100K+/yr. Retire without major lifestyle sacrifices.<br>
-            🏄 <strong>Barista FIRE</strong> — Semi-retire. Work part-time for healthcare benefits + enjoyment.<br>
-            ☁️ <strong>Coast FIRE</strong> — Stop saving now. Let existing investments compound to your FI number.<br><br>
-            <strong>You don't have to be extreme to benefit from FIRE thinking.</strong> Even traditional retirees at 65
-            benefit from knowing their SWR, FI date, and whether their plan is resilient to a market crash.
-            That's exactly what this tool shows you.
-          </div>
-        </div>
+  <!-- SECTION 8: KEY CONCEPTS -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <div class="section-num">8</div>
+      <div style="flex:1;min-width:0;">
+        <div class="section-title">📚 Key Concepts — Plain English</div>
         <div class="section-sub">Retirement planning terms explained without the jargon</div>
       </div>
     </div>
+
+    <!-- FIRE explainer inside section-body so it's full width -->
     <div class="section-body">
 
-      <div style="margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:800;color:#0B2239;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #1CC7D0;">💰 Pre-Tax vs. Roth vs. Taxable Accounts — What's the Difference?</div>
-        <div style="display:grid;grid-template-columns:1fr;gap:10px;">
-
-            <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #5b8fa8;">
-              <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">🏦 Pre-Tax (Traditional 401k / IRA)</div>
-              <div style="font-size:12px;color:#c8dae8;line-height:1.7;">You get a tax deduction when you contribute — but pay income tax on every dollar you withdraw in retirement. The bigger this bucket, the bigger your future tax bill. RMDs force withdrawals starting at age 73 whether you want them or not.</div>
-              <div style="margin-top:8px;font-size:10px;color:#f4b86a;font-weight:700;">⚠️ Taxed on the way OUT · Subject to RMDs at 73</div>
-            </div>
-
-            <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #1CC7D0;">
-              <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">✨ Roth (Roth 401k / Roth IRA)</div>
-              <div style="font-size:12px;color:#c8dae8;line-height:1.7;">You pay tax on contributions now — but the money grows tax-free and comes out completely tax-free in retirement. No Required Minimum Distributions. The gold standard for retirement accounts and the goal of Roth conversions.</div>
-              <div style="margin-top:8px;font-size:10px;color:#4CAF50;font-weight:700;">✅ Tax-free growth · Tax-free withdrawals · No RMDs</div>
-            </div>
-
-            <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #f4b86a;">
-              <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">📈 Taxable Brokerage Account</div>
-              <div style="font-size:12px;color:#c8dae8;line-height:1.7;">A regular investment account — no special tax treatment. You pay taxes on dividends and capital gains each year, but the withdrawals themselves aren't taxed again. Most flexible — no age restrictions, no contribution limits, no RMDs.</div>
-              <div style="margin-top:8px;font-size:10px;color:#f4b86a;font-weight:700;">💡 Most flexible · No age restrictions · Capital gains tax applies</div>
-            </div>
-
-            <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #4CAF50;">
-              <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">🏥 HSA (Health Savings Account)</div>
-              <div style="font-size:12px;color:#c8dae8;line-height:1.7;">The best account in the US tax code — <em>triple</em> tax advantage: contributions are pre-tax, growth is tax-free, and withdrawals for medical expenses are completely tax-free. After age 65 it works like a Traditional IRA for non-medical expenses.</div>
-              <div style="margin-top:8px;font-size:10px;color:#4CAF50;font-weight:700;">⭐ Triple tax advantage · Pre-tax in · Tax-free growth · Tax-free medical out</div>
-            </div>
-
-          </div>
+      <div style="background:linear-gradient(135deg,#1a0a0a,#2d1515);border-radius:10px;padding:16px 20px;margin-bottom:24px;border:1px solid rgba(255,159,67,0.3);width:100%;box-sizing:border-box;">
+        <div style="font-size:12px;font-weight:800;color:#ff9f43;margin-bottom:8px;">🔥 What is FIRE? (New to this concept?)</div>
+        <div style="font-size:13px;color:#ffcba4;line-height:1.8;">
+          <strong>FIRE = Financial Independence, Retire Early.</strong> A financial philosophy built on accumulating enough invested assets that your portfolio's returns cover your living expenses indefinitely — making paid work optional. The key formula: <strong>Annual Expenses ÷ 0.04 = Your FI Number</strong> (the 4% Safe Withdrawal Rate rule).<br><br>
+          <strong style="color:#ff9f43;">The FIRE Spectrum:</strong><br>
+          🥬 <strong>Lean FIRE</strong> — Retire on under $40K/yr. Frugal lifestyle, often in a low cost-of-living area.<br>
+          🔥 <strong>Regular FIRE</strong> — $40K–$80K/yr. Comfortable middle-class retirement lifestyle.<br>
+          🥩 <strong>Fat FIRE</strong> — $100K+/yr. Retire without major lifestyle sacrifices.<br>
+          🏄 <strong>Barista FIRE</strong> — Semi-retire. Work part-time for healthcare benefits + enjoyment.<br>
+          ☁️ <strong>Coast FIRE</strong> — Stop saving now. Let existing investments compound to your FI number.<br><br>
+          <strong>You don't have to be extreme to benefit from FIRE thinking.</strong> Even traditional retirees at 65 benefit from knowing their SWR, FI date, and whether their plan is resilient to a market crash.
         </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #f4b86a;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">📅 Required Minimum Distributions (RMDs) — What Are They?</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">The IRS requires you to start withdrawing money from your Pre-Tax retirement accounts beginning at age 73 — whether you want to or not. The amount is calculated by dividing your account balance by a life expectancy factor (about 26.5 at age 73, meaning you must withdraw about 3.8% of the balance). If you have a large pre-tax balance, RMDs can push you into a higher tax bracket and trigger Medicare surcharges. This is why Roth conversions before age 73 are so valuable.</div>
-        <div style="margin-top:8px;font-size:10px;color:#ff6b6b;font-weight:700;">⚠️ Starts at age 73 · Based on account balance ÷ life expectancy factor</div>
+      <div class="step">
+        <div class="step-icon">💰</div>
+        <div class="step-content">
+          <div class="step-title">Pre-Tax vs. Roth vs. Taxable Accounts — What's the Difference?</div>
+          <div class="step-desc">
+          <strong>Pre-Tax (Traditional 401k/IRA)</strong> — You didn't pay taxes on this money going in. You will pay taxes when you take it out in retirement. The more you have here, the bigger your tax bill when RMDs force you to withdraw at 73.<br><br>
+          <strong>Roth (Roth 401k/IRA)</strong> — You already paid taxes on this money. It grows tax-free and comes out tax-free. No RMDs. The gold standard for retirement accounts.<br><br>
+          <strong>Taxable (Brokerage)</strong> — A regular investment account. You pay taxes on dividends and capital gains each year, but withdrawals themselves aren't taxed again.<br><br>
+          <strong>HSA (Health Savings Account)</strong> — Triple tax advantage: contributions are pre-tax, growth is tax-free, and withdrawals for medical expenses are tax-free. After 65 it works like a Traditional IRA for non-medical expenses.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #1CC7D0;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">🔄 Roth Conversions — Moving Money to Save on Taxes</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">A Roth conversion means moving money from your Pre-Tax 401k/IRA into a Roth IRA. You pay income tax on the amount converted that year — but never again. The ideal time to convert is after you retire (income drops) and before RMDs begin at 73 — your "prime window." Converting enough to fill up your current tax bracket each year can save tens of thousands in lifetime taxes. The Roth Solver on the Inputs page calculates the optimal amount automatically.</div>
-        <div style="margin-top:8px;font-size:10px;color:#4CAF50;font-weight:700;">✅ Convert during low-income years · Fill up your current bracket each year</div>
+      <div class="step">
+        <div class="step-icon">📅</div>
+        <div class="step-content">
+          <div class="step-title">Required Minimum Distributions (RMDs) — What Are They?</div>
+          <div class="step-desc">The IRS requires you to start withdrawing money from your Pre-Tax retirement accounts beginning at age 73 — whether you want to or not. The amount is calculated by dividing your account balance by a life expectancy factor (about 26.5 at age 73, meaning you must withdraw about 3.8% of the balance). If you have a large pre-tax balance, RMDs can push you into a higher tax bracket and trigger Medicare surcharges. This is why Roth conversions before age 73 are so valuable.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #9b59b6;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">🌊 Smile Curve — Why Spending Isn't Flat in Retirement</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">Research shows retirees actually spend in a "smile" pattern: more in early retirement (active years — travel, hobbies), less in middle retirement (settling in), and more again late in retirement (healthcare costs). Your Inputs page lets you set three phases with different spending weights. Phase 1 is typically 115% of base spending, Phase 2 is 100%, Phase 3 is 90% — but these are customizable. The solver then calculates what your base spending can be while still hitting your legacy goal.</div>
-        <div style="margin-top:8px;font-size:10px;color:#c39bd3;font-weight:700;">💡 Phase 1 = 115% spending · Phase 2 = 100% · Phase 3 = 90% (customizable)</div>
+      <div class="step">
+        <div class="step-icon">🔄</div>
+        <div class="step-content">
+          <div class="step-title">Roth Conversions — Moving Money to Save on Taxes</div>
+          <div class="step-desc">A Roth conversion means moving money from your Pre-Tax 401k/IRA into a Roth IRA. You pay income tax on the amount converted that year — but never again. The ideal time to convert is after you retire (income drops) and before RMDs begin at 73 — your "prime window." Converting enough to fill up your current tax bracket each year can save tens of thousands in lifetime taxes. The Roth Solver on the Inputs page calculates the optimal amount automatically.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #e74c3c;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">🏥 The Healthcare Bridge — One of the Biggest Surprises in Early Retirement</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">If you retire before age 65, you lose employer health insurance but Medicare doesn't start until 65. You'll need to buy coverage through the ACA marketplace (healthcare.gov) or COBRA. Costs vary widely by income — if your retirement income is low enough, you may qualify for substantial subsidies. The Healthcare Bridge calculator on the Inputs page estimates your total pre-Medicare healthcare cost. This is often $50,000–$150,000+ for a couple retiring at 60 — a number many people miss completely.</div>
-        <div style="margin-top:8px;font-size:10px;color:#ff9f43;font-weight:700;">⚠️ $50K–$150K+ surprise cost for couples retiring before 65 — plan ahead</div>
+      <div class="step">
+        <div class="step-icon">🌊</div>
+        <div class="step-content">
+          <div class="step-title">Smile Curve — Why Spending Isn't Flat in Retirement</div>
+          <div class="step-desc">Research shows retirees actually spend in a "smile" pattern: more in early retirement (active years — travel, hobbies), less in middle retirement (settling in), and more again late in retirement (healthcare costs). Your Inputs page lets you set three phases with different spending weights. Phase 1 is typically 115% of base spending, Phase 2 is 100%, Phase 3 is 90% — but these are customizable. The solver then calculates what your base spending can be while still hitting your legacy goal.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #3498db;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">📊 IRMAA — The Medicare Surcharge You Didn't Know About</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">IRMAA stands for Income-Related Monthly Adjustment Amount. If your income (including Roth conversions) exceeds certain thresholds, Medicare charges you extra for Part B and Part D coverage. In 2025, the threshold for married couples is $212,000. The Roth Solver shows you if a planned conversion would push you over this threshold — and warns you to consider converting a smaller amount to avoid the surcharge.</div>
-        <div style="margin-top:8px;font-size:10px;color:#f4b86a;font-weight:700;">⚠️ 2025 threshold: $212,000 MFJ — large Roth conversions can trigger this</div>
+      <div class="step">
+        <div class="step-icon">🏥</div>
+        <div class="step-content">
+          <div class="step-title">The Healthcare Bridge — One of the Biggest Surprises in Early Retirement</div>
+          <div class="step-desc">If you retire before age 65, you lose employer health insurance but Medicare doesn't start until 65. You'll need to buy coverage through the ACA marketplace (healthcare.gov) or COBRA. Costs vary widely by income — if your retirement income is low enough, you may qualify for substantial subsidies. The Healthcare Bridge calculator on the Inputs page estimates your total pre-Medicare healthcare cost. This is often $50,000–$150,000+ for a couple retiring at 60 — a number many people miss completely.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #1CC7D0;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">⏱️ The 5-Year Rule — When Can You Access Roth Money?</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">Each Roth conversion has a 5-year waiting period before you can withdraw it penalty-free. If you're under 59½, you must wait 5 years from the conversion date before touching that money without a 10% penalty. However, once you're over 59½, the 5-year rule applies to your original Roth IRA only (the account must be at least 5 years old), not to each individual conversion. The Roth Solver shows your earliest penalty-free access date automatically.</div>
-        <div style="margin-top:8px;font-size:10px;color:#4CAF50;font-weight:700;">✅ Over 59½: only original Roth IRA needs 5 years · Conversions are fine</div>
+      <div class="step">
+        <div class="step-icon">📊</div>
+        <div class="step-content">
+          <div class="step-title">IRMAA — The Medicare Surcharge You Didn't Know About</div>
+          <div class="step-desc">IRMAA stands for Income-Related Monthly Adjustment Amount. If your income (including Roth conversions) exceeds certain thresholds, Medicare charges you extra for Part B and Part D coverage. In 2025, the threshold for married couples is $212,000. The Roth Solver shows you if a planned conversion would push you over this threshold — and warns you to consider converting a smaller amount to avoid the surcharge.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #ff6b6b;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">📈 Sequence of Returns Risk — Why Market Timing in Early Retirement Matters</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">This is one of the most important and least understood retirement risks. If the market drops 30% in your first year of retirement and you're withdrawing $60,000/year, you're forced to sell assets at low prices — permanently reducing your portfolio's ability to recover. The same 30% drop 10 years into retirement is far less damaging. A resilient plan survives a 30% Year-1 drop with your legacy goal intact — use the Stress Tester to check yours.</div>
-        <div style="margin-top:8px;font-size:10px;color:#ff9f43;font-weight:700;">⚡ Year 1 crash = worst timing · 3 defenses: guaranteed income, Roth %, spending flex</div>
+      <div class="step">
+        <div class="step-icon">⏱️</div>
+        <div class="step-content">
+          <div class="step-title">The 5-Year Rule — When Can You Access Roth Money?</div>
+          <div class="step-desc">Each Roth conversion has a 5-year waiting period before you can withdraw it penalty-free. If you're under 59½, you must wait 5 years from the conversion date before touching that money without a 10% penalty. However, once you're over 59½, the 5-year rule applies to your original Roth IRA only (the account must be at least 5 years old), not to each individual conversion. The Roth Solver shows your earliest penalty-free access date automatically.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #5b8fa8;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">📱 Account Owner — Why It Matters for Contributions and Taxes</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;">Each account is owned by Partner 1, Partner 2, or Joint. This matters because contributions and employer match flow to the correct partner's columns, and RMDs are calculated per person. The <strong style="color:#f4b86a;">Show on Summary?</strong> setting controls which accounts appear on your printed PDF report — set Yes for main accounts, No for small or closed ones. All accounts still appear in projections regardless of this setting.</div>
-        <div style="margin-top:8px;font-size:10px;color:#8aaabb;font-weight:700;">💡 Show on Summary? = Yes for main accounts · No for small or closed ones</div>
+      <div class="step">
+        <div class="step-icon">📈</div>
+        <div class="step-content">
+          <div class="step-title">Sequence of Returns Risk — Why Market Timing in Early Retirement Matters</div>
+          <div class="step-desc">This is one of the most important and least understood retirement risks. If the market drops 30% in your first year of retirement and you're withdrawing $60,000/year, you're forced to sell assets at low prices — permanently reducing your portfolio's ability to recover. The same 30% drop 10 years into retirement is far less damaging because you have fewer years of withdrawals ahead. The Stress Test panel on the Dashboard shows you exactly how a Year-1 crash would affect your plan. A resilient plan survives a 30% Year-1 drop with your legacy goal intact.</div>
+        </div>
       </div>
 
-      <div style="background:#0A3145;border-radius:8px;padding:14px 16px;border-left:4px solid #f4b86a;margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;">🏦 Contribution Dates — What Each Date Field Means</div>
-        <div style="font-size:12px;color:#c8dae8;line-height:1.7;"><strong style="color:#f4b86a;">Contrib Start Date</strong> — When you started contributing. Used to calculate partial-year contributions.<br><br><strong style="color:#f4b86a;">Contrib End Date</strong> — When contributions stop, usually your retirement date. Contributions are prorated if you retire mid-year.<br><br><strong style="color:#f4b86a;">Withdrawal Start Date</strong> — When you can start withdrawing. Leave blank if your retirement date applies. Some 403b plans require age 59½ before withdrawal.</div>
-        <div style="margin-top:8px;font-size:10px;color:#f4b86a;font-weight:700;">💡 Contrib End Date = your retirement date · Leave Withdrawal Start blank unless restricted</div>
+      <div class="step">
+        <div class="step-icon">📱</div>
+        <div class="step-content">
+          <div class="step-title">Account Owner — Why It Matters for Contributions and Taxes</div>
+          <div class="step-desc">Each account in the system is owned by Partner 1, Partner 2, or is Joint. This matters for two reasons:<br><br>
+          <strong>1. Contributions:</strong> Contribution amounts and employer match flow to the correct partner's columns in the Master spreadsheet, so the projection knows exactly how much each person is saving.<br><br>
+          <strong>2. RMDs:</strong> RMDs are calculated per person, not per household. Knowing who owns which accounts ensures the system calculates the right RMD amounts at the right ages.<br><br>
+          The <strong>Show on Summary?</strong> column (column H) controls which accounts appear on your printed Summary Report PDF. Set to Yes for your main accounts — 401k, Roth, brokerage. Set to No for small, legacy, or closed accounts you don't want cluttering the report. All accounts still appear in projections and the Dashboard regardless of this setting.<br><br>Always assign each account to the correct owner — don't leave everything as "Joint" unless it truly is a joint account.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-icon">🏦</div>
+        <div class="step-content">
+          <div class="step-title">Contribution Dates — What Each Date Field Means</div>
+          <div class="step-desc">In the Named Accounts section, each account has three date fields:<br><br>
+          <strong>Contrib Start Date</strong> — When you started or will start contributing to this account. Usually your hire date or account opening date. Used to calculate partial-year contributions.<br><br>
+          <strong>Contrib End Date</strong> — When contributions stop. Usually your retirement date or the date you plan to stop making contributions. If you retire June 30, contributions are prorated to 50% for that year.<br><br>
+          <strong>Withdrawal Start Date</strong> — When you can start withdrawing from this account. Usually retirement date, but some plans have restrictions (e.g., some 403b plans require you to be 59½ before withdrawing). Leave blank if your retirement date applies.</div>
+        </div>
       </div>
 
     </div>
@@ -1286,6 +1237,8 @@ function globalSearch(q) {
   <div style="text-align:center;font-size:10px;color:#9ca3af;padding:32px 0 0;">
     Not financial advice · For personal planning use only · © 2026 RetireBlueprint Pro
   </div>
+
+</div>
 
 </div>
 </body>
