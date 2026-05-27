@@ -13,7 +13,7 @@ function rbpApplyNames(p1,p2){
   document.querySelectorAll('[data-rbp-p2]').forEach(function(el){el.textContent=p2;});
   window.rbpP1Name=p1; window.rbpP2Name=p2;
 }
-document.addEventListener('DOMContentLoaded',rbpApplyNames);
+document.addEventListener('DOMContentLoaded', function(){ rbpApplyNames(); });
 window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key==='rbp_p2_name')rbpApplyNames();});
 </script>
 <style>
@@ -354,8 +354,8 @@ function buildLadder() {
   var pretax  = parseInt(document.getElementById('pretax-bal').value)||0;
 
   var curYear = new Date().getFullYear();
-  var p1Name  = window.rbpP1Name || localStorage.getItem('rbp_p1_name') || 'Partner 1';
-  var p2Name  = window.rbpP2Name || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  var p1Name  = (typeof window.rbpP1Name === 'string' ? window.rbpP1Name : null) || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  var p2Name  = (typeof window.rbpP2Name === 'string' ? window.rbpP2Name : null) || localStorage.getItem('rbp_p2_name') || 'Partner 2';
 
   // Determine youngest retiree (who drives the ladder start)
   var earliestRetireAge = Math.min(p1Ret, p2Ret);
@@ -583,7 +583,7 @@ function loadData() {
       // Set names
       if (p1.name) localStorage.setItem('rbp_p1_name', p1.name.trim());
       if (p2.name) localStorage.setItem('rbp_p2_name', p2.name.trim());
-      if (typeof rbpApplyNames === 'function') rbpApplyNames(p1.name, p2.name);
+      if (typeof rbpApplyNames === 'function') rbpApplyNames(p1.name || '', p2.name || '');
 
       // Populate fields from sheet data
       if (p1.age) document.getElementById('p1-age').value = p1.age;

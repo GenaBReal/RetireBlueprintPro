@@ -117,7 +117,7 @@ function rbpApplyNames(p1, p2) {
   });
   window.rbpP1Name = p1; window.rbpP2Name = p2;
 }
-document.addEventListener('DOMContentLoaded', rbpApplyNames);
+document.addEventListener('DOMContentLoaded', function(){ rbpApplyNames(); });
 window.addEventListener('storage', function(e) {
   if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
 });
@@ -390,12 +390,22 @@ window.addEventListener('storage', function(e) {
 
       <!-- Explainer -->
       <div style="padding:14px 22px;background:rgba(28,199,208,0.04);border-bottom:1px solid #1a3a52;font-size:12px;color:#8aaabb;line-height:1.8;">
-        <strong style="color:#1CC7D0;">What this does:</strong>
-        The 4% rule is based on historical averages — but your retirement could start in a boom or a bust.
-        Monte Carlo runs 1,000 different market futures using random annual returns drawn from realistic distributions,
-        then counts how many end with your portfolio above your legacy goal.
-        A result of <strong style="color:#4CAF50;">90%+</strong> is considered very strong.
-        <strong style="color:#f4b86a;">75–89%</strong> is acceptable. Below 75% warrants a closer look.
+        <strong style="color:#1CC7D0;">What Monte Carlo simulation means:</strong>
+        Your Dashboard shows ONE projected future based on your expected return. But the real market is unpredictable —
+        some years it returns 30%, others it drops 40%. Monte Carlo runs <strong style="color:#fff;">1,000 completely different versions of your retirement</strong>,
+        each with random annual returns drawn from realistic market distributions, then counts how many scenarios
+        end with your portfolio still above your legacy goal.
+        <br><br>
+        <strong style="color:#f4b86a;">Why this matters:</strong>
+        Two people can have identical plans and identical average returns over 30 years — but if one retires into a bear market
+        and the other into a bull market, their outcomes are completely different. This is called
+        <strong>sequence of returns risk</strong> and it's the #1 reason "average returns" don't tell the whole story.
+        <br><br>
+        <strong style="color:#4CAF50;">✅ 90%+</strong> = Very strong · 
+        <strong style="color:#f4b86a;">⚠️ 75–89%</strong> = Acceptable, can strengthen · 
+        <strong style="color:#ef5350;">❌ Below 75%</strong> = Needs adjustment
+        <br>
+        <span style="font-size:11px;color:#4a6a7a;">The simulation uses your actual portfolio balance, spending, SS income, pension, and life expectancy — not generic numbers.</span>
       </div>
 
       <!-- Settings row -->
@@ -963,7 +973,7 @@ function runMonteCarlo() {
   var model   = document.getElementById('mc-model').value;
   var flexPct = parseInt(document.getElementById('mc-flex').value) / 100;
 
-  // Pull plan data
+  // ── Pull plan data ───────────────────────────────────────
   var port  = planData.portfolio || {};
   var sp    = planData.spending  || {};
   var gl    = planData.global    || {};
@@ -973,6 +983,9 @@ function runMonteCarlo() {
   var p1    = planData.people[pkeys[0]] || {};
   var p2    = planData.people[pkeys[1]] || {};
 
+  var p1Name = p1.name || window.rbpP1Name || localStorage.getItem('rbp_p1_name') || 'Partner 1';
+  var p2Name = p2.name || window.rbpP2Name || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+
   var totalPF   = port.total || 0;
   var baseSpend = (sp.baseAnnual || 0) + (sp.safeExtra || 0);
   var legacyGoal= leg.goal || 0;
@@ -980,8 +993,26 @@ function runMonteCarlo() {
   var colaRate  = (gl.ssCola || 0.025);
   var ssYear1   = (p1.ssYear1 || 0) + (p2.ssYear1 || 0);
   var pension   = ((p1.pension || 0) + (p2.pension || 0)) * 12;
+  var curYear   = new Date().getFullYear();
 
-  // Derive mean/sigma from plan's expected return
+  // ── Determine simulation length from ACTUAL death ages ──
+  // Use the later of the two projected death years, cap at age 110
+  var p1DeathAge = Math.min(p1.deathAge || 90, 110);
+  var p2DeathAge = Math.min(p2.deathAge || 90, 110);
+  var p1DeathYear = p1.age > 0 ? curYear + (p1DeathAge - p1.age) : curYear + 30;
+  var p2DeathYear = p2.age > 0 ? curYear + (p2DeathAge - p2.age) : curYear + 30;
+  var endYear = Math.max(p1DeathYear, p2DeathYear);
+  var yrs = Math.min(endYear - curYear + 1, 100); // never more than 100 steps, never less than plan length
+  yrs = Math.max(yrs, 20); // minimum 20 years
+
+  // Build year labels for charts
+  var mcYears = [];
+  var origYears = (proj.years && proj.years.length) ? proj.years : null;
+  for (var _y = 0; _y < yrs; _y++) {
+    mcYears.push(origYears && _y < origYears.length ? origYears[_y] : curYear + _y);
+  }
+
+  // ── Mean return from account mix ────────────────────────
   var mu = 0.07;
   if (port.accounts && port.accounts.length) {
     var rs = 0, rc = 0;
@@ -990,38 +1021,21 @@ function runMonteCarlo() {
     });
     if (rc > 0) mu = rs / rc;
   }
-  var sigma = 0.15; // Standard deviation (~15% is long-run equity volatility)
+  var sigma = 0.15;
 
-  var _origYears = (proj.years && proj.years.length) ? proj.years : null;
-  var curYear = new Date().getFullYear();
-  // Always extend to 100 years for MC — key differentiator
-  var yrs = 100;
-  var projYears = [];
-  for (var _y = 0; _y < 100; _y++) {
-    projYears.push(_origYears && _y < _origYears.length ? _origYears[_y] : curYear + _y);
-  }
-  // projIncome kept for reference but MC uses SS+pension directly (more accurate for random scenarios)
-  var projIncome = (proj.income && proj.income.length) ? proj.income : null;
-
-  // UI — show progress
+  // ── UI: show progress ────────────────────────────────────
   document.getElementById('mc-results').style.display = 'none';
   document.getElementById('mc-progress').style.display = 'block';
   document.getElementById('mc-run-btn').disabled = true;
   document.getElementById('mc-run-btn').textContent = 'Running...';
 
-  // Use setTimeout chunks to avoid blocking UI
   var allEndingBals = [];
-  var allPaths = [];        // store P10, P25, P50, P75, P90 percentile paths
-  var failYears = new Array(100).fill(0); // how many scenarios depleted by year i
-  var CHUNK = 100;
-  var completed = 0;
-  var dots = 0;
+  var depleteYears  = []; // which year each depleting scenario runs out
+  var failYears     = new Array(yrs).fill(0);
+  var yearlyBals    = [];
+  for (var y = 0; y < yrs; y++) yearlyBals.push([]);
 
-  // We'll store sampled paths for fan chart (store every path is too much memory at 5000)
-  // Instead accumulate percentile data year by year
-  var yearlyBals = [];
-  for (var y = 0; y < 100; y++) yearlyBals.push([]);
-
+  var CHUNK = 100, completed = 0, dots = 0;
   var dotsInterval = setInterval(function() {
     dots = (dots + 1) % 4;
     var el = document.getElementById('mc-progress-dots');
@@ -1034,46 +1048,38 @@ function runMonteCarlo() {
       var bal = totalPF;
       var depleted = false;
       var peakBal = bal;
+      var depleteAt = null;
 
       for (var i = 0; i < yrs; i++) {
         if (yearlyBals[i]) yearlyBals[i].push(Math.round(bal));
 
-        if (i === 0) {
-          // Year 0 = starting balance, record but don't withdraw or grow yet
-          continue;
-        }
+        if (i === 0) continue; // Year 0 = starting balance, no withdrawal yet
 
-        // Guaranteed income: SS + pension only (grows with COLA, independent of market)
+        // Guaranteed income: SS + pension (not portfolio-dependent)
         var guaranteed = ssYear1 * Math.pow(1 + colaRate, i) + pension;
-
-        // Net portfolio withdrawal = spending minus guaranteed income
         var spend = baseSpend * Math.pow(1 + inflation, i);
 
-        // Spending flexibility: if portfolio dropped 20%+ from peak, cut spending
-        if (flexPct > 0 && peakBal > 0) {
-          var drawdown = (peakBal - bal) / peakBal;
-          if (drawdown >= 0.20) spend *= (1 - flexPct);
+        // Spending flexibility: cut if portfolio dropped 20%+ from peak
+        if (flexPct > 0 && peakBal > 0 && (peakBal - bal) / peakBal >= 0.20) {
+          spend *= (1 - flexPct);
         }
 
-        // Withdraw first, then apply return (matches project() order)
         var withdrawal = Math.max(0, spend - guaranteed);
-        bal -= withdrawal;
-        if (bal < 0) bal = 0;
+        bal = Math.max(0, bal - withdrawal);
 
-        // Random return this year
         var ret = mcRandReturn(model, mu, sigma);
-        bal = bal * (1 + ret);
+        bal = Math.max(0, bal * (1 + ret));
         if (bal > peakBal) peakBal = bal;
-        bal = Math.max(0, bal);
 
         if (bal <= 0 && !depleted) {
           depleted = true;
-          for (var d = i; d < yrs; d++) {
-            failYears[d]++;
-          }
+          depleteAt = mcYears[i] || (curYear + i);
+          for (var d = i; d < yrs; d++) failYears[d]++;
         }
       }
+
       allEndingBals.push(Math.round(bal));
+      if (depleteAt !== null) depleteYears.push(depleteAt);
     }
 
     completed = end;
@@ -1087,7 +1093,10 @@ function runMonteCarlo() {
       setTimeout(function() { runChunk(end); }, 0);
     } else {
       clearInterval(dotsInterval);
-      showMCResults(allEndingBals, yearlyBals, failYears, nRuns, yrs, legacyGoal, curYear, projYears);
+      showMCResults(allEndingBals, yearlyBals, failYears, depleteYears,
+        nRuns, yrs, mcYears, legacyGoal, curYear,
+        p1Name, p2Name, p1DeathAge, p2DeathAge, p1.age||63, p2.age||55,
+        mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model);
     }
   }
 
@@ -1100,74 +1109,143 @@ function mcPercentile(arr, p) {
   return sorted[idx];
 }
 
-function showMCResults(endings, yearlyBals, failYears, nRuns, yrs, legacyGoal, curYear, projYears) {
-  // Sort ending balances
-  var sorted = endings.slice().sort(function(a, b) { return a - b; });
+function showMCResults(endings, yearlyBals, failYears, depleteYears,
+    nRuns, yrs, mcYears, legacyGoal, curYear,
+    p1Name, p2Name, p1DeathAge, p2DeathAge, p1Age, p2Age,
+    mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model) {
 
-  var succeedGoal = endings.filter(function(b) { return b >= legacyGoal; }).length;
-  var survivePos  = endings.filter(function(b) { return b > 0 && b < legacyGoal; }).length;
-  var depleted    = endings.filter(function(b) { return b <= 0; }).length;
+  var sorted = endings.slice().sort(function(a,b){return a-b;});
 
+  // ── Core counts ─────────────────────────────────────────
+  var succeedGoal = endings.filter(function(b){return b >= legacyGoal;}).length;
+  var survivePos  = endings.filter(function(b){return b > 0 && b < legacyGoal;}).length;
+  var depleted    = endings.filter(function(b){return b <= 0;}).length;
   var successPct  = Math.round(succeedGoal / nRuns * 100);
-  var surviveOnlyPct = Math.round(survivePos / nRuns * 100);
-  var failPct     = Math.round(depleted / nRuns * 100);
+  var survivePct  = Math.round(survivePos  / nRuns * 100);
+  var failPct     = Math.round(depleted    / nRuns * 100);
 
-  var median = mcPercentile(endings, 50);
-  var p10    = mcPercentile(endings, 10);
-  var p25    = mcPercentile(endings, 25);
-  var p75    = mcPercentile(endings, 75);
-  var p90    = mcPercentile(endings, 90);
+  var p10 = mcPercentile(endings, 10);
+  var p25 = mcPercentile(endings, 25);
+  var p50 = mcPercentile(endings, 50);
+  var p75 = mcPercentile(endings, 75);
+  var p90 = mcPercentile(endings, 90);
 
-  // Update UI numbers
+  var startYear = mcYears[0] || curYear;
+  var endYearLabel = mcYears[yrs-1] || (curYear + yrs - 1);
+
+  // ── Depletion year stats ─────────────────────────────────
+  var medDepleteYr = depleteYears.length > 0 ?
+    mcPercentile(depleteYears, 50) : null;
+  var earliestDeplete = depleteYears.length > 0 ? Math.min.apply(null, depleteYears) : null;
+
+  // ── Big success % ─────────────────────────────────────────
   var pctEl = document.getElementById('mc-pct');
   pctEl.textContent = successPct + '%';
   pctEl.style.color = successPct >= 90 ? '#4CAF50' : successPct >= 75 ? '#f4b86a' : '#ef5350';
 
   document.getElementById('mc-total-runs').textContent = nRuns.toLocaleString();
-  document.getElementById('mc-median').textContent = fmt(median);
-  document.getElementById('mc-p10').textContent = fmt(p10);
+  document.getElementById('mc-median').textContent = fmt(p50);
+  document.getElementById('mc-p10').textContent = p10 > 0 ? fmt(p10) : '💀 Depleted';
   document.getElementById('mc-p90').textContent = fmt(p90);
 
-  var exceedPct = Math.round(succeedGoal / nRuns * 100);
-  var survivePctOnly = Math.round(survivePos / nRuns * 100);
-  document.getElementById('mc-exceed').textContent = succeedGoal.toLocaleString() + ' (' + exceedPct + '%)';
-  document.getElementById('mc-survive').textContent = survivePos.toLocaleString() + ' (' + survivePctOnly + '%)';
-  document.getElementById('mc-fail').textContent = depleted.toLocaleString() + ' (' + failPct + '%)';
+  // ── Breakdown bars ────────────────────────────────────────
+  document.getElementById('mc-exceed').textContent = succeedGoal.toLocaleString() + ' (' + successPct + '%)';
+  document.getElementById('mc-survive').textContent = survivePos.toLocaleString() + ' (' + survivePct + '%)';
+  document.getElementById('mc-fail').textContent   = depleted.toLocaleString() + ' (' + failPct + '%)';
+  document.getElementById('mc-bar-exceed').style.width  = successPct + '%';
+  document.getElementById('mc-bar-survive').style.width = survivePct + '%';
+  document.getElementById('mc-bar-fail').style.width    = failPct + '%';
 
-  document.getElementById('mc-bar-exceed').style.width = exceedPct + '%';
-  document.getElementById('mc-bar-survive').style.width = survivePctOnly + '%';
-  document.getElementById('mc-bar-fail').style.width = failPct + '%';
+  // ── Context panel: what does this mean in REAL numbers ────
+  var contextHtml = '<div style="background:#061620;border:1px solid #1a3a52;border-radius:10px;padding:16px;margin-bottom:16px;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">📋 What Your Simulation Actually Ran</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">' +
+    contextRow('Simulation period', startYear + ' → ' + endYearLabel + ' (' + yrs + ' years)') +
+    contextRow(p1Name + ' lifespan modeled', 'Age ' + p1Age + ' → ' + p1DeathAge + ' (year ' + (curYear + p1DeathAge - p1Age) + ')') +
+    contextRow(p2Name + ' lifespan modeled', 'Age ' + p2Age + ' → ' + p2DeathAge + ' (year ' + (curYear + p2DeathAge - p2Age) + ')') +
+    contextRow('Starting portfolio', fmt(totalPF)) +
+    contextRow('Annual spending (base)', fmt(baseSpend)) +
+    contextRow('Guaranteed income (SS + pension)', fmt((ssYear1 + pension) || 0) + '/yr') +
+    contextRow('Expected return assumption', (mu * 100).toFixed(1) + '% avg · ' + (sigma*100).toFixed(0) + '% std dev') +
+    contextRow('Inflation assumption', (inflation * 100).toFixed(1) + '%/yr') +
+    contextRow('Return model', {'normal':'Normal distribution','fat':'Fat-tailed (more realistic)','historical':'US historical 1928–2024'}[model] || model) +
+    contextRow('Legacy goal target', legacyGoal > 0 ? fmt(legacyGoal) : 'Not set (using $0)') +
+    '</div></div>';
 
-  // Verdict
-  var verdictEl = document.getElementById('mc-verdict');
-  if (successPct >= 90) {
-    verdictEl.style.cssText = 'border-radius:10px;padding:16px 20px;font-size:13px;line-height:1.8;background:rgba(76,175,80,0.08);border:1px solid rgba(76,175,80,0.3);color:#a5d6a7;';
-    verdictEl.innerHTML = '✅ <strong style="color:#4CAF50;">Excellent resilience.</strong> Your plan succeeds in ' + successPct + '% of 1,000 random market scenarios — including crashes, recessions, and low-return decades. This is above the 90% threshold that most financial planners consider robust.';
-  } else if (successPct >= 75) {
-    verdictEl.style.cssText = 'border-radius:10px;padding:16px 20px;font-size:13px;line-height:1.8;background:rgba(244,184,106,0.08);border:1px solid rgba(244,184,106,0.3);color:#ffcba4;';
-    verdictEl.innerHTML = '⚠️ <strong style="color:#f4b86a;">Acceptable, with room to strengthen.</strong> Your plan succeeds in ' + successPct + '% of scenarios. This is workable but consider either (1) delaying retirement by 1–2 years, (2) reducing planned spending by 5–10%, or (3) increasing your Roth allocation to reduce sequence-of-returns risk.';
+  // ── Depletion detail ─────────────────────────────────────
+  var depleteHtml = '';
+  if (depleted > 0) {
+    depleteHtml = '<div style="background:rgba(239,83,80,0.07);border:1px solid rgba(239,83,80,0.25);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:#ffcdd2;">' +
+      '<strong style="color:#ef5350;font-size:13px;">⚠️ About the ' + depleted + ' scenarios that ran out of money</strong><br><br>' +
+      'In <strong>' + failPct + '%</strong> of simulations the portfolio reached $0.' +
+      (earliestDeplete ? ' The earliest depletion occurred in <strong>' + earliestDeplete + '</strong>.' : '') +
+      (medDepleteYr ? ' The median depletion year was <strong>' + medDepleteYr + '</strong> — meaning half of failing scenarios lasted at least to that year.' : '') +
+      '<br><br>Even in depleted scenarios, your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong> in Social Security + pension) continues — the portfolio reaching $0 means spending above that floor is no longer funded, not that all income stops.' +
+      '<br><br><span style="color:#8aaabb;">To improve: reduce planned spending, delay retirement, increase SS delay, or build a larger Roth bucket to reduce sequence-of-returns risk.</span>' +
+      '</div>';
   } else {
-    verdictEl.style.cssText = 'border-radius:10px;padding:16px 20px;font-size:13px;line-height:1.8;background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.3);color:#ffcdd2;';
-    verdictEl.innerHTML = '❌ <strong style="color:#ef5350;">Plan needs attention.</strong> Only ' + successPct + '% of scenarios succeed. This doesn\'t mean retirement is impossible — it means your current numbers need adjustment. Try extending your working years, reducing spending, or increasing savings. Use the Inputs page to test changes and re-run.';
+    depleteHtml = '<div style="background:rgba(76,175,80,0.07);border:1px solid rgba(76,175,80,0.25);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:#a5d6a7;">' +
+      '✅ <strong>No simulations ran out of money.</strong> Your portfolio lasted through the full modeled lifespan in every single scenario tested (' + nRuns.toLocaleString() + ' runs). This is exceptional plan resilience.' +
+      '</div>';
   }
 
-  document.getElementById('mc-run-info').textContent =
-    'Model: ' + document.getElementById('mc-model').options[document.getElementById('mc-model').selectedIndex].text +
-    ' · Mean return: ' + (planData.portfolio && planData.portfolio.accounts ? 
-      (planData.portfolio.accounts.reduce(function(s,a){return s+(a.expectedReturn||7);},0)/Math.max(1,planData.portfolio.accounts.length)).toFixed(1)
-      : '7.0') + '% · σ = 15% · Inflation: ' +
-    ((planData.global && planData.global.inflation) ? (planData.global.inflation*100).toFixed(1) : '3.0') + '%';
+  // ── Verdict ───────────────────────────────────────────────
+  var verdictHtml;
+  if (successPct >= 90) {
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(76,175,80,0.08);border:1px solid rgba(76,175,80,0.3);color:#a5d6a7;font-size:13px;line-height:1.8;">' +
+      '✅ <strong style="color:#4CAF50;font-size:15px;">Excellent — ' + successPct + '% success rate</strong><br><br>' +
+      'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' random market scenarios</strong> — including crashes, recessions, prolonged low-return decades, and high-inflation periods. ' +
+      'The median ending balance across all runs is <strong>' + fmt(p50) + '</strong>. Even your worst-10% scenario ends at <strong>' + fmt(p10) + '</strong>.<br><br>' +
+      'This is above the <strong>90% threshold</strong> that most financial planners consider robust. Your combination of ' +
+      (ssYear1 > 0 ? 'Social Security income, ' : '') + (pension > 0 ? 'pension income, ' : '') +
+      'portfolio size, and spending level creates a resilient plan that holds up across a wide range of possible futures.' +
+      '</div>';
+  } else if (successPct >= 75) {
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(244,184,106,0.08);border:1px solid rgba(244,184,106,0.3);color:#ffcba4;font-size:13px;line-height:1.8;">' +
+      '⚠️ <strong style="color:#f4b86a;font-size:15px;">Acceptable — ' + successPct + '% success rate</strong><br><br>' +
+      'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' scenarios</strong>. The 75–89% range is workable but leaves meaningful risk. ' +
+      'The median outcome is <strong>' + fmt(p50) + '</strong>. In the worst 10% of scenarios the portfolio ends at <strong>' + (p10 > 0 ? fmt(p10) : '$0 (depleted)') + '</strong>.<br><br>' +
+      '<strong style="color:#f4b86a;">Ways to strengthen your plan:</strong> (1) Delay retirement by 1–2 years, (2) Reduce base spending by 5–10%, (3) Delay Social Security to increase the guaranteed income floor, (4) Increase Roth allocation to reduce sequence-of-returns risk. Any combination of these typically moves the needle above 85%.' +
+      '</div>';
+  } else if (successPct >= 50) {
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.3);color:#ffcdd2;font-size:13px;line-height:1.8;">' +
+      '❌ <strong style="color:#ef5350;font-size:15px;">Needs Attention — ' + successPct + '% success rate</strong><br><br>' +
+      'Only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' scenarios</strong> reach your legacy goal. This warrants a closer look at your plan numbers. ' +
+      (medDepleteYr ? 'In failing scenarios, the portfolio typically depletes around <strong>' + medDepleteYr + '</strong>. ' : '') +
+      '<br><br>This doesn't mean retirement is impossible — your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong>) continues regardless. ' +
+      'But it does mean your portfolio-funded spending is at elevated risk. Go to Inputs, try reducing spending or adjusting your retirement date, then re-run.' +
+      '</div>';
+  } else {
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(239,83,80,0.12);border:2px solid rgba(239,83,80,0.4);color:#ffcdd2;font-size:13px;line-height:1.8;">' +
+      '🚨 <strong style="color:#ef5350;font-size:15px;">Significant Risk — ' + successPct + '% success rate</strong><br><br>' +
+      'Only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' scenarios</strong> reach your goal. ' +
+      (earliestDeplete ? 'Some scenarios deplete as early as <strong>' + earliestDeplete + '</strong>. ' : '') +
+      'This level suggests the current plan parameters need meaningful adjustment before retirement. ' +
+      '<br><br>Important: your guaranteed income of <strong>' + fmt(ssYear1 + pension) + '/yr</strong> continues even if the portfolio depletes — but that may not cover your spending needs. Use the Inputs page to model changes and re-run.' +
+      '</div>';
+  }
 
-  // Build fan chart
-  buildMCFanChart(yearlyBals, yrs, curYear, projYears, nRuns);
-  buildSurvivalChart(failYears, yrs, curYear, projYears, nRuns);
+  document.getElementById('mc-verdict').innerHTML = verdictHtml + depleteHtml + contextHtml;
+  document.getElementById('mc-run-info').textContent =
+    'Ran ' + nRuns.toLocaleString() + ' scenarios · ' + yrs + '-year horizon (' + startYear + '–' + endYearLabel + ') · ' +
+    p1Name + ' to age ' + p1DeathAge + ' · ' + p2Name + ' to age ' + p2DeathAge +
+    ' · Expected return: ' + (mu*100).toFixed(1) + '% · σ=' + (sigma*100).toFixed(0) + '% · Inflation: ' + (inflation*100).toFixed(1) + '%';
+
+  buildMCFanChart(yearlyBals, yrs, curYear, mcYears, nRuns);
+  buildSurvivalChart(failYears, yrs, curYear, mcYears, nRuns, depleteYears);
   buildHistChart(endings, legacyGoal);
 
-  // Show results
   document.getElementById('mc-progress').style.display = 'none';
-  document.getElementById('mc-results').style.display = 'block';
+  document.getElementById('mc-results').style.display  = 'block';
   document.getElementById('mc-run-btn').disabled = false;
   document.getElementById('mc-run-btn').textContent = '▶ Run Again';
+}
+
+function contextRow(label, value) {
+  return '<div style="background:rgba(255,255,255,0.03);border-radius:5px;padding:7px 10px;">' +
+    '<div style="font-size:10px;color:#4a6a7a;margin-bottom:2px;">' + label + '</div>' +
+    '<div style="font-size:12px;font-weight:700;color:#c8dae8;">' + value + '</div>' +
+    '</div>';
 }
 
 function buildMCFanChart(yearlyBals, yrs, curYear, projYears, nRuns) {
@@ -1264,7 +1342,7 @@ function buildMCFanChart(yearlyBals, yrs, curYear, projYears, nRuns) {
   });
 }
 
-function buildSurvivalChart(failYears, yrs, curYear, projYears, nRuns) {
+function buildSurvivalChart(failYears, yrs, curYear, projYears, nRuns, depleteYears) {
   var labels = [], data = [];
   for (var i = 0; i < yrs; i += 3) {
     var yr = projYears ? projYears[i] : curYear + i;

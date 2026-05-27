@@ -109,179 +109,134 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B223
 
 <div class="page">
 
-  <!-- VERSION 1.1 — LATEST -->
+    <!-- VERSION 1.0 — LAUNCH -->
   <div class="version-card">
     <div class="version-hdr">
-      <div class="version-badge latest">v1.1 — Latest</div>
+      <div class="version-badge latest">v1.0 — Launch Release</div>
       <div>
-        <div class="version-title">Live Data Sync + Dynamic Names + Summary Fix</div>
+        <div class="version-title">RetireBlueprint Pro — Initial Release</div>
       </div>
-      <div class="version-date">May 2026</div>
+      <div class="version-date">Coming Soon</div>
     </div>
     <div class="version-body">
 
       <div class="change-group">
-        <div class="change-group-label label-fix">🔧 Fixes</div>
-        <div class="change-item">
-          <div class="change-dot dot-fix"></div>
-          <div class="change-text"><strong>Refresh now works on every page.</strong> After saving on Inputs, click the new 🔄 Refresh button in the nav bar on any page and your updated numbers load instantly. No more hard refresh required — and no more stale data on the Dashboard, Tax Engine, or Stress Test. <span class="change-page">All Pages</span></div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-fix"></div>
-          <div class="change-text"><strong>Auto-reload when you switch tabs.</strong> If you update Inputs in one browser tab and switch back to the Dashboard tab, the Dashboard automatically reloads your new data after 30 seconds. No manual action needed. <span class="change-page">All Pages</span></div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-fix"></div>
-          <div class="change-text"><strong>Summary Report now displays correctly.</strong> The report was failing to show because of a logo file path issue when hosted on GitHub Pages. Fixed — your Summary now loads reliably. <span class="change-page">Summary</span></div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-fix"></div>
-          <div class="change-text"><strong>Navigation links fixed on all pages.</strong> Several pages were using relative file paths that broke when hosted. All 9 pages now use full GitHub Pages URLs for every nav link. <span class="change-page">All Pages</span></div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-fix"></div>
-          <div class="change-text"><strong>Broken "Create/Update My Plan" link fixed.</strong> The Home page nav had a link pointing to a file that didn't exist. It now correctly goes to the Inputs page. <span class="change-page">Home</span></div>
-        </div>
-      </div>
+        <div class="change-group-label label-new">✨ Features at Launch</div>
 
-      <div class="change-group">
-        <div class="change-group-label label-new">✨ New Features</div>
         <div class="change-item">
           <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Your names appear everywhere, automatically.</strong> Enter your names on the Inputs page and they now populate throughout the tool — Dashboard headers, Tax Engine, Annual Check-In, Summary Report, and more. No more "Partner 1 / Partner 2" once you've entered your information. <span class="change-page">All Pages</span></div>
+          <div class="change-text"><strong>100-year projection engine.</strong> Year-by-year portfolio, income, and expense modeling from today through both partners' projected lifespans. Powered by your private Google Sheet. <span class="change-page">Dashboard</span></div>
         </div>
         <div class="change-item">
           <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>🔄 Refresh button added to every nav bar.</strong> One click reloads your latest data from your Google Sheet on any page. <span class="change-page">All Pages</span></div>
+          <div class="change-text"><strong>Monte Carlo simulation — 1,000 market scenarios.</strong> Runs entirely in your browser using your actual data. Shows success rate, median/worst/best outcomes, fan chart, depletion risk by year, and plain-English verdict with depletion year detail. <span class="change-page">Stress Test</span></div>
         </div>
         <div class="change-item">
           <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>What's New page (you're reading it).</strong> Every future update will be documented here so you always know what's changed. <span class="change-page">New Page</span></div>
+          <div class="change-text"><strong>Stress Test — sequence of returns scenarios.</strong> Year-1 market crash (−20% and −30%), high inflation (5%), custom scenario sliders, and base case comparison. <span class="change-page">Stress Test</span></div>
         </div>
-      </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Roth Conversion Optimizer.</strong> Calculates the ideal annual conversion to minimize lifetime taxes, with IRMAA Medicare surcharge detection and a visual conversion window planner. <span class="change-page">Tax Engine · Inputs</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Roth Access Ladder.</strong> Year-by-year visual showing when each account bucket unlocks penalty-free — taxable brokerage, pre-tax 401k, Roth conversions (5-year clock), Roth growth, and HSA. Includes Rule of 55, 72(t) SEPP, and Roth ladder strategy guides. <span class="change-page">Roth Ladder</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Tax Engine with IRMAA modeling.</strong> Real 2025 marginal rates, standard deductions, all five IRMAA Medicare surcharge tiers, RMD schedule, and Roth conversion window analysis. <span class="change-page">Tax Engine</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Medicare Planner.</strong> All parts of Medicare explained (A, B, C, D, Medigap), IRMAA calculator with your income highlighted, lifetime cost estimate, enrollment timeline, and strategy tips. <span class="change-page">Medicare</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Long-Term Care Planner.</strong> National median costs for all 6 care settings, a funded reserve calculator, portfolio impact chart (funded vs. unfunded), and guide to all 6 funding strategies including Medicaid rules. <span class="change-page">LTC Planner</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Healthcare Bridge calculator.</strong> Estimates pre-Medicare insurance costs for early retirees — a number most plans miss entirely ($50K–$150K+ for a couple retiring before 65). <span class="change-page">Inputs</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Smile Curve spending model.</strong> Three-phase spending (active/settling/healthcare-heavy) with customizable weights — because retirees don't spend a flat amount every year. <span class="change-page">Dashboard · Inputs</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Couples support — fully independent.</strong> Two partners with different ages, retirement dates, Social Security, accounts, and RMD calculations. Survivor benefit modeled automatically. <span class="change-page">All Pages</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Social Security optimizer.</strong> Both partners' benefits, survivor scenarios, optimal claiming age, COLA adjustment, and break-even analysis. <span class="change-page">Inputs · Dashboard</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>FIRE Intelligence panel.</strong> FI Date, Safe Withdrawal Rate, FIRE type (Lean/Regular/Fat), and Coast FIRE number — updated automatically as you change your numbers. <span class="change-page">Dashboard</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Annual Check-In system.</strong> Guided one-page form to update balances and assumptions each year in about 15 minutes. Keeps your plan accurate forever. <span class="change-page">Annual Check-In</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Print-ready Summary Report.</strong> Professional one-pager for sharing with a spouse or financial advisor — all your key numbers, income waterfall, and stress test results. <span class="change-page">Summary</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Setup Guide with full FIRE glossary.</strong> Every concept explained from scratch — FIRE, FI, SWR, Coast FIRE, Roth ladder, IRMAA, RMDs, Smile Curve, sequence of returns risk — no financial background required. <span class="change-page">Setup Guide</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Live Demo mode.</strong> Full tool with sample data — try every page before connecting your sheet. <span class="change-page">Demo</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Dynamic partner names.</strong> Enter your names on the Inputs page and they appear throughout the tool — every chart label, header, and table. <span class="change-page">All Pages</span></div>
+        </div>
+        <div class="change-item">
+          <div class="change-dot dot-new"></div>
+          <div class="change-text"><strong>Auto-refresh on save.</strong> Save on Inputs → 🔄 Refresh on any page → all data updates instantly. No manual hard refresh required. <span class="change-page">All Pages</span></div>
+        </div>
 
-      <div class="change-group">
-        <div class="change-group-label label-content">📖 Content</div>
-        <div class="change-item">
-          <div class="change-dot dot-content"></div>
-          <div class="change-text"><strong>FIRE glossary dramatically expanded.</strong> The Setup Guide's Key Concepts section now explains every abbreviation in plain English: FIRE, FI, FI Number, SWR (Safe Withdrawal Rate), Coast FIRE Number, and all five FIRE variants (Lean, Regular, Fat, Barista, Coast) with 2–3 sentences each. <span class="change-page">Setup Guide</span></div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-content"></div>
-          <div class="change-text"><strong>Key Concepts moved to its own section.</strong> The Key Concepts cards are now a standalone Section 8, separate from the FAQ accordion. They render as a clean, readable single-column list on all screen sizes. <span class="change-page">Setup Guide</span></div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-content"></div>
-          <div class="change-text"><strong>Generic example names throughout.</strong> The Setup Guide previously used real names as examples. These have been replaced with "Partner 1" and "Partner 2" so the tool works for any couple. <span class="change-page">Setup Guide</span></div>
-        </div>
       </div>
-
     </div>
   </div>
 
-  <!-- VERSION 1.0 — LAUNCH -->
-  <div class="version-card">
-    <div class="version-hdr">
-      <div class="version-badge">v1.0 — Launch</div>
-      <div>
-        <div class="version-title">Initial Release</div>
-      </div>
-      <div class="version-date">May 2026</div>
-    </div>
-    <div class="version-body">
-
-      <div class="change-group">
-        <div class="change-group-label label-new">✨ Included at Launch</div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>9-page retirement dashboard</strong> — Home, Dashboard, Inputs, Tax Engine, Annual Check-In, Setup Guide, Summary Report, Demo, Stress Test</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>100-year projection engine</strong> — year-by-year portfolio, income, and expense modeling from today through both partners' projected lifespans</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Roth Conversion Optimizer</strong> — calculates the ideal annual conversion amount to minimize lifetime taxes, with IRMAA Medicare surcharge detection</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Tax Engine</strong> — real marginal rates, standard deductions, IRMAA tiers, and RMD schedule for 2025</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Stress Test</strong> — Year-1 market crash scenarios (−20% and −30%), high-inflation scenario (5%), and base case comparison</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Couples support</strong> — two partners with independent ages, retirement dates, Social Security, accounts, and RMD calculations. Survivor benefit modeled automatically.</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Healthcare Bridge calculator</strong> — estimates pre-Medicare insurance costs for early retirees (ages 55–64)</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Smile Curve spending model</strong> — three-phase spending (active, settled, healthcare-heavy) with customizable phase weights</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>FIRE Intelligence panel</strong> — FI Date, SWR, FIRE type (Lean/Regular/Fat), and Coast FIRE number</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Annual Check-In system</strong> — guided form to update balances and assumptions each year in about 15 minutes</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Print-ready Summary Report</strong> — professional one-pager for sharing with a spouse or financial advisor</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Setup Guide with plain-English FIRE glossary</strong> — every concept explained from scratch, no financial knowledge required</div>
-        </div>
-        <div class="change-item">
-          <div class="change-dot dot-new"></div>
-          <div class="change-text"><strong>Demo mode</strong> — full tool with sample data, no Google Sheet required, available before purchase</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ROADMAP -->
+<!-- ROADMAP -->
   <div class="roadmap-card">
     <div class="roadmap-title">🗺️ Coming in Future Updates</div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v11">v1.2</div>
+      <div class="roadmap-tag" style="background:#1a3a52;color:#1CC7D0;">v1.2</div>
       <div class="roadmap-text"><strong>Pension income section</strong> — dedicated fields for pension income, COLA, survivor election, and lump-sum comparison</div>
     </div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v11">v1.2</div>
+      <div class="roadmap-tag" style="background:#1a3a52;color:#1CC7D0;">v1.2</div>
       <div class="roadmap-text"><strong>Social Security break-even calculator</strong> — compare claiming at 62 vs. FRA vs. 70 with your specific numbers and break-even age</div>
     </div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v11">v1.2</div>
+      <div class="roadmap-tag" style="background:#1a3a52;color:#1CC7D0;">v1.2</div>
       <div class="roadmap-text"><strong>Long-term care planning</strong> — estimate LTC costs and their impact on your retirement projection</div>
     </div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v11">v1.2</div>
+      <div class="roadmap-tag" style="background:#1a3a52;color:#1CC7D0;">v1.2</div>
       <div class="roadmap-text"><strong>Inflation scenario comparison</strong> — stress test your plan against 3%, 4%, and 5% inflation side by side</div>
     </div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v2">v2.0</div>
+      <div class="roadmap-tag" style="background:#2d1515;color:#ff9f43;">v2.0</div>
       <div class="roadmap-text"><strong>Monte Carlo simulation</strong> — run 1,000 randomized market scenarios and see your plan's success rate (e.g. "94% of scenarios succeed")</div>
     </div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v2">v2.0</div>
+      <div class="roadmap-tag" style="background:#2d1515;color:#ff9f43;">v2.0</div>
       <div class="roadmap-text"><strong>What-If scenario comparison</strong> — compare two versions of your plan side by side ("retire at 60 vs. 62", "spend $80K vs. $90K")</div>
     </div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v2">v2.0</div>
+      <div class="roadmap-tag" style="background:#2d1515;color:#ff9f43;">v2.0</div>
       <div class="roadmap-text"><strong>FIRE progress gauge</strong> — visual "You're at 73% of your FI Number" indicator with Coast FIRE milestone notification</div>
     </div>
     <div class="roadmap-item">
-      <div class="roadmap-tag tag-v2">v2.0</div>
+      <div class="roadmap-tag" style="background:#2d1515;color:#ff9f43;">v2.0</div>
       <div class="roadmap-text"><strong>Mobile-responsive layout</strong> — full functionality on phones and tablets</div>
     </div>
     <p style="font-size:11px;color:#6a8a9a;margin-top:16px;">All updates are free for existing customers. You paid once — you get everything, forever.</p>
