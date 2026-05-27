@@ -92,13 +92,26 @@
 
 <div class="header">
   <div class="header-logo">
-    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:38px;width:auto;" onerror="this.style.display='none'">
+    <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:44px;width:auto;flex-shrink:0;" onerror="this.style.display='none'">
     <div>
-      <div class="header-title">Stress Tester</div>
-      <div style="font-size:9px;color:#456A73;">Interactive Scenario Analysis · Your Real Data</div>
+      <div class="header-title">⚡ Stress Tester</div>
+      <div style="font-size:9px;color:#ff9f43;margin-top:2px;">Interactive Scenario Analysis · Your Real Data</div>
     </div>
   </div>
-  <a href="RetireBlueprintPro_Dashboard.html" class="nav-back">← Back to Dashboard</a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" class="nav-back">← Dashboard</a>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;font-size:11px;text-decoration:none;">🎬 Demo</a>
+  </div>
+</div>
+<div style="background:#0A3145;border-bottom:1px solid #1a3a52;padding:0 16px;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#ff9f43;font-size:10px;font-weight:800;padding:8px 12px;text-decoration:none;white-space:nowrap;border-bottom:2px solid #ff9f43;">⚡ Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">🎬 Demo</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">📄 Summary</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html" style="color:#8aaabb;font-size:10px;font-weight:600;padding:8px 12px;text-decoration:none;white-space:nowrap;">Setup Guide</a>
 </div>
 
 <div class="body">
@@ -108,9 +121,39 @@
   <p>Use sliders to simulate real-world scenarios against YOUR actual portfolio data. See instantly how a market crash, high inflation, or reduced spending affects your ending balance and legacy goal. This is where retirement plans get battle-tested.</p>
 </div>
 
-<div id="loading-msg">⏳ Loading your plan data... <br><small style="color:#5a7a8a;">Connect your sheet on the Home page first</small></div>
+<div id="loading-msg" style="text-align:center;padding:50px 20px;">
+  <!-- Spinner -->
+  <div style="display:inline-block;width:48px;height:48px;border:4px solid #1a3a52;border-top:4px solid #1CC7D0;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px;"></div>
+  <br>
+  <div id="loading-status" style="font-size:14px;font-weight:700;color:#c8dae8;margin-bottom:12px;">Connecting to your Google Sheet...</div>
+  
+  <!-- Progress bar -->
+  <div style="max-width:320px;margin:0 auto 16px;">
+    <div style="background:#1a3a52;border-radius:10px;height:8px;overflow:hidden;">
+      <div id="loading-progress" style="height:8px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);border-radius:10px;width:0%;transition:width 0.5s ease;"></div>
+    </div>
+    <div id="loading-pct" style="font-size:10px;color:#8aaabb;margin-top:6px;">0%</div>
+  </div>
+  
+  <div id="loading-detail" style="font-size:11px;color:#5a7a8a;max-width:320px;margin:0 auto;line-height:1.6;">
+    Reading projections &amp; portfolio data...
+  </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 
 <div id="stress-content" style="display:none;">
+
+  <!-- SAMPLE DATA NOTICE -->
+  <div id="sample-notice" style="display:none;background:rgba(244,184,106,0.12);border:1px solid rgba(244,184,106,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div style="font-size:20px;">📊</div>
+    <div style="flex:1;">
+      <div style="font-size:11px;font-weight:700;color:#f4b86a;margin-bottom:2px;">Showing Sample Data (Alex & Jordan)</div>
+      <div style="font-size:10px;color:#8aaabb;">Connect your Google Sheet to stress-test YOUR actual numbers. <a href="RetireBlueprintPro_Home.html" style="color:#1CC7D0;">Set up your sheet →</a></div>
+    </div>
+  </div>
 
   <!-- SCENARIO TABS -->
   <div class="scenario-tabs">
@@ -474,30 +517,104 @@ function recalc() {
 }
 
 // ── LOAD DATA ────────────────────────────────────────────────────────
+// ── SAMPLE DATA (shown when no sheet connected) ──────────────────
+function loadSampleData() {
+  planData = {
+    people: {
+      partner1: {name:'Alex', age:63, ssMonthly:2544, ssYear1:15263, salary:72000, salaryEnd:'6/30/2026', pension:343, deathAge:92},
+      partner2: {name:'Jordan', age:55, ssMonthly:2493, ssYear1:0, salary:80230, salaryEnd:'6/30/2028', pension:0, deathAge:105},
+    },
+    portfolio: {
+      total: 925000,
+      accounts: [
+        {name:"401k",expectedReturn:7,balance:437000,type:'Pretax (Deferred)'},
+        {name:"Roth IRA",expectedReturn:8,balance:32000,type:'Roth (Tax Free)'},
+        {name:"Brokerage",expectedReturn:7,balance:99000,type:'Taxable (Liquid)'},
+        {name:"Partner 2 401k",expectedReturn:7,balance:357000,type:'Pretax (Deferred)'},
+      ]
+    },
+    spending: { baseAnnual: 60000, safeExtra: 27000 },
+    legacy: { goal: 250000, projectedEnding: 250000, achievedPct: 100 },
+    global: { planYear: 2026, inflation: 0.03, ssCola: 0.025 },
+    projections: null
+  };
+
+  // Show sample data banner
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('stress-content').style.display = 'block';
+
+  // Add sample data notice
+  var notice = document.getElementById('sample-notice');
+  if (notice) notice.style.display = 'flex';
+
+  recalc();
+}
+
 function loadData() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId) {
-    document.getElementById('loading-msg').innerHTML =
-      '⚠️ No sheet connected.<br><a href="RetireBlueprintPro_Home.html" style="color:var(--teal);">Go to Home page to connect your sheet →</a>';
+    loadSampleData();
     return;
   }
+
+  // Animate progress bar
+  var pct = 0;
+  var msgs = [
+    'Connecting to your Google Sheet...',
+    'Reading account balances...',
+    'Loading projection data...',
+    'Calculating stress scenarios...',
+    'Almost ready...'
+  ];
+  var msgIdx = 0;
+  var progressInterval = setInterval(function() {
+    pct = Math.min(90, pct + (pct < 30 ? 3 : pct < 60 ? 2 : 1));
+    var bar = document.getElementById('loading-progress');
+    var pctEl = document.getElementById('loading-pct');
+    var statusEl = document.getElementById('loading-status');
+    var detailEl = document.getElementById('loading-detail');
+    if (bar) bar.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (statusEl && pct > msgIdx * 20) {
+      if (msgIdx < msgs.length) statusEl.textContent = msgs[msgIdx++];
+    }
+    if (pct >= 90 && detailEl) detailEl.textContent = 'This can take 20-30 seconds on first load — your sheet is being read for the first time.';
+  }, 400);
+
   var cb = 'rbpStress_'+Date.now();
   var done = false;
+
   var t = setTimeout(function(){
-    if(!done){done=true;document.getElementById('loading-msg').textContent='⚠️ Timeout — please refresh';}
-  }, 60000);
+    if(!done){
+      done=true;
+      clearInterval(progressInterval);
+      console.log('Timeout, using sample data');
+      loadSampleData();
+    }
+  }, 90000);  // 90 seconds — plenty of time
   window[cb] = function(d){
-    if(done) return; done=true; clearTimeout(t); delete window[cb];
-    planData = d;
-    document.getElementById('loading-msg').style.display='none';
-    document.getElementById('stress-content').style.display='block';
-    recalc();
+    if(done) return; done=true;
+    clearTimeout(t); clearInterval(progressInterval); delete window[cb];
+    // Complete the progress bar
+    var bar = document.getElementById('loading-progress');
+    var pctEl = document.getElementById('loading-pct');
+    var statusEl = document.getElementById('loading-status');
+    if (bar) bar.style.width = '100%';
+    if (pctEl) pctEl.textContent = '100%';
+    if (statusEl) statusEl.textContent = '✅ Plan loaded!';
+    setTimeout(function() {
+      planData = d;
+      document.getElementById('loading-msg').style.display='none';
+      document.getElementById('stress-content').style.display='block';
+      recalc();
+    }, 400);
   };
   var s = document.createElement('script');
   s.src = SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&t='+Date.now();
   s.onerror = function(){
-    if(!done){done=true;clearTimeout(t);
-      document.getElementById('loading-msg').textContent='⚠️ Could not load data. Check connection and refresh.';
+    if(!done){done=true;clearTimeout(t);clearInterval(progressInterval);
+      console.log('Sheet load failed, using sample data');
+      loadSampleData();
     }
   };
   document.head.appendChild(s);
