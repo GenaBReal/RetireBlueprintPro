@@ -171,6 +171,50 @@
     </div>
   </div>
 
+  <!-- YOUR PLAN FINGERPRINT BAR -->
+  <div id="plan-fingerprint" style="display:none;background:#0A3145;border-radius:10px;padding:12px 18px;margin-bottom:14px;border:2px solid rgba(28,199,208,0.3);">
+    <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">
+      🔍 Your Plan at a Glance — Confirm This Is Your Data
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
+      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
+        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Portfolio</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;" id="fp-portfolio">—</div>
+        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Starting value</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
+        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Legacy Goal</div>
+        <div style="font-size:16px;font-weight:800;color:#f4b86a;" id="fp-legacy">—</div>
+        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Target ending balance</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
+        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Base Ending Balance</div>
+        <div style="font-size:16px;font-weight:800;color:#4CAF50;" id="fp-ending">—</div>
+        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;" id="fp-ending-note">Matches Dashboard ✓</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
+        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Plan Runs Through</div>
+        <div style="font-size:16px;font-weight:800;color:#1CC7D0;" id="fp-end-year">—</div>
+        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;" id="fp-end-note">Both partners covered</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">
+        <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Annual Spending</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;" id="fp-spending">—</div>
+        <div style="font-size:8px;color:#5a7a8a;margin-top:2px;">Base + solver extra</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;border:1px solid rgba(255,107,107,0.3);">
+        <div style="font-size:8px;color:#ff9f43;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">⚡ Stress: -30% Yr1</div>
+        <div style="font-size:16px;font-weight:800;" id="fp-stress30">—</div>
+        <div style="font-size:8px;margin-top:2px;" id="fp-stress30-note">—</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:9px;color:#456A73;text-align:center;">
+      If these numbers match what you see on your Dashboard, your real plan is loaded. 
+      If you see "Alex" or generic numbers, you're on sample data — 
+      <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">open on GitHub Pages to load your sheet →</a>
+    </div>
+  </div>
+
   <!-- SCENARIO TABS -->
   <div class="scenario-tabs">
     <button class="tab-btn active" onclick="setScenario('custom')">🎛️ Custom Scenario</button>
@@ -459,6 +503,85 @@ function project(overrides) {
 }
 
 // ── RECALCULATE ─────────────────────────────────────────────────────
+function updateFingerprint(baseRes, stressRes, baseEnd) {
+  if (!planData) return;
+  var port = planData.portfolio || {};
+  var sp   = planData.spending  || {};
+  var leg  = planData.legacy    || {};
+  var proj = planData.projections || {};
+  var pkeys = Object.keys(planData.people || {});
+  var p1   = planData.people[pkeys[0]] || {};
+  var p2   = planData.people[pkeys[1]] || {};
+
+  // Show fingerprint panel
+  var fp = document.getElementById('plan-fingerprint');
+  if (fp) fp.style.display = 'block';
+
+  // Portfolio
+  var fpp = document.getElementById('fp-portfolio');
+  if (fpp) fpp.textContent = fmt(port.total || 0);
+
+  // Legacy goal
+  var fpl = document.getElementById('fp-legacy');
+  if (fpl) fpl.textContent = fmt(leg.goal || 0);
+
+  // Base ending — use actual sheet projection if available
+  var actualEnding = leg.projectedEnding || baseEnd;
+  var fpEnd = document.getElementById('fp-ending');
+  var fpEndNote = document.getElementById('fp-ending-note');
+  if (fpEnd) {
+    fpEnd.textContent = fmt(actualEnding);
+    fpEnd.style.color = actualEnding >= (leg.goal||0) ? '#4CAF50' : '#f4b86a';
+  }
+  if (fpEndNote) {
+    fpEndNote.textContent = actualEnding >= (leg.goal||0) ? '✅ Matches Dashboard' : '⚠️ Below legacy goal';
+    fpEndNote.style.color = actualEnding >= (leg.goal||0) ? '#4CAF50' : '#f4b86a';
+  }
+
+  // Plan end year — from actual projection years
+  var endYr = '';
+  var endNote = '';
+  if (proj.years && proj.years.length > 0) {
+    endYr = proj.years[proj.years.length-1];
+    var p1DeathYr = p1.age ? new Date().getFullYear() + ((p1.deathAge||90) - (p1.age||63)) : 0;
+    var p2DeathYr = p2.age ? new Date().getFullYear() + ((p2.deathAge||90) - (p2.age||55)) : 0;
+    var longestYr = Math.max(p1DeathYr, p2DeathYr);
+    endNote = longestYr > 0 ? 'Through age ' + (p1DeathYr >= p2DeathYr ? (p1.deathAge||90) : (p2.deathAge||90)) + ' (' + longestYr + ')' : 'Both partners covered';
+  } else if (baseRes && baseRes.length > 0) {
+    endYr = baseRes[baseRes.length-1].year;
+    endNote = 'Based on projection';
+  }
+  var fpYr = document.getElementById('fp-end-year');
+  var fpYrNote = document.getElementById('fp-end-note');
+  if (fpYr) fpYr.textContent = endYr || '—';
+  if (fpYrNote) fpYrNote.textContent = endNote;
+
+  // Annual spending
+  var fpSpend = document.getElementById('fp-spending');
+  if (fpSpend) fpSpend.textContent = fmt((sp.baseAnnual||0) + (sp.safeExtra||0));
+
+  // Stress -30% ending
+  var stress30End = stressRes && stressRes.length > 0 ? stressRes[stressRes.length-1].bal : 0;
+  // Quick calculate -30% if not current scenario
+  var yr1Current = parseInt(document.getElementById('sl-yr1').value);
+  if (yr1Current !== -30) {
+    // Run quick -30 projection
+    var gi = planData.global || {};
+    var quick30 = project({yr1:-30, yrs:1, inf:(gi.inflation||0.03)*100, spend:0, cola:(gi.ssCola||0.025)*100});
+    stress30End = quick30.length > 0 ? quick30[quick30.length-1].bal : 0;
+  }
+  var fp30 = document.getElementById('fp-stress30');
+  var fp30Note = document.getElementById('fp-stress30-note');
+  if (fp30) {
+    fp30.textContent = fmt(stress30End);
+    fp30.style.color = stress30End >= (leg.goal||0) ? '#4CAF50' : stress30End > 0 ? '#f4b86a' : '#ff6b6b';
+  }
+  if (fp30Note) {
+    fp30Note.style.color = fp30.style.color;
+    fp30Note.textContent = stress30End >= (leg.goal||0) ? '✅ Goal met' : stress30End > 0 ? '⚠️ Below goal' : '⛔ Depleted';
+  }
+}
+
 function recalc() {
   // Update labels
   var yr1 = parseInt(document.getElementById('sl-yr1').value);
@@ -494,6 +617,9 @@ function recalc() {
   var deltaPct = baseEnd>0 ? Math.round(delta/baseEnd*100) : 0;
 
   // Update KPIs
+  // ── UPDATE FINGERPRINT BAR ──────────────────────────────
+  updateFingerprint(baseRes, stressRes, baseEnd);
+
   document.getElementById('res-base-end').textContent   = fmt(baseEnd);
   document.getElementById('res-base-conf').textContent  = baseConf+'% of legacy goal';
   document.getElementById('res-stress-end').textContent = fmt(stressEnd);
