@@ -108,6 +108,68 @@ tbody tr.current-year td{background:#fffbf0;font-weight:600;}
   .kpi2 { grid-template-columns: 1fr !important; }
   .stress-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ── MOBILE NAV & HEADER FIX ──────────────────────────── */
+@media (max-width: 768px) {
+  /* Nav bar - scrollable horizontal on mobile */
+  .nav-bar, .nav, [class*="nav"] {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+  }
+  .nav-bar::-webkit-scrollbar, .nav::-webkit-scrollbar { display: none; }
+  
+  /* Hero - prevent overflow */
+  .hero, [class*="hero"] {
+    overflow: hidden !important;
+  }
+  
+  /* Header stats - hide on very small screens */
+  .hero-right, .header-right, .hero-stats, .hstat {
+    display: none !important;
+  }
+  
+  /* Logo area - constrain */
+  .hero-left, .header-left, .hero-logo {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  
+  /* Logo image - never overflow */
+  .hero img, .header img, nav img {
+    max-height: 40px !important;
+    width: auto !important;
+  }
+  
+  /* Force page container to not overflow */
+  .page, .section, .body, main {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Nav links - smaller on mobile */
+  .nav-link, .nav a, [class*="nav"] a {
+    font-size: 9px !important;
+    padding: 8px 8px !important;
+    white-space: nowrap;
+  }
+  
+  /* KPI/stat strips - 2 columns max */
+  .hstat-row, .kpi-strip, [class*="stat-row"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .hstat-row, .kpi-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .hero-title, [class*="hero"] h1, [class*="hero"] h2 {
+    font-size: 16px !important;
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>

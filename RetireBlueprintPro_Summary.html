@@ -168,11 +168,72 @@
   .kpi2 { grid-template-columns: 1fr !important; }
   .stress-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ── MOBILE NAV & HEADER FIX ──────────────────────────── */
+@media (max-width: 768px) {
+  /* Nav bar - scrollable horizontal on mobile */
+  .nav-bar, .nav, [class*="nav"] {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+  }
+  .nav-bar::-webkit-scrollbar, .nav::-webkit-scrollbar { display: none; }
+  
+  /* Hero - prevent overflow */
+  .hero, [class*="hero"] {
+    overflow: hidden !important;
+  }
+  
+  /* Header stats - hide on very small screens */
+  .hero-right, .header-right, .hero-stats, .hstat {
+    display: none !important;
+  }
+  
+  /* Logo area - constrain */
+  .hero-left, .header-left, .hero-logo {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  
+  /* Logo image - never overflow */
+  .hero img, .header img, nav img {
+    max-height: 40px !important;
+    width: auto !important;
+  }
+  
+  /* Force page container to not overflow */
+  .page, .section, .body, main {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Nav links - smaller on mobile */
+  .nav-link, .nav a, [class*="nav"] a {
+    font-size: 9px !important;
+    padding: 8px 8px !important;
+    white-space: nowrap;
+  }
+  
+  /* KPI/stat strips - 2 columns max */
+  .hstat-row, .kpi-strip, [class*="stat-row"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .hstat-row, .kpi-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .hero-title, [class*="hero"] h1, [class*="hero"] h2 {
+    font-size: 16px !important;
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- Toolbar -->
 <div class="toolbar">
   <div class="toolbar-title">📄 Retirement Summary Report</div>
   <div>
@@ -185,7 +246,7 @@
 
 <div class="report-wrap" id="report-page" style="display:none;">
 
-  <!-- ── HEADER ── -->
+  
   <div class="rpt-header">
     <div class="rpt-header-top" style="overflow:hidden;">
       <img src="rbp-logo.png" alt="RetireBlueprint Pro" style="height:60px;width:auto;display:block;flex-shrink:0;" onerror="this.style.display='none'">
@@ -211,7 +272,7 @@
 
   <div class="rpt-body">
 
-    <!-- ── 1. PLAN STATUS ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">🛡</span> Plan Status &amp; Confidence</div>
       <div class="status-banner green" id="r-status-banner">
@@ -246,7 +307,7 @@
       </div>
     </div>
 
-    <!-- ── 2. PARTNER PROFILES ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">👥</span> Partner Profiles</div>
       <div class="col2">
@@ -281,7 +342,7 @@
       </div>
     </div>
 
-    <!-- ── 3. INCOME SOURCES ── -->
+    
     <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">💵</span> Year 1 Income Detail</div>
       <table class="rtbl">
@@ -291,7 +352,7 @@
       </table>
     </div>
 
-    <!-- ── 4. INVESTMENT ACCOUNTS ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">📊</span> Investment Accounts <span style="font-size:8px;font-weight:400;color:#888;text-transform:none;letter-spacing:0;">(accounts flagged "Yes" in Inputs → Named Accounts → Show on Summary)</span></div>
       <table class="rtbl">
@@ -313,7 +374,7 @@
       </div>
     </div>
 
-    <!-- ── 5. SPENDING PLAN ── -->
+    
     <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">🌊</span> Smile Curve Spending Plan</div>
       <div class="kpi4">
@@ -328,7 +389,7 @@
       </div>
     </div>
 
-    <!-- ── 6. TAX STRATEGY ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">🧾</span> Tax Strategy</div>
       <div class="kpi4">
@@ -348,7 +409,7 @@
       </div>
     </div>
 
-    <!-- ── 7. DEBTS & REAL ESTATE ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">🏠</span> Debts &amp; Real Estate</div>
       <table class="rtbl">
@@ -357,7 +418,7 @@
       </table>
     </div>
 
-    <!-- ── 8. STRESS TEST ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">⚡</span> Stress Test — Sequence of Returns Risk</div>
       <p style="font-size:9px;color:#555;margin:0 0 8px;">Shows projected ending portfolio balance under adverse conditions. A resilient plan survives even the severe scenario.</p>
@@ -385,7 +446,7 @@
       </div>
     </div>
 
-    <!-- ── 9. KEY MILESTONES ── -->
+    
     <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">📅</span> Key Dates &amp; Milestones</div>
       <table class="rtbl">
@@ -394,13 +455,13 @@
       </table>
     </div>
 
-    <!-- ── 10. PLAN SUMMARY CHECKLIST ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">✅</span> Plan Completeness</div>
       <div id="r-checklist" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;"></div>
     </div>
 
-    <!-- ── 11. THE STORY ── -->
+    
     <div class="rpt-section pb-before">
       <div class="rpt-section-title"><span class="icon">📖</span> The Story of Your Plan — Plain English</div>
       <div id="r-narrative" style="font-size:12px;line-height:1.9;color:#333;background:#f8f9fa;border-left:4px solid #1CC7D0;padding:16px 20px;border-radius:0 8px 8px 0;">
@@ -408,7 +469,7 @@
       </div>
     </div>
 
-    <!-- ── 12. NET WORTH & FINANCIAL SNAPSHOT ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">💎</span> Net Worth Snapshot</div>
       <div class="kpi4">
@@ -457,7 +518,7 @@
       </div>
     </div>
 
-    <!-- ── 13. MONTHLY RETIREMENT BUDGET ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">📆</span> Monthly Retirement Budget (Full Retirement)</div>
       <div class="col2">
@@ -484,7 +545,7 @@
       <div id="r-monthly-verdict" style="margin-top:12px;padding:10px 16px;border-radius:6px;font-size:11px;font-weight:600;">—</div>
     </div>
 
-    <!-- ── GLOSSARY ── -->
+    
     <div class="rpt-section">
       <div class="rpt-section-title"><span class="icon">📚</span> Key Terms Glossary</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:10px;">
@@ -507,23 +568,23 @@
       </div>
     </div>
 
-    <!-- ── DISCLAIMER ── -->
+    
     <div style="font-size:8px;color:#aaa;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;line-height:1.7;text-align:center;">
       This report is generated by RetireBlueprint Pro for personal planning purposes only. It is not financial, tax, or legal advice.
       Projections are estimates based on assumptions that may differ from actual results. Past performance does not guarantee future results.
       Consult a qualified financial advisor before making retirement decisions.
     </div>
 
-  </div><!-- /.rpt-body -->
+  </div>
 
-  <!-- Footer -->
+  
   <div class="rpt-footer">
     <div>RetireBlueprint Pro · retireblueprintpro.com</div>
     <div id="r-footer-date">—</div>
     <div>Confidential — For Personal Planning Use Only</div>
   </div>
 
-</div><!-- /.report-wrap -->
+</div>
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
@@ -584,8 +645,7 @@ function loadReport(attempt) {
     delete window[cb];
     try { populateReport(d); }
     catch(e) {
-      console.error(e);
-      loadEl.innerHTML = '⚠️ Error loading data: '+e.message+'<br><button onclick="loadReport(1)" style="margin-top:10px;padding:8px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;">Try Again</button>';
+loadEl.innerHTML = '⚠️ Error loading data: '+e.message+'<br><button onclick="loadReport(1)" style="margin-top:10px;padding:8px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;">Try Again</button>';
     }
   };
 
@@ -943,7 +1003,6 @@ function populateReport(d) {
     '</div>';
   }).join('');
 }
-
 
   // ── NARRATIVE ──
   function buildNarrative(p1, p2, p1n, p2n, leg, sp, port, roth, tax, gl, proj) {
