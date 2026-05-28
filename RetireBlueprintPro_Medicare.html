@@ -447,7 +447,7 @@ function loadData() {
   document.head.appendChild(s);
 }
 
-document.addEventListener('DOMContentLoaded', loadData);
+document.addEventListener('DOMContentLoaded', function(){ loadData(); });
 (function(){
   var _h=0;
   window.addEventListener('storage',function(e){if(e.key==='rbp_last_saved')setTimeout(loadData,400);});

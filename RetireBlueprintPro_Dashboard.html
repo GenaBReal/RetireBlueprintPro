@@ -1192,7 +1192,7 @@ function reloadData() {
   document.getElementById('loading-sub').textContent = 'Refreshing your plan data…';
   loadData();
 }
-window.addEventListener('DOMContentLoaded', loadData);
+window.addEventListener('DOMContentLoaded', function(){ loadData(); });
 
 function showDashWelcome() {
   var modal = document.getElementById('dash-welcome-modal');
