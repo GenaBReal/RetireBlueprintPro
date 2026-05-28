@@ -24,9 +24,9 @@ body{font-family:'Montserrat',sans-serif;background:var(--navy);color:#fff;min-h
 .header-title{font-size:13px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:1px;}
 
 /* NAV */
-.nav-strip{background:#0A3145;padding:0;display:flex;align-items:stretch;border-bottom:1px solid #1a3a52;overflow-x:auto;scrollbar-width:none;}
+
 .nav-strip::-webkit-scrollbar{display:none;}
-.nav-strip a{font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;white-space:nowrap;}
+
 .nav-strip a.active,.nav-strip a:hover{color:#f4b86a;}
 
 .body{max-width:1100px;margin:0 auto;padding:16px;}
@@ -165,23 +165,6 @@ window.addEventListener('storage', function(e) {
     <button onclick="loadData()" style="background:rgba(28,199,208,0.15);border:1px solid #1CC7D0;color:#1CC7D0;font-size:10px;font-weight:700;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:inherit;">🔄 Reload Data</button>
     <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" style="color:#8aaabb;font-size:11px;text-decoration:none;">← Dashboard</a>
   </div>
-</div>
-
-<div class="nav-strip">
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html">Dashboard</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
-    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">🔄 Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">🏥 Medicare</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">🏠 LTC</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" class="active">⚡ Stress Test</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">🎬 Demo</a>
-  <a href="#" onclick="loadData();return false;" style="margin-left:auto;padding:8px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;" title="Reload data from your Google Sheet">🔄 Refresh</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">📋 What's New</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">📄 Summary</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
 </div>
 
 <div class="body">
