@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Dashboard</title>
 <style>
+.header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
+.header img{height:60px;width:auto;flex-shrink:0;display:block;}
+.nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{font-size:9px;color:#1CC7D0;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:10px 14px;border-right:1px solid #1a3a52;display:flex;align-items:center;white-space:nowrap;transition:background 0.15s;}
+.nav a:hover{background:#1a3a52;}
+.nav a.active{color:#f4b86a;border-bottom:2px solid #f4b86a;}
+
 .nav{background:#0A3145 !important;}
 .nav a{color:#1CC7D0 !important;}
 
@@ -282,6 +290,23 @@ window.addEventListener('storage', function(e) {
   <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;"></span>
   <button onclick="reloadData()" style="margin:4px 8px;background:#0A3145;border:1px solid #1a3a52;color:#1CC7D0;font-size:9px;font-weight:700;padding:4px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.5px;">↺ Refresh Data</button>
 </div>
+<div class="nav">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" class="active">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+</div>
+
 
 <div class="section">
 
