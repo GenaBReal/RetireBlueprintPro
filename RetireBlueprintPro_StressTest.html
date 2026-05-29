@@ -93,7 +93,7 @@ input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
 .rec-item{display:flex;gap:8px;font-size:10px;color:#3a4e5e;line-height:1.6;margin-bottom:4px;}
 
 /* INFO BOXES */
-.info-teal{background:#f5f9fa;border-left:3px solid #1CC7D0;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:11px;color:#003a42;line-height:1.7;}
+.info-teal{background:#f5f9fa;border-left:3px solid #1CC7D0;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:11px;color:#0B2239;line-height:1.7;}
 
 /* MC SECTION */
 .mc-section{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e4eb;border-top:3px solid #1CC7D0;margin-top:16px;}
@@ -123,6 +123,10 @@ input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
 .mc-progress-bar-fill.fail{background:#c0392b;}
 
 @media(max-width:768px){.main-grid{grid-template-columns:1fr;}.outcome-grid{grid-template-columns:1fr;}.mc-stat-row{grid-template-columns:1fr 1fr;}.mc-bar-row{grid-template-columns:1fr;}}
+
+/* IMPROVE PANEL */
+.info-amber{background:#f5f7fa;border-left:3px solid #f4b86a;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:11px;color:#0B2239;line-height:1.7;}
+.improve-panel{background:#051628;border-radius:10px;padding:18px 20px;margin-top:12px;border:1px solid #1a3a52;border-top:3px solid #f4b86a;}
 </style>
 <script>
 // ── DYNAMIC PARTNER NAMES ─────────────────────────────────
@@ -385,9 +389,7 @@ window.addEventListener('storage', function(e) {
       <!-- Header -->
       <div style="background:linear-gradient(90deg,#041E2F,#0d2d45);padding:18px 22px;border-bottom:1px solid #1a3a52;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
         <div>
-          <div style="font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.3px;">
-            🎲 Monte Carlo Simulation
-          </div>
+          <div style="font-size:16px;font-weight:900;color:#0B2239;letter-spacing:-0.3px;">🎲 Monte Carlo Simulation</div>
           
       <!-- MC Explainer -->
       <div style="background:#fff;border-left:3px solid #1CC7D0;padding:12px 18px;margin:0 18px 16px;border-radius:0 8px 8px 0;font-size:12px;color:#8aaabb;line-height:1.8;">
@@ -785,14 +787,14 @@ function recalc() {
 
   var icon,title,detail,color,bg,bg2,recs=[];
   if(stressEnd>=legGoal&&legGoal>0){
-    icon='✅';title='Plan is Resilient';color='#1CC7D0';bg='rgba(76,175,80,0.12)';bg2='rgba(76,175,80,0.3)';
+    icon='✅';title='Plan is Resilient';color='#1CC7D0';bg='#fff';bg2='#1CC7D0';
     detail='Ending balance of '+fmt(stressEnd)+' meets or exceeds the '+fmt(legGoal)+' legacy goal even under this scenario.';
   } else if(stressEnd>0&&stressConf>=70){
-    icon='⚠️';title='Plan Under Stress';color='#f4b86a';bg='rgba(244,184,106,0.12)';bg2='rgba(244,184,106,0.3)';
+    icon='⚠️';title='Plan Under Stress';color='#f4b86a';bg='#fff';bg2='#f4b86a';
     detail='Plan survives but ends '+fmt(legGoal-stressEnd)+' below the legacy goal ('+stressConf+'% funded). Manageable with small adjustments.';
     recs=['Reduce Phase 1 spending by 10-15% during downturn years','Delay any large purchases 2-3 years','Consider a small part-time income bridge'];
   } else if(stressEnd>0){
-    icon='🚨';title='Plan At Risk';color='#ff6b6b';bg='rgba(255,107,107,0.12)';bg2='rgba(255,107,107,0.3)';
+    icon='🚨';title='Plan At Risk';color='#ff6b6b';bg='#fff';bg2='#ff6b6b';
     detail='Only '+stressConf+'% of the legacy goal is funded under this stress scenario. Your base case is still '+baseConf+'% funded. This shows what a bad sequence of returns could do — not a certainty.';
     recs=['Cut spending 20%+ for first 3-5 years','Delay SS to maximize guaranteed income','Consider 1-2 more working years for buffer','Shift more to Roth before retirement'];
   } else {

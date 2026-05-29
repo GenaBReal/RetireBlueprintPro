@@ -36,81 +36,89 @@ window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key===
 .nav a:hover{background:#1a3a52;}
 .nav a.active{color:#f4b86a;border-bottom:2px solid #f4b86a;}
 
+
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--navy:#051628;--n2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--border:#1a3a52;--muted:#6a8a9a;--white:#fff;--green:#4CAF50;--red:#ef5350;}
+:root{--navy:#051628;--n2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--border:#1a3a52;--muted:#5a6e7e;--white:#fff;}
 body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
 
+.hero{background:var(--navy);padding:32px 24px 24px;border-bottom:3px solid var(--orange);}
+.hero h1{font-size:24px;font-weight:900;color:#fff;margin-bottom:8px;}
+.hero h1 span{color:#1CC7D0;}
+.hero p{font-size:13px;color:#8aaabb;max-width:660px;line-height:1.8;}
 
+.page{max-width:900px;margin:0 auto;padding:28px 20px 80px;}
 
+/* CARDS — exact Dashboard pattern */
+.card{background:#fff;border-radius:12px;border:1px solid #dde3ec;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+.card-hdr{background:#051628;padding:14px 20px;}
+.card-title{font-size:13px;font-weight:800;color:#fff;letter-spacing:0.2px;}
+.card-sub{font-size:10px;color:#8aaabb;margin-top:2px;}
+.card-body{padding:20px;color:#0B2239;}
 
+/* SECTION HEADINGS on light page */
+.section-hdr{font-size:17px;font-weight:900;color:#fff;background:#051628;padding:14px 20px;border-radius:10px;margin:28px 0 16px;border-left:4px solid #1CC7D0;}
+.section-hdr.gold{border-left-color:#f4b86a;}
+.section-sub{font-size:13px;color:#4a5e6e;margin-bottom:18px;line-height:1.7;}
 
-
-
-.nav-right{margin-left:auto;display:flex;}
-.hero{background:var(--navy);padding:36px 24px 28px;border-bottom:2px solid var(--border);}
-.hero h1{font-size:26px;font-weight:900;color:var(--white);margin-bottom:8px;}
-.hero h1 span{color:var(--teal);}
-.hero p{font-size:13px;color:var(--muted);max-width:660px;line-height:1.8;}
-.page{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
-.card{background:#fff;border-radius:12px;border:1px solid #dde3ec;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.06);}
-.card-hdr{background:var(--navy);padding:14px 20px;}
-.card-title{font-size:14px;font-weight:800;color:var(--white);}
-.card-sub{font-size:10px;color:var(--muted);margin-top:2px;}
-.card-body{padding:20px;background:#fff;color:#0B2239;}
+/* GRID LAYOUTS */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.kpi{background:var(--n2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
-.kpi-label{font-size:10px;font-weight:700;color:#4a6070;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
-.kpi-val{font-size:22px;font-weight:900;color:var(--teal);}
-.kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+/* INFO BOXES — replaces the dark inner boxes */
+.info-box{background:#f5f7fa;border-radius:8px;padding:14px 18px;margin-bottom:12px;border-left:3px solid #1CC7D0;}
+.info-box.gold{border-left-color:#f4b86a;}
+.info-box.red{border-left-color:#c0392b;}
+.info-box p,.info-box div{color:#0B2239;}
+.info-box strong{color:#051628;}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:#051628;color:#f4b86a;padding:9px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+td{padding:9px 12px;border-bottom:1px solid #eaecf0;color:#0B2239;vertical-align:top;}
+tr:last-child td{border:none;}
+tr:hover td{background:#f5f8fc;}
+tr.highlighted td{background:#f0fafb;}
+
+/* KPI CELLS */
+.kpi{background:#fff;border-radius:8px;padding:12px;text-align:center;border:1px solid #dde3ec;}
+.kpi-label{font-size:9px;font-weight:700;color:#5a6e7e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.kpi-val{font-size:18px;font-weight:900;color:#0B2239;}
+.kpi-sub{font-size:10px;color:#6a8a9a;margin-top:3px;}
+
+/* ALERTS */
+.alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:12px;}
+.alert-orange{background:#fffcf0;border-left:4px solid #f4b86a;color:#5a3e00;}
+.alert-teal{background:#f0fafb;border-left:4px solid #1CC7D0;color:#004a52;}
+.alert-red{background:#fff5f5;border-left:4px solid #c0392b;color:#6a0000;}
+
+/* LINK BUTTONS */
+.link-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;margin-right:8px;margin-bottom:8px;}
+.link-btn-teal{background:rgba(28,199,208,0.1);border:1px solid #1CC7D0;color:#006677;}
+.link-btn-gold{background:rgba(244,184,106,0.1);border:1px solid #f4b86a;color:#7a5200;}
+.link-btn-navy{background:#051628;color:#1CC7D0;}
+
+/* FORM ELEMENTS */
+label{font-size:10px;font-weight:700;color:#4a6070;text-transform:uppercase;letter-spacing:.5px;}
+input[type=number],select{background:#fff;border:1px solid #ccd3dc;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
+input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.field label{font-size:10px;font-weight:700;color:#4a6070;text-transform:uppercase;letter-spacing:.5px;}
-.field input,.field select{background:#fff;border:1px solid #ccd3dc;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
-  input[type=number]{background:#fff;border:1px solid #ccd3dc;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#0B2239;width:100%;box-sizing:border-box;}
-.field input:focus,.field select:focus{outline:none;border-color:var(--teal);}
-.alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:14px;}
-.alert-orange{background:#fff;border-left:3px solid #f4b86a;color:#f4b86a;}
-.alert-red{background:#fff;border-left:3px solid #ff6b6b;color:#ff9999;}
-.alert-green{background:#fff;border-left:3px solid #4CAF50;color:#81C784;}
-.alert-teal{background:#fff;border-left:3px solid #1CC7D0;color:#80DEEA;}
 
-/* IRMAA TABLE */
-.irmaa-table{width:100%;border-collapse:collapse;font-size:12px;}
-.irmaa-table th{background:var(--navy);color:var(--orange);padding:10px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
-.irmaa-table td{padding:10px 14px;border-bottom:1px solid #f0f2f4;}
-.irmaa-table tr:last-child td{border:none;}
-.irmaa-table tr.irmaa-hit{background:rgba(239,83,80,0.06);}
-.irmaa-table tr.irmaa-current{background:#fff;}
+/* RESOURCE LINKS GRID */
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+.resource-card{background:#fff;border:1px solid #dde3ec;border-radius:8px;padding:12px 14px;text-decoration:none;display:flex;align-items:center;gap:10px;}
+.resource-card:hover{border-color:#1CC7D0;background:#f0fafb;}
+.rc-name{font-size:11px;font-weight:700;color:#1CC7D0;}
+.rc-desc{font-size:10px;color:#5a6e7e;}
 
-/* PARTS GRID */
-.parts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
-.part-card{border-radius:10px;border:2px solid;padding:16px;}
-.part-a{border-color:#1CC7D0;background:rgba(28,199,208,0.05);}
-.part-b{border-color:#f4b86a;background:rgba(244,184,106,0.05);}
-.part-c{border-color:#4CAF50;background:rgba(76,175,80,0.05);}
-.part-d{border-color:#ab47bc;background:rgba(171,71,188,0.05);}
-.part-medigap{border-color:#ef5350;background:rgba(239,83,80,0.05);}
-.part-title{font-size:14px;font-weight:900;margin-bottom:4px;}
-.part-a .part-title{color:#1CC7D0;}
-.part-b .part-title{color:#f4b86a;}
-.part-c .part-title{color:#4CAF50;}
-.part-d .part-title{color:#ab47bc;}
-.part-medigap .part-title{color:#ef5350;}
-.part-cost{font-size:18px;font-weight:800;margin:8px 0 4px;}
-.part-desc{font-size:11px;color:#455A64;line-height:1.6;}
-
-/* TIMELINE */
-.timeline{position:relative;padding-left:28px;}
-.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border);}
-.tl-item{position:relative;margin-bottom:20px;}
-.tl-dot{position:absolute;left:-22px;width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:var(--n2);display:flex;align-items:center;justify-content:center;font-size:9px;}
-.tl-dot.active{border-color:var(--teal);background:var(--teal);}
-.tl-dot.milestone{border-color:var(--orange);background:var(--orange);}
-.tl-content{background:#f8f9fa;border-radius:8px;padding:12px 14px;border:1px solid #e8eaed;}
-.tl-year{font-size:11px;font-weight:800;color:var(--orange);margin-bottom:4px;}
-.tl-text{font-size:12px;color:#37474F;line-height:1.6;}
-
-@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr;}.parts-grid{grid-template-columns:1fr 1fr;}.page{padding:16px 12px 60px;}}
+/* COMPARISON PANELS */
+.compare-panel{border:2px solid #dde3ec;border-radius:10px;overflow:hidden;}
+.compare-panel.teal{border-color:rgba(28,199,208,0.4);}
+.compare-panel.gold{border-color:rgba(244,184,106,0.3);}
+.compare-hdr{background:#051628;padding:10px 14px;font-size:13px;font-weight:800;color:#fff;}
+.compare-hdr.teal{background:#0a2a3a;}
+.compare-hdr.gold{background:#2a1a00;}
+.compare-body{padding:14px;background:#fff;font-size:11px;color:#0B2239;line-height:1.9;}
 </style>
 </head>
 <body>
@@ -198,7 +206,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           <div>🔹 You go to <a href="https://healthcare.gov" target="_blank" style="color:#1CC7D0;">healthcare.gov</a> (or your state exchange)</div>
           <div>🔹 Enter your ZIP code, household size, and estimated income</div>
           <div>🔹 See plans side by side (Bronze, Silver, Gold, Platinum)</div>
-          <div>🔹 If income qualifies, you get a <strong style="color:#4CAF50;">tax credit subsidy</strong> that reduces your premium</div>
+          <div>🔹 If income qualifies, you get a <strong style="color:#1CC7D0;">tax credit subsidy</strong> that reduces your premium</div>
           <div>🔹 Pay the reduced premium monthly — insurance starts Jan 1 (or mid-year if life event)</div>
           <div>🔹 Use it like normal insurance — doctors, specialists, ER</div>
         </div>
@@ -208,7 +216,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
         <div style="font-size:11px;color:#4a5e6e;line-height:1.9;">
           The government pays part of your premium if your income is between <strong style="color:#fff;">100%–400%+ of the federal poverty level.</strong>
           <br><br>
-          For a couple in 2025, that's roughly <strong style="color:#f4b86a;">$21,000–$80,000/yr.</strong> At $60K income, a couple might pay <strong style="color:#4CAF50;">$400–700/month</strong> for a Silver plan instead of $1,500+/month full price.
+          For a couple in 2025, that's roughly <strong style="color:#f4b86a;">$21,000–$80,000/yr.</strong> At $60K income, a couple might pay <strong style="color:#1CC7D0;">$400–700/month</strong> for a Silver plan instead of $1,500+/month full price.
           <br><br>
           <div style="background:#fff;border-radius:6px;padding:8px;">
             <strong style="color:#f4b86a;">⚠️ Roth conversion trap:</strong> Roth conversions count as income on the ACA. Converting $80K in a year can eliminate your subsidy and cost you $15,000+ extra in premiums. Plan conversions carefully if you are on ACA.
@@ -221,7 +229,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:12px;">The 4 Plan Tiers (Metal Levels):</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
       <div style="background:#1a2a20;border:1px solid #2E7032;border-radius:8px;padding:12px;text-align:center;">
-        <div style="font-size:13px;font-weight:900;color:#4CAF50;margin-bottom:6px;">🥉 Bronze</div>
+        <div style="font-size:13px;font-weight:900;color:#1CC7D0;margin-bottom:6px;">🥉 Bronze</div>
         <div style="font-size:11px;color:#4a5e6e;line-height:1.7;">Lowest premium<br>Highest deductible<br>($5,000–8,000)<br>Best if healthy,<br>rarely need care</div>
       </div>
       <div style="background:#1a2533;border:1px solid #1565C0;border-radius:8px;padding:12px;text-align:center;border-width:2px;">
@@ -243,10 +251,10 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div style="overflow-x:auto;">
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead>
-          <tr style="background:#0A2035;">
+          <tr style="background:#f5f7fa;">
             <th style="padding:8px 12px;text-align:left;color:#1CC7D0;font-weight:700;border-bottom:1px solid #1a3a52;">Annual Income</th>
             <th style="padding:8px 12px;text-align:center;color:#1CC7D0;font-weight:700;border-bottom:1px solid #1a3a52;">Full Premium</th>
-            <th style="padding:8px 12px;text-align:center;color:#4CAF50;font-weight:700;border-bottom:1px solid #1a3a52;">Subsidy</th>
+            <th style="padding:8px 12px;text-align:center;color:#1CC7D0;font-weight:700;border-bottom:1px solid #1a3a52;">Subsidy</th>
             <th style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;border-bottom:1px solid #1a3a52;">You Pay/Month</th>
             <th style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;border-bottom:1px solid #1a3a52;">You Pay/Year</th>
             <th style="padding:8px 12px;text-align:left;color:#8aaabb;font-weight:700;border-bottom:1px solid #1a3a52;">Notes</th>
@@ -256,7 +264,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           <tr style="border-bottom:1px solid #1a3a52;">
             <td style="padding:8px 12px;color:#fff;">$40,000/yr</td>
             <td style="padding:8px 12px;text-align:center;color:#8aaabb;">~$1,500</td>
-            <td style="padding:8px 12px;text-align:center;color:#4CAF50;">~$1,100</td>
+            <td style="padding:8px 12px;text-align:center;color:#1CC7D0;">~$1,100</td>
             <td style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;">~$400</td>
             <td style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;">~$4,800</td>
             <td style="padding:8px 12px;color:#8aaabb;">Large subsidy</td>
@@ -264,7 +272,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           <tr style="border-bottom:1px solid #1a3a52;background:rgba(255,255,255,0.02);">
             <td style="padding:8px 12px;color:#fff;">$60,000/yr</td>
             <td style="padding:8px 12px;text-align:center;color:#8aaabb;">~$1,500</td>
-            <td style="padding:8px 12px;text-align:center;color:#4CAF50;">~$850</td>
+            <td style="padding:8px 12px;text-align:center;color:#1CC7D0;">~$850</td>
             <td style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;">~$650</td>
             <td style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;">~$7,800</td>
             <td style="padding:8px 12px;color:#8aaabb;">Good subsidy</td>
@@ -272,7 +280,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           <tr style="border-bottom:1px solid #1a3a52;">
             <td style="padding:8px 12px;color:#fff;">$80,000/yr</td>
             <td style="padding:8px 12px;text-align:center;color:#8aaabb;">~$1,500</td>
-            <td style="padding:8px 12px;text-align:center;color:#4CAF50;">~$500</td>
+            <td style="padding:8px 12px;text-align:center;color:#1CC7D0;">~$500</td>
             <td style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;">~$1,000</td>
             <td style="padding:8px 12px;text-align:center;color:#f4b86a;font-weight:700;">~$12,000</td>
             <td style="padding:8px 12px;color:#8aaabb;">Shrinking subsidy</td>
@@ -316,7 +324,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
       <div style="border:1px solid #1a3a52;border-radius:10px;overflow:hidden;">
         <div style="background:#0A2035;padding:10px 14px;font-size:12px;font-weight:800;color:#1CC7D0;">While on ACA (Before 65)</div>
         <div style="padding:14px;font-size:11px;color:#4a5e6e;line-height:1.9;">
-          <div style="color:#4CAF50;margin-bottom:6px;">✅ Children under 19: dental+vision REQUIRED on ACA plans</div>
+          <div style="color:#1CC7D0;margin-bottom:6px;">✅ Children under 19: dental+vision REQUIRED on ACA plans</div>
           <div style="color:#ff6b6b;margin-bottom:10px;">❌ Adults: dental+vision NOT required — most plans don't include it</div>
           <div style="font-weight:700;color:#fff;margin-bottom:6px;">Your options:</div>
           <div>🔹 <strong style="color:#fff;">Standalone dental plan</strong> — $30–60/mo per person. Covers cleanings, X-rays, basic fillings. Major work (crowns, implants) covered at 50% after deductible.</div>
@@ -362,7 +370,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div style="display:flex;flex-wrap:wrap;gap:10px;">
       <a href="https://www.medicare.gov/health-drug-plans/health-plans/your-coverage-options/dental-vision-hearing" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(244,184,106,0.4);color:#f4b86a;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🦷 Medicare Dental Options →</a>
       <a href="https://www.healthcare.gov/coverage/dental-coverage/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(28,199,208,0.1);border:1px solid #1CC7D0;color:#1CC7D0;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🦷 ACA Dental Coverage →</a>
-      <a href="https://www.medicare.gov/plan-compare" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(76,175,80,0.4);color:#4CAF50;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🔍 Compare Medicare Plans →</a>
+      <a href="https://www.medicare.gov/plan-compare" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(76,175,80,0.4);color:#1CC7D0;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🔍 Compare Medicare Plans →</a>
     </div>
   </div>
 
@@ -410,7 +418,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   <!-- PANIC RELIEF BOX -->
   <div style="background:linear-gradient(135deg,#041E2F,#0a2d45);border:2px solid #1CC7D0;border-radius:14px;padding:22px 26px;margin-bottom:24px;">
     <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;">🛑 First: Take a breath. Medicare is simpler than you think.</div>
-    <div style="font-size:14px;color:#8aaabb;line-height:1.9;">
+    <div style="font-size:14px;color:#0B2239;line-height:1.9;">
       Medicare and Medicaid sound similar but are <strong style="color:#f4b86a;">completely different things.</strong>
       <strong style="color:#fff;">Medicare</strong> is health insurance for people 65+ — <em>everyone</em> gets it, regardless of income.
       <strong style="color:#fff;">Medicaid</strong> is a welfare program for people with very low income — most retirees with savings never use it.
@@ -429,7 +437,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
         <div style="background:#1CC7D0;color:#041E2F;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
         <div>
           <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Part A turns on automatically — it is FREE</div>
-          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">If you or your spouse worked and paid Medicare taxes for at least 10 years (40 quarters), Part A costs you <strong style="color:#4CAF50;">$0/month</strong>. It covers hospital stays. You do not sign up — Social Security automatically enrolls you if you're already collecting SS. If not collecting SS yet, you sign up at <strong style="color:#1CC7D0;">ssa.gov</strong> during your enrollment window.</div>
+          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">If you or your spouse worked and paid Medicare taxes for at least 10 years (40 quarters), Part A costs you <strong style="color:#1CC7D0;">$0/month</strong>. It covers hospital stays. You do not sign up — Social Security automatically enrolls you if you're already collecting SS. If not collecting SS yet, you sign up at <strong style="color:#1CC7D0;">ssa.gov</strong> during your enrollment window.</div>
         </div>
       </div>
 
@@ -450,10 +458,10 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
       </div>
 
       <div style="display:flex;gap:14px;align-items:flex-start;">
-        <div style="background:#2E7032;color:#fff;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+        <div style="background:#051628;color:#fff;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
         <div>
           <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Choose your path: Medigap or Medicare Advantage</div>
-          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">You now make <strong style="color:#fff;">one big decision</strong>. You can either add a <strong style="color:#4CAF50;">Medigap supplement</strong> (private insurance that covers your 20% gap — predictable costs, any doctor) OR switch to <strong style="color:#f4b86a;">Medicare Advantage (Part C)</strong> (a private HMO/PPO that replaces A+B — lower premium, but restricted networks). See the comparison below.</div>
+          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">You now make <strong style="color:#fff;">one big decision</strong>. You can either add a <strong style="color:#1CC7D0;">Medigap supplement</strong> (private insurance that covers your 20% gap — predictable costs, any doctor) OR switch to <strong style="color:#f4b86a;">Medicare Advantage (Part C)</strong> (a private HMO/PPO that replaces A+B — lower premium, but restricted networks). See the comparison below.</div>
         </div>
       </div>
 
@@ -475,7 +483,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
 
       <div style="background:#fff;border:1px solid rgba(76,175,80,0.3);border-radius:10px;padding:16px;">
-        <div style="font-size:12px;font-weight:800;color:#4CAF50;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🎁 You Get This Automatically</div>
+        <div style="font-size:12px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🎁 You Get This Automatically</div>
         <div style="font-size:12px;color:#4a5e6e;line-height:2.0;">
           <div>✅ <strong style="color:#fff;">Part A</strong> — Hospital — $0/mo</div>
           <div style="font-size:10px;color:#4a6a7a;margin-bottom:6px;">Auto-enrolled if collecting SS. Otherwise sign up at ssa.gov.</div>
@@ -511,11 +519,11 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
       <div style="background:#fff;border:2px solid rgba(28,199,208,0.4);border-radius:10px;padding:16px;">
         <div style="font-size:14px;font-weight:900;color:#1CC7D0;margin-bottom:10px;">🛡️ Medigap Supplement</div>
         <div style="font-size:11px;color:#4a5e6e;line-height:1.9;">
-          <div style="color:#4CAF50;">✅ Any doctor in the US who accepts Medicare</div>
-          <div style="color:#4CAF50;">✅ No referrals needed for specialists</div>
-          <div style="color:#4CAF50;">✅ No prior authorization needed</div>
-          <div style="color:#4CAF50;">✅ Predictable costs — almost no surprises</div>
-          <div style="color:#4CAF50;">✅ Best for travelers, complex health needs</div>
+          <div style="color:#1CC7D0;">✅ Any doctor in the US who accepts Medicare</div>
+          <div style="color:#1CC7D0;">✅ No referrals needed for specialists</div>
+          <div style="color:#1CC7D0;">✅ No prior authorization needed</div>
+          <div style="color:#1CC7D0;">✅ Predictable costs — almost no surprises</div>
+          <div style="color:#1CC7D0;">✅ Best for travelers, complex health needs</div>
           <div style="color:#ff6b6b;margin-top:6px;">❌ Higher monthly premium ($70–200/mo each)</div>
           <div style="color:#ff6b6b;">❌ Separate Part D plan needed (add $20–60/mo)</div>
           <div style="color:#ff6b6b;">❌ No dental/vision usually included</div>
@@ -533,10 +541,10 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
       <div style="background:rgba(244,184,106,0.06);border:2px solid rgba(244,184,106,0.3);border-radius:10px;padding:16px;">
         <div style="font-size:14px;font-weight:900;color:#f4b86a;margin-bottom:10px;">🏥 Medicare Advantage (Part C)</div>
         <div style="font-size:11px;color:#4a5e6e;line-height:1.9;">
-          <div style="color:#4CAF50;">✅ Low or $0 monthly premium</div>
-          <div style="color:#4CAF50;">✅ Usually includes dental, vision, hearing</div>
-          <div style="color:#4CAF50;">✅ Often includes Part D drug coverage</div>
-          <div style="color:#4CAF50;">✅ $2,000–$8,500 out-of-pocket maximum/yr</div>
+          <div style="color:#1CC7D0;">✅ Low or $0 monthly premium</div>
+          <div style="color:#1CC7D0;">✅ Usually includes dental, vision, hearing</div>
+          <div style="color:#1CC7D0;">✅ Often includes Part D drug coverage</div>
+          <div style="color:#1CC7D0;">✅ $2,000–$8,500 out-of-pocket maximum/yr</div>
           <div style="color:#ff6b6b;margin-top:6px;">❌ Restricted network — must use their doctors</div>
           <div style="color:#ff6b6b;">❌ Prior authorization often required</div>
           <div style="color:#ff6b6b;">❌ May not cover out-of-area emergencies well</div>
@@ -551,7 +559,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 
     <!-- RECOMMENDATION BOX -->
     <div style="background:rgba(76,175,80,0.07);border:1px solid rgba(76,175,80,0.3);border-radius:10px;padding:14px 18px;">
-      <div style="font-size:12px;font-weight:800;color:#4CAF50;margin-bottom:6px;">💡 What Most Financial Planners Recommend for Retirees with Savings</div>
+      <div style="font-size:12px;font-weight:800;color:#1CC7D0;margin-bottom:6px;">💡 What Most Financial Planners Recommend for Retirees with Savings</div>
       <div style="font-size:12px;color:#4a5e6e;line-height:1.8;">
         <strong style="color:#fff;">Original Medicare + Plan G Medigap + Part D</strong> is the most popular choice for people with retirement savings.
         Yes, the premium is higher — but you get total freedom (any doctor, any specialist, any hospital that accepts Medicare nationwide),
@@ -570,7 +578,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div style="overflow-x:auto;">
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead>
-          <tr style="background:#0A2035;">
+          <tr style="background:#f5f7fa;">
             <th style="padding:10px 14px;text-align:left;color:#1CC7D0;font-weight:700;border-bottom:2px solid #1a3a52;">Coverage Path</th>
             <th style="padding:10px 14px;text-align:center;color:#1CC7D0;font-weight:700;border-bottom:2px solid #1a3a52;">Part A</th>
             <th style="padding:10px 14px;text-align:center;color:#1CC7D0;font-weight:700;border-bottom:2px solid #1a3a52;">Part B</th>
@@ -584,7 +592,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
         <tbody>
           <tr style="border-bottom:1px solid #1a3a52;">
             <td style="padding:10px 14px;color:#fff;font-weight:700;">Bare minimum<br><span style="font-size:10px;color:#6a8a9a;font-weight:400;">Not recommended</span></td>
-            <td style="padding:10px 14px;text-align:center;color:#4CAF50;">$0</td>
+            <td style="padding:10px 14px;text-align:center;color:#1CC7D0;">$0</td>
             <td style="padding:10px 14px;text-align:center;color:#fff;">$185</td>
             <td style="padding:10px 14px;text-align:center;color:#ff6b6b;">None</td>
             <td style="padding:10px 14px;text-align:center;color:#ff6b6b;">None</td>
@@ -594,7 +602,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </tr>
           <tr style="border-bottom:1px solid #1a3a52;background:rgba(255,255,255,0.02);">
             <td style="padding:10px 14px;color:#fff;font-weight:700;">Medicare Advantage<br><span style="font-size:10px;color:#6a8a9a;font-weight:400;">Budget option</span></td>
-            <td style="padding:10px 14px;text-align:center;color:#4CAF50;">$0</td>
+            <td style="padding:10px 14px;text-align:center;color:#1CC7D0;">$0</td>
             <td style="padding:10px 14px;text-align:center;color:#fff;">$185</td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">$0–50<br><span style="font-size:9px;">(replaces A+B)</span></td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">Included</td>
@@ -604,7 +612,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </tr>
           <tr style="border-bottom:1px solid #1a3a52;">
             <td style="padding:10px 14px;color:#fff;font-weight:700;">Plan N + Part D<br><span style="font-size:10px;color:#6a8a9a;font-weight:400;">Budget Medigap</span></td>
-            <td style="padding:10px 14px;text-align:center;color:#4CAF50;">$0</td>
+            <td style="padding:10px 14px;text-align:center;color:#1CC7D0;">$0</td>
             <td style="padding:10px 14px;text-align:center;color:#fff;">$185</td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$70–90</td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$30–50</td>
@@ -614,7 +622,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </tr>
           <tr style="border-bottom:1px solid #1a3a52;background:rgba(28,199,208,0.05);border-left:3px solid #1CC7D0;">
             <td style="padding:10px 14px;color:#fff;font-weight:700;">Plan G + Part D ⭐<br><span style="font-size:10px;color:#1CC7D0;font-weight:400;">Most popular choice</span></td>
-            <td style="padding:10px 14px;text-align:center;color:#4CAF50;">$0</td>
+            <td style="padding:10px 14px;text-align:center;color:#1CC7D0;">$0</td>
             <td style="padding:10px 14px;text-align:center;color:#fff;">$185</td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$100–130</td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$30–50</td>
@@ -624,7 +632,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </tr>
           <tr style="border-bottom:1px solid #1a3a52;background:rgba(255,255,255,0.02);">
             <td style="padding:10px 14px;color:#fff;font-weight:700;">Plan F + Part D<br><span style="font-size:10px;color:#6a8a9a;font-weight:400;">Pre-2020 enrollees only</span></td>
-            <td style="padding:10px 14px;text-align:center;color:#4CAF50;">$0</td>
+            <td style="padding:10px 14px;text-align:center;color:#1CC7D0;">$0</td>
             <td style="padding:10px 14px;text-align:center;color:#fff;">$185</td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$130–180</td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$30–50</td>
@@ -634,7 +642,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </tr>
           <tr style="border-bottom:1px solid #1a3a52;">
             <td style="padding:10px 14px;color:#fff;font-weight:700;">Plan G + IRMAA Tier 1<br><span style="font-size:10px;color:#ff6b6b;font-weight:400;">Income $212K–267K (MFJ)</span></td>
-            <td style="padding:10px 14px;text-align:center;color:#4CAF50;">$0</td>
+            <td style="padding:10px 14px;text-align:center;color:#1CC7D0;">$0</td>
             <td style="padding:10px 14px;text-align:center;color:#ff6b6b;">$259<br><span style="font-size:9px;">(+$74 IRMAA)</span></td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$115</td>
             <td style="padding:10px 14px;text-align:center;color:#ff6b6b;">~$55<br><span style="font-size:9px;">(+IRMAA)</span></td>
@@ -644,7 +652,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </tr>
           <tr>
             <td style="padding:10px 14px;color:#fff;font-weight:700;">Plan G + IRMAA Tier 2<br><span style="font-size:10px;color:#ff6b6b;font-weight:400;">Income $267K–334K (MFJ)</span></td>
-            <td style="padding:10px 14px;text-align:center;color:#4CAF50;">$0</td>
+            <td style="padding:10px 14px;text-align:center;color:#1CC7D0;">$0</td>
             <td style="padding:10px 14px;text-align:center;color:#ff6b6b;">$370<br><span style="font-size:9px;">(+$185 IRMAA)</span></td>
             <td style="padding:10px 14px;text-align:center;color:#8aaabb;">~$115</td>
             <td style="padding:10px 14px;text-align:center;color:#ff6b6b;">~$68<br><span style="font-size:9px;">(+IRMAA)</span></td>
@@ -663,13 +671,13 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div style="font-size:14px;font-weight:900;color:#f4b86a;margin-bottom:10px;">📝 What to Enter in Your Inputs Page</div>
     <div style="font-size:12px;color:#4a5e6e;line-height:1.9;">
       <div style="margin-bottom:8px;">On your <strong style="color:#fff;">Inputs</strong> page under the Healthcare section, you have two fields per partner:</div>
-      <div style="background:#041E2F;border-radius:8px;padding:12px 16px;margin-bottom:8px;">
+      <div style="background:#f5f7fa;border-radius:8px;padding:12px 16px;border-left:3px solid #f4b86a;margin-bottom:8px;">
         <div style="color:#fff;font-weight:700;margin-bottom:3px;">Pre-Medicare Annual ($) — field B52</div>
-        <div style="color:#8aaabb;font-size:11px;">Enter your annual healthcare cost BEFORE age 65 — health insurance premiums, copays, deductibles if retiring early. Example: $12,000/yr for marketplace insurance.</div>
+        <div style="color:#3a4e5e;font-size:11px;">Enter your annual healthcare cost BEFORE age 65 — health insurance premiums, copays, deductibles if retiring early. Example: $12,000/yr for marketplace insurance.</div>
       </div>
-      <div style="background:#041E2F;border-radius:8px;padding:12px 16px;">
+      <div style="background:#f5f7fa;border-radius:8px;padding:12px 16px;border-left:3px solid #f4b86a;">
         <div style="color:#fff;font-weight:700;margin-bottom:3px;">Medicare Annual ($) — field B53</div>
-        <div style="color:#8aaabb;font-size:11px;">Enter your estimated annual Medicare cost AFTER age 65. Use the table above to estimate. Example for Plan G: $315–365/mo × 12 = <strong style="color:#1CC7D0;">~$3,780–4,380/yr per person</strong>. For a couple: <strong style="color:#1CC7D0;">~$7,560–8,760/yr.</strong> Enter each partner's share in their respective field. These are <strong style="color:#f4b86a;">ANNUAL amounts.</strong></div>
+        <div style="color:#3a4e5e;font-size:11px;">Enter your estimated annual Medicare cost AFTER age 65. Use the table above to estimate. Example for Plan G: $315–365/mo × 12 = <strong style="color:#1CC7D0;">~$3,780–4,380/yr per person</strong>. For a couple: <strong style="color:#1CC7D0;">~$7,560–8,760/yr.</strong> Enter each partner's share in their respective field. These are <strong style="color:#f4b86a;">ANNUAL amounts.</strong></div>
       </div>
     </div>
   </div>
@@ -685,7 +693,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
         <div>• NOT based on income or assets</div>
         <div>• You pay premiums ($185+/mo Part B)</div>
         <div>• This is what this page is about</div>
-        <div style="margin-top:6px;color:#4CAF50;font-weight:700;">→ You WILL use this</div>
+        <div style="margin-top:6px;color:#1CC7D0;font-weight:700;">→ You WILL use this</div>
       </div>
       <div>
         <div style="font-size:13px;font-weight:800;color:#ab47bc;margin-bottom:6px;">Medicaid 🏥</div>
@@ -763,7 +771,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
         </div>
         <div class="part-card part-c">
           <div class="part-title">Part C — Medicare Advantage</div>
-          <div class="part-cost" style="color:#4CAF50;">$0–$200/mo</div>
+          <div class="part-cost" style="color:#1CC7D0;">$0–$200/mo</div>
           <div class="part-desc">Private insurer alternative to Original Medicare. Bundles Parts A, B, and usually D. Often includes dental and vision. Lower premium but restricted networks and prior authorization.</div>
         </div>
         <div class="part-card part-d">
@@ -944,7 +952,7 @@ function calc() {
   // IRMAA result banner
   var irmaaBanner = document.getElementById('irmaa-result');
   if (tier.partB === 0) {
-    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fff;border:1px solid #a5d6a7;font-size:13px;color:#1B5E20;';
+    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fff;border:1px solid #a5d6a7;font-size:13px;color:#0B2239;';
     irmaaBanner.innerHTML = '✅ <strong>No IRMAA surcharge</strong> at your income level ($' + income.toLocaleString() + '/yr). Your income is below the $212,000 threshold. Standard Part B premium applies: $' + PARTB_BASE + '/mo per person.';
   } else {
     irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fff;border:1px solid #f48fb1;font-size:13px;color:#7f1d1d;';
@@ -970,7 +978,7 @@ function calc() {
     tr.innerHTML = '<td><strong>' + t[0] + '</strong></td>' +
       '<td>' + (t[1] === 0 ? '$' + PARTB_BASE + '/mo (standard)' : '+$' + t[1].toFixed(0) + '/mo surcharge = $' + (PARTB_BASE + t[1]).toFixed(0) + '/mo') + '</td>' +
       '<td>' + (t[2] === 0 ? 'No surcharge' : '+$' + t[2].toFixed(2) + '/mo') + '</td>' +
-      '<td style="font-weight:700;color:' + (t[1]===0?'#2E7032':'#c62828') + ';">' + (extra === 0 ? '$0' : '+$' + extra.toLocaleString() + '/yr') + '</td>' +
+      '<td style="font-weight:700;color:' + (t[1]===0?'#051628':'#c62828') + ';">' + (extra === 0 ? '$0' : '+$' + extra.toLocaleString() + '/yr') + '</td>' +
       '<td>' + (isCurrent ? '<span style="background:#1CC7D0;color:#041E2F;font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;">← YOUR INCOME</span>' : '') + '</td>';
     tbody.appendChild(tr);
   });
@@ -983,9 +991,9 @@ function calc() {
     '<div><div style="font-size:12px;color:#455A64;margin-bottom:12px;line-height:1.7;">Based on <strong>' + p1Name + '</strong> living to <strong>' + p1Death + '</strong> and <strong>' + p2Name + '</strong> living to <strong>' + p2Death + '</strong>, enrolled in Medicare from age 65.</div>' +
     '<div style="display:grid;gap:8px;">' +
     makeBreakdownRow('Part B (both)', fmt(partBPerPerson * 24) + '/yr', 'var(--orange)') +
-    makeBreakdownRow('Medigap Supplement (both)', fmt(medigap * 24) + '/yr', '#4CAF50') +
+    makeBreakdownRow('Medigap Supplement (both)', fmt(medigap * 24) + '/yr', '#1CC7D0') +
     makeBreakdownRow('Part D Prescriptions (both)', fmt((partDPerPerson) * 24) + '/yr', '#ab47bc') +
-    makeBreakdownRow('IRMAA Surcharges (both)', tier.partB > 0 ? fmt(tier.partB * 24 * 12) + '/yr' : '$0 (none)', tier.partB > 0 ? '#ef5350' : '#2E7032') +
+    makeBreakdownRow('IRMAA Surcharges (both)', tier.partB > 0 ? fmt(tier.partB * 24 * 12) + '/yr' : '$0 (none)', tier.partB > 0 ? '#ef5350' : '#051628') +
     '</div></div>' +
     '<div>' +
     '<div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">' +
