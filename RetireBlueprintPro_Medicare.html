@@ -14,6 +14,16 @@ function rbpApplyNames(p1,p2){
 }
 document.addEventListener('DOMContentLoaded', function(){ rbpApplyNames(); });
 window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key==='rbp_p2_name')rbpApplyNames();});
+
+// Auto-populate ages from localStorage if available
+(function() {
+  var p1age = localStorage.getItem('rbp_p1_age');
+  var p2age = localStorage.getItem('rbp_p2_age');
+  var income = localStorage.getItem('rbp_ret_income');
+  if (p1age) { var el = document.getElementById('p1-age'); if(el) el.value = p1age; }
+  if (p2age) { var el2 = document.getElementById('p2-age'); if(el2) el2.value = p2age; }
+  if (typeof calc === 'function') setTimeout(calc, 100);
+})();
 </script>
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
@@ -25,7 +35,7 @@ window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key===
 
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{--navy:#051628;--n2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--border:#1a3a52;--muted:#6a8a9a;--white:#fff;--green:#4CAF50;--red:#ef5350;}
-body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
+body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#020e18;color:#d8eaf5;min-height:100vh;}
 
 
 
@@ -39,26 +49,27 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 .hero h1 span{color:var(--teal);}
 .hero p{font-size:13px;color:var(--muted);max-width:660px;line-height:1.8;}
 .page{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
-.card{background:#fff;border-radius:12px;border:1px solid #e8eaed;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.card{background:#051628;border-radius:12px;border:1px solid #1a3a52;margin-bottom:24px;overflow:hidden;}
 .card-hdr{background:var(--navy);padding:14px 20px;}
 .card-title{font-size:14px;font-weight:800;color:var(--white);}
 .card-sub{font-size:10px;color:var(--muted);margin-top:2px;}
-.card-body{padding:20px;}
+.card-body{padding:20px;color:#d8eaf5;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .kpi{background:var(--n2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
-.kpi-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.kpi-label{font-size:10px;font-weight:700;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
 .kpi-val{font-size:22px;font-weight:900;color:var(--teal);}
 .kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
-.field input,.field select{background:#f8f9fa;border:1px solid #e0e4e8;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
+.field label{font-size:10px;font-weight:700;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select{background:#0A2035;border:1px solid #1a3a52;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#d8eaf5;}
+  input[type=number]{background:#0A2035;border:1px solid #1a3a52;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#d8eaf5;width:100%;box-sizing:border-box;}
 .field input:focus,.field select:focus{outline:none;border-color:var(--teal);}
 .alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:14px;}
-.alert-orange{background:#fff8e1;border-left:3px solid var(--orange);color:#5a4000;}
-.alert-red{background:#fce4ec;border-left:3px solid var(--red);color:#7f1d1d;}
-.alert-green{background:#e8f5e9;border-left:3px solid var(--green);color:#1B5E20;}
-.alert-teal{background:rgba(28,199,208,0.08);border-left:3px solid var(--teal);color:#0d4a50;}
+.alert-orange{background:rgba(244,184,106,0.12);border-left:3px solid #f4b86a;color:#f4b86a;}
+.alert-red{background:rgba(255,107,107,0.1);border-left:3px solid #ff6b6b;color:#ff9999;}
+.alert-green{background:rgba(76,175,80,0.1);border-left:3px solid #4CAF50;color:#81C784;}
+.alert-teal{background:rgba(28,199,208,0.08);border-left:3px solid #1CC7D0;color:#80DEEA;}
 
 /* IRMAA TABLE */
 .irmaa-table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -132,7 +143,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 <div style="max-width:860px;margin:0 auto;padding:0 20px 0;">
 
   <!-- SECTION HEADER -->
-  <div style="font-size:18px;font-weight:900;color:#fff;margin:28px 0 16px;padding-bottom:10px;border-bottom:2px solid #1a3a52;">
+  <div style="font-size:18px;font-weight:900;color:#fff;background:linear-gradient(135deg,#041E2F,#0a2d45);padding:14px 20px;border-radius:10px;margin:28px 0 16px;border-left:4px solid #1CC7D0;">
     🌉 Part 1: Before Medicare — The Coverage Gap (Ages 55–64)
   </div>
   <div style="font-size:13px;color:#8aaabb;margin-bottom:20px;line-height:1.8;">
@@ -143,16 +154,17 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
 
     <div style="background:#051628;border:1px solid #1a3a52;border-radius:12px;padding:18px;">
-      <div style="font-size:13px;font-weight:900;color:#f4b86a;margin-bottom:10px;">📍 Your Situation (Craig &amp; Gena)</div>
+      <div style="font-size:13px;font-weight:900;color:#f4b86a;margin-bottom:10px;">📍 The Pre-Medicare Gap — Common Scenarios</div>
       <div style="font-size:12px;color:#8aaabb;line-height:1.9;">
-        <strong style="color:#fff;">Craig retired early</strong> — he needs coverage now until Medicare at 65.<br>
-        <strong style="color:#fff;">You're still working</strong> — you're covered by your employer plan.<br><br>
+        <div style="margin-bottom:8px;"><strong style="color:#fff;">One partner retires early, one still works:</strong><br>
+        The retired partner can join the working spouse's employer plan as a dependent (usually cheapest), use COBRA for up to 18 months, or get an ACA Marketplace plan.</div>
+        <strong style="color:#fff;">Both partners retire before 65:</strong> ACA Marketplace is almost always the answer once COBRA expires.<br><br>
         <div style="background:rgba(28,199,208,0.1);border-radius:8px;padding:10px;font-size:11px;">
-          <strong style="color:#1CC7D0;">Craig's options right now:</strong><br>
-          1. COBRA (from your employer plan) — up to 18 months, expensive<br>
-          2. ACA Marketplace plan — likely better value after COBRA expires<br>
-          3. Your employer plan as a dependent — if your employer allows it<br><br>
-          <strong style="color:#1CC7D0;">When you retire before 65:</strong> You go on the ACA marketplace too.
+          <strong style="color:#1CC7D0;">Your 3 options before Medicare:</strong><br>
+          1. <strong style="color:#fff;">Employer dependent coverage</strong> — if spouse is still working, usually cheapest<br>
+          2. <strong style="color:#fff;">COBRA</strong> — keeps your old plan, up to 18 months, but YOU pay the full premium<br>
+          3. <strong style="color:#fff;">ACA Marketplace</strong> — likely best value, especially with subsidy<br><br>
+          <strong style="color:#1CC7D0;">When you retire before 65:</strong> You enroll at healthcare.gov during Open Enrollment (Nov 1–Jan 15) or within 60 days of losing employer coverage.
         </div>
       </div>
     </div>
@@ -379,10 +391,10 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   </div>
 
   <!-- DIVIDER before existing Medicare content -->
-  <div style="font-size:18px;font-weight:900;color:#fff;margin:28px 0 8px;padding-bottom:10px;border-bottom:2px solid #1a3a52;">
+  <div style="font-size:18px;font-weight:900;color:#fff;background:linear-gradient(135deg,#041E2F,#0a2d45);padding:14px 20px;border-radius:10px;margin:28px 0 16px;border-left:4px solid #f4b86a;">
     🏥 Part 2: Medicare at 65 — Full Coverage Guide
   </div>
-  <div style="font-size:13px;color:#8aaabb;margin-bottom:20px;">
+  <div style="font-size:13px;color:#6a8a9a;background:#f0f2f5;border-radius:8px;padding:10px 16px;margin-bottom:20px;">
     Now that the ACA bridge is covered — here is everything you need to know about Medicare itself.
   </div>
 
@@ -817,7 +829,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div class="card-hdr"><div class="card-title">💡 Medicare Strategy Tips</div>
 <div style="max-width:860px;margin:0 auto;padding:0 20px 20px;">
   <div style="background:#051628;border-radius:14px;border:1px solid #1a3a52;padding:20px 24px;margin-top:20px;">
-    <div style="font-size:14px;font-weight:900;color:#1CC7D0;margin-bottom:14px;">🔗 Official Resources — Go Straight to the Source</div>
+    <div style="font-size:16px;font-weight:900;color:#1CC7D0;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #1a3a52;">🔗 Official Resources — Go Straight to the Source</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
       <a href="https://www.medicare.gov" target="_blank" style="display:flex;align-items:center;gap:8px;background:#0A2035;border:1px solid #1a3a52;border-radius:8px;padding:10px 14px;text-decoration:none;">
         <span style="font-size:18px;">🏥</span>
