@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Long-Term Care Planner</title>
@@ -57,10 +60,10 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 .field input:focus{outline:none;border-color:var(--teal);}
 .range-val{font-size:14px;font-weight:800;color:var(--teal);margin-left:8px;}
 .alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:14px;}
-.alert-orange{background:#fff8e1;border-left:3px solid var(--orange);color:#5a4000;}
+.alert-orange{background:#fff;border-left:3px solid var(--orange);color:#5a4000;}
 .alert-red{background:rgba(239,83,80,0.08);border-left:4px solid var(--red);color:#7f1d1d;}
-.alert-green{background:#e8f5e9;border-left:3px solid var(--green);color:#1B5E20;}
-.alert-teal{background:rgba(28,199,208,0.08);border-left:3px solid var(--teal);color:#0d4a50;}
+.alert-green{background:#fff;border-left:3px solid var(--green);color:#1B5E20;}
+.alert-teal{background:#fff;border-left:3px solid var(--teal);color:#0d4a50;}
 .stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8f9fa;border-radius:6px;border:1px solid #e8eaed;margin-bottom:8px;}
 .stat-label{font-size:12px;color:#37474F;}
 .stat-val{font-size:13px;font-weight:800;}
@@ -92,13 +95,14 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html" class="active">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 

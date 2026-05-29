@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — What's New</title>
@@ -49,7 +52,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 .change-group{margin-bottom:18px;}
 .change-group:last-child{margin-bottom:0;}
 .change-group-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding:3px 10px;border-radius:4px;display:inline-block;}
-.label-new{background:#e8f5e9;color:#2E7032;}
+.label-new{background:#fff;color:#2E7032;}
 .label-fix{background:#fff3e0;color:#e65100;}
 .label-improve{background:#e3f2fd;color:#1565c0;}
 .label-content{background:#f3e5f5;color:#6a1b9a;}
@@ -98,13 +101,14 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" class="active">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 

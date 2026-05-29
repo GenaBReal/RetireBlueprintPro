@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Inputs</title>
@@ -116,9 +119,9 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .accounts-table input:focus,.accounts-table select:focus{
   outline:none;border-color:var(--teal);
 }
-.toggle-yes{background:#e8f5e9;color:var(--green);font-weight:700;border:1px solid #c8e6c9;
+.toggle-yes{background:#fff;color:var(--green);font-weight:700;border:1px solid #c8e6c9;
             border-radius:4px;padding:3px 8px;cursor:pointer;font-size:10px;width:100%;}
-.toggle-no{background:#fce4ec;color:var(--red);font-weight:700;border:1px solid #f8bbd0;
+.toggle-no{background:#fff;color:var(--red);font-weight:700;border:1px solid #f8bbd0;
            border-radius:4px;padding:3px 8px;cursor:pointer;font-size:10px;width:100%;}
 
 /* ── EXPENSES TABLE ── */
@@ -149,11 +152,11 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .solver-kpi-sub{font-size:9px;color:#8a9ab0;margin-top:2px;}
 
 /* ── STATUS COLORS ── */
-.badge-go{display:inline-block;background:#e8f5e9;color:var(--green);font-size:9px;
+.badge-go{display:inline-block;background:#fff;color:var(--green);font-size:9px;
           font-weight:700;padding:2px 8px;border-radius:10px;}
-.badge-watch{display:inline-block;background:#fff8e1;color:#C9A040;font-size:9px;
+.badge-watch{display:inline-block;background:#fff;color:#C9A040;font-size:9px;
              font-weight:700;padding:2px 8px;border-radius:10px;}
-.badge-no{display:inline-block;background:#fce4ec;color:var(--red);font-size:9px;
+.badge-no{display:inline-block;background:#fff;color:var(--red);font-size:9px;
           font-weight:700;padding:2px 8px;border-radius:10px;}
 
 /* ── THEME PREVIEW ── */
@@ -362,12 +365,14 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 </div>
 </div>
@@ -504,7 +509,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
       <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Stress Test Settings</div>
-      <div style="font-size:10px;color:var(--muted);background:rgba(244,184,106,0.08);border-left:3px solid var(--orange);padding:8px 12px;border-radius:4px;margin-bottom:10px;line-height:1.6;">
+      <div style="font-size:10px;color:var(--muted);background:#fff;border-left:3px solid var(--orange);padding:8px 12px;border-radius:4px;margin-bottom:10px;line-height:1.6;">
         <strong style="color:var(--text);">What is a stress test?</strong> Simulates a market crash during retirement to see if your plan survives.
         <em>Early Bear</em> = crash right when you retire (worst case). <em>Late Bear</em> = crash later in retirement.
         Leave both on <strong>Normal Returns</strong> for your base plan. Switch to <strong>Bear Market</strong> to test resilience.
@@ -1772,12 +1777,12 @@ function calcPensionVsLumpSum(partner) {
   panel.innerHTML =
     '<div style="font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;margin-bottom:8px;">💰 Pension vs Lump Sum Analysis</div>' +
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;">' +
-    '<div style="text-align:center;background:rgba(28,199,208,0.08);border-radius:6px;padding:8px;border:1px solid rgba(28,199,208,0.2);">' +
+    '<div style="text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid rgba(28,199,208,0.2);">' +
       '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Pension Total</div>' +
       '<div style="font-size:15px;font-weight:800;color:#1CC7D0;">$'+Math.round(totalPensionValue/1000)+'K</div>' +
       '<div style="font-size:9px;color:#8aaabb;">over '+Math.round(yearsOfPayments)+' yrs</div>' +
     '</div>' +
-    '<div style="text-align:center;background:rgba(244,184,106,0.08);border-radius:6px;padding:8px;border:1px solid rgba(244,184,106,0.2);">' +
+    '<div style="text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid rgba(244,184,106,0.2);">' +
       '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Lump Sum Offer</div>' +
       '<div style="font-size:15px;font-weight:800;color:#f4b86a;">$'+Math.round(lumpSum/1000)+'K</div>' +
       '<div style="font-size:9px;color:#8aaabb;">at 6% grows to $'+Math.round(lumpSumGrowth/1000)+'K</div>' +
@@ -1821,7 +1826,7 @@ function calcHealthcareBridge(partner) {
       '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Years to Medicare</div>' +
       '<div style="font-size:16px;font-weight:800;color:#fff;">'+yrsToMedicare+'</div>' +
     '</div>' +
-    '<div style="text-align:center;background:rgba(255,107,107,0.1);border-radius:6px;padding:8px;border:1px solid rgba(255,107,107,0.2);">' +
+    '<div style="text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid rgba(255,107,107,0.2);">' +
       '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Total Bridge Cost</div>' +
       '<div style="font-size:16px;font-weight:800;color:#ff6b6b;">$'+Math.round(totalBridgeCost/1000)+'K</div>' +
     '</div>' +
@@ -1898,7 +1903,7 @@ function calcSSBreakeven(baseId, fraId, ageId) {
       '</div>' +
     '</div>' +
 
-    '<div style="background:#e0f7fa;border-radius:8px;padding:12px;text-align:center;border:2px solid #0097a7;">' +
+    '<div style="background:#fff;border-radius:8px;padding:12px;text-align:center;border:2px solid #0097a7;">' +
       '<div style="font-size:9px;color:#006064;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Claim at FRA (age ' + fra + ')</div>' +
       '<div style="font-size:20px;font-weight:800;color:#006064;">$' + Math.round(atFRA).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
       '<div style="font-size:11px;color:#0097a7;margin-top:2px;font-weight:600;">$' + Math.round(atFRA*12/1000*10)/10 + 'K/yr</div>' +
@@ -1908,7 +1913,7 @@ function calcSSBreakeven(baseId, fraId, ageId) {
       '</div>' +
     '</div>' +
 
-    '<div style="background:#e8f5e9;border-radius:8px;padding:12px;text-align:center;border:1px solid #66bb6a;">' +
+    '<div style="background:#fff;border-radius:8px;padding:12px;text-align:center;border:1px solid #66bb6a;">' +
       '<div style="font-size:9px;color:#1b5e20;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Delay to 70</div>' +
       '<div style="font-size:20px;font-weight:800;color:#1b5e20;">$' + Math.round(at70).toLocaleString() + '<span style="font-size:12px;font-weight:600;">/mo</span></div>' +
       '<div style="font-size:11px;color:#2e7d32;margin-top:2px;font-weight:600;">$' + Math.round(at70*12/1000*10)/10 + 'K/yr</div>' +
@@ -3034,7 +3039,7 @@ function buildRothPlanTable() {
   // Build rows 2026-2075 (50 year Roth window)
   for (var yr = 2026; yr <= 2075; yr++) {
     var isCurrent = yr === 2026;
-    html += '<tr' + (isCurrent ? ' style="background:#fffbf0;"' : '') + '>' +
+    html += '<tr' + (isCurrent ? ' style="background:#fff;"' : '') + '>' +
       '<td><strong>' + yr + '</strong>' + (yr <= 2033 ? ' <span style="font-size:8px;color:var(--teal);">Prime Window</span>' : yr <= 2045 ? ' <span style="font-size:8px;color:#8aaabb;">Pre-RMD</span>' : '') + '</td>' +
       '<td><input type="number" id="roth-p1-' + yr + '" value="0" min="0" step="1000" ' +
         'style="width:140px;" onchange="updateRothTotal(' + yr + ');markDirty();" placeholder="0"></td>' +

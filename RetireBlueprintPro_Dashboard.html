@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Dashboard</title>
@@ -77,7 +80,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .kc-bar-bg{height:4px;background:#e8eaed;border-radius:2px;margin-top:8px;}
 .kc-bar-fill{height:4px;border-radius:2px;}
 .kc-footer{font-size:8px;color:#5F6368;margin-top:3px;}
-.badge-watch{display:inline-block;background:#fff8e1;color:#f4b86a;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;}
+.badge-watch{display:inline-block;background:#fff;color:#f4b86a;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;}
 .engines-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px;}
 .engine{background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8eaed;display:flex;flex-direction:column;}
 .eng-hdr{background:#041E2F;padding:9px 11px;flex-shrink:0;}
@@ -267,13 +270,14 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 
@@ -285,7 +289,7 @@ window.addEventListener('storage', function(e) {
   <div class="cmd-item"><div class="cmd-lbl">Runway</div><div class="cmd-val" id="val-runway">—</div></div>
   <div class="cmd-item"><div class="cmd-lbl">Inflation</div><div class="cmd-val" id="val-inflation">—</div></div>
   <div class="cmd-item"><div class="cmd-lbl">SS COLA</div><div class="cmd-val" id="val-ss-cola">—</div></div>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="display:inline-block;background:rgba(28,199,208,0.15);border:1px solid #1CC7D0;color:#1CC7D0;font-size:11px;font-weight:700;padding:6px 14px;border-radius:6px;text-decoration:none;letter-spacing:0.3px;">⚡ View All Scenarios →</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="display:inline-block;background:#fff;border:1px solid #1CC7D0;color:#1CC7D0;font-size:11px;font-weight:700;padding:6px 14px;border-radius:6px;text-decoration:none;letter-spacing:0.3px;">⚡ View All Scenarios →</a>
 </div>
 
 <div class="section">
@@ -296,7 +300,7 @@ window.addEventListener('storage', function(e) {
   <div style="display:flex;gap:12px;align-items:flex-start;flex:1;">
     <div style="font-size:20px;flex-shrink:0;">💡</div>
     <div>
-      <div style="font-size:12px;font-weight:800;color:#006064;margin-bottom:5px;">Understanding Your Dashboard</div>
+      <div id="rbp-understanding-banner" style="position:relative;font-size:12px;font-weight:800;color:#006064;margin-bottom:5px;">Understanding Your Dashboard<button onclick="document.getElementById('rbp-understanding-banner').style.display='none';localStorage.setItem('rbp_dash_help_seen','1');" style="position:absolute;top:6px;right:8px;background:none;border:none;cursor:pointer;font-size:14px;color:#00838f;opacity:0.6;">✕</button></div>
       <div style="font-size:11px;color:#00838f;line-height:1.7;">
         <strong>Plan Confidence</strong> — How fully your plan is funded toward your legacy goal. 100% = on track. ·
         <strong>Safe Spending</strong> — Maximum annual spend while still meeting your legacy goal. ·
@@ -656,22 +660,22 @@ window.addEventListener('storage', function(e) {
     The goal: keep all 4 scenarios showing ✅.
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+    <div class="solver-kpi" style="background:#fff;padding:16px;">
       <div class="solver-kpi-lbl">Base Scenario</div>
       <div class="solver-kpi-val" id="stress-base" style="color:#1CC7D0;">—</div>
       <div class="solver-kpi-sub">Normal market returns</div>
     </div>
-    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+    <div class="solver-kpi" style="background:#fff;padding:16px;">
       <div class="solver-kpi-lbl">Year 1 Down 20%</div>
       <div class="solver-kpi-val" id="stress-20">—</div>
       <div class="solver-kpi-sub">Mild bear market</div>
     </div>
-    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+    <div class="solver-kpi" style="background:#fff;padding:16px;">
       <div class="solver-kpi-lbl">Year 1 Down 30%</div>
       <div class="solver-kpi-val" id="stress-30">—</div>
       <div class="solver-kpi-sub">Severe bear market</div>
     </div>
-    <div class="solver-kpi" style="background:rgba(255,107,107,0.1);padding:16px;">
+    <div class="solver-kpi" style="background:#fff;padding:16px;">
       <div class="solver-kpi-lbl">High Inflation (5%)</div>
       <div class="solver-kpi-val" id="stress-inf">—</div>
       <div class="solver-kpi-sub">vs base 3% inflation</div>
@@ -1484,6 +1488,12 @@ function loadHomeEquity(sheetData) {
     }
   });
 })();
+</script>
+<script>
+if(localStorage.getItem('rbp_dash_help_seen')==='1'){
+  var b=document.getElementById('rbp-understanding-banner');
+  if(b) b.style.display='none';
+}
 </script>
 </body>
 </html>

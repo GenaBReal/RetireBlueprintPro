@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Tax Engine</title>
@@ -76,13 +79,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 .br-income-marker{position:absolute;top:-3px;height:20px;width:3px;border-radius:2px;background:var(--orange);}
 .br-you{position:absolute;top:-18px;font-size:8px;font-weight:700;color:var(--orange);white-space:nowrap;}
 .br-label{font-size:9px;color:var(--muted);width:80px;text-align:right;flex-shrink:0;}
-.br-highlight{background:rgba(244,184,106,0.08);border-radius:6px;padding:4px 8px;margin:-4px -8px;}
+.br-highlight{background:#fff;border-radius:6px;padding:4px 8px;margin:-4px -8px;}
 
 /* EXPLAINER BOXES */
 .explainer{border-radius:8px;padding:16px;margin-bottom:12px;border-left:4px solid;}
 .explainer.navy{background:#f0f4f8;border-left-color:var(--navy);}
 .explainer.teal{background:#f0fdfd;border-left-color:var(--teal);}
-.explainer.orange{background:#fffbf0;border-left-color:var(--orange);}
+.explainer.orange{background:#fff;border-left-color:var(--orange);}
 .explainer.slate{background:#f5f5f7;border-left-color:#4A5568;}
 .explainer-title{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .explainer-body{font-size:11px;color:var(--dark);line-height:1.6;}
@@ -123,8 +126,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 /* STRATEGY BADGES */
 .strat-badge{display:inline-block;font-size:8px;font-weight:700;padding:2px 8px;border-radius:8px;margin-left:8px;}
 .strat-prime{background:#e0f7f8;color:#007c82;border:1px solid #b2ebf2;}
-.strat-watch{background:#fff8e1;color:#8B6914;border:1px solid #ffe082;}
-.strat-on{background:#e8f5e9;color:var(--green);border:1px solid #c8e6c9;}
+.strat-watch{background:#fff;color:#8B6914;border:1px solid #ffe082;}
+.strat-on{background:#fff;color:var(--green);border:1px solid #c8e6c9;}
 
 /* TAX TIMELINE */
 .timeline-row{display:flex;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);}
@@ -281,13 +284,14 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html" class="active">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 </div>
 </div>
@@ -887,7 +891,7 @@ loadData();
 
   </div>
 
-  <div style="margin-top:14px;padding:10px 14px;background:rgba(244,184,106,0.1);border-radius:6px;border-left:3px solid #f4b86a;font-size:10px;color:#f4b86a;line-height:1.7;">
+  <div style="margin-top:14px;padding:10px 14px;background:#fff;border-radius:6px;border-left:3px solid #f4b86a;font-size:10px;color:#f4b86a;line-height:1.7;">
     💡 <strong>Annual Check-In Tip:</strong> Each January, spend 30 minutes updating: (1) SS COLA rate, (2) tax brackets if changed,
     (3) IRMAA thresholds, (4) account balances, (5) home value from Zillow, (6) mortgage balance from your statement.
     Your whole plan recalculates automatically. This is the whole point of having a live-connected plan!

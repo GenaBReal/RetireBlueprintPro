@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro</title>
@@ -52,7 +55,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 .meta-item:first-child{padding-left:0;}
 .meta-item .mi-lbl{font-size:7px;color:#6a8a9a;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;}
 .meta-item .mi-val{font-size:11px;color:var(--white);font-weight:700;letter-spacing:-0.2px;}
-.status-pill{display:flex;align-items:center;gap:7px;background:rgba(46,112,50,0.18);
+.status-pill{display:flex;align-items:center;gap:7px;background:#fff;
               border:1px solid rgba(46,112,50,0.35);border-radius:20px;padding:5px 14px;}
 .status-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;flex-shrink:0;}
 .status-text{font-size:10px;font-weight:700;color:#4ade80;letter-spacing:0.3px;}
@@ -97,8 +100,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
           padding:3px 9px;border-radius:3px;text-transform:uppercase;letter-spacing:0.8px;
           margin-bottom:10px;border:1px solid;}
 .tag-primary{background:rgba(4,30,47,0.06);color:var(--navy);border-color:rgba(4,30,47,0.15);}
-.tag-teal{background:rgba(20,122,130,0.08);color:var(--teal-dim);border-color:rgba(20,122,130,0.2);}
-.tag-orange{background:rgba(200,144,74,0.08);color:var(--orange-dim);border-color:rgba(200,144,74,0.2);}
+.tag-teal{background:#fff;color:var(--teal-dim);border-color:rgba(20,122,130,0.2);}
+.tag-orange{background:#fff;color:var(--orange-dim);border-color:rgba(200,144,74,0.2);}
 .tag-green{background:rgba(46,112,50,0.08);color:var(--green);border-color:rgba(46,112,50,0.2);}
 .tag-slate{background:rgba(74,85,104,0.08);color:#4A5568;border-color:rgba(74,85,104,0.2);}
 .live-dot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;animation:pulse 2s infinite;}
@@ -259,13 +262,14 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 

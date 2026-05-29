@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Interactive Stress Tester</title>
@@ -15,99 +18,111 @@
 .nav a.active{color:#f4b86a;border-bottom:2px solid #f4b86a;}
 
 :root{ --navy:#051628; --n2:#0A3145; --mid:#0A3145; --teal:#1CC7D0; --orange:#f4b86a; --green:#4CAF50; --red:#ff6b6b; }
+
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Montserrat',sans-serif;background:var(--navy);color:#fff;min-height:100vh;overflow-x:hidden;}
+:root{--navy:#051628;--n2:#0A3145;--mid:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--green:#2E7032;--red:#c0392b;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;overflow-x:hidden;}
 
-/* HEADER */
+.body{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
 
-.header-logo{display:flex;align-items:center;gap:12px;}
-.header-title{font-size:13px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:1px;}
-
-/* NAV */
-
-.nav-strip::-webkit-scrollbar{display:none;}
-
-.nav-strip a.active,.nav-strip a:hover{color:#f4b86a;}
-
-.body{max-width:1100px;margin:0 auto;padding:16px;}
-
-/* HERO */
-.hero{background:linear-gradient(135deg,#1a0808,#2d1515);border-radius:12px;padding:20px 24px;margin-bottom:16px;border:2px solid rgba(255,107,107,0.3);}
-.hero h1{font-size:20px;font-weight:900;color:#fff;margin-bottom:4px;}
-.hero h1 span{color:var(--teal);}
-.hero p{font-size:11px;color:#8aaabb;line-height:1.7;max-width:700px;}
+/* HERO — matches dashboard hero style */
+.hero{background:#041E2F;padding:20px 24px 18px;border-bottom:3px solid #f4b86a;margin-bottom:0;}
+.hero h1{font-size:22px;font-weight:900;color:#fff;margin-bottom:4px;}
+.hero h1 span{color:#1CC7D0;}
+.hero p{font-size:12px;color:#8aaabb;line-height:1.7;max-width:700px;}
 
 /* LOADING */
 @keyframes spin{to{transform:rotate(360deg);}}
-#loading-msg{text-align:center;padding:60px 20px;}
+#loading-msg{text-align:center;padding:60px 20px;color:#4a5e70;}
 
 /* NOTICES */
-#your-data-notice{display:none;background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;}
-#sample-notice{display:none;background:rgba(244,184,106,0.12);border:1px solid rgba(244,184,106,0.4);border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;}
+#your-data-notice{display:none;background:#fff;border:1px solid #e0e4eb;border-left:4px solid #2E7032;border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#0B2239;}
+#sample-notice{display:none;background:#fff;border:1px solid #e0e4eb;border-left:4px solid #f4b86a;border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#0B2239;}
 
 /* FINGERPRINT BAR */
-#plan-fingerprint{display:none;background:#061620;border-radius:10px;padding:12px 18px;margin-bottom:14px;border-left:4px solid var(--teal);border:1px solid rgba(28,199,208,0.25);}
-.fp-cell{text-align:center;padding:8px;background:rgba(255,255,255,0.04);border-radius:6px;}
-.fp-label{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;font-weight:700;}
-.fp-val{font-size:16px;font-weight:800;color:#fff;line-height:1;}
-.fp-note{font-size:8px;color:#8aaabb;margin-top:3px;}
+#plan-fingerprint{display:none;background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:14px;border:1px solid #e0e4eb;border-top:3px solid #1CC7D0;}
+.fp-cell{text-align:center;padding:8px 4px;background:#f5f7fa;border-radius:6px;border:1px solid #e8eaed;}
+.fp-label{font-size:8px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;font-weight:700;}
+.fp-val{font-size:16px;font-weight:800;color:#0B2239;line-height:1;}
+.fp-note{font-size:8px;color:#6a8a9a;margin-top:3px;}
 
 /* SCENARIO TABS */
 .scenario-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-.tab-btn{padding:8px 16px;border-radius:6px;border:2px solid #1a3a52;background:transparent;color:#8aaabb;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;}
-.tab-btn:hover{border-color:var(--teal);color:var(--teal);}
-.tab-btn.active{background:var(--teal);border-color:var(--teal);color:var(--navy);}
+.tab-btn{padding:7px 14px;border-radius:6px;border:1px solid #cdd5e0;background:#fff;color:#4a5e70;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.tab-btn:hover{border-color:#1CC7D0;color:#1CC7D0;}
+.tab-btn.active{background:#051628;border-color:#051628;color:#f4b86a;}
 
 /* MAIN GRID */
-.main-grid{display:grid;grid-template-columns:320px 1fr;gap:16px;}
+.main-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;}
 .results-panel{display:flex;flex-direction:column;gap:12px;}
 
-/* SLIDERS */
-.sliders-panel{background:#061620;border-radius:10px;padding:16px;border:1px solid #1a3a52;}
-.panel-title{font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
-.slider-group{margin-bottom:18px;}
-.slider-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
-.slider-val{font-size:14px;font-weight:800;color:var(--teal);}
-input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;}
-.slider-range{display:flex;justify-content:space-between;font-size:8px;color:#456A73;margin-top:2px;}
-.slider-desc{font-size:9px;color:#5a7a8a;line-height:1.5;margin-top:4px;font-style:italic;}
-.reset-btn{width:100%;padding:8px;background:transparent;border:1px solid #1a3a52;color:#8aaabb;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
-.reset-btn:hover{border-color:var(--orange);color:var(--orange);}
+/* SLIDERS PANEL */
+.sliders-panel{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e4eb;border-top:3px solid #f4b86a;}
+.panel-title{font-size:10px;font-weight:800;color:#051628;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.slider-group{margin-bottom:16px;}
+.slider-label{font-size:9px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.slider-val{font-size:14px;font-weight:800;color:#051628;}
+input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
+.slider-range{display:flex;justify-content:space-between;font-size:8px;color:#8a9ab0;margin-top:2px;}
+.slider-desc{font-size:9px;color:#6a8098;line-height:1.5;margin-top:4px;font-style:italic;}
+.reset-btn{width:100%;padding:7px;background:#fff;border:1px solid #cdd5e0;color:#4a5e70;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
+.reset-btn:hover{border-color:#f4b86a;color:#7a5200;}
 
-/* OUTCOME CARDS */
+/* OUTCOME CARDS — Dashboard style */
 .outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.outcome-card{background:#061620;border-radius:10px;padding:14px;text-align:center;border:2px solid #1a3a52;}
-.outcome-card.base{border-color:rgba(28,199,208,0.4);}
-.outcome-card.scenario{border-color:rgba(244,184,106,0.4);}
-.oc-label{font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-weight:700;}
-.oc-val{font-size:22px;font-weight:900;line-height:1;color:#fff;}
-.oc-sub{font-size:9px;color:#8aaabb;margin-top:5px;line-height:1.4;}
-.oc-diff{font-size:12px;font-weight:700;margin-top:4px;}
+.outcome-card{background:#fff;border-radius:10px;padding:14px;text-align:center;border:1px solid #e0e4eb;border-top:3px solid #cdd5e0;}
+.outcome-card.base{border-top-color:#1CC7D0;}
+.outcome-card.scenario{border-top-color:#f4b86a;}
+.oc-label{font-size:9px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-weight:700;}
+.oc-val{font-size:22px;font-weight:900;line-height:1;color:#0B2239;}
+.oc-sub{font-size:9px;color:#6a8a9a;margin-top:5px;line-height:1.4;}
+.oc-diff{font-size:12px;font-weight:700;margin-top:4px;color:#4a6070;}
 
 /* CHART */
-.chart-card{background:#061620;border-radius:10px;padding:16px;border:1px solid #1a3a52;}
-.chart-title{font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.chart-card{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e4eb;}
+.chart-title{font-size:10px;font-weight:800;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
 .chart-area{height:200px;position:relative;}
 
 /* VERDICT */
-.verdict-banner{border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;}
+.verdict-banner{background:#fff;border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;border:1px solid #e0e4eb;}
 .verdict-icon{font-size:28px;flex-shrink:0;}
-.verdict-title{font-size:14px;font-weight:800;margin-bottom:4px;}
-.verdict-detail{font-size:11px;line-height:1.7;}
-.recs{background:rgba(0,0,0,0.2);border-radius:8px;padding:12px 14px;margin-top:8px;}
-.recs-title{font-size:9px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
-.rec-item{display:flex;gap:8px;font-size:10px;color:#c8dae8;line-height:1.6;margin-bottom:4px;}
+.verdict-title{font-size:14px;font-weight:800;margin-bottom:4px;color:#0B2239;}
+.verdict-detail{font-size:11px;line-height:1.7;color:#3a4e5e;}
+.recs{background:#f5f7fa;border-radius:8px;padding:12px 14px;margin-top:8px;}
+.recs-title{font-size:9px;font-weight:800;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.rec-item{display:flex;gap:8px;font-size:10px;color:#3a4e5e;line-height:1.6;margin-bottom:4px;}
 
 /* INFO BOXES */
-.info-teal{background:rgba(28,199,208,0.08);border-radius:8px;padding:12px 16px;margin-bottom:12px;border-left:4px solid var(--teal);font-size:11px;color:#c8dae8;line-height:1.8;}
-.info-amber{background:rgba(244,184,106,0.08);border-radius:8px;padding:12px 14px;font-size:10px;color:#f4b86a;line-height:1.7;border-left:4px solid var(--orange);}
-.improve-panel{background:#061620;border-radius:12px;padding:18px 22px;margin-top:12px;border:1px solid rgba(76,175,80,0.3);}
+.info-teal{background:#f5f9fa;border-left:3px solid #1CC7D0;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:11px;color:#003a42;line-height:1.7;}
 
-@media(max-width:768px){
-  .main-grid{grid-template-columns:1fr;}
-  .outcome-grid{grid-template-columns:1fr 1fr;}
-  .nav-strip{overflow-x:auto;}
-}
+/* MC SECTION */
+.mc-section{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e4eb;border-top:3px solid #1CC7D0;margin-top:16px;}
+.mc-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.mc-title{font-size:14px;font-weight:900;color:#0B2239;}
+.mc-sub{font-size:10px;color:#6a8a9a;margin-top:2px;}
+.run-mc-btn{background:#051628;color:#f4b86a;border:none;padding:9px 20px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;}
+.run-mc-btn:hover{background:#0A3145;}
+
+/* MC RESULTS */
+.mc-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
+.mc-stat{background:#f5f7fa;border-radius:8px;padding:10px;text-align:center;border:1px solid #e8eaed;}
+.mc-stat-label{font-size:8px;color:#4a6070;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:3px;}
+.mc-stat-val{font-size:18px;font-weight:900;color:#0B2239;}
+.mc-bar-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.mc-bar-item{text-align:center;padding:10px 8px;border-radius:8px;border:1px solid #e0e4eb;}
+.mc-bar-item.exceed{border-top:3px solid #1CC7D0;background:#f5f9fa;}
+.mc-bar-item.survive{border-top:3px solid #f4b86a;background:#fff;}
+.mc-bar-item.fail{border-top:3px solid #c0392b;background:#fff;}
+.mc-bar-label{font-size:9px;font-weight:700;color:#4a6070;margin-bottom:6px;text-transform:uppercase;}
+.mc-bar-pct{font-size:22px;font-weight:900;color:#0B2239;}
+.mc-bar-count{font-size:9px;color:#8a9ab0;margin-top:2px;}
+.mc-progress-bar-wrap{background:#e8ecf0;border-radius:6px;height:8px;margin-top:8px;overflow:hidden;}
+.mc-progress-bar-fill{height:100%;border-radius:6px;transition:width 0.3s;}
+.mc-progress-bar-fill.exceed{background:#1CC7D0;}
+.mc-progress-bar-fill.survive{background:#f4b86a;}
+.mc-progress-bar-fill.fail{background:#c0392b;}
+
+@media(max-width:768px){.main-grid{grid-template-columns:1fr;}.outcome-grid{grid-template-columns:1fr;}.mc-stat-row{grid-template-columns:1fr 1fr;}.mc-bar-row{grid-template-columns:1fr;}}
 </style>
 <script>
 // ── DYNAMIC PARTNER NAMES ─────────────────────────────────
@@ -142,13 +157,14 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" class="active">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 
@@ -197,9 +213,9 @@ window.addEventListener('storage', function(e) {
     <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔍 Your Plan Fingerprint — Confirm This Is Your Data</div>
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
       <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
-      <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:var(--orange);">—</div><div class="fp-note">Target end</div></div>
-      <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:var(--green);">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
-      <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:var(--teal);">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
+      <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#7a4e00;">—</div><div class="fp-note">Target end</div></div>
+      <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#1B5E20;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
+      <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#006677;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
       <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Base + extra</div></div>
       <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
@@ -279,13 +295,13 @@ window.addEventListener('storage', function(e) {
       <div class="outcome-grid">
         <div class="outcome-card base">
           <div class="oc-label">📊 Base Plan</div>
-          <div class="oc-val" id="res-base-end" style="color:var(--teal);">—</div>
+          <div class="oc-val" id="res-base-end" style="color:#006677;">—</div>
           <div class="oc-sub">No stress · your projection</div>
-          <div class="oc-diff" id="res-base-conf" style="color:var(--green);">—</div>
+          <div class="oc-diff" id="res-base-conf" style="color:#1B5E20;">—</div>
         </div>
         <div class="outcome-card scenario">
           <div class="oc-label">⚡ Stress Scenario</div>
-          <div class="oc-val" id="res-stress-end" style="color:var(--orange);">—</div>
+          <div class="oc-val" id="res-stress-end" style="color:#7a4e00;">—</div>
           <div class="oc-sub">With applied stress</div>
           <div class="oc-diff" id="res-stress-conf">—</div>
         </div>
@@ -305,10 +321,10 @@ window.addEventListener('storage', function(e) {
         </div>
       </div>
 
-      <div class="verdict-banner" id="verdict-banner" style="background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);">
+      <div class="verdict-banner" id="verdict-banner" style="background:#fff;border:1px solid rgba(76,175,80,0.3);">
         <div class="verdict-icon" id="verdict-icon">✅</div>
         <div style="flex:1;">
-          <div class="verdict-title" id="verdict-title" style="color:var(--green);">Plan is Resilient</div>
+          <div class="verdict-title" id="verdict-title" style="color:#1B5E20;">Plan is Resilient</div>
           <div class="verdict-detail" id="verdict-detail" style="color:#c8dae8;">Loading...</div>
           <div class="recs" id="recs-section" style="display:none;">
             <div class="recs-title">💡 How to Improve Resilience</div>
@@ -374,7 +390,7 @@ window.addEventListener('storage', function(e) {
           </div>
           
       <!-- MC Explainer -->
-      <div style="background:rgba(28,199,208,0.06);border-left:3px solid #1CC7D0;padding:12px 18px;margin:0 18px 16px;border-radius:0 8px 8px 0;font-size:12px;color:#8aaabb;line-height:1.8;">
+      <div style="background:#fff;border-left:3px solid #1CC7D0;padding:12px 18px;margin:0 18px 16px;border-radius:0 8px 8px 0;font-size:12px;color:#8aaabb;line-height:1.8;">
         <strong style="color:#1CC7D0;">How this differs from your Dashboard:</strong>
         Your Dashboard shows ONE future using your exact plan assumptions (smooth 7% returns every year).
         Monte Carlo runs <strong style="color:#fff;">1,000 different futures</strong> with random good and bad years —
@@ -1244,7 +1260,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // ── Verdict ───────────────────────────────────────────────
   var verdictHtml;
   if (successPct >= 90) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(76,175,80,0.08);border:1px solid rgba(76,175,80,0.3);color:#a5d6a7;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:1px solid rgba(76,175,80,0.3);color:#a5d6a7;font-size:13px;line-height:1.8;">' +
       '✅ <strong style="color:#4CAF50;font-size:15px;">Excellent — ' + successPct + '% success rate</strong><br><br>' +
       'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' random market scenarios</strong> — including crashes, recessions, prolonged low-return decades, and high-inflation periods. ' +
       'The median ending balance across all runs is <strong>' + fmt(p50) + '</strong>. Even your worst-10% scenario ends at <strong>' + fmt(p10) + '</strong>.<br><br>' +
@@ -1253,7 +1269,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       'portfolio size, and spending level creates a resilient plan that holds up across a wide range of possible futures.' +
       '</div>';
   } else if (successPct >= 75) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(244,184,106,0.08);border:1px solid rgba(244,184,106,0.3);color:#ffcba4;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:1px solid rgba(244,184,106,0.3);color:#ffcba4;font-size:13px;line-height:1.8;">' +
       '⚠️ <strong style="color:#f4b86a;font-size:15px;">Acceptable — ' + successPct + '% success rate</strong><br><br>' +
       'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' scenarios</strong>. The 75–89% range is workable but leaves meaningful risk. ' +
       'The median outcome is <strong>' + fmt(p50) + '</strong>. In the worst 10% of scenarios the portfolio ends at <strong>' + (p10 > 0 ? fmt(p10) : '$0 (depleted)') + '</strong>.<br><br>' +
@@ -1268,7 +1284,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       'But it does mean your portfolio-funded spending is at elevated risk. Go to Inputs, try reducing spending or adjusting your retirement date, then re-run.' +
       '</div>';
   } else {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(239,83,80,0.12);border:2px solid rgba(239,83,80,0.4);color:#ffcdd2;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid rgba(239,83,80,0.4);color:#ffcdd2;font-size:13px;line-height:1.8;">' +
       '🚨 <strong style="color:#ef5350;font-size:15px;">Significant Risk — ' + successPct + '% success rate</strong><br><br>' +
       'Only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' scenarios</strong> reach your goal. ' +
       (earliestDeplete ? 'Some scenarios deplete as early as <strong>' + earliestDeplete + '</strong>. ' : '') +

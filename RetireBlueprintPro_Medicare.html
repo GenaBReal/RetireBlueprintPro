@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Medicare Planner</title>
@@ -35,7 +38,7 @@ window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key===
 
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{--navy:#051628;--n2:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--border:#1a3a52;--muted:#6a8a9a;--white:#fff;--green:#4CAF50;--red:#ef5350;}
-body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#020e18;color:#d8eaf5;min-height:100vh;}
+body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
 
 
 
@@ -49,27 +52,27 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 .hero h1 span{color:var(--teal);}
 .hero p{font-size:13px;color:var(--muted);max-width:660px;line-height:1.8;}
 .page{max-width:1000px;margin:0 auto;padding:32px 24px 80px;}
-.card{background:#051628;border-radius:12px;border:1px solid #1a3a52;margin-bottom:24px;overflow:hidden;}
+.card{background:#fff;border-radius:12px;border:1px solid #dde3ec;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.06);}
 .card-hdr{background:var(--navy);padding:14px 20px;}
 .card-title{font-size:14px;font-weight:800;color:var(--white);}
 .card-sub{font-size:10px;color:var(--muted);margin-top:2px;}
-.card-body{padding:20px;color:#d8eaf5;}
+.card-body{padding:20px;background:#fff;color:#0B2239;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .kpi{background:var(--n2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
-.kpi-label{font-size:10px;font-weight:700;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.kpi-label{font-size:10px;font-weight:700;color:#4a6070;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
 .kpi-val{font-size:22px;font-weight:900;color:var(--teal);}
 .kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.field label{font-size:10px;font-weight:700;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;}
-.field input,.field select{background:#0A2035;border:1px solid #1a3a52;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#d8eaf5;}
-  input[type=number]{background:#0A2035;border:1px solid #1a3a52;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#d8eaf5;width:100%;box-sizing:border-box;}
+.field label{font-size:10px;font-weight:700;color:#4a6070;text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select{background:#fff;border:1px solid #ccd3dc;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
+  input[type=number]{background:#fff;border:1px solid #ccd3dc;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#0B2239;width:100%;box-sizing:border-box;}
 .field input:focus,.field select:focus{outline:none;border-color:var(--teal);}
 .alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:14px;}
-.alert-orange{background:rgba(244,184,106,0.12);border-left:3px solid #f4b86a;color:#f4b86a;}
-.alert-red{background:rgba(255,107,107,0.1);border-left:3px solid #ff6b6b;color:#ff9999;}
-.alert-green{background:rgba(76,175,80,0.1);border-left:3px solid #4CAF50;color:#81C784;}
-.alert-teal{background:rgba(28,199,208,0.08);border-left:3px solid #1CC7D0;color:#80DEEA;}
+.alert-orange{background:#fff;border-left:3px solid #f4b86a;color:#f4b86a;}
+.alert-red{background:#fff;border-left:3px solid #ff6b6b;color:#ff9999;}
+.alert-green{background:#fff;border-left:3px solid #4CAF50;color:#81C784;}
+.alert-teal{background:#fff;border-left:3px solid #1CC7D0;color:#80DEEA;}
 
 /* IRMAA TABLE */
 .irmaa-table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -77,7 +80,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 .irmaa-table td{padding:10px 14px;border-bottom:1px solid #f0f2f4;}
 .irmaa-table tr:last-child td{border:none;}
 .irmaa-table tr.irmaa-hit{background:rgba(239,83,80,0.06);}
-.irmaa-table tr.irmaa-current{background:rgba(28,199,208,0.08);}
+.irmaa-table tr.irmaa-current{background:#fff;}
 
 /* PARTS GRID */
 .parts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
@@ -129,7 +132,8 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -146,7 +150,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
   <div style="font-size:18px;font-weight:900;color:#fff;background:linear-gradient(135deg,#041E2F,#0a2d45);padding:14px 20px;border-radius:10px;margin:28px 0 16px;border-left:4px solid #1CC7D0;">
     🌉 Part 1: Before Medicare — The Coverage Gap (Ages 55–64)
   </div>
-  <div style="font-size:13px;color:#8aaabb;margin-bottom:20px;line-height:1.8;">
+  <div style="font-size:13px;color:#4a5e6e;margin-bottom:20px;line-height:1.8;">
     This is the part nobody talks about until it hits them. If you retire before 65, or your spouse retires before you, or you leave a job at any point before Medicare, you need to find your own health insurance. Here is exactly how that works.
   </div>
 
@@ -155,7 +159,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
     <div style="background:#051628;border:1px solid #1a3a52;border-radius:12px;padding:18px;">
       <div style="font-size:13px;font-weight:900;color:#f4b86a;margin-bottom:10px;">📍 The Pre-Medicare Gap — Common Scenarios</div>
-      <div style="font-size:12px;color:#8aaabb;line-height:1.9;">
+      <div style="font-size:12px;color:#4a5e6e;line-height:1.9;">
         <div style="margin-bottom:8px;"><strong style="color:#fff;">One partner retires early, one still works:</strong><br>
         The retired partner can join the working spouse's employer plan as a dependent (usually cheapest), use COBRA for up to 18 months, or get an ACA Marketplace plan.</div>
         <strong style="color:#fff;">Both partners retire before 65:</strong> ACA Marketplace is almost always the answer once COBRA expires.<br><br>
@@ -171,7 +175,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
     <div style="background:#051628;border:1px solid #1a3a52;border-radius:12px;padding:18px;">
       <div style="font-size:13px;font-weight:900;color:#1CC7D0;margin-bottom:10px;">💡 The 3 Ways to Get Coverage Before 65</div>
-      <div style="font-size:12px;color:#8aaabb;line-height:1.9;">
+      <div style="font-size:12px;color:#4a5e6e;line-height:1.9;">
         <div style="margin-bottom:8px;"><strong style="color:#fff;">1. Stay on employer plan as dependent</strong><br>
         <span style="font-size:11px;">If your spouse is still working and their employer allows it, this is usually the cheapest option.</span></div>
         <div style="margin-bottom:8px;"><strong style="color:#fff;">2. COBRA</strong><br>
@@ -190,7 +194,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
       <div>
         <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;">How it works:</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.9;">
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.9;">
           <div>🔹 You go to <a href="https://healthcare.gov" target="_blank" style="color:#1CC7D0;">healthcare.gov</a> (or your state exchange)</div>
           <div>🔹 Enter your ZIP code, household size, and estimated income</div>
           <div>🔹 See plans side by side (Bronze, Silver, Gold, Platinum)</div>
@@ -201,12 +205,12 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
       </div>
       <div>
         <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;">The subsidy — this is the key:</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.9;">
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.9;">
           The government pays part of your premium if your income is between <strong style="color:#fff;">100%–400%+ of the federal poverty level.</strong>
           <br><br>
           For a couple in 2025, that's roughly <strong style="color:#f4b86a;">$21,000–$80,000/yr.</strong> At $60K income, a couple might pay <strong style="color:#4CAF50;">$400–700/month</strong> for a Silver plan instead of $1,500+/month full price.
           <br><br>
-          <div style="background:rgba(244,184,106,0.1);border-radius:6px;padding:8px;">
+          <div style="background:#fff;border-radius:6px;padding:8px;">
             <strong style="color:#f4b86a;">⚠️ Roth conversion trap:</strong> Roth conversions count as income on the ACA. Converting $80K in a year can eliminate your subsidy and cost you $15,000+ extra in premiums. Plan conversions carefully if you are on ACA.
           </div>
         </div>
@@ -218,19 +222,19 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
       <div style="background:#1a2a20;border:1px solid #2E7032;border-radius:8px;padding:12px;text-align:center;">
         <div style="font-size:13px;font-weight:900;color:#4CAF50;margin-bottom:6px;">🥉 Bronze</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.7;">Lowest premium<br>Highest deductible<br>($5,000–8,000)<br>Best if healthy,<br>rarely need care</div>
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.7;">Lowest premium<br>Highest deductible<br>($5,000–8,000)<br>Best if healthy,<br>rarely need care</div>
       </div>
       <div style="background:#1a2533;border:1px solid #1565C0;border-radius:8px;padding:12px;text-align:center;border-width:2px;">
         <div style="font-size:13px;font-weight:900;color:#42a5f5;margin-bottom:6px;">🥈 Silver ⭐</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.7;">Middle ground<br>Moderate deductible<br>($2,000–5,000)<br><strong style="color:#42a5f5;">Best for most</strong><br>Subsidy applies here</div>
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.7;">Middle ground<br>Moderate deductible<br>($2,000–5,000)<br><strong style="color:#42a5f5;">Best for most</strong><br>Subsidy applies here</div>
       </div>
       <div style="background:#1a2520;border:1px solid #f4b86a;border-radius:8px;padding:12px;text-align:center;">
         <div style="font-size:13px;font-weight:900;color:#f4b86a;margin-bottom:6px;">🥇 Gold</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.7;">Higher premium<br>Lower deductible<br>($500–2,000)<br>Best if you use<br>healthcare often</div>
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.7;">Higher premium<br>Lower deductible<br>($500–2,000)<br>Best if you use<br>healthcare often</div>
       </div>
       <div style="background:#1a1a1a;border:1px solid #9e9e9e;border-radius:8px;padding:12px;text-align:center;">
         <div style="font-size:13px;font-weight:900;color:#e0e0e0;margin-bottom:6px;">💎 Platinum</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.7;">Highest premium<br>Lowest deductible<br>(&lt;$500)<br>Best if chronic<br>conditions</div>
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.7;">Highest premium<br>Lowest deductible<br>(&lt;$500)<br>Best if chronic<br>conditions</div>
       </div>
     </div>
 
@@ -297,8 +301,8 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
     <!-- ACA LINKS -->
     <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;">
       <a href="https://healthcare.gov" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#1CC7D0;color:#041E2F;font-size:11px;font-weight:800;padding:8px 16px;border-radius:8px;text-decoration:none;">🌐 Shop Plans at Healthcare.gov →</a>
-      <a href="https://www.kff.org/interactive/subsidy-calculator/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(28,199,208,0.15);border:1px solid #1CC7D0;color:#1CC7D0;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;text-decoration:none;">🧮 KFF Subsidy Calculator →</a>
-      <a href="https://www.healthcare.gov/glossary/cobra-coverage/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(244,184,106,0.1);border:1px solid rgba(244,184,106,0.4);color:#f4b86a;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;text-decoration:none;">📋 COBRA Guide →</a>
+      <a href="https://www.kff.org/interactive/subsidy-calculator/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #1CC7D0;color:#1CC7D0;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;text-decoration:none;">🧮 KFF Subsidy Calculator →</a>
+      <a href="https://www.healthcare.gov/glossary/cobra-coverage/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(244,184,106,0.4);color:#f4b86a;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;text-decoration:none;">📋 COBRA Guide →</a>
     </div>
   </div>
 
@@ -311,14 +315,14 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
       <div style="border:1px solid #1a3a52;border-radius:10px;overflow:hidden;">
         <div style="background:#0A2035;padding:10px 14px;font-size:12px;font-weight:800;color:#1CC7D0;">While on ACA (Before 65)</div>
-        <div style="padding:14px;font-size:11px;color:#8aaabb;line-height:1.9;">
+        <div style="padding:14px;font-size:11px;color:#4a5e6e;line-height:1.9;">
           <div style="color:#4CAF50;margin-bottom:6px;">✅ Children under 19: dental+vision REQUIRED on ACA plans</div>
           <div style="color:#ff6b6b;margin-bottom:10px;">❌ Adults: dental+vision NOT required — most plans don't include it</div>
           <div style="font-weight:700;color:#fff;margin-bottom:6px;">Your options:</div>
           <div>🔹 <strong style="color:#fff;">Standalone dental plan</strong> — $30–60/mo per person. Covers cleanings, X-rays, basic fillings. Major work (crowns, implants) covered at 50% after deductible.</div>
           <div style="margin-top:6px;">🔹 <strong style="color:#fff;">Standalone vision plan</strong> — $10–20/mo per person. Covers annual exam + glasses or contacts allowance ($150–200).</div>
           <div style="margin-top:6px;">🔹 <strong style="color:#fff;">Dental discount plans</strong> (e.g. Careington, Aetna Dental Access) — $8–15/mo. NOT insurance — just negotiated rates. Works well if you pay cash.</div>
-          <div style="margin-top:10px;background:rgba(28,199,208,0.08);border-radius:6px;padding:8px;">
+          <div style="margin-top:10px;background:#fff;border-radius:6px;padding:8px;">
             <strong style="color:#1CC7D0;">Typical annual cost:</strong> Dental ~$600/yr + Vision ~$240/yr = <strong style="color:#fff;">~$840/yr per person</strong> for decent standalone coverage.
           </div>
         </div>
@@ -326,14 +330,14 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
       <div style="border:1px solid #1a3a52;border-radius:10px;overflow:hidden;">
         <div style="background:#0A2035;padding:10px 14px;font-size:12px;font-weight:800;color:#f4b86a;">On Medicare (Age 65+)</div>
-        <div style="padding:14px;font-size:11px;color:#8aaabb;line-height:1.9;">
+        <div style="padding:14px;font-size:11px;color:#4a5e6e;line-height:1.9;">
           <div style="color:#ff6b6b;margin-bottom:10px;">❌ Original Medicare does NOT cover routine dental, vision, or hearing</div>
           <div style="font-weight:700;color:#fff;margin-bottom:6px;">Your options:</div>
           <div>🔹 <strong style="color:#fff;">Medicare Advantage (Part C)</strong> — Most Advantage plans <strong>include</strong> dental, vision, and hearing. This is a major reason people choose Advantage over Medigap.</div>
           <div style="margin-top:6px;">🔹 <strong style="color:#fff;">Standalone dental plan</strong> — Same as above. $30–80/mo. Companies like Humana, Aetna, United sell Medicare-age dental plans.</div>
           <div style="margin-top:6px;">🔹 <strong style="color:#fff;">Standalone vision plan</strong> — $10–30/mo. EyeMed, VSP sell individual plans.</div>
           <div style="margin-top:6px;">🔹 <strong style="color:#fff;">Medicare Supplement + standalone</strong> — If you choose Plan G, add separate dental (~$45/mo) + vision (~$15/mo) = ~$60/mo extra per person.</div>
-          <div style="margin-top:10px;background:rgba(244,184,106,0.08);border-radius:6px;padding:8px;">
+          <div style="margin-top:10px;background:#fff;border-radius:6px;padding:8px;">
             <strong style="color:#f4b86a;">Typical annual cost:</strong> Dental ~$540/yr + Vision ~$240/yr = <strong style="color:#fff;">~$780/yr per person</strong> on top of Medicare premiums.
           </div>
         </div>
@@ -343,7 +347,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
     <!-- DENTAL/VISION COST REALITY -->
     <div style="background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.3);border-radius:10px;padding:14px 18px;margin-bottom:14px;">
       <div style="font-size:12px;font-weight:800;color:#ff6b6b;margin-bottom:8px;">⚠️ The Real Dental Cost Risk in Retirement</div>
-      <div style="font-size:11px;color:#8aaabb;line-height:1.8;">
+      <div style="font-size:11px;color:#4a5e6e;line-height:1.8;">
         Dental insurance is expensive and has low annual caps ($1,000–2,000/yr). A single crown costs $1,500–3,000 out of pocket.
         A full set of implants can run $30,000–60,000. Most retirees find that <strong style="color:#fff;">dental insurance breaks even at best</strong> —
         many financial planners recommend self-insuring dental by keeping $3,000–5,000 in a dedicated dental/medical fund
@@ -356,20 +360,20 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
     <!-- LINKS -->
     <div style="display:flex;flex-wrap:wrap;gap:10px;">
-      <a href="https://www.medicare.gov/health-drug-plans/health-plans/your-coverage-options/dental-vision-hearing" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(244,184,106,0.15);border:1px solid rgba(244,184,106,0.4);color:#f4b86a;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🦷 Medicare Dental Options →</a>
+      <a href="https://www.medicare.gov/health-drug-plans/health-plans/your-coverage-options/dental-vision-hearing" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(244,184,106,0.4);color:#f4b86a;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🦷 Medicare Dental Options →</a>
       <a href="https://www.healthcare.gov/coverage/dental-coverage/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(28,199,208,0.1);border:1px solid #1CC7D0;color:#1CC7D0;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🦷 ACA Dental Coverage →</a>
-      <a href="https://www.medicare.gov/plan-compare" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.4);color:#4CAF50;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🔍 Compare Medicare Plans →</a>
+      <a href="https://www.medicare.gov/plan-compare" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(76,175,80,0.4);color:#4CAF50;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;">🔍 Compare Medicare Plans →</a>
     </div>
   </div>
 
   <!-- WHAT TO ENTER IN INPUTS - UPDATED -->
   <div style="background:rgba(244,184,106,0.07);border:1px solid rgba(244,184,106,0.3);border-radius:14px;padding:18px 22px;margin-bottom:24px;">
     <div style="font-size:14px;font-weight:900;color:#f4b86a;margin-bottom:10px;">📝 What Numbers Go in Your Inputs Page</div>
-    <div style="font-size:12px;color:#8aaabb;line-height:1.9;margin-bottom:12px;">Both fields are <strong style="color:#f4b86a;">ANNUAL amounts</strong> — multiply your monthly estimate by 12.</div>
+    <div style="font-size:12px;color:#4a5e6e;line-height:1.9;margin-bottom:12px;">Both fields are <strong style="color:#f4b86a;">ANNUAL amounts</strong> — multiply your monthly estimate by 12.</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div style="background:#041E2F;border-radius:8px;padding:14px;">
         <div style="font-size:12px;font-weight:800;color:#1CC7D0;margin-bottom:6px;">Field B52 — Pre-Medicare Annual ($)</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.8;">
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.8;">
           Healthcare costs BEFORE age 65.<br>
           Include: ACA premium + dental + vision<br><br>
           <strong style="color:#fff;">Examples:</strong><br>
@@ -379,7 +383,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
       </div>
       <div style="background:#041E2F;border-radius:8px;padding:14px;">
         <div style="font-size:12px;font-weight:800;color:#f4b86a;margin-bottom:6px;">Field B53 — Medicare Annual ($)</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.8;">
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.8;">
           Healthcare costs FROM age 65 onward.<br>
           Include: Part B + Medigap/Advantage + Part D + dental + vision<br><br>
           <strong style="color:#fff;">Examples:</strong><br>
@@ -394,7 +398,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
   <div style="font-size:18px;font-weight:900;color:#fff;background:linear-gradient(135deg,#041E2F,#0a2d45);padding:14px 20px;border-radius:10px;margin:28px 0 16px;border-left:4px solid #f4b86a;">
     🏥 Part 2: Medicare at 65 — Full Coverage Guide
   </div>
-  <div style="font-size:13px;color:#6a8a9a;background:#f0f2f5;border-radius:8px;padding:10px 16px;margin-bottom:20px;">
+  <div style="font-size:13px;color:#3a5060;background:#eef2f7;border-radius:8px;padding:10px 16px;margin-bottom:20px;">
     Now that the ACA bridge is covered — here is everything you need to know about Medicare itself.
   </div>
 
@@ -425,7 +429,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
         <div style="background:#1CC7D0;color:#041E2F;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
         <div>
           <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Part A turns on automatically — it is FREE</div>
-          <div style="font-size:12px;color:#8aaabb;line-height:1.7;">If you or your spouse worked and paid Medicare taxes for at least 10 years (40 quarters), Part A costs you <strong style="color:#4CAF50;">$0/month</strong>. It covers hospital stays. You do not sign up — Social Security automatically enrolls you if you're already collecting SS. If not collecting SS yet, you sign up at <strong style="color:#1CC7D0;">ssa.gov</strong> during your enrollment window.</div>
+          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">If you or your spouse worked and paid Medicare taxes for at least 10 years (40 quarters), Part A costs you <strong style="color:#4CAF50;">$0/month</strong>. It covers hospital stays. You do not sign up — Social Security automatically enrolls you if you're already collecting SS. If not collecting SS yet, you sign up at <strong style="color:#1CC7D0;">ssa.gov</strong> during your enrollment window.</div>
         </div>
       </div>
 
@@ -433,7 +437,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
         <div style="background:#f4b86a;color:#041E2F;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
         <div>
           <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Part B — you must sign up and pay $185/month</div>
-          <div style="font-size:12px;color:#8aaabb;line-height:1.7;">Part B covers doctor visits, lab tests, preventive care, outpatient services. The standard premium is <strong style="color:#f4b86a;">$185/month per person in 2025</strong> (deducted from your Social Security check or billed directly). <strong style="color:#ff6b6b;">This is NOT optional if you want healthcare coverage.</strong> You have a 7-month window to sign up (3 months before your birthday month, your birthday month, 3 months after). Miss the window → permanent 10% penalty per year you delayed, forever.</div>
+          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">Part B covers doctor visits, lab tests, preventive care, outpatient services. The standard premium is <strong style="color:#f4b86a;">$185/month per person in 2025</strong> (deducted from your Social Security check or billed directly). <strong style="color:#ff6b6b;">This is NOT optional if you want healthcare coverage.</strong> You have a 7-month window to sign up (3 months before your birthday month, your birthday month, 3 months after). Miss the window → permanent 10% penalty per year you delayed, forever.</div>
         </div>
       </div>
 
@@ -441,7 +445,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
         <div style="background:#ab47bc;color:#fff;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
         <div>
           <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Now you have "Original Medicare" — Parts A + B</div>
-          <div style="font-size:12px;color:#8aaabb;line-height:1.7;">With just A + B, you are covered for most medical needs. BUT — Original Medicare only pays <strong style="color:#fff;">80% of approved costs.</strong> You pay the other 20% with no cap. That 20% could be tens of thousands of dollars if you have a serious illness. This is the "gap" that Medigap fills.</div>
+          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">With just A + B, you are covered for most medical needs. BUT — Original Medicare only pays <strong style="color:#fff;">80% of approved costs.</strong> You pay the other 20% with no cap. That 20% could be tens of thousands of dollars if you have a serious illness. This is the "gap" that Medigap fills.</div>
         </div>
       </div>
 
@@ -449,7 +453,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
         <div style="background:#2E7032;color:#fff;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
         <div>
           <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Choose your path: Medigap or Medicare Advantage</div>
-          <div style="font-size:12px;color:#8aaabb;line-height:1.7;">You now make <strong style="color:#fff;">one big decision</strong>. You can either add a <strong style="color:#4CAF50;">Medigap supplement</strong> (private insurance that covers your 20% gap — predictable costs, any doctor) OR switch to <strong style="color:#f4b86a;">Medicare Advantage (Part C)</strong> (a private HMO/PPO that replaces A+B — lower premium, but restricted networks). See the comparison below.</div>
+          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">You now make <strong style="color:#fff;">one big decision</strong>. You can either add a <strong style="color:#4CAF50;">Medigap supplement</strong> (private insurance that covers your 20% gap — predictable costs, any doctor) OR switch to <strong style="color:#f4b86a;">Medicare Advantage (Part C)</strong> (a private HMO/PPO that replaces A+B — lower premium, but restricted networks). See the comparison below.</div>
         </div>
       </div>
 
@@ -457,7 +461,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
         <div style="background:#1565C0;color:#fff;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</div>
         <div>
           <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Add Part D for prescriptions</div>
-          <div style="font-size:12px;color:#8aaabb;line-height:1.7;">Part D is a separate prescription drug plan you purchase. Costs $20–$100/month depending on your drugs. If you use Medicare Advantage (Part C), it usually includes drug coverage. <strong style="color:#ff6b6b;">Don't skip Part D even if you take no medications.</strong> The late enrollment penalty is 1% per month you delay, and it stacks permanently.</div>
+          <div style="font-size:12px;color:#4a5e6e;line-height:1.7;">Part D is a separate prescription drug plan you purchase. Costs $20–$100/month depending on your drugs. If you use Medicare Advantage (Part C), it usually includes drug coverage. <strong style="color:#ff6b6b;">Don't skip Part D even if you take no medications.</strong> The late enrollment penalty is 1% per month you delay, and it stacks permanently.</div>
         </div>
       </div>
 
@@ -470,9 +474,9 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
 
-      <div style="background:rgba(76,175,80,0.08);border:1px solid rgba(76,175,80,0.3);border-radius:10px;padding:16px;">
+      <div style="background:#fff;border:1px solid rgba(76,175,80,0.3);border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:800;color:#4CAF50;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🎁 You Get This Automatically</div>
-        <div style="font-size:12px;color:#8aaabb;line-height:2.0;">
+        <div style="font-size:12px;color:#4a5e6e;line-height:2.0;">
           <div>✅ <strong style="color:#fff;">Part A</strong> — Hospital — $0/mo</div>
           <div style="font-size:10px;color:#4a6a7a;margin-bottom:6px;">Auto-enrolled if collecting SS. Otherwise sign up at ssa.gov.</div>
           <div>✅ <strong style="color:#fff;">Free preventive services</strong></div>
@@ -482,9 +486,9 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
         </div>
       </div>
 
-      <div style="background:rgba(244,184,106,0.08);border:1px solid rgba(244,184,106,0.3);border-radius:10px;padding:16px;">
+      <div style="background:#fff;border:1px solid rgba(244,184,106,0.3);border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:800;color:#f4b86a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🛒 You Must Sign Up & Pay For</div>
-        <div style="font-size:12px;color:#8aaabb;line-height:2.0;">
+        <div style="font-size:12px;color:#4a5e6e;line-height:2.0;">
           <div>💰 <strong style="color:#fff;">Part B</strong> — $185/mo per person</div>
           <div style="font-size:10px;color:#4a6a7a;margin-bottom:6px;">Doctor visits, outpatient care. Required to have any coverage.</div>
           <div>💊 <strong style="color:#fff;">Part D</strong> — $20–100/mo</div>
@@ -504,9 +508,9 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
 
-      <div style="background:rgba(28,199,208,0.06);border:2px solid rgba(28,199,208,0.4);border-radius:10px;padding:16px;">
+      <div style="background:#fff;border:2px solid rgba(28,199,208,0.4);border-radius:10px;padding:16px;">
         <div style="font-size:14px;font-weight:900;color:#1CC7D0;margin-bottom:10px;">🛡️ Medigap Supplement</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.9;">
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.9;">
           <div style="color:#4CAF50;">✅ Any doctor in the US who accepts Medicare</div>
           <div style="color:#4CAF50;">✅ No referrals needed for specialists</div>
           <div style="color:#4CAF50;">✅ No prior authorization needed</div>
@@ -516,9 +520,9 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
           <div style="color:#ff6b6b;">❌ Separate Part D plan needed (add $20–60/mo)</div>
           <div style="color:#ff6b6b;">❌ No dental/vision usually included</div>
         </div>
-        <div style="margin-top:12px;padding:10px;background:rgba(28,199,208,0.08);border-radius:8px;">
+        <div style="margin-top:12px;padding:10px;background:#fff;border-radius:8px;">
           <div style="font-size:10px;font-weight:700;color:#1CC7D0;text-transform:uppercase;margin-bottom:4px;">Most Popular Plans</div>
-          <div style="font-size:11px;color:#8aaabb;line-height:1.8;">
+          <div style="font-size:11px;color:#4a5e6e;line-height:1.8;">
             <strong style="color:#fff;">Plan G</strong> — ~$100–130/mo · Covers everything except Part B deductible ($257/yr). Best value for most people.<br>
             <strong style="color:#fff;">Plan N</strong> — ~$70–90/mo · Covers most things, small copays ($20 doctor visits). Good if you're healthy.<br>
             <strong style="color:#fff;">Plan F</strong> — ~$130–180/mo · Covers everything. Only available if you turned 65 before 2020.
@@ -528,7 +532,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
 
       <div style="background:rgba(244,184,106,0.06);border:2px solid rgba(244,184,106,0.3);border-radius:10px;padding:16px;">
         <div style="font-size:14px;font-weight:900;color:#f4b86a;margin-bottom:10px;">🏥 Medicare Advantage (Part C)</div>
-        <div style="font-size:11px;color:#8aaabb;line-height:1.9;">
+        <div style="font-size:11px;color:#4a5e6e;line-height:1.9;">
           <div style="color:#4CAF50;">✅ Low or $0 monthly premium</div>
           <div style="color:#4CAF50;">✅ Usually includes dental, vision, hearing</div>
           <div style="color:#4CAF50;">✅ Often includes Part D drug coverage</div>
@@ -539,8 +543,8 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
           <div style="color:#ff6b6b;">❌ Plans change yearly — benefits not guaranteed</div>
           <div style="color:#ff6b6b;">❌ Harder to switch back to Original Medicare</div>
         </div>
-        <div style="margin-top:12px;padding:10px;background:rgba(244,184,106,0.08);border-radius:8px;">
-          <div style="font-size:11px;color:#8aaabb;line-height:1.7;"><strong style="color:#fff;">Best for:</strong> People who want lower monthly costs, stay in one area, are generally healthy, and don't mind using a network of doctors. Not ideal if you have complex conditions, travel frequently, or want to see any specialist without a referral.</div>
+        <div style="margin-top:12px;padding:10px;background:#fff;border-radius:8px;">
+          <div style="font-size:11px;color:#4a5e6e;line-height:1.7;"><strong style="color:#fff;">Best for:</strong> People who want lower monthly costs, stay in one area, are generally healthy, and don't mind using a network of doctors. Not ideal if you have complex conditions, travel frequently, or want to see any specialist without a referral.</div>
         </div>
       </div>
     </div>
@@ -548,7 +552,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
     <!-- RECOMMENDATION BOX -->
     <div style="background:rgba(76,175,80,0.07);border:1px solid rgba(76,175,80,0.3);border-radius:10px;padding:14px 18px;">
       <div style="font-size:12px;font-weight:800;color:#4CAF50;margin-bottom:6px;">💡 What Most Financial Planners Recommend for Retirees with Savings</div>
-      <div style="font-size:12px;color:#8aaabb;line-height:1.8;">
+      <div style="font-size:12px;color:#4a5e6e;line-height:1.8;">
         <strong style="color:#fff;">Original Medicare + Plan G Medigap + Part D</strong> is the most popular choice for people with retirement savings.
         Yes, the premium is higher — but you get total freedom (any doctor, any specialist, any hospital that accepts Medicare nationwide),
         no surprise bills, no network restrictions, no prior authorizations. The peace of mind alone is worth the premium difference for most people.
@@ -657,7 +661,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
   <!-- WHAT TO ENTER IN INPUTS -->
   <div style="background:rgba(244,184,106,0.07);border:1px solid rgba(244,184,106,0.3);border-radius:14px;padding:18px 22px;margin-bottom:24px;">
     <div style="font-size:14px;font-weight:900;color:#f4b86a;margin-bottom:10px;">📝 What to Enter in Your Inputs Page</div>
-    <div style="font-size:12px;color:#8aaabb;line-height:1.9;">
+    <div style="font-size:12px;color:#4a5e6e;line-height:1.9;">
       <div style="margin-bottom:8px;">On your <strong style="color:#fff;">Inputs</strong> page under the Healthcare section, you have two fields per partner:</div>
       <div style="background:#041E2F;border-radius:8px;padding:12px 16px;margin-bottom:8px;">
         <div style="color:#fff;font-weight:700;margin-bottom:3px;">Pre-Medicare Annual ($) — field B52</div>
@@ -673,7 +677,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#0
   <!-- MEDICARE VS MEDICAID CLARITY -->
   <div style="background:rgba(171,71,188,0.07);border:1px solid rgba(171,71,188,0.3);border-radius:14px;padding:18px 22px;margin-bottom:24px;">
     <div style="font-size:14px;font-weight:900;color:#ab47bc;margin-bottom:10px;">❓ Medicare vs Medicaid — Once and For All</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:11px;color:#8aaabb;line-height:1.8;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:11px;color:#4a5e6e;line-height:1.8;">
       <div>
         <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:6px;">Medicare 🏥</div>
         <div>• Federal health insurance program</div>
@@ -940,10 +944,10 @@ function calc() {
   // IRMAA result banner
   var irmaaBanner = document.getElementById('irmaa-result');
   if (tier.partB === 0) {
-    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#e8f5e9;border:1px solid #a5d6a7;font-size:13px;color:#1B5E20;';
+    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fff;border:1px solid #a5d6a7;font-size:13px;color:#1B5E20;';
     irmaaBanner.innerHTML = '✅ <strong>No IRMAA surcharge</strong> at your income level ($' + income.toLocaleString() + '/yr). Your income is below the $212,000 threshold. Standard Part B premium applies: $' + PARTB_BASE + '/mo per person.';
   } else {
-    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fce4ec;border:1px solid #f48fb1;font-size:13px;color:#7f1d1d;';
+    irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fff;border:1px solid #f48fb1;font-size:13px;color:#7f1d1d;';
     irmaaBanner.innerHTML = '⚠️ <strong>IRMAA ' + tier.label + ' applies</strong> at $' + income.toLocaleString() + '/yr income. Your Part B premium is <strong>$' + partBPerPerson.toFixed(0) + '/mo per person</strong> (standard $' + PARTB_BASE + ' + $' + tier.partB.toFixed(0) + ' surcharge). Combined extra cost for a couple: <strong>$' + Math.round(tier.partB * 2 * 12).toLocaleString() + '/year</strong> just from IRMAA.';
   }
 

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Roth Access Ladder</title>
@@ -65,7 +68,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 .bucket-hsa{background:#fff;border-left:3px solid #6a8a9a;color:#2a3a4a;font-weight:700;}
 .bucket-lock{opacity:0.25;filter:grayscale(0.8);}
 .lock-icon{font-size:10px;}
-.milestone{background:#fffbf0;border:1px solid #f0d090;border-left:3px solid #f4b86a;border-radius:0 6px 6px 0;padding:7px 12px;margin-bottom:3px;font-size:11px;color:#5a3e00;font-weight:700;}
+.milestone{background:#fff;border:1px solid #f0d090;border-left:3px solid #f4b86a;border-radius:0 6px 6px 0;padding:7px 12px;margin-bottom:3px;font-size:11px;color:#5a3e00;font-weight:700;}
 
 /* LEGEND */
 .legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
@@ -102,13 +105,13 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 .conv-note{font-size:10px;color:#5a7080;}
 
 /* RULE OF 55 BANNER */
-.rule55-banner{background:#fffcf0;border-left:4px solid #f4b86a;border-radius:6px;padding:14px 18px;margin-bottom:16px;}
+.rule55-banner{background:#fff;border-left:4px solid #f4b86a;border-radius:6px;padding:14px 18px;margin-bottom:16px;}
 
 /* ALERT BOXES — bold on light bg */
 .alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:12px;}
 .alert-green{background:#f5fbf5;border-left:3px solid #5aaf6a;color:#1a3a1a;}
-.alert-orange{background:#fffcf0;border-left:3px solid #f4b86a;color:#5a3e00;}
-.alert-teal{background:#f0fafb;border-left:3px solid #1CC7D0;color:#004a52;}
+.alert-orange{background:#fff;border-left:3px solid #f4b86a;color:#5a3e00;}
+.alert-teal{background:#f5f9fa;border-left:3px solid #1CC7D0;color:#004a52;}
 
 @media(max-width:600px){.page{padding:16px 12px 60px;}.settings-grid{grid-template-columns:1fr 1fr;}}
 </style>
@@ -126,13 +129,14 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html" class="active">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 <div class="hero">

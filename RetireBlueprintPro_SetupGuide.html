@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Setup Guide</title>
@@ -55,7 +58,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B223
 .btn-outline{border:1px solid var(--border);color:var(--teal);background:transparent;}
 
 /* TIP BOX */
-.tip{background:#fff8e1;border-left:4px solid var(--orange);border-radius:0 8px 8px 0;padding:14px 16px;margin-top:14px;font-size:13px;color:#5a4000;line-height:1.7;}
+.tip{background:#fff;border-left:4px solid var(--orange);border-radius:0 8px 8px 0;padding:14px 16px;margin-top:14px;font-size:13px;color:#5a4000;line-height:1.7;}
 .tip strong{color:#3d2b00;}
 
 /* FAQ */
@@ -72,7 +75,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B223
 .btn-copy{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;}
 .btn-copy:hover{border-color:var(--teal);color:var(--teal);}
 
-.badge{display:inline-block;background:#e8f5e9;color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;}
+.badge{display:inline-block;background:#fff;color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;}
 .time-badge{font-size:11px;color:var(--muted);font-weight:600;margin-left:auto;padding-left:12px;}
 
 /* ── MOBILE RESPONSIVE ────────────────────────────────── */
@@ -196,12 +199,14 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html" class="active">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 
 
@@ -430,7 +435,7 @@ window.addEventListener('storage', function(e) {
       <div class="section-num">4</div>
       <div>
         <div class="section-title">Ongoing Use — Annual Check-In</div>
-        <div style="background:rgba(244,184,106,0.1);border-radius:8px;padding:12px 16px;margin-bottom:12px;border-left:3px solid #f4b86a;font-size:11px;color:#c8dae8;line-height:1.8;">
+        <div style="background:#fff;border-radius:8px;padding:12px 16px;margin-bottom:12px;border-left:3px solid #f4b86a;font-size:11px;color:#c8dae8;line-height:1.8;">
           📅 <strong style="color:#f4b86a;">Each January, update these 6 things</strong> — your whole plan recalculates automatically:<br>
           <strong>1.</strong> Account balances (from your brokerage statements) ·
           <strong>2.</strong> SS COLA rate (<a href="https://www.ssa.gov/OACT/COLA/colasummary.html" target="_blank" style="color:#1CC7D0;">ssa.gov</a>) ·

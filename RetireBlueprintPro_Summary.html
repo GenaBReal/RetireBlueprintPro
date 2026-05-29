@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Retirement Summary Report</title>
@@ -46,8 +49,8 @@
 
   /* ── STATUS BANNER ─────────────────────────────────── */
   .status-banner { border-radius:6px; padding:10px 16px; display:flex; align-items:center; gap:14px; margin-bottom:14px; }
-  .status-banner.green { background:#e8f5e9; border-left:5px solid #2E7D32; }
-  .status-banner.yellow { background:#fff8e1; border-left:5px solid #F57F17; }
+  .status-banner.green { background:#fff; border-left:5px solid #2E7D32; }
+  .status-banner.yellow { background:#fff; border-left:5px solid #F57F17; }
   .status-banner.red { background:#ffebee; border-left:5px solid #C62828; }
   .status-pill { font-size:13px; font-weight:800; white-space:nowrap; }
   .status-detail { font-size:12px; color:#444; }
@@ -81,8 +84,8 @@
   table.rtbl tfoot td { background:#f0f4f8; font-weight:700; border-top:2px solid #1CC7D0; }
   .tag { display:inline-block; padding:2px 7px; border-radius:3px; font-size:8px; font-weight:700; text-transform:uppercase; }
   .tag-pretax  { background:#e3f2fd; color:#1565C0; }
-  .tag-roth    { background:#e8f5e9; color:#2E7D32; }
-  .tag-taxable { background:#fff8e1; color:#E65100; }
+  .tag-roth    { background:#fff; color:#2E7D32; }
+  .tag-taxable { background:#fff; color:#E65100; }
   .tag-hsa     { background:#f3e5f5; color:#6A1B9A; }
 
   /* ── TWO-COL LAYOUT ────────────────────────────────── */
@@ -268,21 +271,14 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
+<a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html" class="active">Summary</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
+<a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
-
-
-
-
-<a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">⚡ Stress Test</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;font-size:11px;text-decoration:none;padding:0 8px;">📋 What's New</a>
-  <div style="display:flex;align-items:center;justify-content:flex-end;padding:10px 20px;background:#041E2F;border-bottom:1px solid #1a3a52;">
+<div style="display:flex;align-items:center;justify-content:flex-end;padding:10px 20px;background:#041E2F;border-bottom:1px solid #1a3a52;">
   <button class="btn" onclick="window.print()" style="background:#1CC7D0;color:#041E2F;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.3px;">🖨️ Print / Save PDF</button>
 </div>
 
@@ -474,7 +470,7 @@ window.addEventListener('storage', function(e) {
           <div class="stress-val" id="r-stress-base" style="color:#006064;">—</div>
           <div class="stress-note">Normal market returns</div>
         </div>
-        <div class="stress-box" style="background:#fff8e1;">
+        <div class="stress-box" style="background:#fff;">
           <div class="stress-label">Year 1 Down 20%</div>
           <div class="stress-val" id="r-stress-20" style="color:#E65100;">—</div>
           <div class="stress-note" id="r-stress-20-note">Mild bear market</div>
@@ -484,7 +480,7 @@ window.addEventListener('storage', function(e) {
           <div class="stress-val" id="r-stress-30" style="color:#C62828;">—</div>
           <div class="stress-note" id="r-stress-30-note">Severe bear market</div>
         </div>
-        <div class="stress-box" style="background:#fff8e1;">
+        <div class="stress-box" style="background:#fff;">
           <div class="stress-label">High Inflation (5%)</div>
           <div class="stress-val" id="r-stress-inf" style="color:#E65100;">—</div>
           <div class="stress-note" id="r-stress-inf-note">vs base 3%</div>
