@@ -194,7 +194,7 @@ window.addEventListener('storage', function(e) {
   <div id="your-data-notice">
     <div style="font-size:20px;">✅</div>
     <div style="flex:1;">
-      <div style="font-weight:800;color:#4CAF50;margin-bottom:2px;">Your Real Plan Loaded — <span id="loaded-names">—</span></div>
+      <div style="font-weight:800;color:#1CC7D0;margin-bottom:2px;">Your Real Plan Loaded — <span id="loaded-names">—</span></div>
       <div style="font-size:10px;color:#8aaabb;"><span id="loaded-portfolio">—</span> · All stress scenarios use your actual numbers · <button onclick="loadData()" style="background:transparent;border:none;color:#1CC7D0;font-size:10px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0;">🔄 Reload</button></div>
     </div>
     <div style="font-size:10px;color:#8aaabb;text-align:right;">Base ending should match Dashboard ✓</div>
@@ -214,7 +214,7 @@ window.addEventListener('storage', function(e) {
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
       <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
       <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#7a4e00;">—</div><div class="fp-note">Target end</div></div>
-      <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#1B5E20;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
+      <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#0B2239;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
       <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#006677;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
       <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Base + extra</div></div>
       <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
@@ -229,7 +229,7 @@ window.addEventListener('storage', function(e) {
     Your Dashboard assumes smooth returns every year. A Year 1 crash means selling shares at the bottom while withdrawing — those shares never recover.
     <br><strong style="color:#f4b86a;">The most powerful lever: Spending Adjustment.</strong>
     Try <strong>-10%</strong> and watch outcomes improve dramatically.
-    <strong style="color:#4CAF50;">Changed something in Inputs?</strong>
+    <strong style="color:#1CC7D0;">Changed something in Inputs?</strong>
     Save there, then click 🔄 Reload Data above.
   </div>
 
@@ -297,7 +297,7 @@ window.addEventListener('storage', function(e) {
           <div class="oc-label">📊 Base Plan</div>
           <div class="oc-val" id="res-base-end" style="color:#006677;">—</div>
           <div class="oc-sub">No stress · your projection</div>
-          <div class="oc-diff" id="res-base-conf" style="color:#1B5E20;">—</div>
+          <div class="oc-diff" id="res-base-conf" style="color:#0B2239;">—</div>
         </div>
         <div class="outcome-card scenario">
           <div class="oc-label">⚡ Stress Scenario</div>
@@ -324,7 +324,7 @@ window.addEventListener('storage', function(e) {
       <div class="verdict-banner" id="verdict-banner" style="background:#fff;border:1px solid rgba(76,175,80,0.3);">
         <div class="verdict-icon" id="verdict-icon">✅</div>
         <div style="flex:1;">
-          <div class="verdict-title" id="verdict-title" style="color:#1B5E20;">Plan is Resilient</div>
+          <div class="verdict-title" id="verdict-title" style="color:#0B2239;">Plan is Resilient</div>
           <div class="verdict-detail" id="verdict-detail" style="color:#c8dae8;">Loading...</div>
           <div class="recs" id="recs-section" style="display:none;">
             <div class="recs-title">💡 How to Improve Resilience</div>
@@ -338,7 +338,7 @@ window.addEventListener('storage', function(e) {
 
   <!-- IMPROVE PANEL -->
   <div class="improve-panel">
-    <div style="font-size:12px;font-weight:800;color:#4CAF50;margin-bottom:14px;">💡 How to Improve Your Stress Test Results</div>
+    <div style="font-size:12px;font-weight:800;color:#1CC7D0;margin-bottom:14px;">💡 How to Improve Your Stress Test Results</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div>
         <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🎛️ Try These Slider Combos</div>
@@ -425,7 +425,7 @@ window.addEventListener('storage', function(e) {
         and the other into a bull market, their outcomes are completely different. This is called
         <strong>sequence of returns risk</strong> and it is the #1 reason "average returns" do not tell the whole story.
         <br><br>
-        <strong style="color:#4CAF50;">✅ 90%+</strong> = Very strong · 
+        <strong style="color:#1CC7D0;">✅ 90%+</strong> = Very strong · 
         <strong style="color:#f4b86a;">⚠️ 75–89%</strong> = Acceptable, can strengthen · 
         <strong style="color:#ef5350;">❌ Below 75%</strong> = Needs adjustment
         <br>
@@ -469,7 +469,7 @@ window.addEventListener('storage', function(e) {
 
           <div style="flex:0 0 auto;background:#061620;border-radius:12px;border:2px solid #1a3a52;padding:20px 28px;text-align:center;min-width:160px;">
             <div style="font-size:11px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Success Rate</div>
-            <div id="mc-pct" style="font-size:52px;font-weight:900;line-height:1;color:#4CAF50;letter-spacing:-2px;">—</div>
+            <div id="mc-pct" style="font-size:52px;font-weight:900;line-height:1;color:#1CC7D0;letter-spacing:-2px;">—</div>
             <div style="font-size:11px;color:#6a8a9a;margin-top:6px;">of <span id="mc-total-runs">1,000</span> scenarios</div>
           </div>
 
@@ -491,7 +491,7 @@ window.addEventListener('storage', function(e) {
             <div style="background:#061620;border-radius:8px;border:1px solid #1a3a52;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
               <div>
                 <div style="font-size:10px;color:#6a8a9a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Best 10% Scenario (P90)</div>
-                <div id="mc-p90" style="font-size:18px;font-weight:800;color:#4CAF50;margin-top:2px;">—</div>
+                <div id="mc-p90" style="font-size:18px;font-weight:800;color:#1CC7D0;margin-top:2px;">—</div>
               </div>
               <div style="font-size:18px;">📈</div>
             </div>
@@ -501,10 +501,10 @@ window.addEventListener('storage', function(e) {
             <div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Scenario Breakdown</div>
             <div style="margin-bottom:7px;">
               <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
-                <span style="color:#4CAF50;font-weight:700;">✅ Exceed goal</span>
+                <span style="color:#1CC7D0;font-weight:700;">✅ Exceed goal</span>
                 <span id="mc-exceed" style="color:#c8dae8;font-weight:700;">—</span>
               </div>
-              <div id="mc-bar-exceed" style="height:6px;background:#4CAF50;border-radius:3px;transition:width .6s;width:0%;"></div>
+              <div id="mc-bar-exceed" style="height:6px;background:#1CC7D0;border-radius:3px;transition:width .6s;width:0%;"></div>
             </div>
             <div style="margin-bottom:7px;">
               <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
@@ -705,7 +705,7 @@ function updateFingerprint(baseRes, stressRes) {
   var actualEnd = leg.projectedEnding || (baseRes.length>0?baseRes[baseRes.length-1].bal:0);
   var fpEnd=document.getElementById('fp-ending');
   var fpEndNote=document.getElementById('fp-ending-note');
-  if(fpEnd){fpEnd.textContent=fmt(actualEnd);fpEnd.style.color=actualEnd>=(leg.goal||0)?'#4CAF50':'#f4b86a';}
+  if(fpEnd){fpEnd.textContent=fmt(actualEnd);fpEnd.style.color=actualEnd>=(leg.goal||0)?'#1CC7D0':'#f4b86a';}
   if(fpEndNote){fpEndNote.textContent=actualEnd>=(leg.goal||0)?'✅ Matches Dashboard':'⚠️ Below goal';fpEndNote.style.color=fpEnd.style.color;}
   var endYr='—';
   if(proj.years&&proj.years.length>0) endYr=proj.years[proj.years.length-1];
@@ -721,7 +721,7 @@ function updateFingerprint(baseRes, stressRes) {
   var s30End=quick30.length>0?quick30[quick30.length-1].bal:0;
   var fp30=document.getElementById('fp-stress30');
   var fp30n=document.getElementById('fp-stress30-note');
-  if(fp30){fp30.textContent=fmt(s30End);fp30.style.color=s30End>=(leg.goal||0)?'#4CAF50':s30End>0?'#f4b86a':'#ff6b6b';}
+  if(fp30){fp30.textContent=fmt(s30End);fp30.style.color=s30End>=(leg.goal||0)?'#1CC7D0':s30End>0?'#f4b86a':'#ff6b6b';}
   // Find depletion year for crash scenario
   var depYr30 = null;
   for(var qi=0;qi<quick30.length;qi++){if(quick30[qi].bal<=0){depYr30=quick30[qi].year;break;}}
@@ -739,12 +739,12 @@ function recalc() {
   var cola=parseFloat(document.getElementById('sl-cola').value);
 
   set('lbl-yr1',(yr1>=0?'+':'')+yr1+'%');
-  document.getElementById('lbl-yr1').style.color=yr1<0?'#ff6b6b':yr1>10?'#4CAF50':'#1CC7D0';
+  document.getElementById('lbl-yr1').style.color=yr1<0?'#ff6b6b':yr1>10?'#1CC7D0':'#1CC7D0';
   set('lbl-yrs',yrs+' yr'+(yrs>1?'s':''));
   set('lbl-inf',inf.toFixed(1)+'%');
   document.getElementById('lbl-inf').style.color=inf>5?'#ff6b6b':inf>3?'#f4b86a':'#1CC7D0';
   set('lbl-spend',(sp>=0?'+':'')+sp+'%');
-  document.getElementById('lbl-spend').style.color=sp<0?'#4CAF50':sp>0?'#f4b86a':'#8aaabb';
+  document.getElementById('lbl-spend').style.color=sp<0?'#1CC7D0':sp>0?'#f4b86a':'#8aaabb';
   set('lbl-cola',cola.toFixed(1)+'%');
 
   if(!planData) return;
@@ -770,22 +770,22 @@ function recalc() {
   if(scenLabel) {
     if(yr1Val===0 && sp===0) {
       scenLabel.textContent = '✅ Showing: Base case (no stress applied)';
-      scenLabel.style.color = '#4CAF50';
+      scenLabel.style.color = '#1CC7D0';
     } else {
       scenLabel.textContent = '⚡ Showing: Stress scenario (Year 1: '+(yr1Val>=0?'+':'')+yr1Val+'%)';
       scenLabel.style.color = '#f4b86a';
     }
   }
   var seEl=document.getElementById('res-stress-end');
-  if(seEl){seEl.textContent=fmt(stressEnd);seEl.style.color=stressEnd>=baseEnd?'#4CAF50':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';}
+  if(seEl){seEl.textContent=fmt(stressEnd);seEl.style.color=stressEnd>=baseEnd?'#1CC7D0':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';}
   var scEl=document.getElementById('res-stress-conf');
-  if(scEl){scEl.textContent=stressConf+'% of legacy goal';scEl.style.color=stressConf>=100?'#4CAF50':stressConf>=80?'#f4b86a':'#ff6b6b';}
+  if(scEl){scEl.textContent=stressConf+'% of legacy goal';scEl.style.color=stressConf>=100?'#1CC7D0':stressConf>=80?'#f4b86a':'#ff6b6b';}
   var dEl=document.getElementById('res-delta');
   if(dEl){dEl.textContent=(delta>=0?'+':'')+fmt(delta)+' ('+deltaPct+'%)';dEl.style.color=delta>=0?'#4CAF50':'#ff6b6b';}
 
   var icon,title,detail,color,bg,bg2,recs=[];
   if(stressEnd>=legGoal&&legGoal>0){
-    icon='✅';title='Plan is Resilient';color='#4CAF50';bg='rgba(76,175,80,0.12)';bg2='rgba(76,175,80,0.3)';
+    icon='✅';title='Plan is Resilient';color='#1CC7D0';bg='rgba(76,175,80,0.12)';bg2='rgba(76,175,80,0.3)';
     detail='Ending balance of '+fmt(stressEnd)+' meets or exceeds the '+fmt(legGoal)+' legacy goal even under this scenario.';
   } else if(stressEnd>0&&stressConf>=70){
     icon='⚠️';title='Plan Under Stress';color='#f4b86a';bg='rgba(244,184,106,0.12)';bg2='rgba(244,184,106,0.3)';
@@ -1209,7 +1209,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // ── Big success % ─────────────────────────────────────────
   var pctEl = document.getElementById('mc-pct');
   pctEl.textContent = successPct + '%';
-  pctEl.style.color = successPct >= 90 ? '#4CAF50' : successPct >= 75 ? '#f4b86a' : '#ef5350';
+  pctEl.style.color = successPct >= 90 ? '#1CC7D0' : successPct >= 75 ? '#f4b86a' : '#ef5350';
 
   document.getElementById('mc-total-runs').textContent = nRuns.toLocaleString();
   document.getElementById('mc-median').textContent = fmt(p50);
@@ -1261,7 +1261,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   var verdictHtml;
   if (successPct >= 90) {
     verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:1px solid rgba(76,175,80,0.3);color:#a5d6a7;font-size:13px;line-height:1.8;">' +
-      '✅ <strong style="color:#4CAF50;font-size:15px;">Excellent — ' + successPct + '% success rate</strong><br><br>' +
+      '✅ <strong style="color:#1CC7D0;font-size:15px;">Excellent — ' + successPct + '% success rate</strong><br><br>' +
       'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' random market scenarios</strong> — including crashes, recessions, prolonged low-return decades, and high-inflation periods. ' +
       'The median ending balance across all runs is <strong>' + fmt(p50) + '</strong>. Even your worst-10% scenario ends at <strong>' + fmt(p10) + '</strong>.<br><br>' +
       'This is above the <strong>90% threshold</strong> that most financial planners consider robust. Your combination of ' +

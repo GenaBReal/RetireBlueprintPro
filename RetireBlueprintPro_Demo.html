@@ -52,9 +52,9 @@
   .big-num { font-size:28px; font-weight:900; color:#fff; line-height:1; }
   .big-num.teal { color:var(--teal); }
   .big-num.orange { color:var(--orange); }
-  .big-num.green { color:var(--green); }
+  .big-num.green { color:var(--teal); }
   .sub { font-size:10px; color:#8aaabb; margin-top:4px; }
-  .badge-green { background:rgba(76,175,80,0.2); color:#4CAF50; font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
+  .badge-green { background:rgba(76,175,80,0.2); color:#1CC7D0; font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
   .badge-orange { background:rgba(244,184,106,0.2); color:var(--orange); font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
 
   /* ── CHART AREA ── */
@@ -77,14 +77,14 @@
   /* ── CTA ── */
   .cta-banner { background:#041E2F; border-radius:12px; padding:28px 24px; text-align:center; margin-top:20px; border-top:3px solid #f4b86a; }
   .cta-banner h2 { font-size:20px; font-weight:900; color:#fff; margin-bottom:8px; }
-  .cta-banner p { font-size:12px; color:#a5d6a7; margin-bottom:16px; line-height:1.7; }
+  .cta-banner p { font-size:12px; color:#8aaabb; margin-bottom:16px; line-height:1.7; }
   .cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
   .cta-btn-primary { background:#1CC7D0; color:#041E2F; font-weight:800; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:13px; }
   .cta-btn-secondary { background:transparent; color:#f4b86a; border:2px solid #f4b86a; font-weight:700; padding:12px 22px; border-radius:8px; text-decoration:none; font-size:13px; }
 
   /* ── FEATURE LIST ── */
   .feature-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
-  .feature-item { display:flex; align-items:center; gap:8px; font-size:11px; color:#a5d6a7; }
+  .feature-item { display:flex; align-items:center; gap:8px; font-size:11px; color:#d8eaf5; }
 
   .disclaimer { font-size:9px; color:#456A73; text-align:center; padding:12px; margin-top:12px; }
 
@@ -248,7 +248,7 @@ window.addEventListener('storage', function(e) {
       </div>
       <div class="fire-box">
         <div class="fire-label">FIRE Type</div>
-        <div class="fire-val" id="d-fire-type" style="color:var(--green);">—</div>
+        <div class="fire-val" id="d-fire-type" style="color:var(--teal);">—</div>
         <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-fire-type-note">—</div>
       </div>
       <div class="fire-box">
@@ -427,7 +427,7 @@ function recalc() {
 
   // ── KPIs ──────────────────────────────────────────────────────
   document.getElementById('d-confidence').textContent = conf+'%';
-  document.getElementById('d-confidence').style.color = conf>=100?'#4CAF50':conf>=80?'#f4b86a':'#ff6b6b';
+  document.getElementById('d-confidence').style.color = conf>=100?'#1CC7D0':conf>=80?'#f4b86a':'#ff6b6b';
   document.getElementById('d-confidence-sub').textContent = conf>=100?'Legacy goal fully funded':conf+'% of legacy goal funded';
   document.getElementById('d-status').textContent = conf>=100?'✅ ON TRACK':conf>=80?'⚠️ REVIEW':'⛔ AT RISK';
   document.getElementById('d-status').className = conf>=100?'badge-green':'badge-orange';
@@ -435,7 +435,7 @@ function recalc() {
   document.getElementById('d-spending').textContent = fmt(p.spend);
   document.getElementById('d-spending-sub').textContent = '$'+Math.round(p.spend/12/1000)+'K/mo equivalent';
   document.getElementById('d-ending').textContent = fmt(endBal);
-  document.getElementById('d-ending').style.color = endBal >= p.legacyGoal ? '#4CAF50' : '#f4b86a';
+  document.getElementById('d-ending').style.color = endBal >= p.legacyGoal ? '#1CC7D0' : '#f4b86a';
   document.getElementById('d-ending-sub').textContent = endBal>=p.legacyGoal ? '✅ Legacy goal met' : '⚠️ '+fmt(p.legacyGoal)+' goal';
 
   // ── FIRE METRICS ────────────────────────────────────────────────
@@ -443,7 +443,7 @@ function recalc() {
   var swr = p.portfolio > 0 && gap > 0 ? Math.round(gap/p.portfolio*1000)/10 : 0;
   var swrEl = document.getElementById('d-swr');
   swrEl.textContent = swr > 0 ? swr.toFixed(1)+'%' : '0%';
-  swrEl.style.color = swr<=3?'#4CAF50':swr<=4?'#1CC7D0':swr<=5?'#f4b86a':'#ff6b6b';
+  swrEl.style.color = swr<=3?'#1CC7D0':swr<=4?'#1CC7D0':swr<=5?'#f4b86a':'#ff6b6b';
   document.getElementById('d-swr-note').textContent = swr<=3?'✅ Very safe':swr<=4?'✅ 4% rule met':swr<=5?'⚠️ Slightly high':'⛔ Review spending';
 
   var fiTarget = gap > 0 ? gap/0.04 : 0;
@@ -451,13 +451,13 @@ function recalc() {
   for (var fi=0;fi<portfolioVals.length;fi++) { if(portfolioVals[fi]>=fiTarget){fiYear=curYear+fi;break;} }
   if (!fiYear && p.portfolio>=fiTarget) fiYear = curYear;
   var fiEl = document.getElementById('d-fi-date');
-  if (fiYear && fiYear<=curYear) { fiEl.textContent='Already FI! 🎉'; fiEl.style.color='#4CAF50'; document.getElementById('d-fi-note').textContent='You have reached financial independence'; }
+  if (fiYear && fiYear<=curYear) { fiEl.textContent='Already FI! 🎉'; fiEl.style.color='#1CC7D0'; document.getElementById('d-fi-note').textContent='You have reached financial independence'; }
   else if (fiYear) { fiEl.textContent=fiYear; fiEl.style.color='#f4b86a'; document.getElementById('d-fi-note').textContent=p.label+' · age '+(p.p1age+(fiYear-curYear)); }
   else { fiEl.textContent='—'; fiEl.style.color='#ff6b6b'; document.getElementById('d-fi-note').textContent='Target: '+fmt(fiTarget); }
 
   var ftEl = document.getElementById('d-fire-type');
   if(p.spend<30000){ftEl.textContent='Lean FIRE';ftEl.style.color='#1CC7D0';document.getElementById('d-fire-type-note').textContent='Under $30K/yr';}
-  else if(p.spend<60000){ftEl.textContent='Regular FIRE';ftEl.style.color='#4CAF50';document.getElementById('d-fire-type-note').textContent='$30K–$60K/yr';}
+  else if(p.spend<60000){ftEl.textContent='Regular FIRE';ftEl.style.color='#1CC7D0';document.getElementById('d-fire-type-note').textContent='$30K–$60K/yr';}
   else if(p.spend<100000){ftEl.textContent='FIRE';ftEl.style.color='#f4b86a';document.getElementById('d-fire-type-note').textContent='$60K–$100K/yr';}
   else{ftEl.textContent='Fat FIRE 🥩';ftEl.style.color='#ff9f43';document.getElementById('d-fire-type-note').textContent='Over $100K/yr';}
 
@@ -465,12 +465,12 @@ function recalc() {
   var coast = fiTarget > 0 ? Math.round(fiTarget/Math.pow(1+p.ret,yrsToRet)) : 0;
   var coastEl = document.getElementById('d-coast');
   coastEl.textContent = coast>0?fmt(coast):'—';
-  if(p.portfolio>=coast&&coast>0){coastEl.style.color='#4CAF50';document.getElementById('d-coast-note').textContent='✅ Already coasting!';}
+  if(p.portfolio>=coast&&coast>0){coastEl.style.color='#1CC7D0';document.getElementById('d-coast-note').textContent='✅ Already coasting!';}
   else{coastEl.style.color='#c39bd3';document.getElementById('d-coast-note').textContent=coast>0?fmt(coast-p.portfolio)+' to coast':'—';}
 
   // ── STRESS TEST ─────────────────────────────────────────────────
   var stressNote = function(val,goal) {
-    if(val>=goal&&goal>0) return {txt:'✅ Goal met',col:'#4CAF50'};
+    if(val>=goal&&goal>0) return {txt:'✅ Goal met',col:'#1CC7D0'};
     if(val>0) return {txt:'⚠️ '+fmt(goal-val)+' short',col:'#f4b86a'};
     return {txt:'⛔ Depleted',col:'#ff6b6b'};
   };
@@ -543,7 +543,7 @@ function recalc() {
     return Math.round(p.spend * Math.pow(1+p.inflation,i));
   });
   mkLine('chart-income', dispYrs, [
-    {label:'Guaranteed Income',data:incomeData,borderColor:'#4CAF50',backgroundColor:'rgba(76,175,80,0.1)',fill:true,tension:0.3,pointRadius:2,borderWidth:2},
+    {label:'Guaranteed Income',data:incomeData,borderColor:'#1CC7D0',backgroundColor:'rgba(76,175,80,0.1)',fill:true,tension:0.3,pointRadius:2,borderWidth:2},
     {label:'Total Expenses',data:spendData,borderColor:'#ff6b6b',borderDash:[4,2],fill:false,tension:0.3,pointRadius:0,borderWidth:1.5}
   ]);
   var yr1gap = p.spend - (p.ss + p.pension*12);
