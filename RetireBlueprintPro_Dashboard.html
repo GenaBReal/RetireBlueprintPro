@@ -35,8 +35,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .cmd-lbl{font-size:8px;color:#1CC7D0;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;}
 .cmd-val{font-size:12px;color:#fff;font-weight:600;margin-top:1px;}
 .cmd-btn{margin-left:auto;align-self:center;background:#f4b86a;color:#041E2F;border:none;padding:7px 16px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;flex-shrink:0;}
-.nav-bar{background:#0A3145;padding:0;display:flex;align-items:stretch;border-top:1px solid #1a3a52;}
-.nav-bar a{font-size:9px;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:7px 13px;border-right:1px solid #1a3a52;display:flex;align-items:center;color:#1CC7D0;}
+
+
 .nav-bar a.active,.nav-bar a:hover{color:#f4b86a;}
 .section{padding:10px 14px;}
 @media(max-width:768px){
@@ -285,29 +285,8 @@ window.addEventListener('storage', function(e) {
   <div class="cmd-item"><div class="cmd-lbl">Runway</div><div class="cmd-val" id="val-runway">—</div></div>
   <div class="cmd-item"><div class="cmd-lbl">Inflation</div><div class="cmd-val" id="val-inflation">—</div></div>
   <div class="cmd-item"><div class="cmd-lbl">SS COLA</div><div class="cmd-val" id="val-ss-cola">—</div></div>
-  <button class="cmd-btn" onclick="window.open('https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html','_blank')"><a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;font-weight:700;text-decoration:none;">View all scenarios →</a></button>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="display:inline-block;background:rgba(28,199,208,0.15);border:1px solid #1CC7D0;color:#1CC7D0;font-size:11px;font-weight:700;padding:6px 14px;border-radius:6px;text-decoration:none;letter-spacing:0.3px;">⚡ View All Scenarios →</a>
 </div>
-
-<div class="nav-bar">
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" class="active">Dashboard</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html">Setup Guide</a>
-    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Medicare</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#ff9f43;font-weight:700;">Stress Test</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="color:#f4b86a;">Demo</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html">Summary</a>
-  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('No sheet connected — go to Setup Guide first.'); return false;">Master Sheet</a>
-  <a href="#" onclick="loadData();return false;" style="margin-left:auto;padding:10px 14px;font-size:10px;font-weight:700;color:#f4b86a;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-left:1px solid #1a3a52;white-space:nowrap;" title="Reload data from your Google Sheet">🔄 Refresh</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="color:#8aaabb;">What's New</a>
-  <span id="load-status" style="font-size:9px;color:#8a9ab0;padding:7px 14px;"></span>
-  <button onclick="reloadData()" style="margin:4px 8px;background:#0A3145;border:1px solid #1a3a52;color:#1CC7D0;font-size:9px;font-weight:700;padding:4px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.5px;">↺ Refresh Data</button>
-</div>
-
 
 <div class="section">
 

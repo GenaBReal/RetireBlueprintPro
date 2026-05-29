@@ -387,19 +387,31 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
 <div class="page">
 
-<div style="background:linear-gradient(135deg,#f0fdfe,#e8f9fa);border-radius:10px;padding:14px 18px;margin-bottom:16px;border:1px solid #b2ebf2;display:flex;gap:14px;align-items:flex-start;">
+<div id="rbp-first-time-banner" style="background:linear-gradient(135deg,#f0fdfe,#e8f9fa);border-radius:10px;padding:14px 18px;margin-bottom:16px;border:1px solid #b2ebf2;display:flex;gap:14px;align-items:flex-start;position:relative;">
   <div style="font-size:24px;flex-shrink:0;">🚀</div>
-  <div>
+  <div style="flex:1;">
     <div style="font-size:13px;font-weight:800;color:#006064;margin-bottom:4px;">First Time? Fill These 4 Things First</div>
     <div style="font-size:11px;color:#00838f;line-height:1.8;">
+
       <strong>1. Partner Names & Ages</strong> (Section II &amp; III) → Required for any calculation<br>
       <strong>2. Account Balances</strong> (Section VI: Named Accounts) → Your starting portfolio values<br>
       <strong>3. Social Security amounts</strong> (in each partner section) → Your guaranteed income foundation<br>
       <strong>4. Base Annual Expenses</strong> (Section IV) → What you spend each year<br>
       <span style="color:#0097a7;">Everything else can be refined later. These 4 unlock your first projection! ✨</span>
+    
     </div>
+    <div style="font-size:10px;color:#00838f;margin-top:6px;font-style:italic;">Everything else can be refined later. These 4 unlock your first projection! ✨</div>
   </div>
+  <button onclick="document.getElementById('rbp-first-time-banner').style.display='none';localStorage.setItem('rbp_first_time_seen','1');" 
+    style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:#00838f;opacity:0.6;line-height:1;" 
+    title="Dismiss">✕</button>
 </div>
+<script>
+if(localStorage.getItem('rbp_first_time_seen')==='1'){
+  var b=document.getElementById('rbp-first-time-banner');
+  if(b) b.style.display='none';
+}
+</script>
 
 <div class="section-card">
   <div class="section-hdr" onclick="toggleSection(this)">
@@ -1176,6 +1188,12 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
     
     <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">X. Roth Conversion Solver — Analysis Settings</div>
+    <div style="background:rgba(28,199,208,0.07);border:1px solid rgba(28,199,208,0.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:#8aaabb;line-height:1.7;">
+      <strong style="color:#1CC7D0;">How the solver works:</strong> It compares two tax rates — 
+      <strong style="color:#1CC7D0;">your rate NOW</strong> (the bracket you fill up to) vs 
+      <strong style="color:#f4b86a;">your rate in the FUTURE</strong> (at RMD age 73). 
+      If your future rate will be <em>higher</em> than today, converting now saves money. 
+      Check your Dashboard for your projected income at age 73 to estimate your future rate.</div>
     <div class="form-grid-4" style="margin-bottom:14px;">
       <div class="field">
         <label>Analysis Year</label>
@@ -1183,20 +1201,20 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         <span class="hint">Which year to analyze</span>
       </div>
       <div class="field">
-        <label>Target Tax Bracket</label>
+        <label>Target Bracket to Fill <span style="font-size:9px;background:#1a3a52;color:#1CC7D0;padding:2px 6px;border-radius:4px;margin-left:4px;font-weight:700;letter-spacing:0.5px;">NOW</span></label>
         <select id="f-B141" onchange="updateRothIncomeForYear(); markDirty();">
           <option value="10%">10% Bracket</option>
           <option value="12%" selected>12% Bracket</option>
           <option value="22%">22% Bracket</option>
           <option value="24%">24% Bracket</option>
         </select>
-        <span class="hint">Fill up to this bracket</span>
+        <span class="hint">Convert Roth up to this bracket each year while in a low tax window</span>
         <div id="roth-bracket-hint" style="font-size:11px;color:var(--teal);margin-top:4px;font-style:italic;"></div>
       </div>
       <div class="field">
-        <label>Assumed Future Tax Rate (%)</label>
+        <label>Projected Tax Rate at RMDs <span style="font-size:9px;background:#2d1a00;color:#f4b86a;padding:2px 6px;border-radius:4px;margin-left:4px;font-weight:700;letter-spacing:0.5px;">FUTURE</span></label>
         <input type="number" id="f-B145" value="" min="1" max="50" onchange="updateRothIncomeForYear(); markDirty();">
-        <span class="hint">Your estimated effective federal tax rate when RMDs begin at 73 — used to calculate tax savings of converting now vs later</span>
+        <span class="hint">Your estimated <strong>effective</strong> rate at age 73 when RMDs kick in — find this on your Dashboard for year 2037 (or when you turn 73). Higher RMDs = higher rate than you might expect.</span>
         <div id="roth-tax-hint" style="font-size:11px;color:var(--teal);margin-top:4px;font-style:italic;"></div>
       </div>
     </div>
