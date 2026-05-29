@@ -16,7 +16,8 @@ function rbpApplyNames(p1,p2){
 document.addEventListener('DOMContentLoaded', function(){ rbpApplyNames(); });
 window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key==='rbp_p2_name')rbpApplyNames();});
 </script>
-<style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
+<style>
+.header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
 .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
 .nav::-webkit-scrollbar{display:none;}
@@ -30,92 +31,84 @@ window.addEventListener('storage',function(e){if(e.key==='rbp_p1_name'||e.key===
   --border:#1a3a52;--muted:#6a8a9a;--white:#fff;--text:#d8eaf5;
   --green:#4CAF50;--red:#ef5350;--purple:#ab47bc;
 }
-body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;}
-
-/* NAV */
-
-
-
-
-
-
+body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F0F4F8;color:#0B2239;min-height:100vh;}
 
 .nav-right{margin-left:auto;display:flex;}
 
 /* HERO */
 .hero{background:var(--navy);padding:36px 24px 28px;border-bottom:2px solid var(--border);}
-.hero h1{font-size:26px;font-weight:900;color:var(--white);margin-bottom:8px;}
-.hero h1 span{color:var(--teal);}
-.hero p{font-size:13px;color:var(--muted);max-width:660px;line-height:1.8;}
+.hero h1{font-size:26px;font-weight:900;color:#fff;margin-bottom:8px;}
+.hero h1 span{color:#1CC7D0;}
+.hero p{font-size:13px;color:#8aaabb;max-width:660px;line-height:1.8;}
 
 /* PAGE */
 .page{max-width:1100px;margin:0 auto;padding:32px 24px 80px;}
 
-/* CARDS */
-.card{background:#fff;border-radius:12px;border:1px solid #e8eaed;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
-.card-hdr{background:var(--navy);padding:14px 20px;display:flex;align-items:center;gap:12px;}
-.card-title{font-size:14px;font-weight:800;color:var(--white);}
-.card-sub{font-size:10px;color:var(--muted);margin-top:2px;}
-.card-body{padding:20px;}
+/* CARDS — keep white/light */
+.card{background:#fff;border-radius:12px;border:1px solid #dde3ec;margin-bottom:24px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.card-hdr{background:#051628;padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.card-title{font-size:14px;font-weight:800;color:#fff;}
+.card-sub{font-size:10px;color:#8aaabb;margin-top:2px;}
+.card-body{padding:20px;background:#fff;}
 
-/* LADDER */
+/* LADDER — dark row bg so bucket colors pop */
 .ladder-wrap{overflow-x:auto;}
 .ladder{min-width:700px;}
 .ladder-row{display:grid;grid-template-columns:100px 1fr;gap:0;margin-bottom:3px;align-items:stretch;}
-.ladder-age{background:var(--n2);border:1px solid var(--border);border-right:none;padding:8px 12px;font-size:12px;font-weight:800;color:var(--orange);display:flex;align-items:center;border-radius:6px 0 0 6px;}
-.ladder-bars{display:flex;gap:3px;padding:6px 8px;background:#f8f9fa;border:1px solid #e8eaed;border-radius:0 6px 6px 0;align-items:center;flex-wrap:wrap;}
-.bucket{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;}
-.bucket-taxable{background:rgba(28,199,208,0.12);border:1px solid rgba(28,199,208,0.3);color:#1CC7D0;}
-.bucket-pretax{background:rgba(244,184,106,0.12);border:1px solid rgba(244,184,106,0.3);color:#f4b86a;}
-.bucket-roth-principal{background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.3);color:#4CAF50;}
-.bucket-roth-growth{background:rgba(171,71,188,0.12);border:1px solid rgba(171,71,188,0.3);color:#ce93d8;}
-.bucket-hsa{background:rgba(239,83,80,0.12);border:1px solid rgba(239,83,80,0.3);color:#ef9a9a;}
-.bucket-lock{opacity:0.35;filter:grayscale(0.5);}
+.ladder-age{background:#051628;border:1px solid #051628;border-right:none;padding:8px 12px;font-size:12px;font-weight:800;color:#f4b86a;display:flex;align-items:center;border-radius:6px 0 0 6px;flex-shrink:0;}
+.ladder-bars{display:flex;gap:5px;padding:8px 12px;background:#eef1f5;border:1px solid #cdd5e0;border-left:none;border-radius:0 6px 6px 0;align-items:center;flex-wrap:wrap;}
+.bucket{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:800;white-space:nowrap;}
+.bucket-taxable{background:#fff;border-left:3px solid #1CC7D0;color:#1CC7D0;font-weight:700;}
+.bucket-pretax{background:#fff;border-left:3px solid #f4b86a;color:#2a3a4a;font-weight:700;}
+.bucket-roth-principal{background:#fff;border-left:3px solid #4CAF50;color:#2a3a4a;font-weight:700;}
+.bucket-roth-growth{background:#fff;border-left:3px solid #9575cd;color:#2a3a4a;font-weight:700;}
+.bucket-hsa{background:#fff;border-left:3px solid #6a8a9a;color:#2a3a4a;font-weight:700;}
+.bucket-lock{opacity:0.25;filter:grayscale(0.8);}
 .lock-icon{font-size:10px;}
-.milestone{background:rgba(244,184,106,0.08);border:1px solid rgba(244,184,106,0.2);border-left:3px solid var(--orange);border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:3px;font-size:11px;color:#f4b86a;font-weight:700;}
+.milestone{background:#fffbf0;border:1px solid #f0d090;border-left:3px solid #f4b86a;border-radius:0 6px 6px 0;padding:7px 12px;margin-bottom:3px;font-size:11px;color:#5a3e00;font-weight:700;}
 
 /* LEGEND */
 .legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
-.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#4a5e6e;}
 .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
 
 /* SETTINGS */
 .settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
 .field{display:flex;flex-direction:column;gap:4px;}
-.field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
-.field input,.field select{background:#f8f9fa;border:1px solid #e0e4e8;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
-.field input:focus,.field select:focus{outline:none;border-color:var(--teal);}
+.field label{font-size:10px;font-weight:700;color:#4a6070;text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select{background:#f8f9fa;border:1px solid #ccd3dc;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#0B2239;}
+.field input:focus,.field select:focus{outline:none;border-color:#1CC7D0;background:#fff;}
 
 /* STRATEGY TABLE */
 .strat-table{width:100%;border-collapse:collapse;font-size:12px;}
-.strat-table th{background:var(--navy);color:var(--orange);padding:10px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
-.strat-table td{padding:10px 14px;border-bottom:1px solid #f0f2f4;vertical-align:top;}
+.strat-table th{background:#051628;color:#f4b86a;padding:10px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+.strat-table td{padding:10px 14px;border-bottom:1px solid #eaecf0;vertical-align:top;color:#1a2e3e;}
 .strat-table tr:last-child td{border:none;}
-.strat-table tr:hover td{background:#f8f9fa;}
-.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-right:4px;}
-.tag-green{background:#e8f5e9;color:#2E7032;}
-.tag-orange{background:#fff3e0;color:#e65100;}
-.tag-blue{background:#e3f2fd;color:#1565c0;}
-.tag-red{background:#fce4ec;color:#c62828;}
-.tag-purple{background:#f3e5f5;color:#6a1b9a;}
+.strat-table tr:hover td{background:#f5f8fc;}
+.tag{display:inline-block;font-size:10px;font-weight:800;padding:3px 9px;border-radius:5px;margin-right:4px;}
+.tag-green{background:#041E2F;color:#1CC7D0;border-radius:4px;padding:2px 7px;}
+.tag-orange{background:#041E2F;color:#f4b86a;border-radius:4px;padding:2px 7px;}
+.tag-blue{background:#041E2F;color:#8aaabb;border-radius:4px;padding:2px 7px;}
+.tag-red{background:#041E2F;color:#f4b86a;border-radius:4px;padding:2px 7px;}
+.tag-purple{background:#041E2F;color:#8aaabb;border-radius:4px;padding:2px 7px;}
 
 /* CONVERSION PLANNER */
-.conv-row{display:grid;grid-template-columns:80px 1fr 140px 180px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f0f2f4;}
+.conv-row{display:grid;grid-template-columns:80px 1fr 140px 180px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #eaecf0;}
 .conv-row:last-child{border:none;}
 .conv-year{font-size:12px;font-weight:800;color:#0B2239;}
-.conv-bar-wrap{background:#f0f2f4;border-radius:4px;height:20px;overflow:hidden;position:relative;}
-.conv-bar{height:100%;background:linear-gradient(90deg,#4CAF50,#1CC7D0);border-radius:4px;transition:width .4s;}
-.conv-amount{font-size:12px;font-weight:700;color:#4CAF50;text-align:right;}
-.conv-note{font-size:10px;color:var(--muted);}
+.conv-bar-wrap{background:#e8ecf0;border-radius:4px;height:20px;overflow:hidden;}
+.conv-bar{height:100%;background:linear-gradient(90deg,#f4b86a,#1CC7D0);border-radius:4px;transition:width .4s;}
+.conv-amount{font-size:12px;font-weight:700;color:#1CC7D0;text-align:right;}
+.conv-note{font-size:10px;color:#5a7080;}
 
 /* RULE OF 55 BANNER */
-.rule55-banner{background:linear-gradient(135deg,#041E2F,#0d2d45);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:16px;}
+.rule55-banner{background:#fffcf0;border-left:4px solid #f4b86a;border-radius:6px;padding:14px 18px;margin-bottom:16px;}
 
-/* ALERT BOXES */
+/* ALERT BOXES — bold on light bg */
 .alert{border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:12px;}
-.alert-green{background:#e8f5e9;border:1px solid #a5d6a7;color:#1B5E20;}
-.alert-orange{background:#fff8e1;border-left:3px solid var(--orange);color:#5a4000;}
-.alert-teal{background:rgba(28,199,208,0.08);border:1px solid rgba(28,199,208,0.25);color:#0d4a50;}
+.alert-green{background:#f5fbf5;border-left:3px solid #5aaf6a;color:#1a3a1a;}
+.alert-orange{background:#fffcf0;border-left:3px solid #f4b86a;color:#5a3e00;}
+.alert-teal{background:#f0fafb;border-left:3px solid #1CC7D0;color:#004a52;}
 
 @media(max-width:600px){.page{padding:16px 12px 60px;}.settings-grid{grid-template-columns:1fr 1fr;}}
 </style>
@@ -142,12 +135,9 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   <a href="#" onclick="if(typeof loadData==='function')loadData();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;">⟳ Refresh</a>
 </div>
 
-
-
-</div>
-
 <div class="hero">
   <h1>🔄 Roth Access <span>Ladder</span></h1>
+  <p style="font-size:11px;color:#6a8a9a;margin-top:10px;">💡 <strong style="color:#d8eaf5;">This page answers: When can I access my money penalty-free?</strong> &nbsp;·&nbsp; For <em>How much to convert each year?</em> see the <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:700;">Roth Conversion Solver in Inputs →</a></p>
   <p>Visualize exactly when each bucket of your retirement money becomes accessible — penalty-free.
   This is the roadmap every early retiree needs: which accounts to draw from, in what order, and why.
   Your plan for <strong data-rbp-p1>Partner 1</strong> and <strong data-rbp-p2>Partner 2</strong> — built from your actual data.</p>
@@ -200,7 +190,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
         </div>
         <div class="field">
           <label>Pre-Tax 401k/IRA Balance</label>
-          <input type="number" id="pretax-bal" value="500000" min="0" step="10000" onchange="buildLadder()">
+          <input type="number" id="pretax-bal" value="0" min="0" step="10000" onchange="buildLadder()">
         </div>
       </div>
       <div style="margin-top:12px;font-size:11px;color:#6a8a9a;">💡 These update automatically when you load data from your sheet. Changes here are local only.</div>
@@ -234,7 +224,8 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 
   <!-- CONVERSION WINDOW PLANNER -->
   <div class="card">
-    <div class="card-hdr"><div class="card-title">📅 Roth Conversion Window Planner</div></div>
+    <div class="card-hdr"><div class="card-title">📅 Roth Conversion Window Planner</div>
+            <div class="card-sub">Suggested annual amount to convert each year — fills tax bracket headroom between retirement and RMDs. Load your sheet for personalized amounts.</div></div>
     <div class="card-body">
       <div class="alert alert-teal" style="margin-bottom:16px;">
         <strong>The Roth Conversion Window</strong> is the period between your retirement date and age 73 (when RMDs begin).
@@ -276,7 +267,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
     <div class="card-body">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
 
-        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #dde3eced;padding:16px;">
           <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">⚡ Rule of 55</div>
           <div style="font-size:12px;color:#455A64;line-height:1.7;">
             If you leave your employer at <strong>age 55 or older</strong>, you can withdraw from <em>that employer's</em> 401k immediately without penalty.
@@ -286,7 +277,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </div>
         </div>
 
-        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #dde3eced;padding:16px;">
           <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">🔄 Roth Conversion Ladder</div>
           <div style="font-size:12px;color:#455A64;line-height:1.7;">
             Convert pre-tax money to Roth each year. After <strong>5 years</strong>, that converted principal can be withdrawn penalty-free.
@@ -296,7 +287,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </div>
         </div>
 
-        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #dde3eced;padding:16px;">
           <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">📋 72(t) SEPP</div>
           <div style="font-size:12px;color:#455A64;line-height:1.7;">
             Substantially Equal Periodic Payments — withdraw a fixed calculated amount from your IRA for at least 5 years or to age 59½.
@@ -306,7 +297,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </div>
         </div>
 
-        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #dde3eced;padding:16px;">
           <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">💰 Taxable Brokerage</div>
           <div style="font-size:12px;color:#455A64;line-height:1.7;">
             No age restrictions whatsoever. Pay capital gains tax on gains (0%, 15%, or 20% depending on your income).
@@ -316,7 +307,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </div>
         </div>
 
-        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #dde3eced;padding:16px;">
           <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">🏥 HSA Bridge</div>
           <div style="font-size:12px;color:#455A64;line-height:1.7;">
             Save all medical receipts. After years of accumulation, you can reimburse yourself from your HSA — even years later.
@@ -326,7 +317,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
           </div>
         </div>
 
-        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">
+        <div style="background:#f8f9fa;border-radius:10px;border:1px solid #dde3eced;padding:16px;">
           <div style="font-size:13px;font-weight:800;color:#0B2239;margin-bottom:6px;">🏠 Roth Contributions</div>
           <div style="font-size:12px;color:#455A64;line-height:1.7;">
             Your <em>original contributions</em> (not earnings) to a Roth IRA can be withdrawn at any time, any age, for any reason — <strong>zero tax, zero penalty</strong>.
@@ -466,7 +457,7 @@ function buildLadder() {
     var p2Rmd = p2AgeNow >= 73;
     if (p1Rmd || p2Rmd) {
       var rmdWho = (p1Rmd && p2Rmd) ? 'Both' : (p1Rmd ? p1Name.split(' ')[0] : p2Name.split(' ')[0]);
-      barsDiv.innerHTML += '<div style="background:rgba(239,83,80,0.1);border:1px solid rgba(239,83,80,0.3);border-radius:5px;padding:4px 9px;font-size:10px;font-weight:700;color:#ef9a9a;white-space:nowrap;">⚠️ RMDs Required (' + rmdWho + ')</div>';
+      barsDiv.innerHTML += '<div style="background:#fff;border-left:3px solid #6a8a9a;border-radius:5px;padding:4px 9px;font-size:10px;font-weight:700;color:#2a4050;white-space:nowrap;">⚠️ RMDs Required (' + rmdWho + ')</div>';
     }
 
     row.appendChild(barsDiv);
@@ -510,16 +501,31 @@ function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, 
   var el = document.getElementById('conversion-planner');
   var html = '';
 
-  var prevEndBal = 500000; // placeholder - uses pretax bal
   var pretax = parseInt(document.getElementById('pretax-bal').value) || 500000;
-  var annualConv = Math.round(pretax * 0.08); // rough 8% per year conversion suggestion
+  // Suggested annual conversion: use planData optimal amount if loaded,
+  // otherwise estimate as the amount needed to fill the 22% bracket
+  // (roughly $94K taxable income limit minus estimated SS/pension income)
+  var annualConv = 0;
+  if (window._rbpPlanData && window._rbpPlanData.roth && window._rbpPlanData.roth.optimalAmount > 0) {
+    annualConv = window._rbpPlanData.roth.optimalAmount;
+  } else {
+    // Fallback: estimate bracket-filling amount
+    // Standard assumption: fill up to 22% bracket (~$94K limit for MFJ)
+    // minus estimated SS/other income (~$40-50K for typical retiree)
+    var estSS = (window._rbpPlanData && window._rbpPlanData.people) ? 
+      (function(){ var pk=Object.keys(window._rbpPlanData.people||{}); 
+        var p1=(window._rbpPlanData.people[pk[0]]||{}); 
+        var p2=(window._rbpPlanData.people[pk[1]]||{});
+        return ((p1.ssMonthly||0)+(p2.ssMonthly||0))*12; })() : 40000;
+    annualConv = Math.max(10000, Math.round(Math.min(94300 - estSS, pretax * 0.15)));
+  }
 
   for (var yr = Math.max(firstConv, retireYear); yr < Math.min(rmd1Year, retireYear + 20); yr++) {
     var p1AgeNow = p1Age + (yr - curYear);
     var p2AgeNow = p2Age + (yr - curYear);
     var fiveYrReady = yr + 5;
     var pct = Math.min(100, Math.round(annualConv / pretax * 100));
-    var note = 'Penalty-free from ' + fiveYrReady;
+    var note = 'Suggested conversion · tax-free access from ' + fiveYrReady;
     if (p1AgeNow >= 73 || p2AgeNow >= 73) note = '⚠️ RMDs begun — convert carefully';
 
     html += '<div class="conv-row">';
