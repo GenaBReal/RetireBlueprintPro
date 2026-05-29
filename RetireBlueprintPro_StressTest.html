@@ -201,9 +201,9 @@ window.addEventListener('storage', function(e) {
       <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:var(--green);">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
       <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:var(--teal);">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
       <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Base + extra</div></div>
-      <div class="fp-cell" style="border:1px solid rgba(255,107,107,0.3);"><div class="fp-label" style="color:#ff9f43;">⚡ -30% Yr1</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
+      <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
-    <div style="margin-top:8px;font-size:9px;color:#456A73;text-align:center;">If these numbers match your Dashboard, your real plan is loaded. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">Need real data? Open on GitHub Pages →</a></div>
+    <div style="margin-top:8px;font-size:9px;color:#456A73;text-align:center;">If these numbers match your Dashboard, your real plan is loaded. The 🛡️ Crash card shows a worst-case stress preview — not your actual projection. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">Need real data? Open on GitHub Pages →</a></div>
   </div>
 
   <!-- HOW TO READ -->
@@ -706,7 +706,11 @@ function updateFingerprint(baseRes, stressRes) {
   var fp30=document.getElementById('fp-stress30');
   var fp30n=document.getElementById('fp-stress30-note');
   if(fp30){fp30.textContent=fmt(s30End);fp30.style.color=s30End>=(leg.goal||0)?'#4CAF50':s30End>0?'#f4b86a':'#ff6b6b';}
-  if(fp30n){fp30n.textContent=s30End>=(leg.goal||0)?'✅ Goal met':s30End>0?'⚠️ Below':'⛔ Depleted';fp30n.style.color=fp30.style.color;}
+  // Find depletion year for crash scenario
+  var depYr30 = null;
+  for(var qi=0;qi<quick30.length;qi++){if(quick30[qi].bal<=0){depYr30=quick30[qi].year;break;}}
+  var note30 = s30End>=(leg.goal||0)?'✅ Goal met':s30End>0?'⚠️ Below goal':'⛔ Depletes ~'+depYr30;
+  if(fp30n){fp30n.textContent=note30;fp30n.style.color=fp30.style.color;}
 }
 
 function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
