@@ -17,116 +17,73 @@
 .nav a:hover{background:#1a3a52;}
 .nav a.active{color:#f4b86a;border-bottom:2px solid #f4b86a;}
 
-:root{ --navy:#051628; --n2:#0A3145; --mid:#0A3145; --teal:#1CC7D0; --orange:#f4b86a; --green:#4CAF50; --red:#ff6b6b; }
 
+:root{--paper:#F4F7FA;--card:#fff;--ink:#0C2436;--muted:#566576;--line:#e6ebf0;--navy:#041E2F;--navy2:#0A3145;--teal:#1CC7D0;--teal-deep:#0c7b84;--gold:#f4b86a;--gold-deep:#b3792f;--red:#d64545;--green:#2E7032;--sh-sm:0 1px 2px rgba(12,36,54,.05);--sh:0 1px 2px rgba(12,36,54,.04),0 6px 22px rgba(12,36,54,.07);--sh-dark:0 14px 50px rgba(4,30,47,.40);--orange:#f4b86a;--n2:#0A3145;--mid:#0A3145;}
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--navy:#051628;--n2:#0A3145;--mid:#0A3145;--teal:#1CC7D0;--orange:#f4b86a;--green:#2E7032;--red:#c0392b;}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;color:#0B2239;min-height:100vh;overflow-x:hidden;}
-
-.body{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
-
-/* HERO — matches dashboard hero style */
-.hero{background:#041E2F;padding:20px 24px 18px;border-bottom:3px solid #f4b86a;margin-bottom:0;}
-.hero h1{font-size:22px;font-weight:900;color:#fff;margin-bottom:4px;}
-.hero h1 span{color:#1CC7D0;}
-.hero p{font-size:12px;color:#8aaabb;line-height:1.7;max-width:700px;}
-
-/* LOADING */
+body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(1200px 400px at 50% -120px,#eaf1f6,var(--paper) 60%) fixed,var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+.body{max-width:1140px;margin:0 auto;padding:22px 20px 90px;}
+.hero{background:linear-gradient(135deg,#041E2F,#0A3145 75%,#0c3a52);padding:26px 30px 24px;border-bottom:3px solid var(--gold);position:relative;overflow:hidden;}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(28,199,208,.18),transparent 70%);pointer-events:none;}
+.hero h1{font-size:27px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.3px;position:relative;}
+.hero h1 span{color:var(--teal);}
+.hero p{font-size:13px;color:#bcd3e2;line-height:1.7;max-width:760px;position:relative;}
 @keyframes spin{to{transform:rotate(360deg);}}
-#loading-msg{text-align:center;padding:60px 20px;color:#4a5e70;}
-
-/* NOTICES */
-#your-data-notice{display:none;background:#fff;border:1px solid #e0e4eb;border-left:4px solid #2E7032;border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#0B2239;}
-#sample-notice{display:none;background:#fff;border:1px solid #e0e4eb;border-left:4px solid #f4b86a;border-radius:8px;padding:10px 16px;margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#0B2239;}
-
-/* FINGERPRINT BAR */
-#plan-fingerprint{display:none;background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:14px;border:1px solid #e0e4eb;border-top:3px solid #1CC7D0;}
-.fp-cell{text-align:center;padding:8px 4px;background:#f5f7fa;border-radius:6px;border:1px solid #e8eaed;}
-.fp-label{font-size:8px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;font-weight:700;}
-.fp-val{font-size:16px;font-weight:800;color:#0B2239;line-height:1;}
-.fp-note{font-size:8px;color:#6a8a9a;margin-top:3px;}
-
-/* SCENARIO TABS */
-.scenario-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-.tab-btn{padding:7px 14px;border-radius:6px;border:1px solid #cdd5e0;background:#fff;color:#4a5e70;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;}
-.tab-btn:hover{border-color:#1CC7D0;color:#1CC7D0;}
-.tab-btn.active{background:#051628;border-color:#051628;color:#f4b86a;}
-
-/* MAIN GRID */
-.main-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;}
-.results-panel{display:flex;flex-direction:column;gap:12px;}
-
-/* SLIDERS PANEL */
-.sliders-panel{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e4eb;border-top:3px solid #f4b86a;}
-.panel-title{font-size:10px;font-weight:800;color:#051628;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
-.slider-group{margin-bottom:16px;}
-.slider-label{font-size:9px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
-.slider-val{font-size:14px;font-weight:800;color:#051628;}
-input[type=range]{width:100%;accent-color:#1CC7D0;cursor:pointer;}
-.slider-range{display:flex;justify-content:space-between;font-size:8px;color:#8a9ab0;margin-top:2px;}
-.slider-desc{font-size:9px;color:#6a8098;line-height:1.5;margin-top:4px;font-style:italic;}
-.reset-btn{width:100%;padding:7px;background:#fff;border:1px solid #cdd5e0;color:#4a5e70;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
-.reset-btn:hover{border-color:#f4b86a;color:#7a5200;}
-
-/* OUTCOME CARDS — Dashboard style */
-.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.outcome-card{background:#fff;border-radius:10px;padding:14px;text-align:center;border:1px solid #e0e4eb;border-top:3px solid #cdd5e0;}
-.outcome-card.base{border-top-color:#1CC7D0;}
-.outcome-card.scenario{border-top-color:#f4b86a;}
-.oc-label{font-size:9px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-weight:700;}
-.oc-val{font-size:22px;font-weight:900;line-height:1;color:#0B2239;}
-.oc-sub{font-size:9px;color:#6a8a9a;margin-top:5px;line-height:1.4;}
-.oc-diff{font-size:12px;font-weight:700;margin-top:4px;color:#4a6070;}
-
-/* CHART */
-.chart-card{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e4eb;}
-.chart-title{font-size:10px;font-weight:800;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
-.chart-area{height:200px;position:relative;}
-
-/* VERDICT */
-.verdict-banner{background:#fff;border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;border:1px solid #e0e4eb;}
-.verdict-icon{font-size:28px;flex-shrink:0;}
-.verdict-title{font-size:14px;font-weight:800;margin-bottom:4px;color:#0B2239;}
-.verdict-detail{font-size:11px;line-height:1.7;color:#3a4e5e;}
-.recs{background:#f5f7fa;border-radius:8px;padding:12px 14px;margin-top:8px;}
-.recs-title{font-size:9px;font-weight:800;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
-.rec-item{display:flex;gap:8px;font-size:10px;color:#3a4e5e;line-height:1.6;margin-bottom:4px;}
-
-/* INFO BOXES */
-.info-teal{background:#f5f9fa;border-left:3px solid #1CC7D0;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:11px;color:#0B2239;line-height:1.7;}
-
-/* MC SECTION */
-.mc-section{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e4eb;border-top:3px solid #1CC7D0;margin-top:16px;}
-.mc-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
-.mc-title{font-size:14px;font-weight:900;color:#0B2239;}
-.mc-sub{font-size:10px;color:#6a8a9a;margin-top:2px;}
-.run-mc-btn{background:#051628;color:#f4b86a;border:none;padding:9px 20px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;}
-.run-mc-btn:hover{background:#0A3145;}
-
-/* MC RESULTS */
-.mc-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
-.mc-stat{background:#f5f7fa;border-radius:8px;padding:10px;text-align:center;border:1px solid #e8eaed;}
-.mc-stat-label{font-size:8px;color:#4a6070;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:3px;}
-.mc-stat-val{font-size:18px;font-weight:900;color:#0B2239;}
-.mc-bar-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.mc-bar-item{text-align:center;padding:10px 8px;border-radius:8px;border:1px solid #e0e4eb;}
-.mc-bar-item.exceed{border-top:3px solid #1CC7D0;background:#f5f9fa;}
-.mc-bar-item.survive{border-top:3px solid #f4b86a;background:#fff;}
-.mc-bar-item.fail{border-top:3px solid #c0392b;background:#fff;}
-.mc-bar-label{font-size:9px;font-weight:700;color:#4a6070;margin-bottom:6px;text-transform:uppercase;}
-.mc-bar-pct{font-size:22px;font-weight:900;color:#0B2239;}
-.mc-bar-count{font-size:9px;color:#8a9ab0;margin-top:2px;}
-.mc-progress-bar-wrap{background:#e8ecf0;border-radius:6px;height:8px;margin-top:8px;overflow:hidden;}
-.mc-progress-bar-fill{height:100%;border-radius:6px;transition:width 0.3s;}
-.mc-progress-bar-fill.exceed{background:#1CC7D0;}
-.mc-progress-bar-fill.survive{background:#f4b86a;}
-.mc-progress-bar-fill.fail{background:#c0392b;}
-
-@media(max-width:768px){.main-grid{grid-template-columns:1fr;}.outcome-grid{grid-template-columns:1fr;}.mc-stat-row{grid-template-columns:1fr 1fr;}.mc-bar-row{grid-template-columns:1fr;}}
-
-/* IMPROVE PANEL */
-.info-amber{background:#f5f7fa;border-left:3px solid #f4b86a;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:11px;color:#0B2239;line-height:1.7;}
-.improve-panel{background:#051628;border-radius:10px;padding:18px 20px;margin-top:12px;border:1px solid #1a3a52;border-top:3px solid #f4b86a;}
+#loading-msg{text-align:center;padding:60px 20px;color:#0C2436;font-weight:700;}
+#your-data-notice,#sample-notice{display:none;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-bottom:14px;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink);box-shadow:var(--sh-sm);}
+#your-data-notice{border-left:4px solid var(--green);}
+#sample-notice{border-left:4px solid var(--gold);}
+#plan-fingerprint{display:none;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;padding:22px 22px 20px;margin-bottom:16px;border:1px solid rgba(28,199,208,.18);box-shadow:var(--sh-dark);position:relative;overflow:hidden;}
+#plan-fingerprint::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--gold));opacity:.8;}
+#plan-fingerprint::after{content:"";position:absolute;right:-80px;top:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(28,199,208,.12),transparent 70%);pointer-events:none;}
+.fp-label{font-size:8px;color:#5a6b7a;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;font-weight:800;}
+.fp-cell{text-align:center;padding:14px 10px;background:#fff;border-radius:10px;border-top:3px solid #f4b86a;box-shadow:0 6px 24px rgba(4,30,47,.36),0 1px 4px rgba(4,30,47,.20);position:relative;z-index:1;}
+.fp-cell:nth-child(3),.fp-cell:nth-child(4){border-top-color:#1CC7D0;}
+.fp-cell:last-child{border-top-color:#d64545;}
+.fp-val{font-size:20px;font-weight:900;color:#0B2239;line-height:1.1;margin:2px 0;}
+.fp-note{font-size:9.5px;color:#5a6b7a;margin-top:5px;font-weight:600;}
+.scenario-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.tab-btn{padding:9px 16px;border-radius:9px;border:1px solid #d3dbe4;background:var(--card);color:var(--muted);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .18s;box-shadow:var(--sh-sm);}
+.tab-btn:hover{border-color:var(--teal);color:var(--teal-deep);}
+.tab-btn.active{background:linear-gradient(135deg,#041E2F,#0A3145);border-color:#041E2F;color:var(--gold);box-shadow:0 4px 14px rgba(4,30,47,.22);}
+.main-grid{display:grid;grid-template-columns:310px 1fr;gap:18px;}
+.results-panel{display:flex;flex-direction:column;gap:14px;}
+.sliders-panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--sh);border-top:3px solid var(--gold);}
+.panel-title{font-size:10.5px;font-weight:900;color:var(--navy);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+.slider-group{margin-bottom:18px;}
+.slider-label{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;font-weight:700;}
+.slider-val{font-size:15px;font-weight:900;color:var(--teal-deep);}
+input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;height:6px;}
+.slider-range{display:flex;justify-content:space-between;font-size:8.5px;color:#92a1b2;margin-top:3px;}
+.slider-desc{font-size:9.5px;color:var(--muted);line-height:1.55;margin-top:5px;font-style:italic;}
+.reset-btn{width:100%;padding:9px;background:var(--card);border:1px solid #d3dbe4;color:var(--muted);border-radius:9px;font-size:10.5px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:8px;}
+.reset-btn:hover{border-color:var(--gold);color:var(--gold-deep);}
+.chart-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--sh);}
+.chart-title{font-size:10.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.chart-area{height:210px;position:relative;}
+.info-teal{background:linear-gradient(135deg,#eef9fa,#f6fbfc);border-left:4px solid var(--teal);border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:16px;font-size:12px;color:var(--ink);line-height:1.7;box-shadow:var(--sh-sm);}
+.info-amber{background:linear-gradient(135deg,#fff6ea,#fffaf3);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:16px;font-size:12px;color:var(--ink);line-height:1.7;box-shadow:var(--sh-sm);}
+.mc-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+.mc-stat{background:rgba(255,255,255,.05);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.10);}
+.mc-stat-label{font-size:8.5px;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;font-weight:800;margin-bottom:4px;}
+.mc-stat-val{font-size:20px;font-weight:900;color:#fff;}
+.mc-bar-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.mc-bar-item{text-align:center;padding:13px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);}
+.mc-bar-item.exceed{border-top:3px solid var(--teal);}
+.mc-bar-item.survive{border-top:3px solid var(--gold);}
+.mc-bar-item.fail{border-top:3px solid var(--red);}
+.mc-bar-label{font-size:9.5px;font-weight:800;color:#bcd3e2;margin-bottom:7px;text-transform:uppercase;}
+.mc-bar-pct{font-size:24px;font-weight:900;color:#fff;}
+.mc-bar-count{font-size:9px;color:#9fc1d6;margin-top:3px;}
+.mc-progress-bar-wrap{background:rgba(255,255,255,.12);border-radius:6px;height:9px;margin-top:10px;overflow:hidden;}
+.mc-progress-bar-fill{height:100%;border-radius:6px;transition:width .3s;}
+.mc-progress-bar-fill.exceed{background:var(--teal);}
+.mc-progress-bar-fill.survive{background:var(--gold);}
+.mc-progress-bar-fill.fail{background:var(--red);}
+.run-mc-btn{background:linear-gradient(135deg,var(--teal),var(--teal-deep));color:#04222e;border:none;padding:11px 24px;border-radius:10px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(28,199,208,.35);transition:transform .15s;}
+.run-mc-btn:hover{transform:translateY(-2px);}
+.verdict-detail{font-size:12px;line-height:1.7;color:#2c3a45;}
+.rec-item{display:flex;gap:9px;font-size:11px;color:#33424e;line-height:1.6;margin-bottom:5px;}
+@media(max-width:768px){.main-grid{grid-template-columns:1fr;}.mc-stat-row{grid-template-columns:1fr 1fr;}.mc-bar-row{grid-template-columns:1fr;}}
 </style>
 <script>
 // ── DYNAMIC PARTNER NAMES ─────────────────────────────────
@@ -174,20 +131,20 @@ window.addEventListener('storage', function(e) {
 
 
 <br>
-  <div id="loading-status" style="font-size:14px;font-weight:700;color:#c8dae8;margin-bottom:12px;">Connecting to your Google Sheet...</div>
+  <div id="loading-status" style="font-size:14px;font-weight:700;color:#2c3e50;margin-bottom:12px;">Connecting to your Google Sheet...</div>
   <div style="max-width:320px;margin:0 auto 16px;">
     <div style="background:#1a3a52;border-radius:10px;height:8px;overflow:hidden;">
       <div id="loading-progress" style="height:8px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);border-radius:10px;width:0%;transition:width 0.5s ease;"></div>
     </div>
-    <div id="loading-pct" style="font-size:10px;color:#8aaabb;margin-top:6px;">0%</div>
+    <div id="loading-pct" style="font-size:10px;color:#2c3e50;margin-top:6px;">0%</div>
   </div>
   <div id="loading-detail" style="font-size:11px;color:#5a7a8a;max-width:320px;margin:0 auto;line-height:1.6;">Reading projections &amp; portfolio data...</div>
 </div>
 
-<div id="loading-msg" style="text-align:center;padding:60px 20px;color:#6a8a9a;">
+<div id="loading-msg" style="text-align:center;padding:60px 20px;color:#9fc1d6;">
   <div style="font-size:32px;margin-bottom:16px;">📊</div>
   <div style="font-size:16px;font-weight:700;color:#1CC7D0;margin-bottom:8px;">Loading your plan data...</div>
-  <div style="font-size:12px;color:#6a8a9a;margin-bottom:20px;">Reading from your Google Sheet</div>
+  <div style="font-size:12px;color:#9fc1d6;margin-bottom:20px;">Reading from your Google Sheet</div>
   <div style="background:#1a3a52;border-radius:8px;height:6px;max-width:300px;margin:0 auto;overflow:hidden;">
     <div id="loading-progress" style="height:100%;width:0%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);transition:width 0.3s;"></div>
   </div>
@@ -205,15 +162,54 @@ window.addEventListener('storage', function(e) {
   </div>
 
   <div id="sample-notice">
-    <div style="font-size:20px;">📊</div>
+    <div style="font-size:20px;color:var(--teal);">🔔</div>
     <div style="flex:1;">
-      <div style="font-weight:700;color:#f4b86a;margin-bottom:2px;">Showing Sample Data</div>
+      <span style="font-weight:800;color:var(--teal);">Showing Sample Data</span></div>
       <div style="font-size:10px;color:#8aaabb;">Connect your sheet to stress-test YOUR numbers. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" style="color:#1CC7D0;">Set up →</a></div>
     </div>
   </div>
 
   <!-- FINGERPRINT -->
-  <div id="plan-fingerprint">
+  <div style="background:linear-gradient(160deg,#041E2F,#0A3145 65%,#0c3a52);border-radius:18px;padding:30px 32px 26px;margin-bottom:20px;border:1px solid rgba(28,199,208,.22);box-shadow:0 14px 50px rgba(4,30,47,.35);position:relative;overflow:hidden;">
+  <!-- top accent rail -->
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);opacity:.85;"></div>
+  <!-- glow -->
+  <div style="position:absolute;right:-80px;top:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(28,199,208,.13),transparent 70%);pointer-events:none;"></div>
+
+  <div style="display:flex;align-items:flex-start;gap:32px;flex-wrap:wrap;position:relative;">
+
+    <!-- Title block -->
+    <div style="flex:1;min-width:260px;">
+      <div style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:1.4px;margin-bottom:8px;">Retirement Intelligence · Stress Testing</div>
+      <div style="font-size:24px;font-weight:900;color:#fff;letter-spacing:-.4px;line-height:1.2;margin-bottom:12px;">
+        What happens to your plan<br><span style="color:#1CC7D0;">when markets crash?</span>
+      </div>
+      <div style="font-size:13px;color:#b8dde6;line-height:1.8;max-width:480px;">
+        Your Dashboard projects smooth 7% returns every year — but real markets don't work that way.
+        This page stress-tests your actual plan against crashes, inflation shocks, and 1,000 random futures
+        to show you <strong style="color:#fff;">exactly how fragile or resilient your retirement really is.</strong>
+      </div>
+    </div>
+
+    <!-- Three quick-concept cards -->
+    <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:10px;min-width:280px;">
+
+      <div style="display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.06);border-radius:10px;padding:12px 14px;border:1px solid rgba(28,199,208,.18);">
+        <div style="font-size:20px;flex-shrink:0;">📉</div>
+        <div>
+          <div style="font-size:11px;font-weight:900;color:#fff;margin-bottom:3px;">Pick a Crash Scenario</div>
+          <div style="font-size:10.5px;color:#b8dde6;line-height:1.55;">Choose a preset (2008, stagflation, COVID) or dial in your own with the sliders below.</div>
+        </div>
+      </div>
+
+      
+      </div>
+
+      
+
+    </div>
+  </div>
+<div id="plan-fingerprint">
     <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔍 Your Plan Fingerprint — Confirm This Is Your Data</div>
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
       <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
@@ -223,21 +219,26 @@ window.addEventListener('storage', function(e) {
       <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Base + extra</div></div>
       <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
-    <div style="margin-top:8px;font-size:9px;color:#456A73;text-align:center;">If these numbers match your Dashboard, your real plan is loaded. The 🛡️ Crash card shows a worst-case stress preview — not your actual projection. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">Need real data? Open on GitHub Pages →</a></div>
+    <div style="margin-top:8px;font-size:9px;color:#dceaf5;text-align:center;">If these numbers match your Dashboard, your real plan is loaded. The 🛡️ Crash card shows a worst-case stress preview — not your actual projection. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">Need real data? Open on GitHub Pages →</a></div>
   </div>
 
   <!-- HOW TO READ -->
-  <div class="info-teal">
-    <strong style="color:#1CC7D0;">📖 How to Read This Page:</strong>
-    Sliders show what happens if a crash hits in <strong>Year 1 of retirement</strong> — the worst possible timing.
-    Your Dashboard assumes smooth returns every year. A Year 1 crash means selling shares at the bottom while withdrawing — those shares never recover.
-    <br><strong style="color:#f4b86a;">The most powerful lever: Spending Adjustment.</strong>
-    Try <strong>-10%</strong> and watch outcomes improve dramatically.
-    <strong style="color:#1CC7D0;">Changed something in Inputs?</strong>
-    Save there, then click 🔄 Reload Data above.
+  <!-- PAGE INTRO ══════════════════════════════════════════════════ -->
+
+
+  <!-- Bottom strip: key insight -->
+  <div style="margin-top:20px;padding:11px 16px;background:rgba(28,199,208,.07);border:1px solid rgba(28,199,208,.18);border-radius:8px;font-size:11.5px;color:#b8dde6;line-height:1.65;position:relative;">
+    <strong style="color:#1CC7D0;">📖 Why Year 1 is the worst timing:</strong>
+    A crash early in retirement forces you to sell at the bottom while withdrawing — those shares never recover.
+    The same crash in Year 20 barely dents your plan because you had 20 years of growth first.
   </div>
+</div>
+
 
   <!-- SCENARIO TABS -->
+  <div style="font-size:11px;color:#566576;margin-bottom:8px;font-weight:600;">
+    ⚡ Step 1 — Pick a scenario preset, or dial in your own with the sliders:
+  </div>
   <div class="scenario-tabs">
     <button class="tab-btn active" onclick="setScenario('custom')">🎛️ Custom</button>
     <button class="tab-btn" onclick="setScenario('crash2008')">📉 2008 Crisis</button>
@@ -247,7 +248,7 @@ window.addEventListener('storage', function(e) {
     <button class="tab-btn" onclick="setScenario('bestcase')">🚀 Bull Market</button>
   </div>
 
-  <div style="font-size:13px;color:#6a8a9a;">Test your plan against market crashes, inflation shocks, and 1,000 random futures</div>
+  
 </div>
 <div class="main-grid">
 
@@ -296,115 +297,165 @@ window.addEventListener('storage', function(e) {
     <!-- RESULTS -->
     <div class="results-panel">
 
-      <div class="outcome-grid">
-        <div class="outcome-card base">
-          <div class="oc-label">📊 Base Plan</div>
-          <div class="oc-val" id="res-base-end" style="color:#006677;">—</div>
-          <div class="oc-sub">No stress · your projection</div>
-          <div class="oc-diff" id="res-base-conf" style="color:#0B2239;">—</div>
-        </div>
-        <div class="outcome-card scenario">
-          <div class="oc-label">⚡ Stress Scenario</div>
-          <div class="oc-val" id="res-stress-end" style="color:#7a4e00;">—</div>
-          <div class="oc-sub">With applied stress</div>
-          <div class="oc-diff" id="res-stress-conf">—</div>
-        </div>
-        <div class="outcome-card" id="verdict-card" style="border-color:rgba(76,175,80,0.4);">
-          <div class="oc-label">📋 Verdict</div>
-          <div class="oc-val" id="res-verdict-icon" style="font-size:28px;">✅</div>
-          <div class="oc-sub" id="res-verdict-text" style="font-size:10px;">—</div>
-          <div class="oc-diff" id="res-delta">—</div>
-        </div>
-      </div>
+      
 
       <div class="chart-card">
-        <div class="chart-title">Portfolio Over Time — Base vs Stress</div>
+        <div class="chart-title">Portfolio Over Time — Base Plan vs. Crash Scenario</div>
         <div class="chart-area"><canvas id="stress-chart"></canvas></div>
         <div style="display:flex;gap:16px;margin-top:8px;font-size:9px;color:#8aaabb;">
-          <span>── Teal = Base</span><span>── Orange = Stress</span><span>- - Gold = Legacy goal</span>
+          <span style="color:#1CC7D0;">── Base Plan</span>  <span style="color:#ef5350;">── With Crash</span>  <span style="color:#f4b86a;">- - Legacy Goal</span>  <span style="background:rgba(214,69,69,.2);padding:1px 6px;border-radius:3px;font-size:9px;">▓ Crash Period</span>
         </div>
+    <!-- CRASH IMPACT CHART -->
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line);">
+      <div style="font-size:9.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">
+        📉 Return Assumptions — Year by Year
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#92a1b2;font-size:9px;margin-left:8px;">Red bars = crash years · Your plan must survive these</span>
       </div>
-
-      <div class="verdict-banner" id="verdict-banner" style="background:#fff;border:1px solid rgba(76,175,80,0.3);">
-        <div class="verdict-icon" id="verdict-icon">✅</div>
-        <div style="flex:1;">
-          <div class="verdict-title" id="verdict-title" style="color:#0B2239;">Plan is Resilient</div>
-          <div class="verdict-detail" id="verdict-detail" style="color:#c8dae8;">Loading...</div>
-          <div class="recs" id="recs-section" style="display:none;">
-            <div class="recs-title">💡 How to Improve Resilience</div>
-            <div id="recs-list"></div>
-          </div>
-        </div>
+      <div style="height:90px;position:relative;">
+        <canvas id="crash-bar-chart"></canvas>
       </div>
+    </div>
 
+      </div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:4px;" id="action-summary-row">
+
+  <!-- CARD 1: Stress Results & Verdict -->
+  <div style="background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:20px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;display:flex;flex-direction:column;" id="verdict-banner">
+    <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;text-align:center;">📊 Stress Results</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#7ecfda;margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;">Base Plan</div>
+        <div id="res-base-end" style="font-size:18px;font-weight:900;color:#1CC7D0;">—</div>
+        <div id="res-base-conf" style="font-size:10px;color:#b8dde6;margin-top:3px;font-weight:600;">—</div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#7ecfda;margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;">With Crash</div>
+        <div id="res-stress-end" style="font-size:18px;font-weight:900;color:#ff6b6b;">—</div>
+        <div id="res-stress-conf" style="font-size:10px;color:#b8dde6;margin-top:3px;font-weight:600;">—</div>
+      </div>
+    </div>
+    <div id="verdict-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;text-align:center;">—</div>
+    <div id="verdict-detail" style="font-size:11px;color:#b8dde6;line-height:1.65;text-align:center;"></div>
+    <div id="recs-section" style="display:none;margin-top:10px;">
+      <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;text-align:center;">💡 Top Actions</div>
+      <div id="recs-list" style="font-size:11px;color:#e0f0f4;line-height:2.0;"></div>
     </div>
   </div>
 
-  <!-- IMPROVE PANEL -->
-  <div class="improve-panel">
-    <div style="font-size:12px;font-weight:800;color:#1CC7D0;margin-bottom:14px;">💡 How to Improve Your Stress Test Results</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div>
-        <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🎛️ Try These Slider Combos</div>
-        <div style="font-size:10px;color:#8aaabb;line-height:2.0;">
-          <strong style="color:#fff;">Spend -10%</strong> → biggest single improvement<br>
-          <strong style="color:#fff;">Bad Years = 2-3</strong> → prolonged downturn test<br>
-          <strong style="color:#fff;">COLA 0%</strong> → SS reform worst case<br>
-          <strong style="color:#fff;">Inflation 5%</strong> → 1970s combo<br>
-          <strong style="color:#fff;">Bull Market preset</strong> → see your upside
-        </div>
-      </div>
-      <div>
-        <div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">⚙️ Change in Inputs → Reload</div>
-        <div style="font-size:10px;color:#8aaabb;line-height:2.0;">
-          <strong style="color:#fff;">Delay SS</strong> → bigger guaranteed income floor<br>
-          <strong style="color:#fff;">Lower Phase 1 spending</strong> → less early withdrawal<br>
-          <strong style="color:#fff;">More Roth</strong> → tax-free, no RMDs<br>
-          <strong style="color:#fff;">Adjust return rates</strong> → conservative vs optimistic
-        </div>
-        <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html"
-           style="display:inline-block;margin-top:10px;background:var(--orange);color:var(--navy);font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;">
-          Open Inputs → Make Changes
-        </a>
-        <div style="font-size:9px;color:#5a7a8a;margin-top:5px;">Save in Inputs → click 🔄 Reload Data above</div>
-      </div>
+  <!-- CARD 2: Slider Combos -->
+  <div style="background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:20px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;">
+    <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;text-align:center;">🎛️ Try These Slider Combos</div>
+    <div style="font-size:12px;color:#e0f0f4;line-height:2.2;">
+      <div><strong style="color:#fff;font-weight:800;">Spend -10%</strong> → biggest single improvement</div>
+      <div><strong style="color:#fff;font-weight:800;">Bad Years = 2-3</strong> → prolonged downturn test</div>
+      <div><strong style="color:#fff;font-weight:800;">COLA 0%</strong> → SS reform worst case</div>
+      <div><strong style="color:#fff;font-weight:800;">Inflation 5%</strong> → 1970s combo</div>
+      <div><strong style="color:#fff;font-weight:800;">Bull Market preset</strong> → see your upside</div>
     </div>
   </div>
 
-  <div class="info-amber" style="margin-top:12px;">
-    📖 <strong>Sequence of Returns Risk:</strong>
-    A $925K portfolio dropping 20% in Year 1 = $740K before any withdrawal.
-    Then $87K withdrawn = $653K. That $272K gap compounds against you for 50 years.
-    The same crash in Year 20 barely affects you — your portfolio had 20 years to grow first.
-    <strong>Your three defenses:</strong> (1) Guaranteed income floor (SS + pension), (2) Roth allocation, (3) Spending flexibility.
+  <!-- CARD 3: Input Changes + Button -->
+  <div style="background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:20px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;display:flex;flex-direction:column;">
+    <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;text-align:center;">⚙️ Change in Inputs → Reload</div>
+    <div style="font-size:11px;color:#e0f0f4;line-height:1.95;margin-bottom:0;">
+      <div><strong style="color:#fff;font-weight:800;">Delay SS</strong> → bigger guaranteed income floor</div>
+      <div><strong style="color:#fff;font-weight:800;">Lower Phase 1 spending</strong> → less early withdrawal</div>
+      <div><strong style="color:#fff;font-weight:800;">More Roth</strong> → tax-free, no RMDs</div>
+      <div><strong style="color:#fff;font-weight:800;">Adjust return rates</strong> → conservative vs optimistic</div>
+    </div>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="display:block;margin-top:16px;background:linear-gradient(135deg,#f4b86a,#e8a245);color:#041E2F;font-size:12px;font-weight:900;padding:12px 18px;border-radius:10px;text-decoration:none;text-align:center;letter-spacing:.3px;box-shadow:0 4px 16px rgba(244,184,106,.35);">Open Inputs → Make Changes</a>
+    <div style="font-size:10px;color:#7ecfda;margin-top:8px;text-align:center;font-weight:600;">Save in Inputs → click 🔄 Reload Data above</div>
   </div>
+
+</div>
+
+
+  
 
 
   <!-- ════════════════════════════════════════════════════════════
        MONTE CARLO SIMULATION
-       Runs 1,000 randomized market scenarios · Uses your actual year-by-year withdrawal plan · Runs only through your plan years (not 110)<div id="mc-section" style="margin-top:28px;">
+       Runs 1,000 randomized market scenarios · Uses your actual year-by-year withdrawal plan · Runs only through your plan years (not 110)<!-- /mc-section -->
+
+
+</div><!-- /stress-content -->
+</div>
+
+
+<!-- ══ MONTE CARLO HEADER + BRIDGE EXPLAINER ══ -->
+<div style="margin:32px 0 0;padding:28px 32px 26px;background:linear-gradient(160deg,#041E2F,#0A3145 65%,#0c3a52);border-radius:18px 18px 0 0;border:1px solid rgba(28,199,208,.22);border-bottom:none;position:relative;overflow:hidden;">
+  <!-- top accent rail -->
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);opacity:.85;"></div>
+  <!-- glow -->
+  <div style="position:absolute;right:-60px;top:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(28,199,208,.14),transparent 70%);pointer-events:none;"></div>
+
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;">
+
+    <!-- Left: title + what it is -->
+    <div style="flex:1;min-width:280px;">
+      <div style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:1.4px;margin-bottom:8px;">Step 2 — Probability Testing</div>
+      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px;margin-bottom:10px;">🎲 Monte Carlo Simulation</div>
+      <div style="font-size:13px;color:#b8dde6;line-height:1.75;max-width:520px;">
+        The scenarios above each test <strong style="color:#fff;">one specific crash you define.</strong>
+        But which sequence of returns would you actually get in retirement?
+        Monte Carlo answers that by running <strong style="color:#1CC7D0;">1,000 randomized futures</strong> and counting how many your plan survives —
+        giving you a true <strong style="color:#fff;">probability of success.</strong>
+      </div>
+    </div>
+
+    <!-- Right: comparison table -->
+    <div style="flex:0 0 auto;min-width:300px;">
+      <div style="font-size:9px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">How These Tests Differ</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.12);border-radius:10px;overflow:hidden;font-size:10.5px;">
+        <!-- header row -->
+        <div style="background:#051e30;padding:8px 10px;font-weight:800;color:#7ecfda;font-size:9px;text-transform:uppercase;letter-spacing:.8px;"></div>
+        <div style="background:#051e30;padding:8px 10px;font-weight:800;color:#f4b86a;font-size:9px;text-transform:uppercase;letter-spacing:.8px;text-align:center;">Crash Scenarios</div>
+        <div style="background:#051e30;padding:8px 10px;font-weight:800;color:#1CC7D0;font-size:9px;text-transform:uppercase;letter-spacing:.8px;text-align:center;">Monte Carlo</div>
+        <!-- row 1 -->
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#b8dde6;font-weight:700;">How it works</div>
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#e0f0f4;text-align:center;">You set the crash</div>
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#e0f0f4;text-align:center;">Random each run</div>
+        <!-- row 2 -->
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#b8dde6;font-weight:700;">Output</div>
+        <div style="background:rgba(255,255,255,.03);padding:7px 10px;color:#e0f0f4;text-align:center;">1 outcome</div>
+        <div style="background:rgba(255,255,255,.03);padding:7px 10px;color:#e0f0f4;text-align:center;">1,000 outcomes</div>
+        <!-- row 3 -->
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#b8dde6;font-weight:700;">Tells you</div>
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#e0f0f4;text-align:center;">"What if 2008 hits?"</div>
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#1CC7D0;font-weight:800;text-align:center;">% chance of success</div>
+        <!-- row 4 -->
+        <div style="background:rgba(255,255,255,.04);padding:7px 10px;color:#b8dde6;font-weight:700;">vs Dashboard</div>
+        <div style="background:rgba(255,255,255,.03);padding:7px 10px;color:#e0f0f4;text-align:center;">More control</div>
+        <div style="background:rgba(255,255,255,.03);padding:7px 10px;color:#e0f0f4;text-align:center;">Most rigorous</div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <div style="margin-top:20px;padding:12px 18px;background:rgba(255,255,255,.05);border:1px solid rgba(28,199,208,.18);border-radius:8px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:11.5px;position:relative;">
+    <span style="color:#9fc1d6;font-weight:700;white-space:nowrap;">After running:</span>
+    <span>✅ <strong style="color:#1CC7D0;">90%+</strong> <span style="color:#b8dde6;">Very strong</span></span>
+    <span style="color:#4a6a7a;">·</span>
+    <span>⚠️ <strong style="color:#f4b86a;">75–89%</strong> <span style="color:#b8dde6;">Acceptable</span></span>
+    <span style="color:#4a6a7a;">·</span>
+    <span>❌ <strong style="color:#ef5350;">Below 75%</strong> <span style="color:#b8dde6;">Needs adjustment</span></span>
+  </div>
+</div>
+
+<div id="mc-section" style="margin-top:0;border-radius:0 0 18px 18px;border-top:none;">
 
     <div style="background:linear-gradient(135deg,#041E2F,#071e30);border-radius:14px;border:1px solid #1a3a52;overflow:hidden;">
 
       <!-- Header -->
       <div style="background:linear-gradient(90deg,#041E2F,#0d2d45);padding:18px 22px;border-bottom:1px solid #1a3a52;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
         <div>
-          <div style="font-size:16px;font-weight:900;color:#0B2239;letter-spacing:-0.3px;">🎲 Monte Carlo Simulation</div>
+          <div style="font-size:16px;font-weight:900;color:#ffffff;letter-spacing:-0.3px;">🎲 Monte Carlo Simulation</div>
           
       <!-- MC Explainer -->
-      <div style="background:#fff;border-left:3px solid #1CC7D0;padding:12px 18px;margin:0 18px 16px;border-radius:0 8px 8px 0;font-size:12px;color:#8aaabb;line-height:1.8;">
-        <strong style="color:#1CC7D0;">How this differs from your Dashboard:</strong>
-        Your Dashboard shows ONE future using your exact plan assumptions (smooth 7% returns every year).
-        Monte Carlo runs <strong style="color:#fff;">1,000 different futures</strong> with random good and bad years —
-        testing whether your plan survives sequence-of-returns risk.
-        <br>
-        <strong style="color:#f4b86a;">It runs only through your actual plan years</strong> (to your projected death dates, not 110 years).
-        It uses your <strong style="color:#fff;">real year-by-year withdrawal amounts</strong> from your sheet —
-        so salary years count properly, and retirement spending is accurate.
-        A lower success rate than 90% means some random bad sequences deplete the portfolio —
-        not that your plan is broken.
-      </div>
-<div style="font-size:11px;color:#6a8a9a;margin-top:3px;">
+      
+<div style="font-size:11px;color:#bcd3e2;margin-top:3px;">
             1,000 randomized market scenarios · Runs entirely in your browser · No re-query needed
           </div>
         </div>
@@ -415,29 +466,12 @@ window.addEventListener('storage', function(e) {
       </div>
 
       <!-- Explainer -->
-      <div style="padding:14px 22px;background:rgba(28,199,208,0.04);border-bottom:1px solid #1a3a52;font-size:12px;color:#8aaabb;line-height:1.8;">
-        <strong style="color:#1CC7D0;">What Monte Carlo simulation means:</strong>
-        Your Dashboard shows ONE projected future based on your expected return. But the real market is unpredictable —
-        some years it returns 30%, others it drops 40%. Monte Carlo runs <strong style="color:#fff;">1,000 completely different versions of your retirement</strong>,
-        each with random annual returns drawn from realistic market distributions, then counts how many scenarios
-        end with your portfolio still above your legacy goal.
-        <br><br>
-        <strong style="color:#f4b86a;">Why this matters:</strong>
-        Two people can have identical plans and identical average returns over 30 years — but if one retires into a bear market
-        and the other into a bull market, their outcomes are completely different. This is called
-        <strong>sequence of returns risk</strong> and it is the #1 reason "average returns" do not tell the whole story.
-        <br><br>
-        <strong style="color:#1CC7D0;">✅ 90%+</strong> = Very strong · 
-        <strong style="color:#f4b86a;">⚠️ 75–89%</strong> = Acceptable, can strengthen · 
-        <strong style="color:#ef5350;">❌ Below 75%</strong> = Needs adjustment
-        <br>
-        <span style="font-size:11px;color:#4a6a7a;">The simulation uses your actual portfolio balance, spending, SS income, pension, and life expectancy — not generic numbers.</span>
-      </div>
+      
 
       <!-- Settings row -->
       <div style="padding:14px 22px;border-bottom:1px solid #1a3a52;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;">
         <div>
-          <div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Simulations</div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Simulations</div>
           <select id="mc-runs" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="500">500 (fast)</option>
             <option value="1000" selected>1,000 (standard)</option>
@@ -446,7 +480,7 @@ window.addEventListener('storage', function(e) {
           </select>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Return Model</div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Return Model</div>
           <select id="mc-model" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="normal">Normal distribution (classic)</option>
             <option value="fat" selected>Fat-tailed (more realistic)</option>
@@ -454,7 +488,7 @@ window.addEventListener('storage', function(e) {
           </select>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Spending Flexibility</div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Spending Flexibility</div>
           <select id="mc-flex" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="0">Fixed spending (rigid)</option>
             <option value="10" selected>Cut 10% when portfolio down 20%</option>
@@ -470,29 +504,29 @@ window.addEventListener('storage', function(e) {
         <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;align-items:stretch;">
 
           <div style="flex:0 0 auto;background:#061620;border-radius:12px;border:2px solid #1a3a52;padding:20px 28px;text-align:center;min-width:160px;">
-            <div style="font-size:11px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Success Rate</div>
+            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Success Rate</div>
             <div id="mc-pct" style="font-size:52px;font-weight:900;line-height:1;color:#1CC7D0;letter-spacing:-2px;">—</div>
-            <div style="font-size:11px;color:#6a8a9a;margin-top:6px;">of <span id="mc-total-runs">1,000</span> scenarios</div>
+            <div style="font-size:11px;color:#9fc1d6;margin-top:6px;">of <span id="mc-total-runs">1,000</span> scenarios</div>
           </div>
 
           <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:10px;">
             <div style="background:#061620;border-radius:8px;border:1px solid #1a3a52;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <div style="font-size:10px;color:#6a8a9a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Median Ending Balance</div>
+                <div style="font-size:10px;color:#9fc1d6;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Median Ending Balance</div>
                 <div id="mc-median" style="font-size:18px;font-weight:800;color:#1CC7D0;margin-top:2px;">—</div>
               </div>
               <div style="font-size:18px;">📊</div>
             </div>
             <div style="background:#061620;border-radius:8px;border:1px solid #1a3a52;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <div style="font-size:10px;color:#6a8a9a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Worst 10% Scenario (P10)</div>
+                <div style="font-size:10px;color:#9fc1d6;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Worst 10% Scenario (P10)</div>
                 <div id="mc-p10" style="font-size:18px;font-weight:800;color:#ff9f43;margin-top:2px;">—</div>
               </div>
               <div style="font-size:18px;">📉</div>
             </div>
             <div style="background:#061620;border-radius:8px;border:1px solid #1a3a52;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <div style="font-size:10px;color:#6a8a9a;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Best 10% Scenario (P90)</div>
+                <div style="font-size:10px;color:#9fc1d6;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Best 10% Scenario (P90)</div>
                 <div id="mc-p90" style="font-size:18px;font-weight:800;color:#1CC7D0;margin-top:2px;">—</div>
               </div>
               <div style="font-size:18px;">📈</div>
@@ -500,7 +534,7 @@ window.addEventListener('storage', function(e) {
           </div>
 
           <div style="flex:0 0 auto;background:#061620;border-radius:12px;border:1px solid #1a3a52;padding:16px 20px;min-width:180px;">
-            <div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Scenario Breakdown</div>
+            <div style="font-size:10px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Scenario Breakdown</div>
             <div style="margin-bottom:7px;">
               <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
                 <span style="color:#1CC7D0;font-weight:700;">✅ Exceed goal</span>
@@ -528,9 +562,9 @@ window.addEventListener('storage', function(e) {
 
         <!-- Fan chart -->
         <div style="background:#061620;border-radius:10px;border:1px solid #1a3a52;padding:16px;margin-bottom:16px;">
-          <div style="font-size:11px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">
             Portfolio Range Across All Scenarios
-            <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4a6a7a;margin-left:8px;">Green band = 25th–75th percentile · Teal line = median · Orange = P10</span>
+            <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#9fc1d6;margin-left:8px;">Green band = 25th–75th percentile · Teal line = median · Orange = P10</span>
           </div>
           <div style="position:relative;height:240px;">
             <canvas id="mc-fan-chart"></canvas>
@@ -540,13 +574,13 @@ window.addEventListener('storage', function(e) {
         <!-- Survival curve -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
           <div style="background:#061620;border-radius:10px;border:1px solid #1a3a52;padding:16px;">
-            <div style="font-size:11px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Depletion Risk by Year</div>
+            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Depletion Risk by Year</div>
             <div style="position:relative;height:160px;">
               <canvas id="mc-survival-chart"></canvas>
             </div>
           </div>
           <div style="background:#061620;border-radius:10px;border:1px solid #1a3a52;padding:16px;">
-            <div style="font-size:11px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Final Balance Distribution</div>
+            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Final Balance Distribution</div>
             <div style="position:relative;height:160px;">
               <canvas id="mc-hist-chart"></canvas>
             </div>
@@ -557,7 +591,7 @@ window.addEventListener('storage', function(e) {
         <div id="mc-verdict" style="border-radius:10px;padding:16px 20px;font-size:13px;line-height:1.8;"></div>
 
         <!-- Run info -->
-        <div style="font-size:10px;color:#3a5a6a;margin-top:10px;text-align:right;" id="mc-run-info"></div>
+        <div style="font-size:10px;color:#9fc1d6;margin-top:10px;text-align:right;" id="mc-run-info"></div>
 
       </div><!-- /mc-results -->
 
@@ -567,26 +601,23 @@ window.addEventListener('storage', function(e) {
           <div style="width:48px;height:48px;border:4px solid #1a3a52;border-top:4px solid #1CC7D0;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;"></div>
         </div>
         <div style="font-size:15px;font-weight:700;color:#1CC7D0;margin-bottom:6px;">Running Monte Carlo Simulation</div>
-        <div style="font-size:12px;color:#6a8a9a;margin-bottom:16px;">Testing 1,000 random market futures against your actual plan...</div>
+        <div style="font-size:12px;color:#bcd3e2;margin-bottom:16px;">Testing 1,000 random market futures against your actual plan...</div>
         <div style="background:#1a3a52;border-radius:8px;height:8px;max-width:320px;margin:0 auto 10px;overflow:hidden;">
           <div id="mc-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);transition:width 0.2s;border-radius:8px;"></div>
         </div>
-        <div id="mc-progress-text" style="font-size:11px;color:#6a8a9a;">0 / 1,000</div>
+        <div id="mc-progress-text" style="font-size:11px;color:#9fc1d6;">0 / 1,000</div>
         <div id="mc-progress-pct" style="font-size:20px;font-weight:900;color:#fff;margin-top:8px;">0%</div>
-        <div style="font-size:10px;color:#4a6a7a;margin-top:4px;">This takes 5–15 seconds depending on your device</div>
+        <div style="font-size:10px;color:#9fc1d6;margin-top:4px;">This takes 5–15 seconds depending on your device</div>
       </div>
 <div<div style="background:#061620;border-radius:6px;height:8px;overflow:hidden;">
           <div id="mc-progress-bar" style="height:100%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);width:0%;transition:width .1s;border-radius:6px;"></div>
         </div>
-        <div style="font-size:11px;color:#4a6a7a;margin-top:8px;" id="mc-progress-text">0 / 1,000</div>
+        <div style="font-size:11px;color:#9fc1d6;margin-top:8px;" id="mc-progress-text">0 / 1,000</div>
       </div>
 
     </div>
-  </div><!-- /mc-section -->
-
-
-</div><!-- /stress-content -->
-</div><!-- /body -->
+  </div>
+<!-- /body -->
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
@@ -765,7 +796,7 @@ function recalc() {
 
   var beEl=document.getElementById('res-base-end');
   if(beEl){beEl.textContent=fmt(baseEnd);}
-  set('res-base-conf',baseConf+'% of legacy goal');
+  set('res-base-conf',baseConf+'% of $'+Math.round(legGoal/1000)+'K goal');
   // Show what scenario is active
   var scenLabel = document.getElementById('active-scenario-label');
   var yr1Val = parseInt(document.getElementById('sl-yr1').value);
@@ -781,9 +812,9 @@ function recalc() {
   var seEl=document.getElementById('res-stress-end');
   if(seEl){seEl.textContent=fmt(stressEnd);seEl.style.color=stressEnd>=baseEnd?'#1CC7D0':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';}
   var scEl=document.getElementById('res-stress-conf');
-  if(scEl){scEl.textContent=stressConf+'% of legacy goal';scEl.style.color=stressConf>=100?'#1CC7D0':stressConf>=80?'#f4b86a':'#ff6b6b';}
+  if(scEl){scEl.textContent=stressEnd<=0?'⚠️ Portfolio depletes in this scenario':stressConf+'% of $'+Math.round(legGoal/1000)+'K goal';scEl.style.color=stressConf>=100?'#1CC7D0':stressConf>=80?'#f4b86a':'#ff6b6b';}
   var dEl=document.getElementById('res-delta');
-  if(dEl){dEl.textContent=(delta>=0?'+':'')+fmt(delta)+' ('+deltaPct+'%)';dEl.style.color=delta>=0?'#4CAF50':'#ff6b6b';}
+  
 
   var icon,title,detail,color,bg,bg2,recs=[];
   if(stressEnd>=legGoal&&legGoal>0){
@@ -802,24 +833,24 @@ function recalc() {
     var depleteYr = null;
     for(var di=0;di<stressRes.length;di++){if(stressRes[di].bal<=0){depleteYr=stressRes[di].year;break;}}
     var depleteMsg = depleteYr ? ' Portfolio runs out around <strong>'+depleteYr+'</strong> in this scenario.' : '';
-    icon='⛔';title='Portfolio Depleted';color='#ff6b6b';bg='rgba(255,0,0,0.1)';bg2='rgba(255,0,0,0.3)';
-    detail='Portfolio runs out under this stress scenario.'+depleteMsg+' Your guaranteed income (SS + pension) continues regardless. Focus on maximizing guaranteed income and reducing portfolio dependence.';
+    icon='⛔';title='Portfolio Depleted';color='#ff6b6b';bg='transparent';bg2='#d64545';
+    detail=depleteMsg.replace(' Portfolio runs',' Depletes')+' Your guaranteed income (SS + pension) continues regardless. Focus on maximizing guaranteed income and reducing portfolio dependence.';
     recs=['Maximize SS by delaying to 70','Consider annuitizing a portion','Reduce legacy goal to zero','Add part-time income for first 5-7 years'];
   }
 
-  set('res-verdict-icon',icon);set('res-verdict-text',stressConf+'% funded');
+  
   set('verdict-title',title);
   document.getElementById('verdict-title').style.color=color;
   document.getElementById('verdict-detail').innerHTML=detail;
   var vb=document.getElementById('verdict-banner');
-  if(vb){vb.style.background=bg;vb.style.borderColor=bg2;}
+  /* verdict-banner is now summary card */
   var vc=document.getElementById('verdict-card');
   if(vc){vc.style.borderColor=bg2;}
   var rs2=document.getElementById('recs-section');
   var rl=document.getElementById('recs-list');
   if(rs2&&rl){
     rs2.style.display=recs.length>0?'block':'none';
-    rl.innerHTML=recs.map(function(r){return '<div class="rec-item"><span>→</span><span>'+r+'</span></div>';}).join('');
+    rl.innerHTML=recs.map(function(r){return '<div style="display:flex;gap:8px;font-size:11px;color:#e0f0f4;line-height:1.7;margin-bottom:4px;"><span style="color:#7ecfda;">→</span><span>'+r+'</span></div>';}).join('');
   }
 
   // Update chart
@@ -837,22 +868,157 @@ function recalc() {
   if(stressChart) stressChart.destroy();
   var ctx=document.getElementById('stress-chart');
   if(ctx){
-    stressChart=new Chart(ctx,{
-      type:'line',
-      data:{labels:labels,datasets:[
-        {label:'Base Plan',data:baseData,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.08)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
-        {label:'Stress Scenario',data:stressData,borderColor:'#f4b86a',backgroundColor:'rgba(244,184,106,0.06)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5},
-        {label:'Legacy Goal',data:goalData,borderColor:'#456A73',borderDash:[5,3],fill:false,pointRadius:0,borderWidth:1.5},
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:12}}},
-        scales:{
-          x:{ticks:{font:{size:10},color:'#8aaabb'},grid:{display:false}},
-          y:{ticks:{font:{size:10},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.04)'}}
+    // Build crash-period shading data (full height bars during crash years)
+    var maxVal = Math.max.apply(null, baseData.concat(stressData).filter(Boolean));
+    var crashData = labels.map(function(yr){
+      return (yr > curYear && yr <= curYear + Math.max(badYrs,1)) ? maxVal * 1.05 : null;
+    });
+    // Mark the crash start year
+    var crashLabel = yr1 < 0 ? 'Crash Year' : (yr1 > 0 ? 'Bull Start' : '');
+
+    stressChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          // Crash zone shading (rendered as bar overlay)
+          {
+            label: crashLabel,
+            data: crashData,
+            type: 'bar',
+            backgroundColor: yr1 < 0 ? 'rgba(214,69,69,0.13)' : 'rgba(28,199,208,0.10)',
+            borderColor: 'transparent',
+            borderWidth: 0,
+            barPercentage: 1.0,
+            categoryPercentage: 1.0,
+            order: 3,
+          },
+          // Legacy goal line
+          {label:'Legacy Goal',data:goalData,borderColor:'#f4b86a',borderDash:[6,4],
+           fill:false,pointRadius:0,borderWidth:1.8,order:2},
+          // Stress scenario
+          {label:'With Crash',data:stressData,borderColor:'#ef5350',
+           backgroundColor:'transparent',fill:false,tension:0.3,
+           pointRadius:0,borderWidth:3,order:1},
+          // Base plan (on top)
+          {label:'Base Plan',data:baseData,borderColor:'#1CC7D0',
+           backgroundColor:'rgba(28,199,208,0.06)',fill:false,tension:0.3,
+           pointRadius:0,borderWidth:3,order:0},
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              font:{size:10}, color:'#566576', boxWidth:14,
+              filter: function(item) { return item.text !== ''; }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                if(ctx.dataset.type === 'bar') return null;
+                var v = ctx.raw;
+                if(!v && v !== 0) return null;
+                return ctx.dataset.label + ': ' + (v>=1000000 ? '$'+(v/1000000).toFixed(2)+'M' : v>=1000 ? '$'+Math.round(v/1000)+'K' : '$0');
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks:{font:{size:10},color:'#8aaabb',maxTicksLimit:8},
+            grid:{display:false}
+          },
+          y: {
+            ticks:{
+              font:{size:10},color:'#8aaabb',
+              callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}
+            },
+            grid:{color:'rgba(0,0,0,0.04)'}
+          }
         }
       }
     });
+
+    // Add crash annotation text on canvas
+    var crashAnnotation = document.getElementById('crash-annotation');
+    if(!crashAnnotation){
+      crashAnnotation = document.createElement('div');
+      crashAnnotation.id = 'crash-annotation';
+      crashAnnotation.style.cssText = 'position:absolute;top:6px;left:0;font-size:9px;font-weight:800;pointer-events:none;';
+      ctx.parentElement.style.position='relative';
+      ctx.parentElement.appendChild(crashAnnotation);
+    }
+    if(yr1 < 0){
+      crashAnnotation.style.color='#ef5350';
+      crashAnnotation.textContent = yr1+'% crash  →';
+    } else if(yr1 > 0){
+      crashAnnotation.style.color='#1CC7D0';
+      crashAnnotation.textContent = '+'+yr1+'% bull  →';
+    } else {
+      crashAnnotation.textContent = '';
+    }
   }
+
+    // ── Crash Impact Bar Chart ──────────────────────────────────────
+    var curYear = new Date().getFullYear();
+    var crashCtx = document.getElementById('crash-bar-chart');
+    if(crashCtx) {
+      if(window.crashBarChart) window.crashBarChart.destroy();
+      var nBars = Math.min(15, baseRes.length);
+      var barLabels = [], barData = [], barColors = [], barBorders = [];
+      for(var bi=0; bi<nBars; bi++) {
+        var yr = (baseRes[bi] ? baseRes[bi].year : curYear+bi);
+        barLabels.push(yr);
+        var ret;
+        if(bi===0) ret = 0;
+        else if(bi===1) ret = yr1;
+        else if(bi<=yrs) ret = yr1*(1-(bi-1)/yrs) + 7*((bi-1)/yrs);
+        else ret = 7;
+        ret = Math.round(ret);
+        barData.push(ret);
+        barColors.push(ret < 0 ? 'rgba(214,69,69,0.75)' : 'rgba(28,199,208,0.6)');
+        barBorders.push(ret < 0 ? '#d64545' : '#1CC7D0');
+      }
+      window.crashBarChart = new Chart(crashCtx, {
+        type: 'bar',
+        data: {
+          labels: barLabels,
+          datasets: [{
+            label: 'Annual Return %',
+            data: barData,
+            backgroundColor: barColors,
+            borderColor: barBorders,
+            borderWidth: 1.5,
+            borderRadius: 2,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: {display:false},
+            tooltip: {
+              callbacks: {
+                label: function(ctx) { return (ctx.raw > 0 ? '+' : '') + ctx.raw + '%'; }
+              }
+            }
+          },
+          scales: {
+            x: {ticks:{font:{size:9},color:'#92a1b2',maxTicksLimit:10}, grid:{display:false}},
+            y: {
+              ticks:{font:{size:9},color:'#92a1b2',callback:function(v){return v+'%';}},
+              grid:{color:'rgba(0,0,0,0.04)'},
+              // Zero line prominent
+              border:{color:'#ccc'}
+            }
+          }
+        }
+      });
+    }
+
 
   updateFingerprint(baseRes, stressRes);
 }
@@ -1227,8 +1393,8 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   document.getElementById('mc-bar-fail').style.width    = failPct + '%';
 
   // ── Context panel: what does this mean in REAL numbers ────
-  var contextHtml = '<div style="background:#061620;border:1px solid #1a3a52;border-radius:10px;padding:16px;margin-bottom:16px;">' +
-    '<div style="font-size:10px;font-weight:700;color:#6a8a9a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">📋 What Your Simulation Actually Ran</div>' +
+  var contextHtml = '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.22);border-radius:12px;padding:16px;margin-bottom:16px;">' +
+    '<div style="font-size:10px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">📋 What Your Simulation Actually Ran</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">' +
     contextRow('Simulation period', startYear + ' → ' + endYearLabel + ' (' + yrs + ' years)') +
     contextRow(p1Name + ' lifespan modeled', 'Age ' + p1Age + ' → ' + p1DeathAge + ' (year ' + (curYear + p1DeathAge - p1Age) + ')') +
@@ -1312,10 +1478,10 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
 }
 
 function contextRow(label, value) {
-  return '<div style="background:rgba(255,255,255,0.03);border-radius:5px;padding:7px 10px;">' +
-    '<div style="font-size:10px;color:#4a6a7a;margin-bottom:2px;">' + label + '</div>' +
-    '<div style="font-size:12px;font-weight:700;color:#c8dae8;">' + value + '</div>' +
-    '</div>';
+  return '<div style="background:rgba(255,255,255,.06);border-radius:5px;padding:8px 10px;">' +
+    '<div style="font-size:10px;color:#9fc1d6;margin-bottom:3px;">' + label + '</div>' +
+    '<div style="font-size:13px;font-weight:700;color:#ffffff;">' + value + '</div>' +
+  '</div>';
 }
 
 function buildMCFanChart(yearlyBals, yrs, curYear, projYears, nRuns) {
@@ -1429,8 +1595,8 @@ function buildSurvivalChart(failYears, yrs, curYear, projYears, nRuns, depleteYe
       datasets: [{
         label: '% Depleted',
         data: data,
-        borderColor: '#ef5350',
-        backgroundColor: 'rgba(239,83,80,0.08)',
+        borderColor:'#1CC7D0',
+        backgroundColor:'rgba(28,199,208,0.08)',
         fill: true,
         borderWidth: 2,
         pointRadius: 0,
