@@ -273,8 +273,10 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
 <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html" class="active">Summary</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
 <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
@@ -655,10 +657,44 @@ function shareWithAdvisor() {
   }
 }
 
+// ── SAMPLE DATA (demo when no sheet connected) — same couple as the Stress Test page ──
+var SAMPLE_SUMMARY = {
+  people:{
+    partner1:{name:'Alex',age:63,deathAge:92,ssMonthly:2544,ssStartDate:'2028',salary:72000,salaryEnd:'6/30/2026',pension:343,pensionStart:'2027',otherIncome:0,healthPreMedicare:0},
+    partner2:{name:'Jordan',age:55,deathAge:105,ssMonthly:2493,ssStartDate:'2038',salary:80230,salaryEnd:'6/30/2028',pension:0,otherIncome:0,healthPreMedicare:6200}
+  },
+  global:{planYear:2026,inflation:0.03,ssCola:0.025,filingStatus:'Married Filing Jointly',standardDeduction:30000,survivorReduction:0.20},
+  tax:{effectiveRate:12.4,standardDeduction:30000,stateRate:0,rothConversionSavings:41000},
+  portfolio:{total:925000,accounts:[
+    {name:'Alex 401(k)',expectedReturn:7,balance:437000,type:'Pretax (Deferred)',contrib:0,showOnDashboard:'Yes'},
+    {name:'Roth IRA',expectedReturn:8,balance:32000,type:'Roth (Tax Free)',contrib:0,showOnDashboard:'Yes'},
+    {name:'Brokerage',expectedReturn:7,balance:99000,type:'Taxable (Liquid)',contrib:0,showOnDashboard:'Yes'},
+    {name:'Jordan 401(k)',expectedReturn:7,balance:357000,type:'Pretax (Deferred)',contrib:0,showOnDashboard:'Yes'}
+  ]},
+  spending:{baseAnnual:42000,safeExtra:16000,
+    phase1Start:'2026',phase1End:'2038',phase1Extra:12000,
+    phase2Start:'2039',phase2End:'2055',phase2Extra:4000,
+    phase3Start:'2056',phase3End:'2075',phase3Extra:0},
+  legacy:{goal:250000,projectedEnding:250000,achievedPct:100},
+  projections:{years:[2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045,2046,2047,2048,2049,2050,2051,2052,2053,2054,2055,2056,2057,2058,2059,2060,2061,2062,2063,2064,2065,2066,2067,2068,2069,2070,2071,2072,2073,2074,2075],endLiquid:[925000,933000,941000,949000,958000,966000,974000,982000,990000,989000,986000,980000,973000,963000,952000,938000,923000,905000,887000,866000,844000,821000,797000,771000,745000,718000,690000,662000,634000,606000,578000,550000,522000,495000,469000,443000,419000,396000,374000,353000,335000,317000,302000,288000,277000,267000,260000,254000,251000,250000]},
+  roth:{year:2031,optimalAmount:48000},
+  expenses:[{label:'Housing',monthly:1850},{label:'Food & Groceries',monthly:850},{label:'Healthcare',monthly:640},{label:'Transportation',monthly:520},{label:'Travel & Leisure',monthly:700},{label:'Insurance',monthly:340}],
+  debts:[{name:'Mortgage',mo:1420,monthly:1420,bal:184000,end:'2034'}]
+};
+function showSampleBanner() {
+  if (document.getElementById('rbp-sample-banner')) return;
+  var b = document.createElement('div');
+  b.id = 'rbp-sample-banner';
+  b.style.cssText = 'max-width:1140px;margin:14px auto 0;padding:11px 18px;background:#fff8e9;border:1px solid #f0d8a8;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:13px;color:#7a5a1e;font-weight:600;';
+  b.innerHTML = '<span style="font-size:18px;">\uD83D\uDD14</span><span>Showing <strong>Sample Data</strong> — connect your sheet to see YOUR retirement summary. <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html" style="color:#0c7b84;">Set up \u2192</a></span>';
+  var rp = document.getElementById('report-page');
+  rp.parentNode.insertBefore(b, rp);
+}
+
 function loadReport(attempt) {
   attempt = attempt || 1;
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId) { document.getElementById('loading').textContent = '⚠️ No sheet connected. Go to Setup Guide first.'; return; }
+  if (!sheetId) { try { populateReport(SAMPLE_SUMMARY); showSampleBanner(); } catch(e){ document.getElementById('loading').textContent = '⚠️ Demo failed to load: '+e.message; } return; }
 
   var loadEl = document.getElementById('loading');
   loadEl.innerHTML = 'Loading your retirement summary' + (attempt > 1 ? ' (attempt '+attempt+' of 3)' : '') + '...<br><small style="color:#aaa;">This may take 15-30 seconds on first load</small>';
@@ -1270,5 +1306,9 @@ window.addEventListener('DOMContentLoaded', function(){ loadReport(); });
   });
 })();
 </script>
+<div class="rbp-disclaimer" style="max-width:1140px;margin:28px auto 18px;padding:14px 20px;border-top:1px solid #e6ebf0;text-align:center;font-size:10.5px;color:#7a8a99;line-height:1.7;">
+  <strong style="color:#566576;">Educational tool — not financial, tax, or legal advice.</strong>
+  RetireBlueprint Pro provides general retirement-planning projections for personal use only. Markets are unpredictable and your actual results will differ. Always consult a licensed financial, tax, or legal professional before making major retirement decisions. © 2026 RetireBlueprint Pro
+</div>
 </body>
 </html>

@@ -130,24 +130,16 @@ window.addEventListener('storage', function(e) {
 
 
 
-<br>
-  <div id="loading-status" style="font-size:14px;font-weight:700;color:#2c3e50;margin-bottom:12px;">Connecting to your Google Sheet...</div>
-  <div style="max-width:320px;margin:0 auto 16px;">
-    <div style="background:#1a3a52;border-radius:10px;height:8px;overflow:hidden;">
-      <div id="loading-progress" style="height:8px;background:linear-gradient(90deg,#1CC7D0,#f4b86a);border-radius:10px;width:0%;transition:width 0.5s ease;"></div>
+<div id="loading-msg" style="text-align:center;padding:54px 20px;">
+  <div style="font-size:32px;margin-bottom:14px;">📊</div>
+  <div id="loading-status" style="font-size:15px;font-weight:700;color:#0C2436;margin-bottom:12px;">Connecting to your Google Sheet...</div>
+  <div style="max-width:320px;margin:0 auto 12px;">
+    <div style="background:#d7e2ea;border-radius:10px;height:8px;overflow:hidden;">
+      <div id="loading-progress" style="height:8px;width:0%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);border-radius:10px;transition:width 0.5s ease;"></div>
     </div>
-    <div id="loading-pct" style="font-size:10px;color:#2c3e50;margin-top:6px;">0%</div>
+    <div id="loading-pct" style="font-size:10px;color:#566576;margin-top:6px;">0%</div>
   </div>
   <div id="loading-detail" style="font-size:11px;color:#5a7a8a;max-width:320px;margin:0 auto;line-height:1.6;">Reading projections &amp; portfolio data...</div>
-</div>
-
-<div id="loading-msg" style="text-align:center;padding:60px 20px;color:#9fc1d6;">
-  <div style="font-size:32px;margin-bottom:16px;">📊</div>
-  <div style="font-size:16px;font-weight:700;color:#1CC7D0;margin-bottom:8px;">Loading your plan data...</div>
-  <div style="font-size:12px;color:#9fc1d6;margin-bottom:20px;">Reading from your Google Sheet</div>
-  <div style="background:#1a3a52;border-radius:8px;height:6px;max-width:300px;margin:0 auto;overflow:hidden;">
-    <div id="loading-progress" style="height:100%;width:0%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);transition:width 0.3s;"></div>
-  </div>
 </div>
 <div id="stress-content" style="display:none;">
 
@@ -227,8 +219,8 @@ window.addEventListener('storage', function(e) {
 
 
   <!-- Bottom strip: key insight -->
-  <div style="margin-top:20px;padding:11px 16px;background:rgba(28,199,208,.07);border:1px solid rgba(28,199,208,.18);border-radius:8px;font-size:11.5px;color:#b8dde6;line-height:1.65;position:relative;">
-    <strong style="color:#1CC7D0;">📖 Why Year 1 is the worst timing:</strong>
+  <div style="margin-top:20px;padding:11px 16px;background:rgba(28,199,208,.07);border:1px solid rgba(28,199,208,.28);border-radius:8px;font-size:11.5px;color:#2c4a57;line-height:1.65;position:relative;">
+    <strong style="color:#0c7b84;">📖 Why Year 1 is the worst timing:</strong>
     A crash early in retirement forces you to sell at the bottom while withdrawing — those shares never recover.
     The same crash in Year 20 barely dents your plan because you had 20 years of growth first.
   </div>
@@ -609,14 +601,14 @@ window.addEventListener('storage', function(e) {
         <div id="mc-progress-pct" style="font-size:20px;font-weight:900;color:#fff;margin-top:8px;">0%</div>
         <div style="font-size:10px;color:#9fc1d6;margin-top:4px;">This takes 5–15 seconds depending on your device</div>
       </div>
-<div<div style="background:#061620;border-radius:6px;height:8px;overflow:hidden;">
-          <div id="mc-progress-bar" style="height:100%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);width:0%;transition:width .1s;border-radius:6px;"></div>
-        </div>
-        <div style="font-size:11px;color:#9fc1d6;margin-top:8px;" id="mc-progress-text">0 / 1,000</div>
-      </div>
 
     </div>
   </div>
+
+<div class="rbp-disclaimer" style="max-width:1140px;margin:28px auto 8px;padding:14px 20px;border-top:1px solid #e6ebf0;text-align:center;font-size:10.5px;color:#7a8a99;line-height:1.7;">
+  <strong style="color:#566576;">Educational tool — not financial, tax, or legal advice.</strong>
+  RetireBlueprint Pro provides general retirement-planning projections for personal use only. Markets are unpredictable and your actual results will differ. Always consult a licensed financial, tax, or legal professional before making major retirement decisions. © 2026 RetireBlueprint Pro
+</div>
 <!-- /body -->
 
 <script>
@@ -782,6 +774,7 @@ function recalc() {
 
   if(!planData) return;
 
+  var curYear = new Date().getFullYear();
   var gi=planData.global||{};
   var baseRes=project({yr1:0,yrs:1,inf:(gi.inflation||0.03)*100,spend:0,cola:(gi.ssCola||0.025)*100});
   var stressRes=project({yr1:yr1,yrs:yrs,inf:inf,spend:sp,cola:cola});
@@ -871,7 +864,7 @@ function recalc() {
     // Build crash-period shading data (full height bars during crash years)
     var maxVal = Math.max.apply(null, baseData.concat(stressData).filter(Boolean));
     var crashData = labels.map(function(yr){
-      return (yr > curYear && yr <= curYear + Math.max(badYrs,1)) ? maxVal * 1.05 : null;
+      return (yr > curYear && yr <= curYear + Math.max(yrs,1)) ? maxVal * 1.05 : null;
     });
     // Mark the crash start year
     var crashLabel = yr1 < 0 ? 'Crash Year' : (yr1 > 0 ? 'Bull Start' : '');
@@ -964,7 +957,7 @@ function recalc() {
   }
 
     // ── Crash Impact Bar Chart ──────────────────────────────────────
-    var curYear = new Date().getFullYear();
+    curYear = new Date().getFullYear(); // reuse outer declaration
     var crashCtx = document.getElementById('crash-bar-chart');
     if(crashCtx) {
       if(window.crashBarChart) window.crashBarChart.destroy();
@@ -1025,6 +1018,9 @@ function recalc() {
 
 // ── SAMPLE DATA ───────────────────────────────────────────────
 function loadSampleData() {
+  // SAMPLE DATA — a realistic, healthy demo plan (sustainable ~3.5% withdrawal).
+  // projections.endLiquid is a Master-style glide so the BASE case matches the
+  // fingerprint ($250K legacy goal) and stress scenarios deviate believably from it.
   planData = {
     people:{
       partner1:{name:'Alex',age:63,ssMonthly:2544,ssYear1:15263,salary:72000,salaryEnd:'6/30/2026',pension:343,deathAge:92},
@@ -1036,10 +1032,13 @@ function loadSampleData() {
       {name:'Brokerage',expectedReturn:7,balance:99000,type:'Taxable (Liquid)'},
       {name:'Partner 2 401k',expectedReturn:7,balance:357000,type:'Pretax (Deferred)'},
     ]},
-    spending:{baseAnnual:60000,safeExtra:27000},
+    spending:{baseAnnual:42000,safeExtra:16000},
     legacy:{goal:250000,projectedEnding:250000,achievedPct:100},
     global:{planYear:2026,inflation:0.03,ssCola:0.025},
-    projections:null
+    projections:{
+      years:[2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045,2046,2047,2048,2049,2050,2051,2052,2053,2054,2055,2056,2057,2058,2059,2060,2061,2062,2063,2064,2065,2066,2067,2068,2069,2070,2071,2072,2073,2074,2075],
+      endLiquid:[925000,933000,941000,949000,958000,966000,974000,982000,990000,989000,986000,980000,973000,963000,952000,938000,923000,905000,887000,866000,844000,821000,797000,771000,745000,718000,690000,662000,634000,606000,578000,550000,522000,495000,469000,443000,419000,396000,374000,353000,335000,317000,302000,288000,277000,267000,260000,254000,251000,250000]
+    }
   };
   document.getElementById('loading-msg').style.display='none';
   document.getElementById('stress-content').style.display='block';
