@@ -1196,9 +1196,9 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
     <div style="background:rgba(28,199,208,0.07);border:1px solid rgba(28,199,208,0.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:#8aaabb;line-height:1.7;">
       <strong style="color:#1CC7D0;">How the solver works:</strong> It compares two tax rates — 
       <strong style="color:#1CC7D0;">your rate NOW</strong> (the bracket you fill up to) vs 
-      <strong style="color:#f4b86a;">your rate in the FUTURE</strong> (at RMD age 73). 
+      <strong style="color:#f4b86a;">your rate in the FUTURE</strong> (at your RMD age — 73 or 75 by birth year). 
       If your future rate will be <em>higher</em> than today, converting now saves money. 
-      Check your Dashboard for your projected income at age 73 to estimate your future rate. <strong style="color:#f4b86a;">💡 This answers: "How much to convert?" — For "When can I access it?" see the <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html" style="color:#1CC7D0;">Roth Access Ladder →</a></strong></div>
+      Check your Dashboard for your projected income at your RMD age (73 or 75) to estimate your future rate. <strong style="color:#f4b86a;">💡 This answers: "How much to convert?" — For "When can I access it?" see the <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html" style="color:#1CC7D0;">Roth Access Ladder →</a></strong></div>
     <div class="form-grid-4" style="margin-bottom:14px;">
       <div class="field">
         <label>Analysis Year</label>
@@ -1219,7 +1219,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       <div class="field">
         <label>Projected Tax Rate at RMDs <span style="font-size:9px;background:#2d1a00;color:#f4b86a;padding:2px 6px;border-radius:4px;margin-left:4px;font-weight:700;letter-spacing:0.5px;">FUTURE</span></label>
         <input type="number" id="f-B145" value="" min="1" max="50" onchange="updateRothIncomeForYear(); markDirty();">
-        <span class="hint">Your estimated <strong>effective</strong> rate at age 73 when RMDs kick in — find this on your Dashboard for year 2037 (or when you turn 73). Higher RMDs = higher rate than you might expect.</span>
+        <span class="hint">Your estimated <strong>effective</strong> rate when RMDs begin (age 73 or 75) — find this on your Dashboard for year 2037 (or when you turn 73). Higher RMDs = higher rate than you might expect.</span>
         <div id="roth-tax-hint" style="font-size:11px;color:var(--teal);margin-top:4px;font-style:italic;"></div>
       </div>
     </div>
@@ -1262,7 +1262,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
         <div class="solver-kpi">
-          <div class="solver-kpi-lbl">Est. RMD at Age 73</div>
+          <div class="solver-kpi-lbl">Est. RMD at RMD Age</div>
           <div class="solver-kpi-val" id="r-rmd" style="font-size:16px;color:#f4b86a;">—</div>
           <div class="solver-kpi-sub" id="r-rmd-year">Forced withdrawal/yr</div>
         </div>
@@ -1981,15 +1981,16 @@ function updateRothIncomeForYear() {
   setTxt('r-income', fmt(income));
 
   // Inflation-adjusted MFJ bracket thresholds for chosen year
-  var yearsOut = Math.max(0, yr - 2024);
+  var yearsOut = Math.max(0, yr - 2026);
   var inf = Math.pow(1.03, yearsOut);
+  // 2026 MFJ bracket thresholds (IRS Rev. Proc. 2025-32), projected forward at 3%/yr
   var brackets = [
-    {name:'10% Bracket', threshold:Math.round(23200*inf),  rate:0.10},
-    {name:'12% Bracket', threshold:Math.round(94300*inf),  rate:0.12},
-    {name:'22% Bracket', threshold:Math.round(201050*inf), rate:0.22},
-    {name:'24% Bracket', threshold:Math.round(383900*inf), rate:0.24},
-    {name:'32% Bracket', threshold:Math.round(487450*inf), rate:0.32},
-    {name:'35% Bracket', threshold:Math.round(731200*inf), rate:0.35},
+    {name:'10% Bracket', threshold:Math.round(24800*inf),  rate:0.10},
+    {name:'12% Bracket', threshold:Math.round(100800*inf), rate:0.12},
+    {name:'22% Bracket', threshold:Math.round(211400*inf), rate:0.22},
+    {name:'24% Bracket', threshold:Math.round(403550*inf), rate:0.24},
+    {name:'32% Bracket', threshold:Math.round(512450*inf), rate:0.32},
+    {name:'35% Bracket', threshold:Math.round(768700*inf), rate:0.35},
   ];
 
   // Find which bracket client is currently in
@@ -2025,12 +2026,13 @@ function updateRothIncomeForYear() {
 
   // === LIFETIME TAX SAVINGS (proper calculation) ===
   // Convert now: pay taxNow, get tax-free growth for N years
-  // Wait for RMDs: pay futureRate × optimal at age 73
+  // Wait for RMDs: pay futureRate × optimal at RMD age (73 or 75 by birth year)
   var futureRateEl = document.getElementById('f-B145');
   var futureRate = futureRateEl ? (parseFloat(futureRateEl.value)||8)/100 : 0.08;
   var p1AgeEl = document.getElementById('f-B33'); // current age (read-only)
   var p1Age = p1AgeEl ? parseFloat(p1AgeEl.value)||63 : 63;
-  var yrsToRMD = Math.max(1, 73 - p1Age);
+  var rmdStartAge = ((new Date().getFullYear() - p1Age) >= 1960) ? 75 : 73; // SECURE 2.0: 73 if born ≤1959, else 75
+  var yrsToRMD = Math.max(1, rmdStartAge - p1Age);
   // Assumed Roth growth rate (use avg account return or 7%)
   var growthRate = 0.07;
   // Value of converted amount at RMD time, tax-free
@@ -2067,23 +2069,24 @@ function updateRothIncomeForYear() {
   }
 
   // === RMD PROJECTION ===
-  // Estimate pre-tax balance at age 73 using current pre-tax total
+  // Estimate pre-tax balance at RMD start (age 73 or 75 by birth year)
   var preTaxNow = 0;
   if (window._rbpProjections && window._rbpProjections.preTax && window._rbpProjections.preTax[0]) {
     preTaxNow = window._rbpProjections.preTax[0];
   }
   var preTaxAtRMD = Math.round(preTaxNow * Math.pow(1+growthRate, yrsToRMD));
-  // RMD factor at age 73 = 26.5 (IRS Uniform Lifetime Table)
-  var rmdAmt = Math.round(preTaxAtRMD / 26.5);
+  // IRS Uniform Lifetime Table first-year factor: 26.5 at age 73, 24.6 at age 75
+  var rmdFactor = (rmdStartAge >= 75) ? 24.6 : 26.5;
+  var rmdAmt = Math.round(preTaxAtRMD / rmdFactor);
   var rmdEl = document.getElementById('r-rmd');
   var rmdYrEl = document.getElementById('r-rmd-year');
   var rmdYear2 = new Date().getFullYear() + yrsToRMD;
   if (rmdEl) rmdEl.textContent = '$' + Math.round(rmdAmt/1000) + 'K/yr';
-  if (rmdYrEl) rmdYrEl.textContent = 'Est. starting ' + rmdYear2 + ' (age 73)';
+  if (rmdYrEl) rmdYrEl.textContent = 'Est. starting ' + rmdYear2 + ' (age ' + rmdStartAge + ')';
 
   // === IRMAA WARNING ===
-  // 2025 IRMAA threshold for MFJ: $212,000 MAGI
-  var irmaThreshold = Math.round(212000 * Math.pow(1.03, yearsOut));
+  // 2026 IRMAA threshold for MFJ: $218,000 MAGI
+  var irmaThreshold = Math.round(218000 * Math.pow(1.03, yearsOut));
   var conversionTotal = optimal; // what they plan to convert
   var totalWithConversion = income + conversionTotal;
   var irmaaEl = document.getElementById('r-irmaa');
@@ -2611,14 +2614,15 @@ var incEl  = document.getElementById('d-inc-'+i);
   if (roth.bracket) sv('f-B141', roth.bracket);
   if (roth.assumedRate) sv('f-B145', Math.round(roth.assumedRate*10000)/100);
 
-  // Auto-populate assumed future tax rate from Master at RMD year (age 73)
+  // Auto-populate assumed future tax rate from Master at RMD year (age 73 or 75)
   // Only auto-populate if field is empty or still at default
   var taxRateEl = document.getElementById('f-B145');
   var currentTaxRate = taxRateEl ? parseFloat(taxRateEl.value) : 0;
   if ((!currentTaxRate || currentTaxRate === 8) && d.projections && d.projections.years) {
     // Find the year when Partner 1 turns 73
     var p1Age = d.people && d.people[Object.keys(d.people||{})[0]] ? (d.people[Object.keys(d.people||{})[0]].age||0) : 0;
-    var rmdYear = p1Age > 0 ? (new Date().getFullYear() + (73 - p1Age)) : 0;
+    var rmdAgeP1 = ((new Date().getFullYear() - p1Age) >= 1960) ? 75 : 73;
+    var rmdYear = p1Age > 0 ? (new Date().getFullYear() + (rmdAgeP1 - p1Age)) : 0;
     if (rmdYear > 0) {
       var rmdIdx = d.projections.years.indexOf(rmdYear);
       if (rmdIdx < 0) {
@@ -2635,7 +2639,7 @@ var incEl  = document.getElementById('d-inc-'+i);
           if (effectiveRateAtRMD > 0 && effectiveRateAtRMD < 50) {
             sv('f-B145', effectiveRateAtRMD);
             var hint = document.getElementById('roth-tax-hint');
-            if (hint) hint.textContent = 'Auto-estimated from your projected ' + rmdYear + ' tax data (' + rmdYear + ' = age 73)';
+            if (hint) hint.textContent = 'Auto-estimated from your projected ' + rmdYear + ' tax data (' + rmdYear + ' = age ' + rmdAgeP1 + ')';
           }
         }
       }

@@ -457,8 +457,10 @@ function buildLadder() {
     }
 
     // RMD milestone
-    var p1Rmd = p1AgeNow >= 73;
-    var p2Rmd = p2AgeNow >= 73;
+    var p1RmdAge = (curYear - p1Age) >= 1960 ? 75 : 73; // SECURE 2.0
+    var p2RmdAge = (curYear - p2Age) >= 1960 ? 75 : 73;
+    var p1Rmd = p1AgeNow >= p1RmdAge;
+    var p2Rmd = p2AgeNow >= p2RmdAge;
     if (p1Rmd || p2Rmd) {
       var rmdWho = (p1Rmd && p2Rmd) ? 'Both' : (p1Rmd ? p1Name.split(' ')[0] : p2Name.split(' ')[0]);
       barsDiv.innerHTML += '<div style="background:#fff;border-left:3px solid #6a8a9a;border-radius:5px;padding:4px 9px;font-size:10px;font-weight:700;color:#2a4050;white-space:nowrap;">⚠️ RMDs Required (' + rmdWho + ')</div>';
@@ -481,8 +483,8 @@ function buildLadder() {
     if (p2AgeNow === 67) milestones.push('💰 ' + p2Name.split(' ')[0] + ' Full Retirement Age (FRA) for Social Security');
     if (p1AgeNow === 70) milestones.push('⬆️ ' + p1Name.split(' ')[0] + ' SS max delay benefit — no more increases after 70');
     if (p2AgeNow === 70) milestones.push('⬆️ ' + p2Name.split(' ')[0] + ' SS max delay benefit — no more increases after 70');
-    if (p1AgeNow === 73) milestones.push('⚠️ ' + p1Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
-    if (p2AgeNow === 73) milestones.push('⚠️ ' + p2Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
+    if (p1AgeNow === ((curYear - p1Age) >= 1960 ? 75 : 73)) milestones.push('⚠️ ' + p1Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
+    if (p2AgeNow === ((curYear - p2Age) >= 1960 ? 75 : 73)) milestones.push('⚠️ ' + p2Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
 
     milestones.forEach(function(m) {
       var mDiv = document.createElement('div');
@@ -501,27 +503,29 @@ function buildLadder() {
 
 function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, p1Name, p2Name) {
   var retireYear = curYear + Math.min(p1Ret - p1Age, p2Ret - p2Age);
-  var rmd1Year = curYear + (73 - Math.min(p1Age, p2Age));
+  function rmdAgeFor(age){ var birthYr = curYear - age; return birthYr >= 1960 ? 75 : 73; }
+  var youngerAge = Math.min(p1Age, p2Age);
+  var rmd1Year = curYear + (rmdAgeFor(youngerAge) - youngerAge);
   var el = document.getElementById('conversion-planner');
   var html = '';
 
   var pretax = parseInt(document.getElementById('pretax-bal').value) || 500000;
   // Suggested annual conversion: use planData optimal amount if loaded,
   // otherwise estimate as the amount needed to fill the 22% bracket
-  // (roughly $94K taxable income limit minus estimated SS/pension income)
+  // (2026 MFJ 12%-bracket top $100,800 minus estimated SS/pension income)
   var annualConv = 0;
   if (window._rbpPlanData && window._rbpPlanData.roth && window._rbpPlanData.roth.optimalAmount > 0) {
     annualConv = window._rbpPlanData.roth.optimalAmount;
   } else {
     // Fallback: estimate bracket-filling amount
-    // Standard assumption: fill up to 22% bracket (~$94K limit for MFJ)
+    // Standard assumption: fill up to the 22% bracket (2026 MFJ 12% top = $100,800 taxable)
     // minus estimated SS/other income (~$40-50K for typical retiree)
     var estSS = (window._rbpPlanData && window._rbpPlanData.people) ? 
       (function(){ var pk=Object.keys(window._rbpPlanData.people||{}); 
         var p1=(window._rbpPlanData.people[pk[0]]||{}); 
         var p2=(window._rbpPlanData.people[pk[1]]||{});
         return ((p1.ssMonthly||0)+(p2.ssMonthly||0))*12; })() : 40000;
-    annualConv = Math.max(10000, Math.round(Math.min(94300 - estSS, pretax * 0.15)));
+    annualConv = Math.max(10000, Math.round(Math.min(100800 - estSS, pretax * 0.15)));
   }
 
   for (var yr = Math.max(firstConv, retireYear); yr < Math.min(rmd1Year, retireYear + 20); yr++) {
@@ -530,7 +534,7 @@ function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, 
     var fiveYrReady = yr + 5;
     var pct = Math.min(100, Math.round(annualConv / pretax * 100));
     var note = 'Suggested conversion · tax-free access from ' + fiveYrReady;
-    if (p1AgeNow >= 73 || p2AgeNow >= 73) note = '⚠️ RMDs begun — convert carefully';
+    if (p1AgeNow >= rmdAgeFor(p1Age) || p2AgeNow >= rmdAgeFor(p2Age)) note = '⚠️ RMDs begun — convert carefully';
 
     html += '<div class="conv-row">';
     html += '<div class="conv-year">' + yr + '</div>';
