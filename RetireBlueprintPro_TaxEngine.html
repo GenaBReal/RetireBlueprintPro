@@ -448,7 +448,7 @@ window.addEventListener('storage', function(e) {
           <div class="gross-box withdraw">
             <div class="gross-lbl light">Must Withdraw</div>
             <div class="gross-val orange" id="gross-withdraw">$1,136</div>
-            <div class="gross-sub light">@ 12% effective rate</div>
+            <div class="gross-sub light" id="gross-rate-note">@ 12% effective rate</div>
           </div>
         </div>
         <div style="margin-top:12px;">
@@ -718,10 +718,13 @@ function renderTimeline(proj, tax) {
 
 function calcGrossUp() {
   var net = parseFloat(document.getElementById('gross-input').value)||1000;
-  var rate = 0.12;
+  // Use the client's real effective rate when available; fall back to 12% for the demo default.
+  var rate = (window._rbpEffRate && window._rbpEffRate > 0 && window._rbpEffRate < 0.9) ? window._rbpEffRate : 0.12;
   var gross = net/(1-rate);
   set('gross-need',    '$'+Math.round(net).toLocaleString());
   set('gross-withdraw','$'+Math.round(gross).toLocaleString());
+  var note = document.getElementById('gross-rate-note');
+  if (note) note.textContent = '@ ' + (Math.round(rate*1000)/10) + '% effective rate';
 }
 
 function populate(data) {
@@ -735,6 +738,9 @@ function populate(data) {
   // Header
   var effPct = tax.effectiveRate ? (tax.effectiveRate < 1 ? (tax.effectiveRate*100).toFixed(1) : tax.effectiveRate.toFixed(1))+'%' : '—';
   set('hdr-eff',     effPct);
+  // Make the client's real effective rate available to the Gross-Up solver, then refresh it.
+  window._rbpEffRate = tax.effectiveRate ? (tax.effectiveRate < 1 ? tax.effectiveRate : tax.effectiveRate/100) : 0.12;
+  if (typeof calcGrossUp === 'function') calcGrossUp();
   set('hdr-filing',  (gl.filingStatus||'MFJ')+' '+(meta.planYear||2026));
   set('hdr-state',   tax.stateRate ? (tax.stateRate<1?tax.stateRate*100:tax.stateRate).toFixed(1)+'%' : '—');
   set('hdr-savings', fmt(tax.rothConversionSavings||0));

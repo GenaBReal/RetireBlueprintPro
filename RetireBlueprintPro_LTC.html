@@ -349,12 +349,16 @@ function calc() {
   var netCostPerPerson = Math.max(0, totalCostPerPerson - insOffsetPerPerson);
   var totalBothPartners = netCostPerPerson * 2;
 
-  // PV of that cost (how much to set aside today)
+  // PV of that cost (lump sum to set aside today)
   var pvReserve = totalBothPartners / Math.pow(1 + retRate, yrsUntilCare);
-  var monthlySetAside = pvReserve / (yrsUntilCare * 12);
+  // Monthly set-aside = sinking-fund payment that GROWS to the future care cost by care start.
+  var rm = retRate / 12, nMonths = Math.max(1, yrsUntilCare * 12);
+  var monthlySetAside = rm > 0
+    ? totalBothPartners * rm / (Math.pow(1 + rm, nMonths) - 1)
+    : totalBothPartners / nMonths;
 
-  // Portfolio impact: what % of current portfolio
-  var portfolioImpact = totalBothPartners / portfolio * 100;
+  // Portfolio impact in today's dollars (PV of cost vs today's portfolio) — apples-to-apples
+  var portfolioImpact = pvReserve / portfolio * 100;
 
   document.getElementById('k-reserve').textContent = fmt(pvReserve) + ' today';
   document.getElementById('k-monthly').textContent = fmt(monthlySetAside) + '/mo';
