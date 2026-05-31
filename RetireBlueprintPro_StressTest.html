@@ -416,6 +416,9 @@ window.addEventListener('storage', function(e) {
         Monte Carlo answers that by running <strong style="color:#1CC7D0;">1,000 randomized futures</strong> and counting how many your plan survives —
         giving you a true <strong style="color:#fff;">probability of success.</strong>
       </div>
+      <div style="margin-top:12px;padding:10px 13px;background:rgba(28,199,208,.08);border:1px solid rgba(28,199,208,.28);border-radius:8px;font-size:11.5px;color:#cfe8ee;line-height:1.6;max-width:520px;">
+        <strong style="color:#fff;">Reading this against your Dashboard:</strong> the <strong style="color:#1CC7D0;">average</strong> of these runs should land near your Master projection — a good sign it's using your real portfolio. But the <strong style="color:#1CC7D0;">median</strong> and success rate come in <em>lower, on purpose</em> — that gap is real-market volatility your smooth projection can't show. Plan around the median and the success rate, not the average: half of all futures are worse than the average.
+      </div>
     </div>
 
     <!-- Right: comparison table -->
@@ -668,6 +671,27 @@ function setScenario(key) {
   recalc();
 }
 
+// Balance-weighted portfolio return + volatility scaled to equity exposure.
+// Centers the simulation on THIS client's actual mix rather than a flat average,
+// so the Monte Carlo AVERAGE tracks the Master projection (median stays lower by design).
+function rbpPortfolioStats(port){
+  var EQUITY_THRESHOLD = 0.045;          // returns above this count as "growth/equity" for volatility
+  var VOL_FIXED = 0.06, VOL_EQUITY = 0.18; // ~bond-like vs ~stock-like annual volatility
+  var wRet = 0.07, eqFrac = 0.6;          // fallbacks if no account detail is available
+  if (port && port.accounts && port.accounts.length){
+    var totBal = 0, retBal = 0, eqBal = 0;
+    port.accounts.forEach(function(a){
+      var bal = (a.balance > 0) ? a.balance : 0;
+      var r   = (a.expectedReturn > 0) ? a.expectedReturn / 100 : 0;
+      if (bal > 0 && r > 0){ totBal += bal; retBal += bal * r; if (r > EQUITY_THRESHOLD) eqBal += bal; }
+    });
+    if (totBal > 0){ wRet = retBal / totBal; eqFrac = eqBal / totBal; }
+  }
+  var sigma = VOL_FIXED + (VOL_EQUITY - VOL_FIXED) * eqFrac;
+  sigma = Math.max(0.05, Math.min(0.19, sigma));
+  return { meanReturn: wRet, equityFraction: eqFrac, sigma: sigma };
+}
+
 function project(overrides) {
   if (!planData) return [];
   var port  = planData.portfolio || {};
@@ -684,12 +708,7 @@ function project(overrides) {
 
   var totalPF  = port.total || 0;
   var baseSpend= (sp.baseAnnual||0) + (sp.safeExtra||0);
-  var baseRet  = 0.07;
-  if (port.accounts && port.accounts.length) {
-    var rs=0,rc=0;
-    port.accounts.forEach(function(a){if(a.expectedReturn>0){rs+=a.expectedReturn/100;rc++;}});
-    if(rc>0) baseRet=rs/rc;
-  }
+  var baseRet  = rbpPortfolioStats(port).meanReturn;
   var baseInfl = gl.inflation  || 0.03;
   var baseCola = gl.ssCola     || 0.025;
   var ssYear1  = (p1.ssYear1||0)+(p2.ssYear1||0);
@@ -1260,16 +1279,13 @@ function runMonteCarlo() {
     mcYears.push(origYears && _y < origYears.length ? origYears[_y] : curYear + _y);
   }
 
-  // ── Mean return from account mix ────────────────────────
-  var mu = 0.07;
-  if (port.accounts && port.accounts.length) {
-    var rs = 0, rc = 0;
-    port.accounts.forEach(function(a) {
-      if (a.expectedReturn > 0) { rs += a.expectedReturn / 100; rc++; }
-    });
-    if (rc > 0) mu = rs / rc;
-  }
-  var sigma = 0.15;
+  // ── Balance-weighted mean return + volatility scaled to equity exposure ──
+  // Centers the simulation on THIS client's actual portfolio so its AVERAGE
+  // tracks the Master projection. (The median stays lower on purpose — that gap
+  // is real-world volatility; see the "How to read this" note in the results.)
+  var _pstats = rbpPortfolioStats(port);
+  var mu    = _pstats.meanReturn;
+  var sigma = _pstats.sigma;
 
   // ── UI: show progress ────────────────────────────────────
   document.getElementById('mc-results').style.display = 'none';
