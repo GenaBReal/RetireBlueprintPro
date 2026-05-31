@@ -558,7 +558,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         <div class="field">
           <label>Early Bear Return Drag (%)</label>
           <input type="number" id="f-B15" value="15" min="0" max="50" onchange="markDirty()">
-          <span class="hint">Typical: 10–20% · Mild=10%, Moderate=15%, Severe=20–30% · 2008 dropped ~37%</span>
+          <span class="hint">Points cut from your growth-asset return <em>each</em> bear year (cash/bonds unaffected). A normal 7% year − 15 = −8%. Mild ≈ 10, Moderate ≈ 15, Severe ≈ 20–30. For a sharp 2008-style crash, use ~35 with a 1–2 yr duration.</span>
         </div>
         <div class="field">
           <label>Late Bear Market?</label>
@@ -581,7 +581,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         <div class="field">
           <label>Late Bear Return Drag (%)</label>
           <input type="number" id="f-B19" value="15" min="0" max="50" onchange="markDirty()">
-          <span class="hint">Typical: 10–15% · Can use lower than early bear</span>
+          <span class="hint">Same idea as the Early Bear drag — points cut from growth returns during the late-bear years. Often a bit lower (≈ 10–15) than the early one.</span>
         </div>
       </div>
     </div>
