@@ -437,7 +437,7 @@ window.addEventListener('storage', function(e) {
 <!-- ── REQUIRED SPENDING BREAKDOWN + WITHDRAWAL SOURCES ───────────── -->
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
   <div class="kpi-card" style="display:block;">
-    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#C0392B;"></span>Required Spending — What You Must Cover <span class="tooltip-icon" data-tip="Your total REQUIRED annual spending this year: base living costs + healthcare + every debt you've marked Include=Yes (mortgage, RV, cars, etc.). This is the floor you have to cover before any discretionary 'extra' spending. Shown for the current plan year; it grows with inflation in later years." style="font-size:9px;">?</span></div>
+    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#C0392B;"></span>Required Spending — What You Must Cover <span class="tooltip-icon" data-tip="Your required floor this year (living + healthcare + included debts), then your extra-spend choice: what you COULD safely add (from the solver) vs what you're CHOOSING this year. The big total includes ONLY the chosen extra — so if you choose $0, the total is just your required floor. Turn extra spending on/off with 'Assume Extra Spending' on the Inputs page." style="font-size:9px;">?</span></div>
     <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
       <div class="kc-value" id="req-total" style="color:#C0392B;">—</div>
       <div style="font-size:12px;color:var(--muted);">/yr &nbsp;·&nbsp; <span id="req-total-mo" style="font-weight:700;">—</span>/mo</div>
@@ -995,7 +995,41 @@ function populate(d){
         debtTotal += annual;
       }
     });
-    var total = rows.reduce(function(s,r){return s+r.annual;},0);
+    var requiredFloor = rows.reduce(function(s,r){return s+r.annual;},0);
+
+    // ── EXTRA SPEND: what you COULD safely add vs what you're CHOOSING this year ──
+    // "Could" = this year's solver guidance for the active smile phase (falls back to blended safeExtra).
+    // "Chosen" = what the engine actually applies: only if 'Assume Extra Spending' (B11) = Yes,
+    //            using the phase override if set, else the solver guidance. Otherwise $0.
+    var couldExtra = 0, chosenExtra = 0, phaseLabel = '';
+    (function(){
+      function yr(v){ try{ return (typeof v==='number')? v : (new Date(v)).getFullYear(); }catch(e){ return null; } }
+      var p1s=yr(sp.phase1Start), p1e=yr(sp.phase1End), p2s=yr(sp.phase2Start), p2e=yr(sp.phase2End), p3s=yr(sp.phase3Start), p3e=yr(sp.phase3End);
+      var guidance=0, override=0;
+      if (p1s && curYr>=p1s && curYr<=p1e){ guidance=sp.phase1Extra||0; override=sp.phase1Override||0; phaseLabel='Phase 1 (Go-Go)'; }
+      else if (p2s && curYr>=p2s && curYr<=p2e){ guidance=sp.phase2Extra||0; override=sp.phase2Override||0; phaseLabel='Phase 2 (Slow-Go)'; }
+      else if (p3s && curYr>=p3s && curYr<=p3e){ guidance=sp.phase3Extra||0; override=sp.phase3Override||0; phaseLabel='Phase 3 (No-Go)'; }
+      else { guidance = sp.safeExtra||0; phaseLabel=''; }
+      couldExtra = (override>0? override : guidance);
+      if (!couldExtra) couldExtra = sp.safeExtra||0;   // fallback to blended safe extra
+      var assume = String(gl.assumeExtraSpend||'').toLowerCase()==='yes';
+      chosenExtra = assume ? (override>0? override : guidance) : 0;
+    })();
+
+    // Render the two extra-spend rows: a muted "could" row, then the highlighted "chosen" row.
+    var moOfFn = moOf;
+    var extraHtml = '';
+    extraHtml += '<tr style="border-top:2px solid var(--border);"><td style="padding:6px 0 2px;color:#1CC7D0;font-style:italic;">You COULD safely add'
+      + (phaseLabel? ' ('+phaseLabel+')':'') + '</td>'
+      + '<td style="padding:6px 0 2px;text-align:right;color:#1CC7D0;font-style:italic;">'+fmt(couldExtra)+'</td>'
+      + '<td style="padding:6px 0 2px;text-align:right;color:#1CC7D0;font-style:italic;">'+fmt(moOfFn(couldExtra))+'</td></tr>';
+    extraHtml += '<tr><td style="padding:2px 0 6px;font-weight:700;color:#0B7A4B;">You are CHOOSING this year'
+      + (chosenExtra<=0? ' (none)':'') + '</td>'
+      + '<td style="padding:2px 0 6px;text-align:right;font-weight:800;color:#0B7A4B;">'+fmt(chosenExtra)+'</td>'
+      + '<td style="padding:2px 0 6px;text-align:right;font-weight:700;color:#0B7A4B;">'+fmt(moOfFn(chosenExtra))+'</td></tr>';
+
+    // Total INCLUDES only the chosen extra (not the "could").
+    var total = requiredFloor + chosenExtra;
     // Render
     var html='';
     rows.forEach(function(r){
@@ -1007,10 +1041,19 @@ function populate(d){
     if(!rows.length){
       html = '<tr><td colspan="3" style="padding:8px 0;color:var(--muted);">No expense or debt data entered yet — add them on the Inputs page (Sections IV & V).</td></tr>';
     }
+    // Subtotal of the required floor
+    if(rows.length){
+      html += '<tr><td style="padding:5px 0;font-weight:700;">Required floor (must cover)</td>'
+        + '<td style="padding:5px 0;text-align:right;font-weight:800;">'+fmt(requiredFloor)+'</td>'
+        + '<td style="padding:5px 0;text-align:right;color:var(--muted);font-weight:700;">'+fmt(moOf(requiredFloor))+'</td></tr>';
+    }
+    // Then the could/chosen extra-spend rows
+    html += extraHtml;
     body.innerHTML = html;
     set('req-total', fmt(total));
     set('req-total-mo', fmt(moOf(total)));
-    set('req-year', 'Plan year '+curYr+(debtTotal>0?' · includes '+fmt(debtTotal)+'/yr of debts':' · no debts active'));
+    var assumeYes = String(gl.assumeExtraSpend||'').toLowerCase()==='yes';
+    set('req-year', 'Plan year '+curYr+' · total = required floor + chosen extra ('+(assumeYes?'extra ON':'extra OFF — choosing $0')+')');
   })();
 
   // ── WHERE WITHDRAWALS COME FROM (per-account, first draw year) ───────
