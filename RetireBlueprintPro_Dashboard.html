@@ -60,7 +60,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .at-lbl{font-size:8px;color:#f4b86a;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
 .at-val{font-size:22px;font-weight:800;color:#fff;margin-top:3px;line-height:1;}
 .at-sub{font-size:8px;color:#8a9ab0;margin-top:3px;}
-.kpi-grid{display:grid;grid-template-columns:200px repeat(5,1fr);gap:8px;margin-bottom:10px;align-items:start;}
+.kpi-grid{display:grid;grid-template-columns:190px repeat(6,1fr);gap:8px;margin-bottom:10px;align-items:start;}
+@media (max-width:1200px) and (min-width:641px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.kpi-grid .plan-health{grid-column:span 1;}}
 .plan-health{background:#041E2F;border-radius:6px;padding:12px 14px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;}
 .ph-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#f4b86a;text-transform:uppercase;margin-bottom:4px;}
 .ph-score{font-size:50px;font-weight:800;color:#fff;line-height:1;}
