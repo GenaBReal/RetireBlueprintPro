@@ -534,6 +534,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         <strong style="color:var(--text);">What is a stress test?</strong> Simulates a market crash during retirement to see if your plan survives.
         <em>Early Bear</em> = crash right when you retire (worst case). <em>Late Bear</em> = crash later in retirement.
         Leave both on <strong>Normal Returns</strong> for your base plan. Switch to <strong>Bear Market</strong> to test resilience.
+        <br><br>⚠️ <strong style="color:var(--text);">These settings change your saved plan everywhere</strong> — Dashboard, Tax Engine, and every page recalculate once you Save. For a quick throwaway what-if that does <em>not</em> touch your plan, use the <strong>Stress Test</strong> page instead.
       </div>
       <div class="form-grid-4">
         <div class="field">
@@ -1357,7 +1358,7 @@ var SHEET_ID = (function() {
   var p = new URLSearchParams(window.location.search);
   var id = p.get('sheetId') || localStorage.getItem('rbp_sheet_id') || '';
   // NEVER fall back to blank template — that's our master copy
-  if (id && id !== '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
+  if (id && id !== '1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA') {
     localStorage.setItem('rbp_sheet_id', id);
   } else {
     id = ''; // Force error state so user goes through setup
@@ -2275,7 +2276,7 @@ function hideLoadingOverlay() {
 
 function loadLiveData() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId || sheetId === '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
+  if (!sheetId || sheetId === '1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA') {
     hideLoadingOverlay();
     setStatus('No sheet connected — complete Setup Guide first.', 'error');
     return;
@@ -2828,7 +2829,7 @@ function gpct(id) {
 
 function saveAll() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId || sheetId === '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
+  if (!sheetId || sheetId === '1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA') {
     setStatus('No sheet connected — complete Setup first.', 'error');
     return;
   }
