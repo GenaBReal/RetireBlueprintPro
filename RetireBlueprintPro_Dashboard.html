@@ -434,6 +434,47 @@ window.addEventListener('storage', function(e) {
   </div>
 </div>
 
+<!-- ── REQUIRED SPENDING BREAKDOWN + WITHDRAWAL SOURCES ───────────── -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+  <div class="kpi-card" style="display:block;">
+    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#C0392B;"></span>Required Spending — What You Must Cover <span class="tooltip-icon" data-tip="Your total REQUIRED annual spending this year: base living costs + healthcare + every debt you've marked Include=Yes (mortgage, RV, cars, etc.). This is the floor you have to cover before any discretionary 'extra' spending. Shown for the current plan year; it grows with inflation in later years." style="font-size:9px;">?</span></div>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+      <div class="kc-value" id="req-total" style="color:#C0392B;">—</div>
+      <div style="font-size:12px;color:var(--muted);">/yr &nbsp;·&nbsp; <span id="req-total-mo" style="font-weight:700;">—</span>/mo</div>
+    </div>
+    <div class="kc-sub" id="req-year" style="margin-bottom:8px;">current plan year</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;" id="req-breakdown-table">
+      <thead>
+        <tr style="text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">
+          <th style="padding:4px 0;font-weight:600;">Item</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">Annual</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">Monthly</th>
+        </tr>
+      </thead>
+      <tbody id="req-breakdown-body"></tbody>
+    </table>
+  </div>
+
+  <div class="kpi-card" style="display:block;">
+    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#2E7D5B;"></span>Where Withdrawals Come From <span class="tooltip-icon" data-tip="For the first year your plan draws from the portfolio, this shows how much comes from each account. The strategy pulls taxable/brokerage first, then pre-tax (401k/403b), and preserves Roth for last (tax-free growth). RMDs and Roth conversions are handled automatically by the engine." style="font-size:9px;">?</span></div>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+      <div class="kc-value" id="wsrc-total" style="color:#2E7D5B;">—</div>
+      <div style="font-size:12px;color:var(--muted);">total draw &nbsp;·&nbsp; <span id="wsrc-year" style="font-weight:700;">—</span></div>
+    </div>
+    <div class="kc-sub" id="wsrc-note" style="margin-bottom:8px;">portfolio withdrawal by account</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;" id="wsrc-table">
+      <thead>
+        <tr style="text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">
+          <th style="padding:4px 0;font-weight:600;">Account</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">Withdrawal</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">% of draw</th>
+        </tr>
+      </thead>
+      <tbody id="wsrc-body"></tbody>
+    </table>
+  </div>
+</div>
+
 <div class="engines-grid">
   <div class="engine">
     <div class="eng-hdr"><div class="eng-hdr-title">Income Engine</div><div class="eng-hdr-sub" id="eng-income-hdr">—</div></div>
@@ -905,10 +946,10 @@ function populate(d){
     if (rate !== null && isFinite(rate)){
       var ratePctNum = rate*100;
       set('kpi-wdraw', ratePctNum.toFixed(1)+'%');
-      set('kpi-wdraw-sub', 'First draw year ('+rateYr+') · '+fmt(wAmt)+' from '+fmt(balUsed));
+      set('kpi-wdraw-sub', 'First draw year ('+rateYr+') · incl. extra spend & taxes');
       var vs4 = ratePctNum - 4;
       if (ratePctNum <= 4)
-        set('kpi-wdraw-delta', 'Below the 4% rule by '+Math.abs(vs4).toFixed(1)+' pts — conservative ✓');
+        set('kpi-wdraw-delta', 'Below the 4% rule by '+Math.abs(vs4).toFixed(1)+' pts — conservative ✓ (rises with inflation later)');
       else
         set('kpi-wdraw-delta', 'Above the 4% rule by '+vs4.toFixed(1)+' pts — watch sustainability');
       // bar: 4% sits at the midpoint; scale so 0%→0, 8%→100
@@ -921,6 +962,99 @@ function populate(d){
       set('kpi-wdraw-foot', 'Well under the 4% rule');
       var bar0=$s('kpi-wdraw-bar'); if(bar0){ bar0.style.width='4%'; }
     }
+  })();
+
+  // ── REQUIRED SPENDING BREAKDOWN (current year) ───────────────────────
+  (function(){
+    var body = $s('req-breakdown-body'); if(!body) return;
+    var curYr = meta.planYear || new Date().getFullYear();
+    function moOf(annual){ return Math.round(annual/12); }
+    var rows = [];
+    // 1) Base living costs — sum of included monthly expenses ×12 (fallback to sp.baseAnnual)
+    var living = 0;
+    if (d.expenses && d.expenses.length) {
+      d.expenses.forEach(function(e){ if(e && e.monthly>0) living += e.monthly*12; });
+    }
+    if (!living && sp && sp.baseAnnual) living = sp.baseAnnual;
+    if (living > 0) rows.push({label:'Base living costs', annual:living});
+    // 2) Healthcare — not separately read by connector; show only if available via expenses note (skip otherwise)
+    // 3) Debts — each included debt active this year (mortgage, RV, cars, etc.)
+    var debts = d.debts || [];
+    var debtTotal = 0;
+    debts.forEach(function(db){
+      if(!db) return;
+      var inc = String(db.inc||'').toLowerCase()==='yes';
+      var annual = db.ann || (db.mo? db.mo*12 : 0);
+      if(!inc || annual<=0) return;
+      // respect start/end window if present
+      var okStart = true, okEnd = true;
+      try { if(db.start){ okStart = (new Date(db.start)).getFullYear() <= curYr; } } catch(e){}
+      try { if(db.end){ okEnd = (new Date(db.end)).getFullYear() >= curYr; } } catch(e){}
+      if(okStart && okEnd){
+        rows.push({label:(db.name||'Debt'), annual:annual});
+        debtTotal += annual;
+      }
+    });
+    var total = rows.reduce(function(s,r){return s+r.annual;},0);
+    // Render
+    var html='';
+    rows.forEach(function(r){
+      html += '<tr style="border-bottom:1px solid var(--border);">'
+        + '<td style="padding:5px 0;">'+r.label+'</td>'
+        + '<td style="padding:5px 0;text-align:right;font-weight:700;">'+fmt(r.annual)+'</td>'
+        + '<td style="padding:5px 0;text-align:right;color:var(--muted);">'+fmt(moOf(r.annual))+'</td></tr>';
+    });
+    if(!rows.length){
+      html = '<tr><td colspan="3" style="padding:8px 0;color:var(--muted);">No expense or debt data entered yet — add them on the Inputs page (Sections IV & V).</td></tr>';
+    }
+    body.innerHTML = html;
+    set('req-total', fmt(total));
+    set('req-total-mo', fmt(moOf(total)));
+    set('req-year', 'Plan year '+curYr+(debtTotal>0?' · includes '+fmt(debtTotal)+'/yr of debts':' · no debts active'));
+  })();
+
+  // ── WHERE WITHDRAWALS COME FROM (per-account, first draw year) ───────
+  (function(){
+    var body = $s('wsrc-body'); if(!body) return;
+    var aw = (proj.acctWithdrawals)||[], yrs = proj.years||[];
+    var slots = (port && port.slots) ? port.slots : [];
+    // find first year with any positive per-account withdrawal
+    var idx = -1;
+    for (var i=0;i<aw.length;i++){
+      var any = (aw[i]||[]).some(function(v){return (v||0)>0;});
+      if(any){ idx=i; break; }
+    }
+    if (idx < 0){
+      set('wsrc-total','~$0');
+      set('wsrc-year', meta.planYear||'');
+      set('wsrc-note','Guaranteed income covers spending — no portfolio draw yet');
+      body.innerHTML = '<tr><td colspan="3" style="padding:8px 0;color:var(--muted);">SS, pension and other income cover your spending, so the portfolio isn\'t tapped yet. ✓</td></tr>';
+      return;
+    }
+    var draws = aw[idx];
+    var total = draws.reduce(function(s,v){return s+(v||0);},0);
+    // pair each slot withdrawal with its account label (fixed 12-slot order)
+    var items = [];
+    for (var s=0;s<draws.length;s++){
+      var amt = draws[s]||0; if(amt<=0) continue;
+      var slot = slots[s]||{};
+      var nm = slot.name ? slot.name : ('Account '+(s+1));
+      var own = slot.owner ? (slot.owner+' · ') : '';
+      items.push({label:own+nm, amt:amt});
+    }
+    items.sort(function(a,b){return b.amt-a.amt;});
+    var html='';
+    items.forEach(function(it){
+      var pctOf = total>0 ? Math.round(it.amt/total*100) : 0;
+      html += '<tr style="border-bottom:1px solid var(--border);">'
+        + '<td style="padding:5px 0;">'+it.label+'</td>'
+        + '<td style="padding:5px 0;text-align:right;font-weight:700;">'+fmt(it.amt)+'</td>'
+        + '<td style="padding:5px 0;text-align:right;color:var(--muted);">'+pctOf+'%</td></tr>';
+    });
+    body.innerHTML = html || '<tr><td colspan="3" style="padding:8px 0;color:var(--muted);">No per-account withdrawal detail available.</td></tr>';
+    set('wsrc-total', fmt(total));
+    set('wsrc-year', 'first draw: '+(yrs[idx]||''));
+    set('wsrc-note', 'Drawn taxable → pre-tax → Roth (Roth preserved)');
   })();
 
   set('kpi-legacy', fmt(leg.projectedEnding));

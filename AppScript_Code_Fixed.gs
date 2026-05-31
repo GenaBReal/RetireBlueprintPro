@@ -200,6 +200,11 @@ function readAll(ss, inp) {
 
   // Accounts (rows 105-116, cols A-H = 1-8)
   var accounts = [], portfolioTotal = 0;
+  var acctSlots = []; // FIXED 12-slot order (rows 105-116) to align with per-account withdrawals
+  for (var ar=105; ar<=116; ar++) {
+    var aNameSlot = str(ar,2);
+    acctSlots.push({ name:aNameSlot, owner:str(ar,3), type:str(ar,4), included:(str(ar,1).toLowerCase()==='yes') });
+  }
   for (var ar=105; ar<=116; ar++) {
     var aName = str(ar,2);
     if (!aName) continue;
@@ -309,7 +314,8 @@ function readAll(ss, inp) {
   // Read Master sheet for year-by-year projection data (charts)
   var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
                      preTax:[], roth:[], taxable:[], hsa:[],
-                     federalTaxes:[], taxableIncome:[], stateIncome:[]};
+                     federalTaxes:[], taxableIncome:[], stateIncome:[],
+                     acctWithdrawals:[]};
   var masterYear1FedTax = 0, masterYear1TaxableIncome = 0, masterYear1Set = false;
   try {
     var masterSheet = ss.getSheetByName('Master');
@@ -341,6 +347,12 @@ function readAll(ss, inp) {
         projections.federalTaxes.push(Math.round(fedTaxes));
         projections.taxableIncome.push(Math.round(taxableIncome));
         projections.stateIncome.push(Math.round(Number(row[42])||0)); // AP = State tax
+        // Per-account WITHDRAWALS for this year — 12 account slots (var_D 1..12),
+        // indices 46..57 on the SAME basis as the verified row[59]=Craig 401k ending.
+        // Slot order matches the account order used for ending balances / account names.
+        var acctW = [];
+        for (var wi = 46; wi <= 57; wi++) { acctW.push(Math.round(Number(row[wi])||0)); }
+        projections.acctWithdrawals.push(acctW);
         // Account type TOTALS — correct column indices
         var p1_401k   = Number(row[59])||0;  // BH = Craig 401k ending balance
         var p1_roth   = Number(row[60])||0;  // BI = Craig Roth ending balance
@@ -414,6 +426,7 @@ function readAll(ss, inp) {
           projections.roth.push(lastRoth);
           projections.taxable.push(lastTax);
           projections.hsa.push(lastHsa);
+          projections.acctWithdrawals.push([0,0,0,0,0,0,0,0,0,0,0,0]); // no withdrawals after both die
         }
       }
       // ── END EXTENSION ────────────────────────────────────────────────
@@ -434,7 +447,7 @@ function readAll(ss, inp) {
     meta:{planYear:new Date().getFullYear()},
     people:{craig:p1, gena:p2},
     global:gl, tax:tax,
-    portfolio:{accounts:accounts, total:portfolioTotal},
+    portfolio:{accounts:accounts, total:portfolioTotal, slots:acctSlots},
     expenses:expenses, debts:debts,
     spending:spending, legacy:legacy,
     roth:roth, rothPlan:rothPlan,
