@@ -409,7 +409,7 @@ function renderTable(data) {
 
     html += '<tr' + (isCurrent ? ' class="current-year"' : '') + '>' +
       '<td><strong>' + row.year + '</strong>' + (isCurrent ? ' ← Enter now' : '') + '</td>' +
-      '<td>' + craigAge + (row.year > (window._p1DeathYear||2055) ? ' <span style="color:#999;font-size:9px;">(est)</span>' : '') + '</td>' +
+      '<td>' + craigAge + (row.year > (window._p1DeathYear||2055) ? ' <span style="color:#666;font-size:9px;">(est)</span>' : '') + '</td>' +
       '<td>' + genaAge + '</td>' +
       '<td>' + fmt(row.projected) + '</td>' +
       '<td><input type="number" class="' + inputClass + '" id="actual-' + idx +

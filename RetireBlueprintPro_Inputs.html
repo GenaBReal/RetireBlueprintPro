@@ -720,7 +720,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
               <input type="number" id="f-B52" value="0" onchange="calcHealthcareBridge('p1'); markDirty();">
-              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr · <a href="#" onclick="autoEstimateACA('p1',event)" style="color:var(--teal);">Auto-estimate from income</a></span>
+              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr · <a href="#" onclick="autoEstimateACA('p1',event)" style="color:var(--teal);">Auto-estimate from income</a> · rough 2026 estimate (subsidy cliff is back) — verify at healthcare.gov</span>
               <div id="hc-bridge-p1" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(244,184,106,0.15);display:none;"></div>
             </div>
             <div class="field">
@@ -846,7 +846,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
             <div class="field">
               <label>Pre-Medicare Annual ($)</label>
               <input type="number" id="f-D52" value="0" onchange="calcHealthcareBridge('p2'); markDirty();">
-              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr · <a href="#" onclick="autoEstimateACA('p2',event)" style="color:var(--teal);">Auto-estimate from income</a></span>
+              <span class="hint">Annual healthcare before Medicare · Typical: $6,000–$20,000/yr · <a href="#" onclick="autoEstimateACA('p2',event)" style="color:var(--teal);">Auto-estimate from income</a> · rough 2026 estimate (subsidy cliff is back) — verify at healthcare.gov</span>
               <div id="hc-bridge-p2" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;margin-top:8px;border:1px solid rgba(244,184,106,0.15);display:none;"></div>
             </div>
             <div class="field">
@@ -1525,22 +1525,22 @@ function buildAccountsTable() {
 }
 
 function ownerSel(idx, val) {
-  var o = '<select onchange="accountsData['+idx+'].owner=this.value">';
+  var o = '<select aria-label="Account owner" onchange="accountsData['+idx+'].owner=this.value">';
   ownerOptions.forEach(function(op){ o += '<option'+(op===val?' selected':'')+'>'+op+'</option>'; });
   return o + '</select>';
 }
 function typeSel(idx, val) {
-  var o = '<select onchange="accountsData['+idx+'].type=this.value">';
+  var o = '<select aria-label="Account type" onchange="accountsData['+idx+'].type=this.value">';
   typeOptions.forEach(function(op){ o += '<option'+(op===val?' selected':'')+'>'+op+'</option>'; });
   return o + '</select>';
 }
 function statusSel(idx, val) {
-  var o = '<select onchange="accountsData['+idx+'].status=this.value">';
+  var o = '<select aria-label="Account status" onchange="accountsData['+idx+'].status=this.value">';
   statusOptions.forEach(function(op){ o += '<option'+(op===val?' selected':'')+'>'+op+'</option>'; });
   return o + '</select>';
 }
 function dashSel(idx, val) {
-  var o = '<select onchange="accountsData['+idx+'].dash=this.value">';
+  var o = '<select aria-label="Show on dashboard" onchange="accountsData['+idx+'].dash=this.value">';
   ['Yes','No'].forEach(function(op){ o += '<option'+(op===val?' selected':'')+'>'+op+'</option>'; });
   return o + '</select>';
 }
@@ -1740,22 +1740,26 @@ function autoEstimateACA(partner, e) {
     if (idx >= 0) retireIncome = proj.income[idx] || 0;
   }
   
-  // 2025 ACA benchmark silver plan premium (MFJ) based on income
-  // Subsidies available up to 400% FPL (~$66K for single, $133K MFJ in 2025)
-  var fpl2025 = 33860; // 100% FPL for 2-person household
-  var fpl400 = fpl2025 * 4;
-  var benchmarkPremium = 1400 * 12; // ~$1,400/mo benchmark silver plan
-  
+  // ACA estimate for 2026 coverage. IMPORTANT: the enhanced subsidies that ran 2021–2025
+  // EXPIRED at the end of 2025, so the 400%-of-FPL subsidy cliff is back and required
+  // contributions are higher. 2026 Marketplace subsidies are based on the 2025 FPL.
+  // These figures change every year — always verify at healthcare.gov.
+  var FPL_2PERSON = 21150;           // 2025 FPL, 2-person household (continental US); used for 2026 coverage
+  var fpl400 = FPL_2PERSON * 4;      // 400% FPL ≈ $84,600 — the 2026 subsidy cliff
+  var benchmarkPremium = 1400 * 12;  // rough benchmark silver premium; varies widely by age & area
+
   var subsidy = 0;
-  if (retireIncome < fpl400) {
-    // Sliding scale subsidy
-    var capPct = Math.min(0.085, 0.02 + (retireIncome/fpl400) * 0.065);
+  if (retireIncome <= fpl400) {
+    // Below the cliff: expected contribution ramps from ~2% up to ~9.96% of income at 400% FPL (2026 scale)
+    var fplRatio = retireIncome / FPL_2PERSON;
+    var capPct = Math.min(0.0996, 0.02 + Math.max(0, fplRatio - 1.5) / (4.0 - 1.5) * (0.0996 - 0.02));
     var maxContrib = retireIncome * capPct;
     subsidy = Math.max(0, benchmarkPremium - maxContrib);
   }
-  
+  // Above 400% FPL: no premium subsidy in 2026 (cliff returned) — pay the full premium.
+
   var estPremium = Math.round(benchmarkPremium - subsidy);
-  var estTotal = estPremium + 3000; // Add est. out-of-pocket
+  var estTotal = estPremium + 3000; // + rough out-of-pocket
   
   // Set the field
   var fieldId = partner === 'p1' ? 'f-B52' : 'f-D52';

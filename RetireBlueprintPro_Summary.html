@@ -7,7 +7,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Retirement Summary Report</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
 .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
@@ -19,7 +18,7 @@
 :root { --n2:#0A3145; --navy:#051628; --teal:#1CC7D0; --orange:#f4b86a; --border:#1a3a52; }
 
   /* ── SCREEN CHROME ─────────────────────────────────── */
-  body{overflow-x:hidden; margin:0; padding:0; font-family:'Montserrat',Arial,sans-serif; background:#f0f2f5; color:#1a1a2e; }
+  body{overflow-x:hidden; margin:0; padding:0; font-family:'Segoe UI',system-ui,sans-serif; background:#f0f2f5; color:#1a1a2e; }
   .toolbar { background:#041E2F; padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; z-index:100; }
   .toolbar-title { color:#1CC7D0; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
   .btn { background:#1CC7D0; color:#041E2F; border:none; padding:8px 18px; border-radius:5px; font-weight:700; cursor:pointer; font-size:12px; font-family:inherit; }
@@ -27,7 +26,7 @@
 
   /* ── REPORT PAGE (white) ───────────────────────────── */
   .report-wrap { max-width:850px; margin:60px auto 40px; background:#fff; box-shadow:0 2px 20px rgba(0,0,0,0.15); }
-  #loading { text-align:center; padding:80px; color:#888; font-size:14px; margin-top:60px; }
+  #loading { text-align:center; padding:80px; color:#666; font-size:14px; margin-top:60px; }
 
   /* ── HEADER ────────────────────────────────────────── */
   .rpt-header { background:#041E2F; padding:0; }
@@ -66,14 +65,14 @@
   .kbox.red    { border-left-color:#C62828; }
   .kbox.navy   { border-left-color:#041E2F; }
   .kbox.purple { border-left-color:#6A4A6D; }
-  .klabel { font-size:8px; color:#888; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; font-weight:600; }
+  .klabel { font-size:8px; color:#666; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; font-weight:600; }
   .kval   { font-size:17px; font-weight:800; color:#1a1a2e; line-height:1.1; }
   .kval.teal   { color:#006064; }
   .kval.green  { color:#2E7D32; }
   .kval.red    { color:#C62828; }
   .kval.orange { color:#E65100; }
   .kval.navy   { color:#041E2F; }
-  .ksub  { font-size:9px; color:#888; margin-top:2px; }
+  .ksub  { font-size:9px; color:#666; margin-top:2px; }
 
   /* ── TABLES ────────────────────────────────────────── */
   table.rtbl { width:100%; border-collapse:collapse; font-size:11px; }
@@ -116,7 +115,7 @@
   .stress-note { font-size:9px; color:#666; margin-top:3px; }
 
   /* ── FOOTER ────────────────────────────────────────── */
-  .rpt-footer { background:#f8f9fa; border-top:1px solid #e0e0e0; padding:10px 32px; display:flex; justify-content:space-between; align-items:center; font-size:9px; color:#888; }
+  .rpt-footer { background:#f8f9fa; border-top:1px solid #e0e0e0; padding:10px 32px; display:flex; justify-content:space-between; align-items:center; font-size:9px; color:#666; }
 
   /* ── PRINT ─────────────────────────────────────────── */
   @media print {
@@ -366,7 +365,7 @@ window.addEventListener('storage', function(e) {
         </div>
       </div>
       <div style="margin-top:10px;">
-        <div style="font-size:9px;color:#888;margin-bottom:4px;">Plan funded <span id="r-confidence2">—</span> of legacy goal</div>
+        <div style="font-size:9px;color:#666;margin-bottom:4px;">Plan funded <span id="r-confidence2">—</span> of legacy goal</div>
         <div class="prog-bar-wrap"><div class="prog-bar" id="r-conf-bar" style="width:0%;"></div></div>
       </div>
     </div>
@@ -418,7 +417,7 @@ window.addEventListener('storage', function(e) {
 
     
     <div class="rpt-section">
-      <div class="rpt-section-title"><span class="icon">📊</span> Investment Accounts <span style="font-size:8px;font-weight:400;color:#888;text-transform:none;letter-spacing:0;">(accounts flagged "Yes" in Inputs → Named Accounts → Show on Summary)</span></div>
+      <div class="rpt-section-title"><span class="icon">📊</span> Investment Accounts <span style="font-size:8px;font-weight:400;color:#666;text-transform:none;letter-spacing:0;">(accounts flagged "Yes" in Inputs → Named Accounts → Show on Summary)</span></div>
       <table class="rtbl">
         <thead><tr><th>Account Name</th><th>Owner</th><th>Type</th><th>Balance</th><th>Return %</th><th>Ann. Contrib</th><th>Employer Match</th></tr></thead>
         <tbody id="r-accounts-body"></tbody>
