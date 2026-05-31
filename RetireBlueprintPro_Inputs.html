@@ -1793,7 +1793,8 @@ function calcPensionVsLumpSum(partner) {
   var breakEvenYrs = lumpSum / (monthly * 12);
   var breakEvenAge = currentAge + breakEvenYrs;
 
-  var pensionWins = totalPensionValue > lumpSumGrowth * 0.85; // pension wins if lump sum needs >85% growth to match
+  // Verdict on the SAME basis as the breakeven age shown below (simple payback, no growth).
+  var pensionWins = lifeAge > breakEvenAge;
 
   panel.style.display = 'block';
   panel.innerHTML =
@@ -1815,7 +1816,7 @@ function calcPensionVsLumpSum(partner) {
       '<div style="font-size:9px;color:#8aaabb;">'+(pensionWins?'✅ Pension wins':'⚠️ Take lump sum')+'</div>' +
     '</div>' +
     '</div>' +
-    '<div style="font-size:9px;color:#8aaabb;font-style:italic;">💡 '+(pensionWins ? 'Pension pays more if you live past '+Math.round(breakEvenAge)+'. With expected lifespan of '+lifeAge+', take the pension.' : 'Lump sum may be better — breakeven age of '+Math.round(breakEvenAge)+' exceeds expected lifespan of '+lifeAge+'.')+'</div>';
+    '<div style="font-size:9px;color:#8aaabb;font-style:italic;">💡 '+(pensionWins ? 'On raw dollars, the pension pays more if you live past age '+Math.round(breakEvenAge)+' — and your expected lifespan is '+lifeAge+'. This ignores investment growth, so if you can reliably out-earn the pension, the lump sum could still win.' : 'On raw dollars, you would need to live to about age '+Math.round(breakEvenAge)+' just to match the lump sum — past your expected lifespan of '+lifeAge+' — so the lump sum likely wins, and investing it could widen the gap.')+'</div>';
 }
 
 function calcHealthcareBridge(partner) {
@@ -1832,8 +1833,15 @@ function calcHealthcareBridge(partner) {
   var medicareAge = parseFloat((document.getElementById(medicareAgeId)||{}).value) || 65;
   
   if (hcAnnual <= 0 || currentAge <= 0) { panel.style.display='none'; return; }
-  
-  var yrsToMedicare = Math.max(0, medicareAge - currentAge);
+
+  // The bridge runs from RETIREMENT (when employer coverage ends) to Medicare — not from today.
+  var retireEl = document.getElementById(retireId);
+  var curYr = new Date().getFullYear();
+  var retireAge = (retireEl && retireEl.value)
+      ? currentAge + (new Date(retireEl.value).getFullYear() - curYr)
+      : currentAge;
+  if (retireAge < currentAge) retireAge = currentAge; // already retired → count the remaining gap from now
+  var yrsToMedicare = Math.max(0, Math.round(medicareAge - retireAge));
   var totalBridgeCost = Math.round(hcAnnual * yrsToMedicare);
   
   panel.style.display = 'block';
@@ -1992,6 +2000,21 @@ function updateRothGrandTotal() {
   if (ft)  ft.textContent  = '$'+Math.round(total).toLocaleString();
 }
 
+// Incremental federal tax on converting `amount` of income that stacks on top of `startIncome`.
+// brackets = ascending [{threshold:<upper bound>, rate}]; walks each bracket the conversion spans.
+function rbpIncrementalFedTax(startIncome, amount, brackets) {
+  var tax = 0, lo = startIncome, remaining = amount;
+  for (var i = 0; i < brackets.length && remaining > 0; i++) {
+    var upper = brackets[i].threshold;
+    if (lo >= upper) continue;                  // bracket sits entirely below our start
+    var room = upper - lo;
+    var taxedHere = Math.min(remaining, room);
+    if (taxedHere > 0) { tax += taxedHere * brackets[i].rate; remaining -= taxedHere; lo += taxedHere; }
+  }
+  if (remaining > 0) tax += remaining * brackets[brackets.length - 1].rate; // above top listed threshold
+  return tax;
+}
+
 function updateRothIncomeForYear() {
   var yr = parseInt(document.getElementById('f-B139').value);
   if (!yr || !window._rbpProjections) return;
@@ -2040,10 +2063,10 @@ function updateRothIncomeForYear() {
   var optimal = Math.max(0, targetThreshold - income);
   setTxt('r-optimal', fmt(optimal));
 
-  // Tax cost now (marginal rate × optimal amount)
+  // Tax cost now: incremental federal tax across the brackets the conversion spans, plus state.
   var stateRateEl = document.getElementById('f-B26') || {value:'0'};
   var stateRate = _rothStateTax ? (parseFloat(stateRateEl.value)||0)/100 : 0;
-  var taxNow = Math.round(optimal * (targetRate + stateRate));
+  var taxNow = Math.round(rbpIncrementalFedTax(income, optimal, brackets) + optimal * stateRate);
   setTxt('r-tax-now', fmt(taxNow));
 
   // === LIFETIME TAX SAVINGS (proper calculation) ===
