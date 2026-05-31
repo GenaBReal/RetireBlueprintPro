@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Inputs</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-tax-config.js"></script>
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:0 20px;display:flex;align-items:stretch;justify-content:flex-start;overflow:hidden;min-height:76px;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
 .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
@@ -1744,7 +1745,7 @@ function autoEstimateACA(partner, e) {
   // EXPIRED at the end of 2025, so the 400%-of-FPL subsidy cliff is back and required
   // contributions are higher. 2026 Marketplace subsidies are based on the 2025 FPL.
   // These figures change every year — always verify at healthcare.gov.
-  var FPL_2PERSON = 21150;           // 2025 FPL, 2-person household (continental US); used for 2026 coverage
+  var FPL_2PERSON = (window.RBP_TAX ? window.RBP_TAX.acaFpl2Person : 21150);  // 2-person FPL from shared config; used for coverage-year subsidy
   var fpl400 = FPL_2PERSON * 4;      // 400% FPL ≈ $84,600 — the 2026 subsidy cliff
   var benchmarkPremium = 1400 * 12;  // rough benchmark silver premium; varies widely by age & area
 
@@ -2032,15 +2033,10 @@ function updateRothIncomeForYear() {
   // Inflation-adjusted MFJ bracket thresholds for chosen year
   var yearsOut = Math.max(0, yr - 2026);
   var inf = Math.pow(1.03, yearsOut);
-  // 2026 MFJ bracket thresholds (IRS Rev. Proc. 2025-32), projected forward at 3%/yr
-  var brackets = [
-    {name:'10% Bracket', threshold:Math.round(24800*inf),  rate:0.10},
-    {name:'12% Bracket', threshold:Math.round(100800*inf), rate:0.12},
-    {name:'22% Bracket', threshold:Math.round(211400*inf), rate:0.22},
-    {name:'24% Bracket', threshold:Math.round(403550*inf), rate:0.24},
-    {name:'32% Bracket', threshold:Math.round(512450*inf), rate:0.32},
-    {name:'35% Bracket', threshold:Math.round(768700*inf), rate:0.35},
-  ];
+  // MFJ bracket thresholds from the shared tax config, projected forward at 3%/yr
+  var brackets = (window.RBP_TAX ? window.RBP_TAX.mfjBrackets : []).filter(function(b){ return isFinite(b.max); }).map(function(b){
+    return {name:Math.round(b.rate*100)+'% Bracket', threshold:Math.round(b.max*inf), rate:b.rate};
+  });
 
   // Find which bracket client is currently in
   var currentBracket = brackets[brackets.length-1];
@@ -2134,8 +2130,8 @@ function updateRothIncomeForYear() {
   if (rmdYrEl) rmdYrEl.textContent = 'Est. starting ' + rmdYear2 + ' (age ' + rmdStartAge + ')';
 
   // === IRMAA WARNING ===
-  // 2026 IRMAA threshold for MFJ: $218,000 MAGI
-  var irmaThreshold = Math.round(218000 * Math.pow(1.03, yearsOut));
+  // IRMAA first-tier MFJ threshold (from shared config), projected forward
+  var irmaThreshold = Math.round((window.RBP_TAX ? window.RBP_TAX.irmaa.tiers[0].mfjMax : 218000) * Math.pow(1.03, yearsOut));
   var conversionTotal = optimal; // what they plan to convert
   var totalWithConversion = income + conversionTotal;
   var irmaaEl = document.getElementById('r-irmaa');
@@ -2175,14 +2171,14 @@ function updateRothIncomeForYear() {
 function calcStdDed() {
   // 2026 standard deductions by filing status (IRS Rev. Proc. 2025-32)
   var fs = (document.getElementById('f-B24')||{}).value || 'Married Filing Jointly';
-  var table = {
+  var table = (window.RBP_TAX ? window.RBP_TAX.stdDed : {
     'Married Filing Jointly': 32200,
     'Married Filing Separately': 16100,
     'Single': 16100,
     'Head of Household': 24150
-  };
+  });
   var el = document.getElementById('f-B25');
-  if (el) el.value = (table[fs] != null ? table[fs] : 32200);
+  if (el) el.value = (table[fs] != null ? table[fs] : (window.RBP_TAX ? window.RBP_TAX.stdDed['Married Filing Jointly'] : 32200));
 }
 
 function updatePartnerNames() {

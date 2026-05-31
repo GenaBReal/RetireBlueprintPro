@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Medicare Planner</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-tax-config.js"></script>
 <script>
 function rbpApplyNames(p1,p2){
   p1=p1||localStorage.getItem('rbp_p1_name')||'Partner 1';
@@ -506,8 +507,8 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
       <div style="display:flex;gap:14px;align-items:flex-start;">
         <div style="background:#f4b86a;color:#041E2F;font-weight:900;font-size:13px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
         <div>
-          <div style="font-size:14px;font-weight:800;color:#16242f;margin-bottom:3px;">Part B — you must sign up and pay $202.90/month</div>
-          <div style="font-size:12px;color:#33424e;line-height:1.7;">Part B covers doctor visits, lab tests, preventive care, outpatient services. The standard premium is <strong style="color:#a8690f;">$203/month per person in 2025</strong> (deducted from your Social Security check or billed directly). <strong style="color:#c0392b;">This is NOT optional if you want healthcare coverage.</strong> You have a 7-month window to sign up (3 months before your birthday month, your birthday month, 3 months after). Miss the window → permanent 10% penalty per year you delayed, forever.</div>
+          <div style="font-size:14px;font-weight:800;color:#16242f;margin-bottom:3px;">Part B — you must sign up and pay <span class="rbp-pb-base">$202.90</span>/month</div>
+          <div style="font-size:12px;color:#33424e;line-height:1.7;">Part B covers doctor visits, lab tests, preventive care, outpatient services. The standard premium is <strong style="color:#a8690f;"><span class="rbp-pb-base">$202.90</span>/month per person in <span class="rbp-year">2026</span></strong> (deducted from your Social Security check or billed directly). <strong style="color:#c0392b;">This is NOT optional if you want healthcare coverage.</strong> You have a 7-month window to sign up (3 months before your birthday month, your birthday month, 3 months after). Miss the window → permanent 10% penalty per year you delayed, forever.</div>
         </div>
       </div>
 
@@ -819,8 +820,8 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
         </div>
         <div class="part-card part-b">
           <div class="part-title">Part B — Medical</div>
-          <div class="part-cost" id="partb-base-display" style="color:#a8690f;">$203/mo</div>
-          <div class="part-desc">Doctor visits, outpatient care, preventive services, lab tests. The standard premium in 2026 is <strong>$202.90/month per person</strong>. Subject to IRMAA surcharges if income exceeds $212K/yr (married).</div>
+          <div class="part-cost rbp-pb-base-mo" id="partb-base-display" style="color:#a8690f;">$202.90/mo</div>
+          <div class="part-desc">Doctor visits, outpatient care, preventive services, lab tests. The standard premium in <span class="rbp-year">2026</span> is <strong><span class="rbp-pb-base">$202.90</span>/month per person</strong>. Subject to IRMAA surcharges if income exceeds <span class="rbp-irmaa-mfj1k">$218K</span>/yr (married).</div>
         </div>
         <div class="part-card part-c">
           <div class="part-title">Part C — Medicare Advantage</div>
@@ -953,16 +954,11 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
 
-// 2026 IRMAA thresholds (MFJ) — CMS 2026 Medicare Parts B & D. partB/partD are per-person monthly surcharges added to the base.
-var IRMAA = [
-  {maxIncome: 218000, partB: 0,      partD: 0,     label: 'Standard'},
-  {maxIncome: 274000, partB: 81.20,  partD: 14.50, label: 'Tier 1'},
-  {maxIncome: 342000, partB: 202.90, partD: 37.50, label: 'Tier 2'},
-  {maxIncome: 410000, partB: 324.60, partD: 60.40, label: 'Tier 3'},
-  {maxIncome: 750000, partB: 446.30, partD: 83.30, label: 'Tier 4'},
-  {maxIncome: Infinity,partB:487.00, partD: 91.00, label: 'Tier 5'}
-];
-var PARTB_BASE = 202.90;
+// IRMAA thresholds (MFJ) + base Part B premium — from the shared tax config (rbp-tax-config.js)
+var IRMAA = (window.RBP_TAX ? window.RBP_TAX.irmaa.tiers : []).map(function(t){
+  return {maxIncome:t.mfjMax, partB:t.partBSurcharge, partD:t.partD, label:t.label};
+});
+var PARTB_BASE = window.RBP_TAX ? window.RBP_TAX.irmaa.partBBase : 202.90;
 
 function fmt(n){if(!n&&n!==0)return '—';if(Math.abs(n)>=1000000)return '$'+(n/1000000).toFixed(1)+'M';if(Math.abs(n)>=1000)return '$'+Math.round(n).toLocaleString();return '$'+n.toFixed(0);}
 function fmtM(n){return '$'+n.toFixed(0)+'/mo';}
@@ -1014,14 +1010,15 @@ function calc() {
   // IRMAA table
   var tbody = document.getElementById('irmaa-tbody');
   tbody.innerHTML = '';
-  var thresholds = [
-    ['$0 – $218,000',         0,     0,    'Standard — no surcharge'],
-    ['$218,001 – $274,000',   81.20, 14.50,'Tier 1'],
-    ['$274,001 – $342,000',   202.90,37.50,'Tier 2'],
-    ['$342,001 – $410,000',   324.60,60.40,'Tier 3'],
-    ['$410,001 – $750,000',   446.30,83.30,'Tier 4'],
-    ['$750,001+',             487.00,91.00,'Tier 5 (maximum)']
-  ];
+  var thresholds = IRMAA.map(function(x, i){
+    var lo = i ? IRMAA[i-1].maxIncome + 1 : 0;
+    var range = (x.maxIncome === Infinity)
+      ? ('$' + lo.toLocaleString() + '+')
+      : ('$' + (i ? lo : 0).toLocaleString() + ' – $' + x.maxIncome.toLocaleString());
+    var lbl = (i === 0) ? 'Standard — no surcharge'
+                        : ((i === IRMAA.length - 1) ? x.label + ' (maximum)' : x.label);
+    return [range, x.partB, x.partD, lbl];
+  });
   thresholds.forEach(function(t, i) {
     var extra = t[1] * 2 * 12; // couple annual
     var isCurrent = (i === IRMAA.findIndex(function(x){return income <= x.maxIncome;}));

@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Roth Access Ladder</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-tax-config.js"></script>
 <script>
 // ── DYNAMIC PARTNER NAMES ─────────────────────────────────
 function rbpApplyNames(p1,p2){
@@ -545,7 +546,7 @@ function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, 
         var p1=(window._rbpPlanData.people[pk[0]]||{}); 
         var p2=(window._rbpPlanData.people[pk[1]]||{});
         return ((p1.ssMonthly||0)+(p2.ssMonthly||0))*12; })() : 40000;
-    annualConv = Math.max(10000, Math.round(Math.min(100800 - estSS, pretax * 0.15)));
+    annualConv = Math.max(10000, Math.round(Math.min((window.RBP_TAX?window.RBP_TAX.mfjBrackets[1].max:100800) - estSS, pretax * 0.15)));
   }
 
   for (var yr = Math.max(firstConv, retireYear); yr < Math.min(rmd1Year, retireYear + 20); yr++) {
