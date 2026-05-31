@@ -260,6 +260,26 @@ window.addEventListener('storage', function(e) {
   if (e.key === 'rbp_p1_name' || e.key === 'rbp_p2_name') rbpApplyNames();
 });
 </script>
+<style id="rbp-mobile-fix">
+.rbp-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+@media (max-width:640px){
+  html,body{min-width:0 !important;max-width:100% !important;overflow-x:hidden !important;}
+  /* collapse multi-column grids (inline + class) to a single column */
+  [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid{grid-template-columns:1fr !important;}
+  /* let inline flex rows wrap (nav/header use classes, so they're untouched) */
+  [style*="display:flex"],[style*="display: flex"],.plan-meta{flex-wrap:wrap !important;}
+  /* keep fields, media, charts within the viewport */
+  input,select,textarea{max-width:100% !important;box-sizing:border-box;}
+  img,canvas{max-width:100% !important;}
+  /* neutralize full-bleed negative margins that cause a sliver of scroll */
+  .disclaimer{margin-left:0 !important;margin-right:0 !important;}
+  [style*="margin:0 -"],[style*="margin: 0 -"]{margin-left:0 !important;margin-right:0 !important;}
+  /* trim horizontal padding so content fits a phone */
+  .card,.section,.section-body,.page,.rpt-body,.explainer{padding-left:12px !important;padding-right:12px !important;}
+  /* nav scrolls horizontally rather than overflowing the page */
+  .nav{overflow-x:auto !important;flex-wrap:nowrap !important;}
+}
+</style>
 </head>
 <body>
 
@@ -936,6 +956,11 @@ Not financial advice. Not legal advice. For personal planning purposes only. Alw
     }
   });
 })();
+</script>
+<script>
+/* mobile: wrap tables so wide ones scroll inside their own box instead of pushing the page wide */
+(function(){function w(){document.querySelectorAll('table').forEach(function(t){var p=t.parentElement;if(p&&p.classList&&p.classList.contains('rbp-tscroll'))return;var d=document.createElement('div');d.className='rbp-tscroll';t.parentNode.insertBefore(d,t);d.appendChild(t);});}
+if(document.readyState!=='loading')w();else document.addEventListener('DOMContentLoaded',w);})();
 </script>
 </body>
 </html>
