@@ -523,10 +523,6 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
           <option value="No">No</option>
         </select>
       </div>
-      <div class="field">
-        <label>Projection Max Years</label>
-        <input type="number" id="f-B7" value="100" min="30" max="110">
-      </div>
     </div>
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
@@ -2446,7 +2442,7 @@ function populateFromData(d) {
     var yr = parts.length === 3 ? parseInt(parts[2]) : parseInt(gl.planStartYear);
     if (yr > 2000) document.getElementById('f-B6').value = yr;
   }
-  sv('f-B7',  gl.projectionYears);
+  sv('f-B6',  gl.planYear);
   sv('f-B8',  gl.legacyGoal);
   sv('f-B9',  gl.safetyFloor);
   sv('f-B10', gl.survivorReduction ? Math.round(gl.survivorReduction * 10000)/100 : 25);
@@ -2901,7 +2897,7 @@ function saveAll() {
 
   var payload = {
     global: {
-      B6: gn('f-B6'), B7: gn('f-B7'), // B6 is year number e.g. 2026
+      B6: gn('f-B6'), // B6 is year number e.g. 2026
       B8: gn('f-B8'), B9: gn('f-B9'),
       B10: gn('f-B10'),
       B11: gv('f-B11'),
@@ -2991,7 +2987,6 @@ function buildPayload() {
   return {
     global: {
       B6:  document.getElementById('f-B6').value,
-      B7:  document.getElementById('f-B7').value,
       B8:  document.getElementById('f-B8').value,
       B9:  document.getElementById('f-B9').value,
       B10: gn('f-B10'), // whole number — Apps Script divides by 100

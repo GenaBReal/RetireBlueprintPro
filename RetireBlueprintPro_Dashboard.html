@@ -322,8 +322,9 @@ window.addEventListener('storage', function(e) {
     <div>
       <div id="rbp-understanding-banner" style="position:relative;font-size:12px;font-weight:800;color:#006064;margin-bottom:5px;">Understanding Your Dashboard<button onclick="document.getElementById('rbp-understanding-banner').style.display='none';localStorage.setItem('rbp_dash_help_seen','1');" style="position:absolute;top:6px;right:8px;background:none;border:none;cursor:pointer;font-size:14px;color:#00838f;opacity:0.6;">✕</button></div>
       <div style="font-size:11px;color:#00838f;line-height:1.7;">
-        <strong>Plan Confidence</strong> — How fully your plan is funded toward your legacy goal. 100% = on track. ·
+        <strong>Plan Confidence</strong> — Whether your plan funds the longer-lived partner for life (without running out). Your legacy goal is tracked separately. ·
         <strong>Safe Spending</strong> — Maximum annual spend while still meeting your legacy goal. ·
+        <strong>Withdrawal Rate</strong> — How much of your portfolio you draw each year vs. the classic 4% rule. ·
         <strong>Survivor Runway</strong> — Years the plan covers the longer-lived partner. ·
         Press <strong>Cmd+Shift+R</strong> (Mac) or <strong>Ctrl+Shift+R</strong> (Windows) after saving Inputs to refresh all charts.
       </div>
@@ -352,9 +353,9 @@ window.addEventListener('storage', function(e) {
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot"></span>Safe Spending Capacity <span class="tooltip-icon" data-tip="Maximum annual spending — base lifestyle PLUS optional extras — while still meeting your legacy goal. Calculated by the solver. Higher = more lifestyle flexibility." style="font-size:9px;">?</span></div>
+      <div class="kc-title"><span class="kc-dot"></span>Base Expenses <span class="tooltip-icon" data-tip="Your REQUIRED annual spending — the lifestyle you've told us you need, including any debts you've marked as included in Section V. This is what you have to cover. The 'extra you can safely add' below is discretionary spending on top, while still meeting your legacy goal." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-spend">—</div>
-      <div class="kc-sub">Base lifestyle · solver-optimized</div>
+      <div class="kc-sub">Required spending · what you have to cover</div>
       <div class="kc-delta-up" id="kpi-spend-extra">—</div>
     </div>
     <div>
@@ -399,6 +400,19 @@ window.addEventListener('storage', function(e) {
     <div>
       <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-tax-bar" style="background:#1CC7D0;"></div></div>
       <div class="kc-footer" id="kpi-tax-foot">—</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#2E7D5B;"></span>Withdrawal Rate <span class="tooltip-icon" data-tip="The share of your investment portfolio you draw in a typical full-retirement year (portfolio withdrawal ÷ portfolio balance). The classic '4% rule' suggests ~4% is a sustainable starting point. Lower is more conservative; guaranteed income like Social Security and pensions reduces how much you need to pull." style="font-size:9px;">?</span></div>
+      <div class="kc-value" id="kpi-wdraw">—</div>
+      <div class="kc-sub" id="kpi-wdraw-sub">Portfolio draw · typical retirement year</div>
+      <div class="kc-delta-up" id="kpi-wdraw-delta">—</div>
+    </div>
+    <div>
+      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-wdraw-bar" style="background:#2E7D5B;"></div></div>
+      <div class="kc-footer" id="kpi-wdraw-foot">—</div>
     </div>
   </div>
 
@@ -779,11 +793,34 @@ function populate(d){
   var longestYrs = longestP.projectedDeathYear - meta.planYear;
 
   // HERO
-  var pct = leg.achievedPct||0;
-  set('val-confidence', pct+'%');
-  set('val-conf-label', pct>=90?'✓ Very Strong':pct>=70?'✓ On Track':'⚠ Needs Review');
-  set('val-status', pct>=90?'✅ ON TRACK':'⚠ REVIEW');
-  set('val-status-sub', 'Legacy goal '+(pct>=100?'met':'at '+pct+'%'));
+  var pct = leg.achievedPct||0;   // legacy achievement (kept for the Legacy card, shown separately)
+
+  // ── FUNDED-FOR-LIFE: does the portfolio last through the longest-lived spouse? ──
+  // The plan is "funded for life" when liquid assets never hit zero before the
+  // longest-lived partner's projected death. We read the year-by-year ending
+  // liquid balances and check for depletion across the covered years.
+  var fundedForLife = true, depletionYear = null;
+  (function(){
+    var el = proj.endLiquid || [], yrs = proj.years || [];
+    var deathYr = longestP.projectedDeathYear || (meta.planYear + longestYrs);
+    for (var i=0; i<el.length; i++){
+      if (yrs[i] && yrs[i] <= deathYr && el[i] <= 0){ fundedForLife = false; depletionYear = yrs[i]; break; }
+    }
+    if (!el.length) fundedForLife = (leg.projectedEnding||0) > 0; // fallback if no per-year data
+  })();
+
+  // Hero headline now reflects PLAN FUNDING (not the legacy target)
+  if (fundedForLife){
+    set('val-confidence', '✓ Funded');
+    set('val-conf-label', 'Covers '+longestN+' to age '+longestP.deathAge);
+    set('val-status', '✅ FUNDED FOR LIFE');
+    set('val-status-sub', 'Legacy goal: '+pct+'% of '+fmt(leg.goal)+' target');
+  } else {
+    set('val-confidence', '⚠ Shortfall');
+    set('val-conf-label', 'Funds run low around '+depletionYear);
+    set('val-status', '⚠ REVIEW FUNDING');
+    set('val-status-sub', 'Adjust spending or returns — see Inputs');
+  }
   set('val-names', p1n+' & '+p2n);
   set('val-ages', p1n+' age '+p1.age+' · '+p2n+' age '+p2.age);
 
@@ -812,12 +849,23 @@ function populate(d){
   }
 
   // KPIs
-  set('kpi-health', pct+'%');
-  var mk=$s('ph-marker'); if(mk) mk.style.right=Math.max(0,100-pct)+'%';
+  // Plan Health Score = funding-based (does the plan last for life?), NOT the legacy %.
+  // Funded for life => strong score; if it depletes early, scale by how far the funds reach.
+  var healthPct;
+  if (fundedForLife) {
+    healthPct = 100;
+  } else {
+    var _yrsNeeded = (longestP.projectedDeathYear||0) - meta.planYear;
+    var _yrsFunded = (depletionYear||meta.planYear) - meta.planYear;
+    healthPct = _yrsNeeded>0 ? Math.max(0,Math.min(99,Math.round(_yrsFunded/_yrsNeeded*100))) : 0;
+  }
+  set('kpi-health', healthPct+'%');
+  var mk=$s('ph-marker'); if(mk) mk.style.right=Math.max(0,100-healthPct)+'%';
+  var zoneEl=$s('ph-zone'); if(zoneEl) zoneEl.textContent = fundedForLife ? 'SAFE ZONE' : 'REVIEW ZONE';
 
   set('kpi-spend', fmt(sp.baseAnnual)+'/yr');
-  set('kpi-spend-extra', (sp.safeExtra>0?'+ '+fmt(sp.safeExtra)+'/yr extra available':''));
-  set('kpi-spend-foot', 'Legacy: '+fmt(leg.projectedEnding)+' projected · Goal: '+fmt(leg.goal));
+  set('kpi-spend-extra', (sp.safeExtra>0?'+ '+fmt(sp.safeExtra)+'/yr extra you can safely add on top':'No extra room — at safe limit'));
+  set('kpi-spend-foot', 'Total safe spending: '+fmt(sp.baseAnnual+(sp.safeExtra>0?sp.safeExtra:0))+'/yr');
   var sb=$s('kpi-spend-bar'); if(sb) sb.style.width=Math.min(100,pct)+'%';
 
   set('kpi-runway', longestYrs+' years');
@@ -835,6 +883,45 @@ function populate(d){
   set('kpi-tax-delta', 'Roth conversion saves '+fmt(tax.rothConversionSavings)+' now vs. later');
   set('kpi-tax-foot', 'State: '+fmtP(tax.stateRate)+' · Deduction: '+fmt(gl.standardDeduction));
   var tb=$s('kpi-tax-bar'); if(tb) tb.style.width=Math.min(100,(tax.effectiveRate<1?tax.effectiveRate*100:tax.effectiveRate)*3)+'%';
+
+  // ── WITHDRAWAL RATE vs the 4% rule ───────────────────────────────────
+  // True portfolio withdrawal rate = portfolio withdrawal ÷ portfolio balance.
+  // We pick the first year the plan actually draws from the portfolio (first
+  // positive withdrawal) — that's the meaningful "retirement" rate to compare
+  // against the 4% rule, since working/SS/pension years may draw little or nothing.
+  (function(){
+    var wd = proj.withdrawals||[], el = proj.endLiquid||[], yrs = proj.years||[];
+    var rateYearIdx = -1;
+    for (var i=0; i<wd.length; i++){ if ((wd[i]||0) > 0){ rateYearIdx = i; break; } }
+    var rate=null, wAmt=0, balUsed=0, rateYr=null;
+    if (rateYearIdx >= 0){
+      wAmt = wd[rateYearIdx];
+      // balance at START of that year = prior year's ending liquid (or this year's ending + withdrawal as fallback)
+      balUsed = (rateYearIdx>0 && el[rateYearIdx-1]>0) ? el[rateYearIdx-1]
+                : ((el[rateYearIdx]||0) + wAmt);
+      rateYr = yrs[rateYearIdx];
+      if (balUsed > 0) rate = wAmt / balUsed;
+    }
+    if (rate !== null && isFinite(rate)){
+      var ratePctNum = rate*100;
+      set('kpi-wdraw', ratePctNum.toFixed(1)+'%');
+      set('kpi-wdraw-sub', 'First draw year ('+rateYr+') · '+fmt(wAmt)+' from '+fmt(balUsed));
+      var vs4 = ratePctNum - 4;
+      if (ratePctNum <= 4)
+        set('kpi-wdraw-delta', 'Below the 4% rule by '+Math.abs(vs4).toFixed(1)+' pts — conservative ✓');
+      else
+        set('kpi-wdraw-delta', 'Above the 4% rule by '+vs4.toFixed(1)+' pts — watch sustainability');
+      // bar: 4% sits at the midpoint; scale so 0%→0, 8%→100
+      var bar=$s('kpi-wdraw-bar'); if(bar){ bar.style.width=Math.max(4,Math.min(100,ratePctNum/8*100))+'%'; bar.style.background = ratePctNum<=4 ? '#2E7D5B' : '#f4b86a'; }
+      set('kpi-wdraw-foot', '4% rule benchmark: '+fmt(Math.round((balUsed*0.04)/100)*100)+'/yr');
+    } else {
+      set('kpi-wdraw', '~0%');
+      set('kpi-wdraw-sub', 'Guaranteed income covers spending');
+      set('kpi-wdraw-delta', 'Not drawing from the portfolio yet ✓');
+      set('kpi-wdraw-foot', 'Well under the 4% rule');
+      var bar0=$s('kpi-wdraw-bar'); if(bar0){ bar0.style.width='4%'; }
+    }
+  })();
 
   set('kpi-legacy', fmt(leg.projectedEnding));
   set('kpi-legacy-delta', 'Goal: '+fmt(leg.goal)+' · Variance: '+fmt(leg.variance)+' · '+pct+'% achieved');
