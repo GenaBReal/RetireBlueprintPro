@@ -315,7 +315,7 @@ function readAll(ss, inp) {
   var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
                      preTax:[], roth:[], taxable:[], hsa:[],
                      federalTaxes:[], taxableIncome:[], stateIncome:[],
-                     acctWithdrawals:[]};
+                     acctWithdrawals:[], totalRMD:[]};
   var masterYear1FedTax = 0, masterYear1TaxableIncome = 0, masterYear1Set = false;
   try {
     var masterSheet = ss.getSheetByName('Master');
@@ -347,6 +347,7 @@ function readAll(ss, inp) {
         projections.federalTaxes.push(Math.round(fedTaxes));
         projections.taxableIncome.push(Math.round(taxableIncome));
         projections.stateIncome.push(Math.round(Number(row[42])||0)); // AP = State tax
+        projections.totalRMD.push(Math.round(Number(row[35])||0));     // Total RMD (formula output index 35)
         // Per-account WITHDRAWALS for this year — 12 account slots (var_D 1..12),
         // indices 46..57 on the SAME basis as the verified row[59]=Craig 401k ending.
         // Slot order matches the account order used for ending balances / account names.
@@ -427,6 +428,7 @@ function readAll(ss, inp) {
           projections.taxable.push(lastTax);
           projections.hsa.push(lastHsa);
           projections.acctWithdrawals.push([0,0,0,0,0,0,0,0,0,0,0,0]); // no withdrawals after both die
+          projections.totalRMD.push(0);
         }
       }
       // ── END EXTENSION ────────────────────────────────────────────────

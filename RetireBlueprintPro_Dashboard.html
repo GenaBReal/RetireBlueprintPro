@@ -60,8 +60,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .at-lbl{font-size:8px;color:#f4b86a;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
 .at-val{font-size:22px;font-weight:800;color:#fff;margin-top:3px;line-height:1;}
 .at-sub{font-size:8px;color:#8a9ab0;margin-top:3px;}
-.kpi-grid{display:grid;grid-template-columns:190px repeat(6,1fr);gap:8px;margin-bottom:10px;align-items:start;}
-@media (max-width:1200px) and (min-width:641px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.kpi-grid .plan-health{grid-column:span 1;}}
+.kpi-grid{display:grid;grid-template-columns:200px repeat(5,1fr);gap:8px;margin-bottom:10px;align-items:start;}
 .plan-health{background:#041E2F;border-radius:6px;padding:12px 14px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;}
 .ph-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#f4b86a;text-transform:uppercase;margin-bottom:4px;}
 .ph-score{font-size:50px;font-weight:800;color:#fff;line-height:1;}
@@ -354,19 +353,6 @@ window.addEventListener('storage', function(e) {
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot"></span>Base Expenses <span class="tooltip-icon" data-tip="Your REQUIRED annual spending — the lifestyle you've told us you need, including any debts you've marked as included in Section V. This is what you have to cover. The 'extra you can safely add' below is discretionary spending on top, while still meeting your legacy goal." style="font-size:9px;">?</span></div>
-      <div class="kc-value" id="kpi-spend">—</div>
-      <div class="kc-sub">Required spending · what you have to cover</div>
-      <div class="kc-delta-up" id="kpi-spend-extra">—</div>
-    </div>
-    <div>
-      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-spend-bar" style="background:#051628;"></div></div>
-      <div class="kc-footer" id="kpi-spend-foot">—</div>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div>
       <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Survivor Runway <span class="tooltip-icon" data-tip="Years the plan covers the longer-lived partner after the first spouse passes. SS survivor benefit (keeping the higher of two SS amounts) is automatically included." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-runway">—</div>
       <div class="kc-sub" id="kpi-runway-sub">—</div>
@@ -473,6 +459,43 @@ window.addEventListener('storage', function(e) {
       </thead>
       <tbody id="wsrc-body"></tbody>
     </table>
+  </div>
+</div>
+
+<!-- ── PLAN MILESTONES & LIFETIME NUMBERS ─────────────────────────── -->
+<div class="kpi-card" style="display:block;margin-bottom:14px;">
+  <div class="kc-title" style="margin-bottom:10px;"><span class="kc-dot" style="background:#456A73;"></span>Plan Milestones & Lifetime Numbers <span class="tooltip-icon" data-tip="Key dates and whole-of-plan totals computed across your full projection: when your portfolio peaks, when withdrawals and RMDs begin, total lifetime taxes, your plan's lowest point, and how much guaranteed income replaces your working income." style="font-size:9px;">?</span></div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
+    <div style="border-left:3px solid #2E7D5B;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Portfolio Peaks</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-peak">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-peak-yr">—</div>
+    </div>
+    <div style="border-left:3px solid #1CC7D0;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">First Portfolio Draw</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-firstdraw">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-firstdraw-note">—</div>
+    </div>
+    <div style="border-left:3px solid #6A4A6D;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">RMDs Begin</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-rmd">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-rmd-note">—</div>
+    </div>
+    <div style="border-left:3px solid #C0392B;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Lifetime Taxes</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-ltaxes">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-ltaxes-note">—</div>
+    </div>
+    <div style="border-left:3px solid #f4b86a;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Plan Low Point</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-low">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-low-yr">—</div>
+    </div>
+    <div style="border-left:3px solid #2E4053;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Income Replaced</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-repl">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-repl-note">—</div>
+    </div>
   </div>
 </div>
 
@@ -905,11 +928,6 @@ function populate(d){
   var mk=$s('ph-marker'); if(mk) mk.style.right=Math.max(0,100-healthPct)+'%';
   var zoneEl=$s('ph-zone'); if(zoneEl) zoneEl.textContent = fundedForLife ? 'SAFE ZONE' : 'REVIEW ZONE';
 
-  set('kpi-spend', fmt(sp.baseAnnual)+'/yr');
-  set('kpi-spend-extra', (sp.safeExtra>0?'+ '+fmt(sp.safeExtra)+'/yr extra you can safely add on top':'No extra room — at safe limit'));
-  set('kpi-spend-foot', 'Total safe spending: '+fmt(sp.baseAnnual+(sp.safeExtra>0?sp.safeExtra:0))+'/yr');
-  var sb=$s('kpi-spend-bar'); if(sb) sb.style.width=Math.min(100,pct)+'%';
-
   set('kpi-runway', longestYrs+' years');
   set('kpi-runway-sub', 'Covers '+longestN+' to age '+longestP.deathAge+' ('+longestP.projectedDeathYear+')');
   set('kpi-runway-delta', otherN+' covered to age '+otherP.deathAge+' ('+otherP.projectedDeathYear+')');
@@ -1099,6 +1117,53 @@ function populate(d){
     set('wsrc-total', fmt(total));
     set('wsrc-year', 'first draw: '+(yrs[idx]||''));
     set('wsrc-note', 'Drawn taxable → pre-tax → Roth (Roth preserved)');
+  })();
+
+  // ── PLAN MILESTONES & LIFETIME NUMBERS ───────────────────────────────
+  (function(){
+    var yrs = proj.years||[], el = proj.endLiquid||[], wd = proj.withdrawals||[],
+        fed = proj.federalTaxes||[], st = proj.stateIncome||[], rmd = proj.totalRMD||[],
+        inc = proj.income||[];
+    var deathYr = longestP.projectedDeathYear || (yrs.length? yrs[yrs.length-1] : 0);
+
+    // Peak portfolio (within lifetime)
+    var peak=0, peakYr=0;
+    el.forEach(function(v,i){ if(yrs[i]<=deathYr && (v||0)>peak){ peak=v; peakYr=yrs[i]; } });
+    if(peak>0){ set('ms-peak', fmt(peak)); set('ms-peak-yr', 'in '+peakYr+(peakYr?' · age '+(longestP.age + (peakYr-(meta.planYear||peakYr))):'')); }
+    else { set('ms-peak', fmt(port.total||0)); set('ms-peak-yr', 'starting value'); }
+
+    // First portfolio draw year
+    var fwy=null; for(var i=0;i<wd.length;i++){ if((wd[i]||0)>0){ fwy=yrs[i]; break; } }
+    if(fwy){ set('ms-firstdraw', fwy); set('ms-firstdraw-note', 'income covers all spending until then'); }
+    else { set('ms-firstdraw', 'Never'); set('ms-firstdraw-note', 'guaranteed income covers life ✓'); }
+
+    // RMDs begin
+    var rmdYr=null; for(var i=0;i<rmd.length;i++){ if((rmd[i]||0)>0){ rmdYr=yrs[i]; break; } }
+    if(rmdYr){ set('ms-rmd', rmdYr); set('ms-rmd-note', 'required 401k/403b distributions start'); }
+    else { set('ms-rmd', '—'); set('ms-rmd-note', 'no pre-tax RMDs projected'); }
+
+    // Lifetime taxes (federal + state, within lifetime)
+    var ltax=0; for(var i=0;i<fed.length;i++){ if(yrs[i]<=deathYr) ltax += (fed[i]||0)+(st[i]||0); }
+    set('ms-ltaxes', fmt(ltax));
+    set('ms-ltaxes-note', (tax && tax.rothConversionSavings>0)? ('Roth plan saves ~'+fmt(tax.rothConversionSavings)) : 'federal + state, full plan');
+
+    // Plan low point (lowest end-of-year liquid before death, excluding $0 after depletion)
+    var low=Infinity, lowYr=0;
+    el.forEach(function(v,i){ if(yrs[i]<=deathYr && v!=null && v<low){ low=v; lowYr=yrs[i]; } });
+    if(low===Infinity) low=0;
+    set('ms-low', fmt(low));
+    set('ms-low-yr', low>0? ('in '+lowYr+' · stays positive ✓') : ('depletes in '+lowYr));
+
+    // Income replacement: retirement guaranteed income ÷ pre-retirement income
+    var preR=0, postR=0;
+    // pre-retirement = first year's gross income; post = first full-retirement year income (after first draw, or last working year+1)
+    if(inc.length){ preR = inc[0]||0; }
+    var postIdx = fwy ? yrs.indexOf(fwy) : -1;
+    if(postIdx>=0 && inc[postIdx]!=null) postR = inc[postIdx];
+    else if(inc.length>3) postR = inc[3];
+    var repl = (preR>0)? Math.round(postR/preR*100) : 0;
+    set('ms-repl', repl>0? repl+'%' : '—');
+    set('ms-repl-note', repl>0? 'guaranteed income vs. working income' : 'set income on Inputs');
   })();
 
   set('kpi-legacy', fmt(leg.projectedEnding));
