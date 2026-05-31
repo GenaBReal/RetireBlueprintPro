@@ -2636,7 +2636,6 @@ var incEl  = document.getElementById('d-inc-'+i);
   function fmt(n) {
     if (!n && n!==0) return '--';
     if (Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
-    if (Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
     return '$'+Math.round(n).toLocaleString();
   }
   function setTxt(id, val) { var el=document.getElementById(id); if(el) el.textContent=val; }
@@ -2644,6 +2643,10 @@ var incEl  = document.getElementById('d-inc-'+i);
   setTxt('s-phase1',  fmt(sp.phase1Extra));
   setTxt('s-phase2',  fmt(sp.phase2Extra));
   setTxt('s-phase3',  fmt(sp.phase3Extra));
+  // mirror the per-phase guidance into the table's "Solver Guidance" column (was showing —)
+  setTxt('g-phase1',  fmt(sp.phase1Extra));
+  setTxt('g-phase2',  fmt(sp.phase2Extra));
+  setTxt('g-phase3',  fmt(sp.phase3Extra));
   setTxt('s-surplus', (leg.variance>=0?'+':'')+fmt(leg.variance));
   setTxt('s-ending',  fmt(leg.projectedEnding));
   setTxt('s-leg-goal', fmt(leg.goal));
@@ -3055,16 +3058,17 @@ function buildPayload() {
       B145: document.gpct('f-B145'),
     },
     phases: {
-      // C122: not written (sheet formula)
-      // D122: not written (sheet formula)
+      // C/D 122-124 are EDITABLE phase start/end years (written as dates by the connector)
+      C122: document.getElementById('f-C122').value,
+      D122: document.getElementById('f-D122').value,
       E122: document.getElementById('f-E122').value,
       F122: document.getElementById('f-F122').value,
-      // C123: not written (sheet formula)
-      // D123: not written (sheet formula)
+      C123: document.getElementById('f-C123').value,
+      D123: document.getElementById('f-D123').value,
       E123: document.getElementById('f-E123').value,
       F123: document.getElementById('f-F123').value,
-      // C124: not written (sheet formula)
-      // D124: not written (sheet formula)
+      C124: document.getElementById('f-C124').value,
+      D124: document.getElementById('f-D124').value,
       E124: document.getElementById('f-E124').value,
       F124: document.getElementById('f-F124').value,
     },
