@@ -315,7 +315,7 @@ function readAll(ss, inp) {
   var projections = {years:[], income:[], withdrawals:[], endLiquid:[],
                      preTax:[], roth:[], taxable:[], hsa:[],
                      federalTaxes:[], taxableIncome:[], stateIncome:[],
-                     acctWithdrawals:[], totalRMD:[]};
+                     acctWithdrawals:[], totalRMD:[], byYear:[]};
   var masterYear1FedTax = 0, masterYear1TaxableIncome = 0, masterYear1Set = false;
   try {
     var masterSheet = ss.getSheetByName('Master');
@@ -348,6 +348,25 @@ function readAll(ss, inp) {
         projections.taxableIncome.push(Math.round(taxableIncome));
         projections.stateIncome.push(Math.round(Number(row[42])||0)); // AP = State tax
         projections.totalRMD.push(Math.round(Number(row[35])||0));     // Total RMD (formula output index 35)
+        // FULL per-year snapshot — lets the dashboard render every card for any chosen year.
+        function N(i){ return Math.round(Number(row[i])||0); }
+        projections.byYear.push({
+          year:yr, craigAge:N(2), genaAge:N(3),
+          gSal:N(4), gSS:N(5), gProjSS:N(6), gPen:N(7), gOth:N(8),
+          cSal:N(9), cSS:N(10), cProjSS:N(11), cPen:N(12), cOth:N(13),
+          totalGross:N(14),
+          craigContrib:N(15), craigMatch:N(16), genaContrib:N(17), genaMatch:N(18), totalContrib:N(19),
+          stdDed:N(20), baseLiving:N(23), healthcare:N(26), debt:N(27), totalNeed:N(28),
+          gap:N(29), surplus:N(30), chosenExtra:N(31), fundingRequired:N(32),
+          rmdC:N(33), rmdG:N(34), totalRMD:N(35),
+          convC:N(36), convG:N(37), totalConv:N(38),
+          totalTaxable:N(39), federalTaxes:N(40), stateTax:N(41), totalTaxes:N(43),
+          acctW:(function(){ var a=[]; for(var k=46;k<=57;k++) a.push(N(k)); return a; })(),
+          monthlyWithdraw:N(58),
+          acctEnd:(function(){ var a=[]; for(var k=59;k<=70;k++) a.push(N(k)); return a; })(),
+          preTaxTotal:N(72), rothTotal:N(73), taxableTotal:N(74), hsaTotal:N(75),
+          endLiquid:N(80)
+        });
         // Per-account WITHDRAWALS for this year — 12 account slots (var_D 1..12),
         // indices 46..57 on the SAME basis as the verified row[59]=Craig 401k ending.
         // Slot order matches the account order used for ending balances / account names.
@@ -429,6 +448,19 @@ function readAll(ss, inp) {
           projections.hsa.push(lastHsa);
           projections.acctWithdrawals.push([0,0,0,0,0,0,0,0,0,0,0,0]); // no withdrawals after both die
           projections.totalRMD.push(0);
+          projections.byYear.push({
+            year:extYr, craigAge:0, genaAge:0,
+            gSal:0,gSS:0,gProjSS:0,gPen:0,gOth:0, cSal:0,cSS:0,cProjSS:0,cPen:0,cOth:0,
+            totalGross:0, craigContrib:0,craigMatch:0,genaContrib:0,genaMatch:0,totalContrib:0,
+            stdDed:0, baseLiving:0, healthcare:0, debt:0, totalNeed:0,
+            gap:0, surplus:0, chosenExtra:0, fundingRequired:0,
+            rmdC:0, rmdG:0, totalRMD:0, convC:0, convG:0, totalConv:0,
+            totalTaxable:0, federalTaxes:0, stateTax:0, totalTaxes:0,
+            acctW:[0,0,0,0,0,0,0,0,0,0,0,0], monthlyWithdraw:0,
+            acctEnd:[0,0,0,0,0,0,0,0,0,0,0,0],
+            preTaxTotal:lastPre, rothTotal:lastRoth, taxableTotal:lastTax, hsaTotal:lastHsa,
+            endLiquid:lastBal
+          });
         }
       }
       // ── END EXTENSION ────────────────────────────────────────────────
