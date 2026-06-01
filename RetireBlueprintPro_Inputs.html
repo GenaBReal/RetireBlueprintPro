@@ -327,6 +327,8 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .kc-sub-d{font-size:8px;color:#5F6368;margin-top:2px;font-style:italic;}
 .kc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;}
 .kc-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(28,199,208,0.2);color:#1CC7D0;font-size:10px;font-weight:700;cursor:help;margin-left:4px;position:relative;flex-shrink:0;}
+.tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:11px;font-weight:400;padding:8px 12px;border-radius:6px;white-space:normal;width:240px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;text-transform:none;letter-spacing:normal;}
 </style>
 <style id="rbp-mobile-fix">
 .rbp-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
@@ -1161,7 +1163,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
           <th>Description</th>
           <th>Start Year</th>
           <th>End Year</th>
-          <th>Smile Weight</th>
+          <th>Smile Weight <span class="tooltip-icon" data-tip="A multiplier on your baseline spending for each phase, shaping the classic retirement 'smile': spend more early, settle in the middle, ease off late. 1.15 = 115% (spend 15% MORE in the go-go years), 1.00 = 100% (normal baseline), 0.90 = 90% (spend 10% LESS in the no-go years). Raise a number to splurge more in that phase, lower it to spend less. The Solver Guidance column then shows the actual safe extra dollars for each phase." style="font-size:9px;cursor:help;">?</span></th>
           <th>Chosen Override ($/yr)</th>
           <th>Solver Guidance ($/yr)</th>
         </tr>
