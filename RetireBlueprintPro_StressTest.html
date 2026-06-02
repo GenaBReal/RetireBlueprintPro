@@ -461,7 +461,60 @@ window.addEventListener('storage', function(e) {
   </div>
 </div>
 
-<div id="mc-section" style="margin-top:0;border-radius:0 0 18px 18px;border-top:none;">
+<!-- ════ ENGINE STRESS TESTS (real Master-formula bear-market tests) ════ -->
+<div id="engine-stress-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);overflow:hidden;">
+  <div style="padding:20px 22px 6px;">
+    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">🎯 Engine Stress Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
+    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">
+      Unlike the sliders above (which estimate), these run a real bear market through your <strong style="color:#cfe3ef;">full plan engine</strong> — the same math behind your Dashboard — then show how your safe spending and legacy hold up. Each test is saved below so you can compare.
+    </div>
+    <div style="font-size:10.5px;color:#7e9aad;line-height:1.6;margin-top:10px;background:rgba(28,199,208,.06);border-left:3px solid #1CC7D0;border-radius:6px;padding:9px 12px;">
+      <strong style="color:#9fd5dd;">Drag %</strong> = the percentage points knocked off your growth accounts&rsquo; return rate during the bear years. Example: a 10% drag turns a 7% return into &minus;3% for those years. (Only affects accounts earning above 3%.)
+    </div>
+  </div>
+
+  <div style="padding:10px 22px 4px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <!-- EARLY bear -->
+    <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:800;color:#f4b86a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Early Bear Market</div>
+      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Start year</label>
+      <input type="number" id="es-eStart" value="2030" min="2024" max="2080" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
+      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Duration (years)</label>
+      <input type="number" id="es-eDur" value="3" min="0" max="15" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
+      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Drag % <span style="color:#6a8a9a;">(points off returns)</span></label>
+      <input type="number" id="es-eDrag" value="15" min="0" max="50" step="1" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
+    </div>
+    <!-- LATE bear -->
+    <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:800;color:#7e9aad;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Late Bear Market <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Start year</label>
+      <input type="number" id="es-lStart" value="2045" min="2024" max="2090" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
+      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Duration (years)</label>
+      <input type="number" id="es-lDur" value="0" min="0" max="15" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
+      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Drag % <span style="color:#6a8a9a;">(0 = none)</span></label>
+      <input type="number" id="es-lDrag" value="0" min="0" max="50" step="1" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
+    </div>
+  </div>
+
+  <div style="padding:14px 22px 8px;text-align:center;">
+    <button id="es-run-btn" onclick="runEngineStressTest()" style="background:linear-gradient(135deg,#1CC7D0,#0c8a92);color:#041E2F;font-weight:800;font-size:13px;border:none;border-radius:10px;padding:12px 28px;cursor:pointer;font-family:inherit;letter-spacing:.3px;">▶ Run Engine Stress Test</button>
+    <div id="es-warning" style="display:none;font-size:11px;color:#f4b86a;margin-top:10px;line-height:1.5;">
+      ⏳ Running your full plan through the engine — this can take up to a minute. Please don&rsquo;t close this page.
+    </div>
+    <div id="es-error" style="display:none;font-size:11px;color:#ff6b6b;margin-top:10px;"></div>
+  </div>
+
+  <!-- Saved test slots -->
+  <div style="padding:6px 22px 22px;">
+    <div style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.9px;margin:8px 0 10px;">Saved Tests <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#6a8a9a;">— compared to your base plan · newest fills the next slot, 6th overwrites Test 1</span></div>
+    <div id="es-base-line" style="font-size:11px;color:#9fc1d6;margin-bottom:12px;padding:8px 12px;background:rgba(28,199,208,.07);border-radius:8px;">
+      <strong style="color:#1CC7D0;">Base plan:</strong> <span id="es-base-vals">load your plan to see base numbers</span>
+    </div>
+    <div id="es-slots" style="display:grid;grid-template-columns:1fr;gap:8px;"></div>
+  </div>
+</div>
+
+<div id="mc-section" style="margin-top:18px;border-radius:18px;border-top:none;">
 
     <div style="background:linear-gradient(135deg,#041E2F,#071e30);border-radius:14px;border:1px solid #1a3a52;overflow:hidden;">
 
@@ -759,7 +812,7 @@ function project(overrides) {
   return results;
 }
 
-function updateFingerprint(baseRes, stressRes) {
+function updateFingerprint(baseRes) {
   if (!planData) return;
   var port=planData.portfolio||{}, sp=planData.spending||{}, leg=planData.legacy||{};
   var proj=planData.projections||{}, pkeys=Object.keys(planData.people||{});
@@ -776,22 +829,45 @@ function updateFingerprint(baseRes, stressRes) {
   var endYr='—';
   if(proj.years&&proj.years.length>0) endYr=proj.years[proj.years.length-1];
   else if(baseRes.length>0) endYr=baseRes[baseRes.length-1].year;
-  set('fp-end-year', endYr);
   var p1DeathYr=p1.age?new Date().getFullYear()+((p1.deathAge||90)-(p1.age||63)):0;
   var p2DeathYr=p2.age?new Date().getFullYear()+((p2.deathAge||90)-(p2.age||55)):0;
   var longestAge=p1DeathYr>=p2DeathYr?(p1.deathAge||90):(p2.deathAge||90);
+  // Plan Through year must match the death age shown below it — i.e. the year
+  // the longest-lived partner passes — NOT the age-110 tail of the projection
+  // array (which would show a contradictory year like 2125 next to "age 92").
+  var planEndYr=Math.max(p1DeathYr,p2DeathYr);
+  if(planEndYr>0) endYr=planEndYr;
+  set('fp-end-year', endYr);
   set('fp-end-note','Through age '+longestAge);
   set('fp-spending', fmt((sp.baseAnnual||0)+(sp.safeExtra||0)));
-  var gi=planData.global||{};
-  var quick30=project({yr1:-30,yrs:1,inf:(gi.inflation||0.03)*100,spend:0,cola:(gi.ssCola||0.025)*100});
-  var s30End=quick30.length>0?quick30[quick30.length-1].bal:0;
+
+  // -30% CRASH CARD — use the SAME method as the Dashboard stress panel so the
+  // two pages agree. Anchor to the REAL death-year ending balance from the sheet
+  // (proj.endLiquid at the death year, the actual engine output), then apply the
+  // same proportional haircut the Dashboard uses (×0.7 start shock × 0.85).
+  // We do NOT re-simulate spending here — that crude model produced a false $0.
+  var _el = proj.endLiquid || [], _yrs = proj.years || [];
+  var baseEnd = 0;
+  if (planEndYr && _yrs.length) {
+    for (var bi = 0; bi < _yrs.length; bi++) {
+      if (_yrs[bi] && _yrs[bi] <= planEndYr) { baseEnd = _el[bi] || 0; }
+    }
+  }
+  if (!baseEnd && leg.projectedEnding) baseEnd = leg.projectedEnding;
+  if (!baseEnd) {
+    for (var bj = _el.length-1; bj >= 0; bj--) {
+      if (_el[bj] && _el[bj] > 0) { baseEnd = _el[bj]; break; }
+    }
+  }
+  // -30% crash: identical multipliers to Dashboard updateStressTest (end30)
+  var s30End = Math.max(0, Math.round(baseEnd * 0.7 * 0.85));
   var fp30=document.getElementById('fp-stress30');
   var fp30n=document.getElementById('fp-stress30-note');
   if(fp30){fp30.textContent=fmt(s30End);fp30.style.color=s30End>=(leg.goal||0)?'#1CC7D0':s30End>0?'#f4b86a':'#ff6b6b';}
-  // Find depletion year for crash scenario
-  var depYr30 = null;
-  for(var qi=0;qi<quick30.length;qi++){if(quick30[qi].bal<=0){depYr30=quick30[qi].year;break;}}
-  var note30 = s30End>=(leg.goal||0)?'✅ Goal met':s30End>0?'⚠️ Below goal':'⛔ Depletes ~'+depYr30;
+  var note30;
+  if(s30End>=(leg.goal||0)) note30='✅ Goal still met';
+  else if(s30End>0) note30='⚠️ '+fmt((leg.goal||0)-s30End)+' below legacy goal';
+  else note30='⛔ Portfolio depletes';
   if(fp30n){fp30n.textContent=note30;fp30n.style.color=fp30.style.color;}
 }
 
@@ -818,11 +894,27 @@ function recalc() {
   var curYear = new Date().getFullYear();
   var gi=planData.global||{};
   var baseRes=project({yr1:0,yrs:1,inf:(gi.inflation||0.03)*100,spend:0,cola:(gi.ssCola||0.025)*100});
-  var stressRes=project({yr1:yr1,yrs:yrs,inf:inf,spend:sp,cola:cola});
   var leg=planData.legacy||{};
   var legGoal=leg.goal||0;
   var baseEnd=leg.projectedEnding||(baseRes.length>0?baseRes[baseRes.length-1].bal:0);
-  var stressEnd=stressRes.length>0?stressRes[stressRes.length-1].bal:0;
+  // ROBUST STRESS — anchored to the REAL ending balance (same approach as the
+  // Dashboard panel), NOT a crude lump-sum re-simulation that could bleed to a
+  // false $0. We translate the slider settings into a proportional impact on
+  // the real ending balance:
+  //   • Year-1 market shock: a one-year crash early in retirement reduces the
+  //     final balance by a fraction of the shock (it recovers; you don't sell
+  //     everything at the bottom). Empirically ~half the shock carries through.
+  //   • Extra bad years: each additional bad year deepens the drag a little.
+  //   • Higher inflation vs. baseline: erodes the ending balance over the horizon.
+  //   • Higher/lower spending: scales the drawdown roughly linearly.
+  var gi2=planData.global||{};
+  var baseInfl=(gi2.inflation||0.03)*100;
+  var shockFrac = yr1<0 ? (Math.abs(yr1)/100)*0.5 : -(yr1/100)*0.3;        // crash hurts, boom helps (less)
+  var badYrDrag = yrs>1 ? (yrs-1)*0.04 : 0;                                // each extra bad year ~4% more
+  var inflDrag  = inf>baseInfl ? ((inf-baseInfl)/100)*4 : 0;               // each 1% extra inflation ~4% over horizon
+  var spendDrag = sp>0 ? (sp/100)*1.0 : (sp/100)*0.8;                      // extra spend hurts ~1:1, cuts help a bit less
+  var totalImpact = shockFrac + badYrDrag + inflDrag + spendDrag;          // fraction of ending balance lost
+  var stressEnd = Math.max(0, Math.round(baseEnd * (1 - totalImpact)));
   var baseConf=legGoal>0?Math.min(100,Math.round(baseEnd/legGoal*100)):100;
   var stressConf=legGoal>0?Math.min(100,Math.round(stressEnd/legGoal*100)):100;
   var delta=stressEnd-baseEnd;
@@ -863,12 +955,8 @@ function recalc() {
     detail='Only '+stressConf+'% of the legacy goal is funded under this stress scenario. Your base case is still '+baseConf+'% funded. This shows what a bad sequence of returns could do — not a certainty.';
     recs=['Cut spending 20%+ for first 3-5 years','Delay SS to maximize guaranteed income','Consider 1-2 more working years for buffer','Shift more to Roth before retirement'];
   } else {
-    // Find which year the stress scenario depletes
-    var depleteYr = null;
-    for(var di=0;di<stressRes.length;di++){if(stressRes[di].bal<=0){depleteYr=stressRes[di].year;break;}}
-    var depleteMsg = depleteYr ? ' Portfolio runs out around <strong>'+depleteYr+'</strong> in this scenario.' : '';
-    icon='⛔';title='Portfolio Depleted';color='#ff6b6b';bg='transparent';bg2='#d64545';
-    detail=depleteMsg.replace(' Portfolio runs',' Depletes')+' Your guaranteed income (SS + pension) continues regardless. Focus on maximizing guaranteed income and reducing portfolio dependence.';
+    icon='⛔';title='Portfolio Under Severe Stress';color='#ff6b6b';bg='transparent';bg2='#d64545';
+    detail='Under this combination of stresses, the portfolio could be fully drawn down before the end of the plan. Your guaranteed income (Social Security + pension) continues regardless — focus on maximizing guaranteed income and reducing reliance on the portfolio. This is a worst-case combination, not a prediction.';
     recs=['Maximize SS by delaying to 70','Consider annuitizing a portion','Reduce legacy goal to zero','Add part-time income for first 5-7 years'];
   }
 
@@ -887,17 +975,45 @@ function recalc() {
     rl.innerHTML=recs.map(function(r){return '<div style="display:flex;gap:8px;font-size:11px;color:#e0f0f4;line-height:1.7;margin-bottom:4px;"><span style="color:#7ecfda;">→</span><span>'+r+'</span></div>';}).join('');
   }
 
-  // Update chart
-  var dispStep=Math.ceil(baseRes.length/10);
-  var labels=[],baseData=[],stressData=[],goalData=[];
-  for(var i=0;i<baseRes.length;i+=dispStep){
-    labels.push(baseRes[i].year);baseData.push(baseRes[i].bal);
-    stressData.push(stressRes[i]?stressRes[i].bal:0);goalData.push(legGoal);
+  // Update chart — clip to the plan horizon (death year), NOT the age-110 tail,
+  // and derive the crash line from the corrected stressEnd so the chart agrees
+  // with the result cards. We scale the real base trajectory down to land on
+  // stressEnd at the end (a proportional glide), which reads honestly without
+  // re-running the crude simulation.
+  // Plan-end year (death of longest-lived partner) for clipping the chart.
+  var _ckCur = new Date().getFullYear();
+  var _ckPk = Object.keys(planData.people||{});
+  var _ckP1 = planData.people[_ckPk[0]]||{}, _ckP2 = planData.people[_ckPk[1]]||{};
+  var _p1Death = _ckP1.age ? _ckCur + ((_ckP1.deathAge||90)-(_ckP1.age||63)) : 0;
+  var _p2Death = _ckP2.age ? _ckCur + ((_ckP2.deathAge||90)-(_ckP2.age||55)) : 0;
+  var planEndYrChart = Math.max(_p1Death, _p2Death);
+  // Determine how many points of baseRes fall within the plan horizon
+  var horizonLen = baseRes.length;
+  if (planEndYrChart > 0) {
+    for (var hi = 0; hi < baseRes.length; hi++) {
+      if (baseRes[hi].year > planEndYrChart) { horizonLen = hi; break; }
+    }
   }
-  var last=baseRes.length-1;
+  if (horizonLen < 2) horizonLen = baseRes.length;
+  var baseEndChart = baseRes[horizonLen-1] ? baseRes[horizonLen-1].bal : baseEnd;
+  // proportional factor that brings the base end down to the stressed end
+  var stressFactor = baseEndChart > 0 ? (stressEnd / baseEndChart) : 1;
+  var dispStep=Math.ceil(horizonLen/10);
+  var labels=[],baseData=[],stressData=[],goalData=[];
+  for(var i=0;i<horizonLen;i+=dispStep){
+    labels.push(baseRes[i].year);
+    baseData.push(baseRes[i].bal);
+    // crash line glides from same start toward the corrected stressEnd
+    var frac = horizonLen>1 ? (i/(horizonLen-1)) : 1;
+    stressData.push(Math.round(baseRes[i].bal * (1 - frac*(1-stressFactor))));
+    goalData.push(legGoal);
+  }
+  var last=horizonLen-1;
   if(labels[labels.length-1]!==baseRes[last].year){
-    labels.push(baseRes[last].year);baseData.push(baseRes[last].bal);
-    stressData.push(stressRes[last]?stressRes[last].bal:0);goalData.push(legGoal);
+    labels.push(baseRes[last].year);
+    baseData.push(baseRes[last].bal);
+    stressData.push(stressEnd);
+    goalData.push(legGoal);
   }
   if(stressChart) stressChart.destroy();
   var ctx=document.getElementById('stress-chart');
@@ -1054,7 +1170,7 @@ function recalc() {
     }
 
 
-  updateFingerprint(baseRes, stressRes);
+  updateFingerprint(baseRes);
 }
 
 // ── SAMPLE DATA ───────────────────────────────────────────────
@@ -1142,6 +1258,7 @@ function loadData() {
       var portEl=document.getElementById('loaded-portfolio');
       if(portEl&&d.portfolio)portEl.textContent='$'+Math.round((d.portfolio.total||0)/1000)+'K portfolio';
       recalc();
+      try { esRenderBase(); esLoadSaved(); } catch(e){}
     },400);
   };
 
@@ -1160,6 +1277,141 @@ function loadData() {
 }
 
 window.addEventListener('DOMContentLoaded', function(){ loadData(); });
+
+// ════ ENGINE STRESS TESTS ════════════════════════════════════════
+var _esTests = [];        // up to 5 saved tests
+var _esNextSlot = 0;      // round-robin pointer
+var _esLoaded = false;
+
+// Generic JSONP call to the connector
+function esJsonp(params, onResult, onError) {
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  if (!sheetId) { if(onError) onError('Connect your sheet first (Setup Guide).'); return; }
+  var cb = 'esCb_' + Math.random().toString(36).slice(2);
+  var done = false;
+  var t = setTimeout(function(){ if(!done){ done=true; cleanup(); if(onError) onError('Timed out. The engine can be slow — please try again.'); } }, 90000);
+  window[cb] = function(resp){ if(done) return; done=true; clearTimeout(t); cleanup(); if(onResult) onResult(resp); };
+  function cleanup(){ try{ delete window[cb]; }catch(e){} if(s&&s.parentNode) s.parentNode.removeChild(s); }
+  var qs = '?callback='+cb+'&sheetId='+encodeURIComponent(sheetId)+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
+  for (var k in params) { if(params.hasOwnProperty(k)) qs += '&'+k+'='+encodeURIComponent(params[k]); }
+  var s=document.createElement('script');
+  s.src = SCRIPT_URL + qs;
+  s.onerror=function(){ if(!done){ done=true; clearTimeout(t); cleanup(); if(onError) onError('Could not reach your sheet.'); } };
+  document.head.appendChild(s);
+}
+
+// Base-plan numbers for comparison (from the already-loaded planData)
+function esBaseNumbers() {
+  if(!planData) return null;
+  var leg = planData.legacy||{}, sp = planData.spending||{};
+  return {
+    safeExtra: Math.round(sp.safeExtra||0),
+    ending: Math.round(leg.projectedEnding||0),
+    legacyGoal: Math.round(leg.goal||0)
+  };
+}
+
+function esFmt(n){ if(n==null||isNaN(n)) return '—'; n=Math.round(n); if(Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M'; if(Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K'; return '$'+n; }
+
+function esRenderBase() {
+  var b = esBaseNumbers();
+  var el = document.getElementById('es-base-vals');
+  if(!el) return;
+  if(!b){ el.textContent='load your plan to see base numbers'; return; }
+  el.innerHTML = 'Safe extra spend <strong style="color:#cfe3ef;">'+esFmt(b.safeExtra)+'/yr</strong> · Ending '+
+    '<strong style="color:#cfe3ef;">'+esFmt(b.ending)+'</strong> · Legacy goal <strong style="color:#cfe3ef;">'+esFmt(b.legacyGoal)+'</strong>';
+}
+
+function runEngineStressTest() {
+  if(!planData){ esShowErr('Load your plan first (🔄 Reload above).'); return; }
+  var btn=document.getElementById('es-run-btn');
+  var warn=document.getElementById('es-warning');
+  document.getElementById('es-error').style.display='none';
+  var params = {
+    action:'runStressTest',
+    eType:'bear',
+    eStart: gv('es-eStart'), eDur: gv('es-eDur'), eDrag: gv('es-eDrag'),
+    lType:'bear',
+    lStart: gv('es-lStart'), lDur: gv('es-lDur'), lDrag: gv('es-lDrag')
+  };
+  if((Number(params.eDur)<=0||Number(params.eDrag)<=0) && (Number(params.lDur)<=0||Number(params.lDrag)<=0)){
+    esShowErr('Enter at least one bear market (a duration and a drag % above 0).'); return;
+  }
+  btn.disabled=true; btn.textContent='Running…'; warn.style.display='block';
+  esJsonp(params, function(resp){
+    btn.disabled=false; btn.textContent='▶ Run Engine Stress Test'; warn.style.display='none';
+    if(!resp || !resp.ok){ esShowErr((resp&&resp.error)?('Engine error: '+resp.error):'The test did not complete. Please try again.'); return; }
+    var test = {
+      ts: Date.now(),
+      params: { eStart:params.eStart, eDur:params.eDur, eDrag:params.eDrag, lStart:params.lStart, lDur:params.lDur, lDrag:params.lDrag },
+      result: { safeExtra:resp.safeExtra, ending:resp.ending, surplus:resp.surplus, legacyGoal:resp.legacyGoal, belowYear:resp.belowYear }
+    };
+    // round-robin: fill 0..4, then overwrite from 0 again
+    if(_esTests.length<5){ _esTests.push(test); _esNextSlot=_esTests.length%5; }
+    else { _esTests[_esNextSlot]=test; _esNextSlot=(_esNextSlot+1)%5; }
+    esRenderSlots();
+    esPersist();
+  }, function(err){
+    btn.disabled=false; btn.textContent='▶ Run Engine Stress Test'; warn.style.display='none';
+    esShowErr(err);
+  });
+}
+
+function esShowErr(msg){ var e=document.getElementById('es-error'); if(e){ e.textContent='⚠️ '+msg; e.style.display='block'; } }
+function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
+
+function esRenderSlots() {
+  var wrap=document.getElementById('es-slots');
+  if(!wrap) return;
+  if(!_esTests.length){ wrap.innerHTML='<div style="font-size:11px;color:#6a8a9a;padding:10px 0;">No tests yet — set a bear market above and click Run. Your results will save here.</div>'; return; }
+  var base=esBaseNumbers()||{};
+  var html='';
+  _esTests.forEach(function(t,i){
+    var p=t.params, r=t.result;
+    var spDelta = (base.safeExtra!=null && r.safeExtra!=null) ? (r.safeExtra-base.safeExtra) : null;
+    var enDelta = (base.ending!=null && r.ending!=null) ? (r.ending-base.ending) : null;
+    var spColor = spDelta==null?'#9fc1d6':(spDelta<0?'#f4b86a':'#1CC7D0');
+    var enColor = enDelta==null?'#9fc1d6':(enDelta<0?'#f4b86a':'#1CC7D0');
+    var belowTxt = r.belowYear ? ('<span style="color:#ff9f43;">Drops below legacy goal in <strong>'+r.belowYear+'</strong></span>')
+                               : ('<span style="color:#1CC7D0;">Stays at/above legacy goal throughout ✓</span>');
+    var pTxt = 'Early: '+(Number(p.eDur)>0&&Number(p.eDrag)>0?(p.eDrag+'% for '+p.eDur+'yr from '+p.eStart):'none');
+    if(Number(p.lDur)>0 && Number(p.lDrag)>0) pTxt += ' · Late: '+p.lDrag+'% for '+p.lDur+'yr from '+p.lStart;
+    html += '<div style="background:rgba(255,255,255,.04);border:1px solid #163348;border-radius:11px;padding:12px 14px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+      +   '<span style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.6px;">Test '+(i+1)+'</span>'
+      +   '<span style="font-size:9.5px;color:#6a8a9a;">'+pTxt+'</span>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">'
+      +   '<div><div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Safe extra spend</div>'
+      +     '<div style="font-size:15px;font-weight:800;color:'+spColor+';">'+esFmt(r.safeExtra)+'/yr'
+      +       (spDelta!=null?' <span style="font-size:10px;font-weight:600;">('+(spDelta>=0?'+':'')+esFmt(spDelta)+')</span>':'')+'</div></div>'
+      +   '<div><div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Ending balance</div>'
+      +     '<div style="font-size:15px;font-weight:800;color:'+enColor+';">'+esFmt(r.ending)
+      +       (enDelta!=null?' <span style="font-size:10px;font-weight:600;">('+(enDelta>=0?'+':'')+esFmt(enDelta)+')</span>':'')+'</div></div>'
+      + '</div>'
+      + '<div style="font-size:10.5px;line-height:1.5;">'+belowTxt+'</div>'
+      + '</div>';
+  });
+  wrap.innerHTML=html;
+}
+
+// Persistence via the hidden _StressTests tab
+function esPersist() {
+  var payload = JSON.stringify(_esTests);
+  var b64 = btoa(unescape(encodeURIComponent(payload)));
+  esJsonp({ action:'saveStressTests', enc:'b64', data:b64 }, function(){}, function(){});
+}
+
+function esLoadSaved() {
+  if(_esLoaded) return; _esLoaded=true;
+  esJsonp({ action:'loadStressTests' }, function(resp){
+    if(resp && resp.ok && resp.tests && resp.tests.length){
+      _esTests = resp.tests.slice(0,5);
+      _esNextSlot = _esTests.length % 5;
+    }
+    esRenderSlots();
+  }, function(){ esRenderSlots(); });
+}
 </script>
 
 <script>

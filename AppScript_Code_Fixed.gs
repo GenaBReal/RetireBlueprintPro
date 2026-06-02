@@ -36,6 +36,24 @@ function doGet(e) {
       return respond(readAll(ss, inp));
     }
 
+    if (action === 'runStressTest') {
+      // Write bear-market params -> recalc -> read stressed results -> RESTORE originals.
+      return respond(runStressTest(ss, inp, e.parameter));
+    }
+
+    if (action === 'loadStressTests') {
+      // Return the saved Test 1-5 slots from the hidden _StressTests tab.
+      return respond(loadStressTests(ss));
+    }
+
+    if (action === 'saveStressTests') {
+      // Persist the Test 1-5 slots to the hidden _StressTests tab.
+      var stRaw = e.parameter.enc === 'b64'
+        ? Utilities.newBlob(Utilities.base64Decode(e.parameter.data)).getDataAsString()
+        : e.parameter.data;
+      return respond(saveStressTests(ss, JSON.parse(stRaw)));
+    }
+
     if (action === 'save') {
       var enc = e.parameter.enc;
       var raw = enc === 'b64'
@@ -934,3 +952,127 @@ function applyMasterThemeFormatting(ss) {
   }
 }
 
+
+// ════════════════════════════════════════════════════════════════════
+// STRESS TEST — write bear-market params, recalc, read stressed results,
+// then RESTORE the customer's original B12-B19 so their plan is untouched.
+// Drag values arrive as WHOLE NUMBERS (e.g. 10) and are written as decimals
+// (0.10) using the same /100 convention as the normal save (setPct).
+// ════════════════════════════════════════════════════════════════════
+function runStressTest(ss, inp, p) {
+  try {
+    // --- 1. Save the customer's current stress cells (B12-B19) ---
+    var orig = inp.getRange('B12:B19').getValues(); // 8 rows x 1 col
+
+    // --- 2. Parse incoming test params (whole-number drags) ---
+    function pnum(v, d){ var n = Number(v); return isNaN(n) ? d : n; }
+    var eType  = (p.eType  !== undefined && p.eType  !== '') ? String(p.eType)  : 'bear';
+    var eStart = pnum(p.eStart, 0);
+    var eDur   = pnum(p.eDur,   0);
+    var eDrag  = pnum(p.eDrag,  0);   // whole number, e.g. 10
+    var lType  = (p.lType  !== undefined && p.lType  !== '') ? String(p.lType)  : '';
+    var lStart = pnum(p.lStart, 0);
+    var lDur   = pnum(p.lDur,   0);
+    var lDrag  = pnum(p.lDrag,  0);
+
+    // --- 3. Write the test values ---
+    // Only write an EARLY bear if a duration & drag were given; same for LATE.
+    var newVals = orig.map(function(r){ return [r[0]]; }); // clone
+    if (eDur > 0 && eDrag !== 0) {
+      newVals[0] = [eType];          // B12 type
+      newVals[1] = [eStart];         // B13 start
+      newVals[2] = [eDur];           // B14 duration
+      newVals[3] = [eDrag/100];      // B15 drag -> decimal
+    } else {
+      // no early stress this test — clear the trigger so it doesn't apply
+      newVals[0] = [''];
+    }
+    if (lDur > 0 && lDrag !== 0) {
+      newVals[4] = [lType || 'bear']; // B16 type
+      newVals[5] = [lStart];          // B17 start
+      newVals[6] = [lDur];            // B18 duration
+      newVals[7] = [lDrag/100];       // B19 drag -> decimal
+    } else {
+      newVals[4] = ['']; // clear late trigger
+    }
+    inp.getRange('B12:B19').setValues(newVals);
+
+    // --- 4. Force recalc and let the Master array settle ---
+    SpreadsheetApp.flush();
+    Utilities.sleep(1200); // give array formula time to recompute
+
+    // --- 5. Read stressed results ---
+    function cell(a1){ var v = inp.getRange(a1).getValue(); return Number(v)||0; }
+    var safeExtra = cell('B119');
+    var ending    = cell('B133');
+    var surplus   = cell('B120');
+    var legacyGoal= cell('B8');
+
+    // Year balance first drops below legacy goal (from Master endLiquid array)
+    var belowYear = null;
+    var master = ss.getSheetByName('Master');
+    if (master) {
+      var md = master.getRange('A8:CC200').getValues();
+      for (var i=0;i<md.length;i++){
+        var row = md[i];
+        var rawYr = row[0], yr;
+        if (rawYr instanceof Date) yr = rawYr.getFullYear();
+        else { yr = Number(rawYr); if (yr>40000 && yr<100000){ var d=new Date((yr-25569)*86400*1000); yr=d.getFullYear(); } }
+        if (!yr || yr<2020 || yr>2200) continue;
+        var endLiq = Number(row[80])||0;
+        if (legacyGoal>0 && endLiq < legacyGoal){ belowYear = yr; break; }
+      }
+    }
+
+    // --- 6. RESTORE the customer's original cells ---
+    inp.getRange('B12:B19').setValues(orig);
+    SpreadsheetApp.flush();
+
+    return {
+      ok:true,
+      safeExtra:Math.round(safeExtra),
+      ending:Math.round(ending),
+      surplus:Math.round(surplus),
+      legacyGoal:Math.round(legacyGoal),
+      belowYear:belowYear
+    };
+  } catch(err) {
+    // Best-effort restore even on error
+    try { if (orig) inp.getRange('B12:B19').setValues(orig); SpreadsheetApp.flush(); } catch(e2){}
+    return { ok:false, error: err.toString() };
+  }
+}
+
+// ── Hidden tab persistence for the Test 1-5 slots ──────────────────
+function getStressTab(ss) {
+  var sh = ss.getSheetByName('_StressTests');
+  if (!sh) {
+    sh = ss.insertSheet('_StressTests');
+    sh.getRange('A1').setValue('RetireBlueprint Pro — saved stress tests (do not edit)');
+  }
+  try { sh.hideSheet(); } catch(e){} // keep it tucked away
+  return sh;
+}
+
+function loadStressTests(ss) {
+  try {
+    var sh = ss.getSheetByName('_StressTests');
+    if (!sh) return { ok:true, tests:[] };
+    var json = sh.getRange('A2').getValue();
+    if (!json) return { ok:true, tests:[] };
+    return { ok:true, tests: JSON.parse(String(json)) };
+  } catch(err) {
+    return { ok:true, tests:[] }; // never block the page on a load failure
+  }
+}
+
+function saveStressTests(ss, tests) {
+  try {
+    var sh = getStressTab(ss);
+    sh.getRange('A2').setValue(JSON.stringify(tests || []));
+    SpreadsheetApp.flush();
+    return { ok:true };
+  } catch(err) {
+    return { ok:false, error: err.toString() };
+  }
+}
