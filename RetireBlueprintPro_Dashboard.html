@@ -1025,7 +1025,11 @@ function populate(d){
     set('val-confidence', '✓ Funded');
     set('val-conf-label', 'Covers '+longestN+' to age '+longestP.deathAge);
     set('val-status', '✅ FUNDED FOR LIFE');
-    set('val-status-sub', 'Legacy goal: '+pct+'% of '+fmt(leg.goal)+' target');
+    if (pct < 100){
+      set('val-status-sub', '⚠ But legacy goal now '+pct+'% of '+fmt(leg.goal)+' target — spending choices reduce your inheritance');
+    } else {
+      set('val-status-sub', 'Legacy goal: '+pct+'% of '+fmt(leg.goal)+' target');
+    }
   } else {
     set('val-confidence', '⚠ Shortfall');
     set('val-conf-label', 'Funds run low around '+depletionYear);
@@ -1744,12 +1748,27 @@ function updateStressTest(d) {
     var p2=d.people[_sk[1]]||{};
     if (!proj || !proj.endLiquid || !proj.endLiquid.length) return;
 
-    // Find last non-zero ending balance
+    // Ending balance AT the longest-lived person's death year — NOT the last
+    // non-zero entry in the full array. The projection runs to age 110, and in
+    // the years after both spouses die the untouched portfolio keeps compounding,
+    // so the tail of the array is a fantastical (multi-million) growth figure.
+    // We must read the same death-year value the hero/funded-for-life logic uses.
+    var _el = proj.endLiquid || [], _yrs = proj.years || [];
+    var _deathYr = Math.max(p1.projectedDeathYear||0, p2.projectedDeathYear||0);
     var baseEnd = 0;
-    for (var si = proj.endLiquid.length-1; si >= 0; si--) {
-      if (proj.endLiquid[si] && proj.endLiquid[si] > 0) { baseEnd = proj.endLiquid[si]; break; }
+    if (_deathYr && _yrs.length) {
+      // find the ending-liquid value at (or last at/before) the death year
+      for (var si = 0; si < _yrs.length; si++) {
+        if (_yrs[si] && _yrs[si] <= _deathYr) { baseEnd = _el[si] || 0; }
+      }
     }
+    // Fallbacks if death-year alignment isn't available
     if (!baseEnd && leg.projectedEnding) baseEnd = leg.projectedEnding;
+    if (!baseEnd) {
+      for (var sj = proj.endLiquid.length-1; sj >= 0; sj--) {
+        if (proj.endLiquid[sj] && proj.endLiquid[sj] > 0) { baseEnd = proj.endLiquid[sj]; break; }
+      }
+    }
     var baseStart = proj.endLiquid[0] || 0;
     var legacyGoal = leg.goal || 0;
     var longestAge = Math.max(p1.deathAge||90, p2.deathAge||90);
