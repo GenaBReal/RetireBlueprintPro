@@ -250,7 +250,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   <!-- CONVERSION WINDOW PLANNER -->
   <div class="card">
     <div class="card-hdr"><div class="card-title">📅 Roth Conversion Window Planner</div>
-            <div class="card-sub">Suggested annual amount to convert each year — fills tax bracket headroom between retirement and RMDs. Load your sheet for personalized amounts.</div></div>
+            <div class="card-sub">Shows WHEN your low-tax conversion window is open and why it matters. For HOW MUCH to convert each year, use the Roth Conversion Solver on the Inputs page.</div></div>
     <div class="card-body">
       <div class="alert alert-teal" style="margin-bottom:16px;">
         <strong>The Roth Conversion Window</strong> is the period between your retirement date and age 73 (when RMDs begin).
@@ -528,46 +528,67 @@ function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, 
   var youngerAge = Math.min(p1Age, p2Age);
   var rmd1Year = curYear + (rmdAgeFor(youngerAge) - youngerAge);
   var el = document.getElementById('conversion-planner');
+
+  var windowStart = Math.max(firstConv, retireYear);
+  var windowEnd = rmd1Year - 1;            // last full year before RMDs begin
+  var windowYears = Math.max(0, windowEnd - windowStart + 1);
+
+  // This page explains WHEN the window is open and WHY it matters.
+  // The actual dollar amount to convert each year is computed by the real
+  // Roth Conversion Solver on the Inputs page (it accounts for your bracket,
+  // IRMAA, SS taxation, and cash available to pay the tax) — so we point there
+  // rather than show a misleading flat number here.
   var html = '';
 
-  var pretax = parseInt(document.getElementById('pretax-bal').value) || 500000;
-  // Suggested annual conversion: use planData optimal amount if loaded,
-  // otherwise estimate as the amount needed to fill the 22% bracket
-  // (2026 MFJ 12%-bracket top $100,800 minus estimated SS/pension income)
-  var annualConv = 0;
-  if (window._rbpPlanData && window._rbpPlanData.roth && window._rbpPlanData.roth.optimalAmount > 0) {
-    annualConv = window._rbpPlanData.roth.optimalAmount;
-  } else {
-    // Fallback: estimate bracket-filling amount
-    // Standard assumption: fill up to the 22% bracket (2026 MFJ 12% top = $100,800 taxable)
-    // minus estimated SS/other income (~$40-50K for typical retiree)
-    var estSS = (window._rbpPlanData && window._rbpPlanData.people) ? 
-      (function(){ var pk=Object.keys(window._rbpPlanData.people||{}); 
-        var p1=(window._rbpPlanData.people[pk[0]]||{}); 
-        var p2=(window._rbpPlanData.people[pk[1]]||{});
-        return ((p1.ssMonthly||0)+(p2.ssMonthly||0))*12; })() : 40000;
-    annualConv = Math.max(10000, Math.round(Math.min((window.RBP_TAX?window.RBP_TAX.mfjBrackets[1].max:100800) - estSS, pretax * 0.15)));
+  if (windowYears <= 0) {
+    html = '<div style="color:#6a8a9a;font-size:12px;padding:12px 0;">'
+         + 'Based on these ages, your low-income conversion window has already closed (RMDs at age '
+         + rmdAgeFor(youngerAge) + '). Conversions are still allowed, but they no longer happen before RMDs — '
+         + 'so they are taxed on top of required withdrawals. Adjust the ages above to explore an earlier window.'
+         + '</div>';
+    el.innerHTML = html;
+    return;
   }
 
-  for (var yr = Math.max(firstConv, retireYear); yr < Math.min(rmd1Year, retireYear + 20); yr++) {
-    var p1AgeNow = p1Age + (yr - curYear);
-    var p2AgeNow = p2Age + (yr - curYear);
-    var fiveYrReady = yr + 5;
-    var pct = Math.min(100, Math.round(annualConv / pretax * 100));
-    var note = 'Suggested conversion · tax-free access from ' + fiveYrReady;
-    if (p1AgeNow >= rmdAgeFor(p1Age) || p2AgeNow >= rmdAgeFor(p2Age)) note = '⚠️ RMDs begun — convert carefully';
+  // Visual timeline: Retire ──► [conversion window] ──► RMDs begin
+  html += '<div style="display:flex;align-items:stretch;gap:0;margin-bottom:18px;border-radius:10px;overflow:hidden;border:1px solid #1a3a52;">';
+  html += '  <div style="flex:0 0 auto;padding:14px 16px;background:#0A3145;text-align:center;min-width:96px;">'
+        + '    <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Retire</div>'
+        + '    <div style="font-size:18px;font-weight:800;color:#d8eaf5;">' + windowStart + '</div></div>';
+  html += '  <div style="flex:1 1 auto;padding:14px 16px;background:linear-gradient(135deg,#0c5460,#1CC7D0);text-align:center;color:#041E2F;">'
+        + '    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Conversion Window</div>'
+        + '    <div style="font-size:18px;font-weight:800;">' + windowYears + ' year' + (windowYears===1?'':'s') + '</div>'
+        + '    <div style="font-size:10px;opacity:.85;">' + windowStart + ' \u2013 ' + windowEnd + '</div></div>';
+  html += '  <div style="flex:0 0 auto;padding:14px 16px;background:#3a1010;text-align:center;min-width:110px;">'
+        + '    <div style="font-size:9px;color:#f4a0a0;text-transform:uppercase;letter-spacing:.5px;">RMDs begin</div>'
+        + '    <div style="font-size:18px;font-weight:800;color:#ffd0d0;">' + rmd1Year + '</div></div>';
+  html += '</div>';
 
-    html += '<div class="conv-row">';
-    html += '<div class="conv-year">' + yr + '</div>';
-    html += '<div class="conv-bar-wrap"><div class="conv-bar" style="width:' + pct + '%"></div></div>';
-    html += '<div class="conv-amount">' + fmt(annualConv) + '</div>';
-    html += '<div class="conv-note">' + note + '</div>';
-    html += '</div>';
-  }
+  // Plain-language explanation of what to do
+  html += '<div style="font-size:12px;color:#cfe3ef;line-height:1.7;">';
+  html += '  You have a <strong style="color:#1CC7D0;">' + windowYears + '-year window</strong> '
+        + '(' + windowStart + '\u2013' + windowEnd + ') when your income is lowest \u2014 after you stop working '
+        + 'but before RMDs force taxable withdrawals at age ' + rmdAgeFor(youngerAge) + '. '
+        + 'Converting pre-tax 401k/IRA money to Roth <em>during</em> this window is usually the cheapest time to do it, '
+        + 'because it is taxed at your low bracket now instead of a higher bracket later.';
+  html += '</div>';
 
-  if (!html) {
-    html = '<div style="color:#6a8a9a;font-size:12px;padding:12px 0;">No conversion window identified — adjust your ages above.</div>';
-  }
+  // Honest note about amounts + hard pointer to the real solver
+  html += '<div class="alert alert-teal" style="margin-top:16px;">';
+  html += '  <strong>How much should you convert each year?</strong> That depends on your tax bracket, IRMAA thresholds, '
+        + 'how your Social Security gets taxed, and how much cash you have on hand to pay the conversion tax \u2014 '
+        + 'so there is no single flat number. The <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" '
+        + 'style="color:#1CC7D0;font-weight:800;text-decoration:underline;">Roth Conversion Solver on the Inputs page</a> '
+        + 'calculates the right amount for each year of this window and lets you enter your actual planned conversions.';
+  html += '</div>';
+
+  // Reminder of the 5-year clock, since timing is this page's job
+  html += '<div style="font-size:11px;color:#8aaabb;margin-top:12px;line-height:1.6;">';
+  html += '  \uD83D\uDD52 <strong style="color:#cfe3ef;">Remember the 5-year clock:</strong> each year\u2019s converted principal '
+        + 'can be withdrawn penalty-free 5 years later. A conversion done in ' + windowStart + ' is accessible in '
+        + (windowStart + 5) + '. Starting early keeps those clocks running while you still have other income to live on.';
+  html += '</div>';
+
   el.innerHTML = html;
 }
 
