@@ -573,6 +573,18 @@ window.addEventListener('storage', function(e) {
       <!-- Results area — hidden until run -->
       <div id="mc-results" style="display:none;padding:22px;">
 
+        <!-- Plain-language explainer -->
+        <details style="background:#061620;border:1px solid #1a3a52;border-radius:10px;margin-bottom:18px;">
+          <summary style="cursor:pointer;padding:12px 16px;font-size:12px;font-weight:700;color:#1CC7D0;">&#9432; New to this? What Monte Carlo and these numbers mean</summary>
+          <div style="padding:0 16px 16px;font-size:12px;color:#c8dae8;line-height:1.7;">
+            <p style="margin:0 0 10px;"><strong style="color:#fff;">Monte Carlo</strong> means we don't bet on one future &mdash; we replay your plan through 1,000 different random market histories (calm years, crashes, long flat stretches) and count how it turns out. It answers "how often does my plan work?" rather than "what happens if returns are exactly average?"</p>
+            <p style="margin:0 0 6px;"><strong style="color:#f4b86a;">Never ran out of money</strong> &mdash; the share of those 1,000 futures where your money lasted your whole life. This is the number most planning tools lead with.</p>
+            <p style="margin:0 0 6px;"><strong style="color:#1CC7D0;">Success rate</strong> &mdash; a stricter bar: futures where you not only didn't run out, but finished with your full legacy goal still intact.</p>
+            <p style="margin:0 0 6px;"><strong>Median</strong> &mdash; the middle outcome: half the futures did better, half did worse.</p>
+            <p style="margin:0;"><strong style="color:#ff9f43;">P10 / P90</strong> &mdash; your unlucky and lucky edges. P10 is the result only the worst 10% of futures fell below; P90 is the result only the best 10% beat. A wide gap means your outcome rides heavily on market luck.</p>
+          </div>
+        </details>
+
         <!-- Big success rate number -->
         <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;align-items:stretch;">
 
@@ -633,6 +645,22 @@ window.addEventListener('storage', function(e) {
             </div>
           </div>
 
+        </div>
+
+        <!-- Extra-spend comparison: full plan vs essentials only -->
+        <div id="mc-extra-compare" style="display:none;background:#061620;border:1px solid #1a3a52;border-radius:10px;padding:14px 18px;margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">What if you treat your "extra" spending as optional?</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:220px;background:#08202e;border-left:3px solid #1CC7D0;border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;font-weight:700;color:#c8dae8;margin-bottom:3px;">Full plan (base + extras)</div>
+              <div id="mc-cmp-full" style="font-size:13px;font-weight:800;color:#fff;">&mdash;</div>
+            </div>
+            <div style="flex:1;min-width:220px;background:#08202e;border-left:3px solid #f4b86a;border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;font-weight:700;color:#f4b86a;margin-bottom:3px;">Essentials only (extras paused)</div>
+              <div id="mc-cmp-ess" style="font-size:13px;font-weight:800;color:#fff;">&mdash;</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:#9fc1d6;margin-top:9px;line-height:1.5;">Both run on the same market scenarios &mdash; the only difference is whether your discretionary extra spending is in or out. The gap is the safety you'd buy by trimming the extras in a rough stretch. This is a what-if only; it doesn't change your saved plan.</div>
         </div>
 
         <!-- Fan chart -->
@@ -1481,10 +1509,11 @@ function mcRandReturn(model, mu, sigma) {
     // Sample directly from real historical returns (already realized — no correction)
     return MC_HISTORICAL[Math.floor(Math.random() * MC_HISTORICAL.length)] / 100;
   } else if (model === 'fat') {
-    // Fat tails add variance (~0.65*sigma^2 from the occasional shocks), so total
-    // drag is ~1.65*sigma^2/2. Correcting for it lets fat tails WIDEN the spread
-    // without dragging the median down — which is what was happening before.
-    var driftFat = 0.825 * sigma * sigma;
+    // Use the SAME drift as Normal (sigma^2/2) so the fat-tailed MEDIAN centers on
+    // mu just like Normal does. The occasional shocks then only WIDEN the spread
+    // (fatter tails both ways) instead of also lifting the median and upside, which
+    // was making the P90 run hot.
+    var driftFat = 0.5 * sigma * sigma;
     var base = (mu + driftFat) + sigma * z;
     // 5% chance of a "tail event" (either direction)
     if (Math.random() < 0.05) {
@@ -1526,6 +1555,9 @@ function runMonteCarlo() {
 
   var totalPF   = port.total || 0;
   var baseSpend = (sp.baseAnnual || 0) + (sp.safeExtra || 0);
+  var safeExtra = (sp.safeExtra || 0); // discretionary extra, removed in the "essentials only" run
+  // Does the SAVED plan already include the extra? ("Assume Extra Spending Used?" = Yes on Inputs, cell B11)
+  var extraInPlan = String(gl.assumeExtraSpend || 'Yes').trim().toLowerCase().charAt(0) !== 'n';
   var legacyGoal= leg.goal || 0;
   var inflation = (gl.inflation || 0.03);
   var colaRate  = (gl.ssCola || 0.025);
@@ -1565,6 +1597,7 @@ function runMonteCarlo() {
   document.getElementById('mc-run-btn').textContent = 'Running...';
 
   var allEndingBals = [];
+  var allEndingBalsNX = []; // "essentials only" endings - discretionary extra paused
   var depleteYears  = []; // which year each depleting scenario runs out
   var failYears     = new Array(yrs).fill(0);
   var yearlyBals    = [];
@@ -1581,8 +1614,10 @@ function runMonteCarlo() {
     var end = Math.min(start + CHUNK, nRuns);
     for (var run = start; run < end; run++) {
       var bal = totalPF;
+      var balNX = totalPF;        // parallel "essentials only" balance
       var depleted = false;
       var peakBal = bal;
+      var peakBalNX = balNX;
       var depleteAt = null;
 
       for (var i = 0; i < yrs; i++) {
@@ -1590,11 +1625,12 @@ function runMonteCarlo() {
 
         if (i === 0) continue; // Year 0 = starting balance, no withdrawal yet
 
-        // Use actual sheet withdrawal data if available (more accurate)
-        var withdrawal;
+        // ── Full plan: spending INCLUDES your discretionary extra ──
+        var withdrawal, extraInflated = safeExtra * Math.pow(1 + inflation, i);
         if (useSheetWithdrawals && i < proj.withdrawals.length) {
-          // Real withdrawal from your sheet (already accounts for income, taxes, etc.)
-          withdrawal = Math.max(0, proj.withdrawals[i] || 0);
+          // Real withdrawal from your sheet (already accounts for income, taxes, etc.).
+          // If the saved plan does NOT already include the extra, add it back for the full-plan line.
+          withdrawal = Math.max(0, (proj.withdrawals[i] || 0) + (extraInPlan ? 0 : extraInflated));
           // Spending flexibility: cut if portfolio dropped 20%+ from peak
           if (flexPct > 0 && peakBal > 0 && (peakBal - bal) / peakBal >= 0.20) {
             withdrawal *= (1 - flexPct * 0.5); // partial cut on actual withdrawals
@@ -1608,20 +1644,42 @@ function runMonteCarlo() {
           }
           withdrawal = Math.max(0, spend - guaranteed);
         }
-        bal = Math.max(0, bal - withdrawal);
 
+        // ── Essentials only: SAME plan with the inflated discretionary extra removed ──
+        var withdrawalNX;
+        if (useSheetWithdrawals && i < proj.withdrawals.length) {
+          withdrawalNX = Math.max(0, (proj.withdrawals[i] || 0) - (extraInPlan ? extraInflated : 0));
+          if (flexPct > 0 && peakBalNX > 0 && (peakBalNX - balNX) / peakBalNX >= 0.20) {
+            withdrawalNX *= (1 - flexPct * 0.5);
+          }
+        } else {
+          var guaranteedNX = ssYear1 * Math.pow(1 + colaRate, i) + pension;
+          var spendNX = Math.max(0, baseSpend - safeExtra) * Math.pow(1 + inflation, i);
+          if (flexPct > 0 && peakBalNX > 0 && (peakBalNX - balNX) / peakBalNX >= 0.20) {
+            spendNX *= (1 - flexPct);
+          }
+          withdrawalNX = Math.max(0, spendNX - guaranteedNX);
+        }
+
+        // One shared market return drives BOTH paths (clean apples-to-apples)
         var ret = mcRandReturn(model, mu, sigma);
+
+        bal = Math.max(0, bal - withdrawal);
         bal = Math.max(0, bal * (1 + ret));
         if (bal > peakBal) peakBal = bal;
-
         if (bal <= 0 && !depleted) {
           depleted = true;
           depleteAt = mcYears[i] || (curYear + i);
           for (var d = i; d < yrs; d++) failYears[d]++;
         }
+
+        balNX = Math.max(0, balNX - withdrawalNX);
+        balNX = Math.max(0, balNX * (1 + ret));
+        if (balNX > peakBalNX) peakBalNX = balNX;
       }
 
       allEndingBals.push(Math.round(bal));
+      allEndingBalsNX.push(Math.round(balNX));
       if (depleteAt !== null) depleteYears.push(depleteAt);
     }
 
@@ -1641,7 +1699,8 @@ function runMonteCarlo() {
       showMCResults(allEndingBals, yearlyBals, failYears, depleteYears,
         nRuns, yrs, mcYears, legacyGoal, curYear,
         p1Name, p2Name, p1DeathAge, p2DeathAge, p1.age||63, p2.age||55,
-        mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model);
+        mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
+        allEndingBalsNX, safeExtra, extraInPlan);
     }
   }
 
@@ -1657,7 +1716,8 @@ function mcPercentile(arr, p) {
 function showMCResults(endings, yearlyBals, failYears, depleteYears,
     nRuns, yrs, mcYears, legacyGoal, curYear,
     p1Name, p2Name, p1DeathAge, p2DeathAge, p1Age, p2Age,
-    mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model) {
+    mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
+    endingsNX, safeExtraAmt, extraInPlan) {
 
   var sorted = endings.slice().sort(function(a,b){return a-b;});
 
@@ -1692,6 +1752,25 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   var neverRanPct = Math.round((nRuns - depleted) / nRuns * 100);
   var nrEl = document.getElementById('mc-neverran');
   if (nrEl) nrEl.textContent = neverRanPct + '%';
+
+  // ── Essentials-only comparison (discretionary extra paused) ──
+  var cmpBox = document.getElementById('mc-extra-compare');
+  if (cmpBox) {
+    if (!endingsNX || !endingsNX.length || !(safeExtraAmt > 0)) {
+      cmpBox.style.display = 'none'; // nothing discretionary to remove
+    } else {
+      var depletedNX = endingsNX.filter(function(b){ return b <= 0; }).length;
+      var neverRanNX = Math.round((endingsNX.length - depletedNX) / endingsNX.length * 100);
+      var medianNX   = mcPercentile(endingsNX, 50);
+      cmpBox.style.display = '';
+      var sFull = document.getElementById('mc-cmp-full');
+      var sEss  = document.getElementById('mc-cmp-ess');
+      var tagFull = extraInPlan ? '   ← your current plan' : '';
+      var tagEss  = extraInPlan ? '' : '   ← your current plan';
+      if (sFull) sFull.textContent = neverRanPct + '% never ran out · median ' + fmt(p50) + tagFull;
+      if (sEss)  sEss.textContent  = neverRanNX  + '% never ran out · median ' + fmt(medianNX) + tagEss;
+    }
+  }
   document.getElementById('mc-median').textContent = fmt(p50);
   document.getElementById('mc-p10').textContent = p10 > 0 ? fmt(p10) : '💀 Depleted';
   document.getElementById('mc-p90').textContent = fmt(p90);
