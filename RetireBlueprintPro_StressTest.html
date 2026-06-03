@@ -294,14 +294,14 @@ window.addEventListener('storage', function(e) {
         <div class="slider-desc">Higher inflation erodes purchasing power every year. 1970s saw 8-12%.</div>
       </div>
 
-      <div class="slider-group">
+      <div class="slider-group" style="display:none;">
         <div class="slider-label">Spending Adjustment <span class="slider-val" id="lbl-spend">0%</span></div>
         <input type="range" id="sl-spend" min="-30" max="20" step="5" value="0" oninput="recalc()">
         <div class="slider-range"><span>-30%</span><span>0%</span><span>+20%</span></div>
         <div class="slider-desc">Your most powerful lever. Cutting 10% in a downturn dramatically changes outcomes.</div>
       </div>
 
-      <div class="slider-group">
+      <div class="slider-group" style="display:none;">
         <div class="slider-label">SS COLA Rate <span class="slider-val" id="lbl-cola">2.5%</span></div>
         <input type="range" id="sl-cola" min="0" max="5" step="0.5" value="2.5" oninput="recalc()">
         <div class="slider-range"><span>0%</span><span>2.5%</span><span>5%</span></div>
@@ -1432,10 +1432,24 @@ function esRenderBase() {
 // only real numbers. If the engine returns no detailed series, we say so plainly —
 // we never show an estimate dressed up as a result.
 
+function rbpPlanEndYear(){
+  if(!planData) return 0;
+  var cur=new Date().getFullYear();
+  var people=planData.people||{};
+  var end=0;
+  Object.keys(people).forEach(function(k){
+    var p=people[k]||{};
+    if(p.age){ var dy=cur+((p.deathAge||90)-(p.age||60)); if(dy>end) end=dy; }
+  });
+  return end; // later of the two partners' death years
+}
+
 function rbpDrawBars(yr1, yrs, baseRes){
   var crashCtx=document.getElementById('crash-bar-chart'); if(!crashCtx) return;
   if(window.crashBarChart) window.crashBarChart.destroy();
   var curYear=new Date().getFullYear();
+  var _pe=rbpPlanEndYear();
+  if(_pe>0 && baseRes) baseRes=baseRes.filter(function(p){return p.year<=_pe;});
   var nBars=Math.min(45, (baseRes&&baseRes.length)?baseRes.length:30);
   var barLabels=[],barData=[],barColors=[],barBorders=[];
   for(var bi=0;bi<nBars;bi++){
@@ -1464,6 +1478,8 @@ function rbpDrawRealChart(baseSeries, stressSeries, crashYrs){
   var ctx=document.getElementById('stress-chart'); if(!ctx) return;
   if(stressChart) stressChart.destroy();
   baseSeries=baseSeries||[];
+  var _pe=rbpPlanEndYear();
+  if(_pe>0) baseSeries=baseSeries.filter(function(p){return p.year<=_pe;});
   var labels=baseSeries.map(function(p){return p.year;});
   var baseData=baseSeries.map(function(p){return p.bal;});
   var sMap={}; (stressSeries||[]).forEach(function(p){sMap[p.year]=p.bal;});
@@ -1507,12 +1523,11 @@ function runNewTest(){
   var yrs=parseInt(document.getElementById('sl-yrs').value);
   var inf=parseFloat(document.getElementById('sl-inf').value);
   var proj=planData.projections||{};
-  // Map sliders -> engine's native bear levers. Drag = points cut from a ~7% baseline
-  // growth year (your Inputs help convention). Non-negative only: a flat/positive
-  // year-1 = no bear, so the engine runs your base plan (+ any inflation change).
-  var eDrag=Math.max(0, Math.round(7 - yr1));
+  // Map sliders -> engine's native lever. Drag = points vs a ~7% baseline year:
+  //   >0 = crash (returns cut)   <0 = boom (returns boosted, IF the sheet supports it)   0 = normal
+  var drag=Math.round(7 - yr1);
   var startYr=(proj.years && proj.years.length)?proj.years[0]:new Date().getFullYear();
-  var params={ action:'runStressTest', eType:'bear', eStart:startYr, eDur:(eDrag>0?Math.max(1,yrs):0), eDrag:eDrag, lType:'bear', lStart:0, lDur:0, lDrag:0, infl:inf };
+  var params={ action:'runStressTest', eType:'bear', eStart:startYr, eDur:(drag!==0?Math.max(1,yrs):0), eDrag:drag, lType:'bear', lStart:0, lDur:0, lDrag:0, infl:inf };
   if(btn){btn.disabled=true;btn.textContent='Running… (~20–30 sec)';btn.style.opacity='0.7';btn.style.cursor='wait';}
   if(st){st.style.display='block';st.innerHTML='<span style="color:#e09a3e;">⏳ Running your real engine — thousands of calculations. This takes ~20–30 seconds…</span>';}
   esJsonp(params, function(resp){
@@ -1539,7 +1554,12 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
   var seEl=document.getElementById('res-stress-end'); if(seEl){seEl.textContent=fmt(stressEnd);seEl.style.fontSize='18px';seEl.style.color=stressEnd>=baseEnd?'#1CC7D0':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';}
   var scEl=document.getElementById('res-stress-conf'); if(scEl){scEl.textContent=stressEnd<=0?'⚠️ Portfolio depletes':(stressConf+'% of $'+Math.round(legGoal/1000)+'K goal');scEl.style.color=stressConf>=100?'#1CC7D0':stressConf>=80?'#f4b86a':'#ff6b6b';}
   var title,detail,color,recs=[];
-  if(stressEnd>=legGoal&&legGoal>0){ title='✅ Plan is Resilient';color='#1CC7D0'; detail='Real engine run — ending balance of '+fmt(stressEnd)+' meets or exceeds your '+fmt(legGoal)+' legacy goal under this scenario.'; }
+  if(yr1 > 7){
+    title='📈 Strong-Market Run'; color='#1CC7D0';
+    detail = (stressEnd>baseEnd)
+      ? ('Real engine run — a better-than-normal market lifts your ending balance to '+fmt(stressEnd)+', above your base plan\u2019s '+fmt(baseEnd)+'.')
+      : ('Real engine run — ending balance '+fmt(stressEnd)+'. If that matches your base plan, your engine models downside stress but not an upside boost (your sheet only subtracts returns).');
+  } else if(stressEnd>=legGoal&&legGoal>0){ title='✅ Plan is Resilient';color='#1CC7D0'; detail='Real engine run — ending balance of '+fmt(stressEnd)+' meets or exceeds your '+fmt(legGoal)+' legacy goal under this scenario.'; }
   else if(stressEnd>0&&stressConf>=70){ title='⚠️ Plan Under Stress';color='#f4b86a'; detail='Real engine run — plan survives but ends '+fmt(legGoal-stressEnd)+' below your legacy goal ('+stressConf+'% funded). Your safe extra spend adjusted to '+fmt(resp.safeExtra)+'/yr to absorb the hit.'; recs=['Trim discretionary spending during the downturn years','Delay large purchases until the market recovers','Consider a small part-time income bridge']; }
   else if(stressEnd>0){ title='🚨 Plan At Risk';color='#ff6b6b'; detail='Real engine run — only '+stressConf+'% of your legacy goal is funded under this scenario. Your guaranteed income (Social Security + pension) continues regardless.'; recs=['Cut spending for the first few downturn years','Delay Social Security to maximize guaranteed income','Consider 1–2 more working years for a buffer']; }
   else { title='⛔ Portfolio Depletes';color='#ff6b6b'; detail='Real engine run — under this scenario the portfolio is fully drawn down before the plan ends. Focus on maximizing guaranteed income and reducing reliance on the portfolio.'; recs=['Maximize Social Security by delaying','Reduce the legacy goal','Add part-time income for the first several years']; }
@@ -1555,7 +1575,7 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
   var proj=planData.projections||{};
   var baseSeries=[];
   if(proj.years&&proj.endLiquid){ for(var i=0;i<proj.years.length;i++){ baseSeries.push({year:proj.years[i],bal:proj.endLiquid[i]}); } }
-  var crashYrs=(Math.max(0,Math.round(7-yr1))>0?Math.max(1,yrs):0);
+  var crashYrs=((Math.round(7-yr1))>0?Math.max(1,yrs):0);
   rbpDrawRealChart(baseSeries, resp.series, crashYrs);
   rbpDrawBars(yr1, yrs, baseSeries.length?baseSeries:null);
   var scen=document.getElementById('active-scenario-label'); if(scen){scen.textContent='✓ Showing a REAL engine run';scen.style.color='#1CC7D0';}
