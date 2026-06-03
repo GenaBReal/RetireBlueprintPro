@@ -110,6 +110,12 @@ window.addEventListener('storage', function(e) {
   html,body{min-width:0 !important;max-width:100% !important;overflow-x:hidden !important;}
   /* collapse multi-column grids (inline + class) to a single column */
   [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid{grid-template-columns:1fr !important;}
+  /* keep the stress-test result KPIs as a 3-wide grid (3 and 3) on mobile */
+  #stress-kpi-grid{grid-template-columns:repeat(3,1fr) !important;gap:6px !important;}
+  #stress-kpi-grid .kpi-card{padding:9px 6px !important;}
+  #stress-kpi-grid .kpi-val{font-size:14px !important;}
+  #stress-kpi-grid .kpi-lbl{font-size:7px !important;letter-spacing:.3px !important;}
+  #stress-kpi-grid .kpi-sub{font-size:8px !important;}
   /* let inline flex rows wrap (nav/header use classes, so they're untouched) */
   [style*="display:flex"],[style*="display: flex"],.plan-meta{flex-wrap:wrap !important;}
   /* keep fields, media, charts within the viewport */
@@ -350,6 +356,7 @@ window.addEventListener('storage', function(e) {
       </div>
 <!-- ══ 6-KPI STRESS RESULT (3 + 3) ══ -->
 <style>
+#stress-kpi-grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px;}
 #stress-kpi-grid .kpi-card{background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.18);border-radius:12px;padding:13px 14px 12px;text-align:center;}
 #stress-kpi-grid .kpi-lbl{font-size:8.5px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;line-height:1.3;}
 #stress-kpi-grid .kpi-val{font-size:19px;font-weight:900;line-height:1.1;}
@@ -425,6 +432,26 @@ window.addEventListener('storage', function(e) {
 </div>
 
 
+<!-- ════ SAVED TESTS (comparison of your real-engine runs) ════ -->
+<div id="saved-tests-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);overflow:hidden;">
+  <div style="padding:20px 22px 6px;">
+    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">🎯 Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
+    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">Every time you press <strong style="color:#cfe3ef;">▶ Run New Test</strong> above, that result saves here so you can compare your scenarios side by side — including any with a second, later crash.</div>
+  </div>
+
+  <!-- Saved test slots -->
+  <div style="padding:6px 22px 22px;">
+    <div style="font-size:11px;color:#9fc1d6;line-height:1.65;background:rgba(255,255,255,.03);border-radius:9px;padding:12px 14px;margin-bottom:14px;">
+      <strong style="color:#cfe3ef;">What these tests mean.</strong> A bear market early in retirement is one of the biggest risks to a plan, because you&rsquo;re selling investments to live on while prices are down &mdash; money that leaves the portfolio in a downturn can&rsquo;t recover when the market does. Each test runs that scenario through your full plan and shows two things. First, your <strong style="color:#cfe3ef;">safe extra spend</strong>: if it drops, that&rsquo;s your plan protecting itself &mdash; trimming spending is how it absorbs the hit while still reaching your legacy goal. Second, whether and when your balance <strong style="color:#cfe3ef;">drops below your legacy goal</strong>: if the bear market is mild, spending flexes down and your legacy stays intact; if it&rsquo;s severe, spending can&rsquo;t absorb it all and your legacy takes the hit. Neither outcome is a prediction &mdash; it&rsquo;s a way to see how much cushion you have, and which lever (spending or legacy) moves first when markets turn. A plan that holds its legacy goal even under a steep, multi-year bear market has real resilience built in.
+    </div>
+    <div style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.9px;margin:8px 0 10px;">Saved Tests <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#6a8a9a;">— compared to your base plan · newest fills the next slot, 6th overwrites Test 1</span></div>
+    <div id="es-base-line" style="font-size:11px;color:#9fc1d6;margin-bottom:12px;padding:8px 12px;background:rgba(28,199,208,.07);border-radius:8px;">
+      <strong style="color:#1CC7D0;">Base plan:</strong> <span id="es-base-vals">load your plan to see base numbers</span>
+    </div>
+    <div id="es-slots" style="display:grid;grid-template-columns:1fr;gap:8px;"></div>
+  </div>
+</div>
+
 <!-- ══ MONTE CARLO HEADER + BRIDGE EXPLAINER ══ -->
 <div style="margin:32px 0 0;padding:28px 32px 26px;background:linear-gradient(160deg,#041E2F,#0A3145 65%,#0c3a52);border-radius:18px 18px 0 0;border:1px solid rgba(28,199,208,.22);border-bottom:none;position:relative;overflow:hidden;">
   <!-- top accent rail -->
@@ -487,26 +514,6 @@ window.addEventListener('storage', function(e) {
     <span>⚠️ <strong style="color:#f4b86a;">75–89%</strong> <span style="color:#b8dde6;">Acceptable</span></span>
     <span style="color:#4a6a7a;">·</span>
     <span>❌ <strong style="color:#ef5350;">Below 75%</strong> <span style="color:#b8dde6;">Needs adjustment</span></span>
-  </div>
-</div>
-
-<!-- ════ SAVED TESTS (comparison of your real-engine runs) ════ -->
-<div id="saved-tests-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);overflow:hidden;">
-  <div style="padding:20px 22px 6px;">
-    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">🎯 Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
-    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">Every time you press <strong style="color:#cfe3ef;">▶ Run New Test</strong> above, that result saves here so you can compare your scenarios side by side — including any with a second, later crash.</div>
-  </div>
-
-  <!-- Saved test slots -->
-  <div style="padding:6px 22px 22px;">
-    <div style="font-size:11px;color:#9fc1d6;line-height:1.65;background:rgba(255,255,255,.03);border-radius:9px;padding:12px 14px;margin-bottom:14px;">
-      <strong style="color:#cfe3ef;">What these tests mean.</strong> A bear market early in retirement is one of the biggest risks to a plan, because you&rsquo;re selling investments to live on while prices are down &mdash; money that leaves the portfolio in a downturn can&rsquo;t recover when the market does. Each test runs that scenario through your full plan and shows two things. First, your <strong style="color:#cfe3ef;">safe extra spend</strong>: if it drops, that&rsquo;s your plan protecting itself &mdash; trimming spending is how it absorbs the hit while still reaching your legacy goal. Second, whether and when your balance <strong style="color:#cfe3ef;">drops below your legacy goal</strong>: if the bear market is mild, spending flexes down and your legacy stays intact; if it&rsquo;s severe, spending can&rsquo;t absorb it all and your legacy takes the hit. Neither outcome is a prediction &mdash; it&rsquo;s a way to see how much cushion you have, and which lever (spending or legacy) moves first when markets turn. A plan that holds its legacy goal even under a steep, multi-year bear market has real resilience built in.
-    </div>
-    <div style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.9px;margin:8px 0 10px;">Saved Tests <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#6a8a9a;">— compared to your base plan · newest fills the next slot, 6th overwrites Test 1</span></div>
-    <div id="es-base-line" style="font-size:11px;color:#9fc1d6;margin-bottom:12px;padding:8px 12px;background:rgba(28,199,208,.07);border-radius:8px;">
-      <strong style="color:#1CC7D0;">Base plan:</strong> <span id="es-base-vals">load your plan to see base numbers</span>
-    </div>
-    <div id="es-slots" style="display:grid;grid-template-columns:1fr;gap:8px;"></div>
   </div>
 </div>
 
