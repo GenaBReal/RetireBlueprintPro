@@ -38,7 +38,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(1200
 .fp-cell{text-align:center;padding:14px 10px;background:linear-gradient(165deg,rgba(28,199,208,.10),rgba(255,255,255,.04));border-radius:10px;border:1px solid rgba(28,199,208,.22);border-top:3px solid #f4b86a;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative;z-index:1;}
 .fp-cell:nth-child(2){border-top-color:#f4b86a;background:linear-gradient(165deg,rgba(244,184,106,.14),rgba(255,255,255,.04));}
 .fp-cell:nth-child(3),.fp-cell:nth-child(4){border-top-color:#1CC7D0;background:linear-gradient(165deg,rgba(28,199,208,.16),rgba(255,255,255,.04));}
-.fp-cell:last-child{border-top-color:#ff6b6b;background:linear-gradient(165deg,rgba(255,107,107,.14),rgba(255,255,255,.04));}
 .fp-val{font-size:20px;font-weight:900;color:#eaf4f8;line-height:1.1;margin:2px 0;}
 .fp-note{font-size:9.5px;color:#9fc1d6;margin-top:5px;font-weight:600;}
 .scenario-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
@@ -232,13 +231,12 @@ window.addEventListener('storage', function(e) {
   </div>
 <div id="plan-fingerprint">
     <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔍 Your Plan Fingerprint — Confirm This Is Your Data</div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
       <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
       <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#f4b86a;">—</div><div class="fp-note">Target end</div></div>
       <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#0B2239;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
       <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#7ecfda;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
       <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Essentials + extra</div></div>
-      <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
     <div style="margin-top:10px;font-size:9.5px;color:#dceaf5;text-align:center;line-height:1.6;">These are your <b>real saved plan</b> numbers. Anything you test on this page is a <b>safe what-if</b> — it never changes your saved plan. To make a change <b style="color:#f4b86a;">permanent</b>, update it in your actual plan on the <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;">Inputs page</a> and Save — it then flows through every page. The 🛡️ Crash card is a worst-case preview, not your projection.</div>
   </div>
@@ -373,37 +371,37 @@ window.addEventListener('storage', function(e) {
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" id="stress-kpi-grid">
 
     <!-- 1 Base ending -->
-    <div class="kpi-card">
+    <div class="kpi-card" title="Your projected ending balance with NO crash — the baseline this scenario is measured against.">
       <div class="kpi-lbl">Base Plan Ending</div>
       <div id="res-base-end" class="kpi-val" style="color:#1CC7D0;">—</div>
       <div id="res-base-conf" class="kpi-sub">no crash</div>
     </div>
     <!-- 2 With this scenario -->
-    <div class="kpi-card">
+    <div class="kpi-card" title="Projected ending balance after applying the crash / low-return scenario you set with the sliders.">
       <div class="kpi-lbl">With This Scenario</div>
       <div id="res-stress-end" class="kpi-val" style="color:#ff6b6b;">—</div>
       <div id="res-stress-conf" class="kpi-sub">—</div>
     </div>
     <!-- 3 The hit -->
-    <div class="kpi-card">
+    <div class="kpi-card" title="How much lower (or higher) this scenario ends versus your base plan — base minus scenario.">
       <div class="kpi-lbl">The Hit</div>
       <div id="kpi-hit" class="kpi-val" style="color:#f4b86a;">—</div>
       <div class="kpi-sub">base − scenario</div>
     </div>
     <!-- 4 Safe extra spend -->
-    <div class="kpi-card">
+    <div class="kpi-card" title="The most you could spend ON TOP of your essentials each year and still finish at/above your legacy goal in this scenario.">
       <div class="kpi-lbl">Safe Extra Spend</div>
       <div id="kpi-safe" class="kpi-val" style="color:#1CC7D0;">—</div>
       <div class="kpi-sub">per year, this scenario</div>
     </div>
     <!-- 5 Drops below legacy -->
-    <div class="kpi-card">
+    <div class="kpi-card" title="The first year your portfolio would fall below your legacy goal in this scenario — or "Holds" if it never does.">
       <div class="kpi-lbl">Drops Below Legacy</div>
       <div id="kpi-below" class="kpi-val" style="color:#1CC7D0;">—</div>
       <div class="kpi-sub">year, or holds</div>
     </div>
     <!-- 6 Legacy target -->
-    <div class="kpi-card">
+    <div class="kpi-card" title="The ending balance this scenario is tested against — your legacy goal from your plan.">
       <div class="kpi-lbl">Your Legacy Target</div>
       <div id="kpi-legacy" class="kpi-val" style="color:#0B2239;">—</div>
       <div class="kpi-sub">tested against</div>
@@ -679,7 +677,7 @@ window.addEventListener('storage', function(e) {
         <div style="background:#061620;border-radius:10px;border:1px solid #1a3a52;padding:16px;margin-bottom:16px;">
           <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">
             Portfolio Range Across All Scenarios
-            <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#9fc1d6;margin-left:8px;">Green band = 25th–75th percentile · Teal line = median · Orange = P10</span>
+            <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#9fc1d6;margin-left:8px;">Teal line = your middle-of-the-road outcome · Shaded = range of all scenarios · Orange = worst 10% · Top of chart capped for readability (a few lucky runs go far higher)</span>
           </div>
           <div style="position:relative;height:240px;">
             <canvas id="mc-fan-chart"></canvas>
@@ -689,13 +687,13 @@ window.addEventListener('storage', function(e) {
         <!-- Survival curve -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
           <div style="background:#061620;border-radius:10px;border:1px solid #1a3a52;padding:16px;">
-            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Depletion Risk by Year</div>
+            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Chance You Can't Cover Must-Pay (by Year)</div>
             <div style="position:relative;height:160px;">
               <canvas id="mc-survival-chart"></canvas>
             </div>
           </div>
           <div style="background:#061620;border-radius:10px;border:1px solid #1a3a52;padding:16px;">
-            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Final Balance Distribution</div>
+            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Ending Balance at Full Spending</div>
             <div style="position:relative;height:160px;">
               <canvas id="mc-hist-chart"></canvas>
             </div>
@@ -1971,15 +1969,18 @@ function runMonteCarlo() {
         bal = Math.max(0, bal - withdrawal);
         bal = Math.max(0, bal * (1 + ret));
         if (bal > peakBal) peakBal = bal;
-        if (bal <= 0 && !depleted) {
-          depleted = true;
-          depleteAt = mcYears[i] || (curYear + i);
-          for (var d = i; d < yrs; d++) failYears[d]++;
-        }
 
         balNX = Math.max(0, balNX - withdrawalNX);
         balNX = Math.max(0, balNX * (1 + ret));
         if (balNX > peakBalNX) peakBalNX = balNX;
+        // ── RUN-OUT / loss of sustainability = portfolio can no longer cover the
+        // MUST-PAY floor (base + healthcare + debt), discretionary extra excluded.
+        // Keyed off the essentials-only path (balNX), NOT the full-spend path. ──
+        if (balNX <= 0 && !depleted) {
+          depleted = true;
+          depleteAt = mcYears[i] || (curYear + i);
+          for (var d = i; d < yrs; d++) failYears[d]++;
+        }
       }
 
       allEndingBals.push(Math.round(bal));
@@ -2122,12 +2123,12 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   var depleteHtml = '';
   if (depleted > 0) {
     depleteHtml = '<div style="background:rgba(239,83,80,0.07);border:1px solid rgba(239,83,80,0.25);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:#ffcdd2;">' +
-      '<strong style="color:#ef5350;font-size:13px;">⚠️ About the ' + depleted + ' scenarios that ran out of money</strong><br><br>' +
-      'In <strong>' + failPct + '%</strong> of simulations the portfolio reached $0.' +
-      (earliestDeplete ? ' The earliest depletion occurred in <strong>' + earliestDeplete + '</strong>.' : '') +
-      (medDepleteYr ? ' The median depletion year was <strong>' + medDepleteYr + '</strong> — meaning half of failing scenarios lasted at least to that year.' : '') +
-      '<br><br>Even in depleted scenarios, your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong> in Social Security + pension) continues — the portfolio reaching $0 means spending above that floor is no longer funded, not that all income stops.' +
-      '<br><br><span style="color:#8aaabb;">To improve: reduce planned spending, delay retirement, increase SS delay, or build a larger Roth bucket to reduce sequence-of-returns risk.</span>' +
+      '<strong style="color:#ef5350;font-size:13px;">⚠️ About the ' + depleted + ' scenarios that ran short of your must-pay floor</strong><br><br>' +
+      'In <strong>' + failPct + '%</strong> of simulations the portfolio could no longer cover your <strong>must-pay floor</strong> — base living + healthcare + debt — at some point in retirement.' +
+      (earliestDeplete ? ' The earliest this happened was <strong>' + earliestDeplete + '</strong>.' : '') +
+      (medDepleteYr ? ' The median run-out year was <strong>' + medDepleteYr + '</strong> — half of the failing scenarios held the must-pay floor at least until then.' : '') +
+      '<br><br>This is the line that matters most: it is the year your essential, cannot-skip expenses outlast the portfolio. Your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong> in Social Security + pension) keeps coming, but on its own it does not cover the full must-pay floor.' +
+      '<br><br><span style="color:#8aaabb;">To push the run-out year later: trim base spending, delay retirement, delay Social Security, or pay down debt faster to shrink the must-pay floor.</span>' +
       '</div>';
   } else {
     depleteHtml = '<div style="background:rgba(76,175,80,0.07);border:1px solid rgba(76,175,80,0.25);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:#a5d6a7;">' +
@@ -2164,10 +2165,10 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   } else {
     verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #ef5350;color:#2c3e50;font-size:13px;line-height:1.8;">' +
       '🚨 <strong style="color:#ef5350;font-size:15px;">Significant Risk — ' + successPct + '% success rate</strong><br><br>' +
-      'Only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' scenarios</strong> reach your goal. ' +
-      (earliestDeplete ? 'Some scenarios deplete as early as <strong>' + earliestDeplete + '</strong>. ' : '') +
-      'This level suggests the current plan parameters need meaningful adjustment before retirement. ' +
-      '<br><br>Important: your guaranteed income of <strong>' + fmt(ssYear1 + pension) + '/yr</strong> continues even if the portfolio depletes — but that may not cover your spending needs. Use the Inputs page to model changes and re-run.' +
+      'The number that matters most: in <strong>' + failPct + '% of futures (' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + ')</strong> the portfolio can no longer cover your <strong>must-pay floor</strong> — base living + healthcare + debt — before the plan ends. ' +
+      (medDepleteYr ? 'In a typical failure that happens around <strong>' + medDepleteYr + '</strong>' + (earliestDeplete ? ', and as early as <strong>' + earliestDeplete + '</strong> in the worst cases' : '') + '. ' : (earliestDeplete ? 'Some run dry as early as <strong>' + earliestDeplete + '</strong>. ' : '')) +
+      'Separately, only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + '</strong> futures also finish with your full legacy goal still intact. ' +
+      '<br><br>Your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong> in Social Security + pension) keeps coming for life — but on its own it does not cover the must-pay floor, so the run-out year above is your real sustainability limit. Use the Inputs page to trim base spending, delay retirement or Social Security, or pay down debt, then re-run.' +
       '</div>';
   }
 
@@ -2210,6 +2211,14 @@ function buildMCFanChart(yearlyBals, yrs, curYear, projYears, nRuns) {
       p90Vals.push(mcPercentile(yearlyBals[i], 90));
     }
   }
+
+  // Readability cap: a handful of lucky scenarios balloon to $10M+, which crushes
+  // the median and downside lines flat at the bottom. Cap the visible y-axis at
+  // ~3x the starting balance so the lines people actually care about (median +
+  // worst cases) are legible. The very top of the upside band is clipped — noted
+  // in the legend — which is fine: the point of this chart is the downside.
+  var startBal = p50Vals.length ? p50Vals[0] : 0;
+  var yMaxCap = startBal > 0 ? Math.round(startBal * 3) : undefined;
 
   var ctx = document.getElementById('mc-fan-chart').getContext('2d');
   if (window._mcFanChart) window._mcFanChart.destroy();
@@ -2277,6 +2286,8 @@ function buildMCFanChart(yearlyBals, yrs, curYear, projYears, nRuns) {
       scales: {
         x: { ticks: { color: '#6a8a9a', font: { size: 10 } }, grid: { color: '#0d2a3a' } },
         y: {
+          beginAtZero: true,
+          max: yMaxCap,
           ticks: {
             color: '#6a8a9a', font: { size: 10 },
             callback: function(v) { return v >= 1000000 ? '$'+(v/1000000).toFixed(1)+'M' : '$'+(v/1000).toFixed(0)+'K'; }
