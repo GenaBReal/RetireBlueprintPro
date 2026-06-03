@@ -603,6 +603,7 @@ window.addEventListener('storage', function(e) {
               <div><div id="mc-neverran" style="font-size:18px;font-weight:900;color:#1CC7D0;line-height:1;">—</div><div style="font-size:9px;color:#9fc1d6;margin-top:3px;max-width:92px;">never ran out at full spending</div></div>
               <div><div id="mc-goalpct" style="font-size:18px;font-weight:900;color:#9fc1d6;line-height:1;">—</div><div style="font-size:9px;color:#9fc1d6;margin-top:3px;max-width:92px;">reached full legacy goal</div></div>
             </div>
+            <div id="mc-fullspend-note" style="font-size:9px;color:#9fc1d6;margin-top:9px;line-height:1.45;font-style:italic;">—</div>
           </div>
 
           <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:10px;">
@@ -1722,12 +1723,13 @@ function esLoadSaved() {
     }
   });
 
-  // When user returns to this tab after 30+ seconds → reload
+  // When user returns to this tab (e.g. after editing the Google Sheet directly) → reload fresh data.
+  // Short threshold so a real "went to the sheet and came back" always refreshes; ignores quick flickers.
   document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
       _hiddenAt = Date.now();
     } else {
-      if (_hiddenAt && (Date.now() - _hiddenAt) > 30000) {
+      if (_hiddenAt && (Date.now() - _hiddenAt) > 4000) {
         if (typeof window[_loadFn] === 'function') window[_loadFn]();
       }
     }
@@ -2022,6 +2024,8 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   if (nrEl) nrEl.textContent = neverRanPct + '%';
   var gpEl = document.getElementById('mc-goalpct');
   if (gpEl) gpEl.textContent = successPct + '%';
+  var fsEl = document.getElementById('mc-fullspend-note');
+  if (fsEl) fsEl.textContent = 'At full spending: reached your full legacy goal ' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' times.';
 
   // ── Essentials-only comparison (discretionary extra paused) ──
   var cmpBox = document.getElementById('mc-extra-compare');
