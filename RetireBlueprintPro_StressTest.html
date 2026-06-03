@@ -308,6 +308,16 @@ window.addEventListener('storage', function(e) {
         <div class="slider-desc">Zero models a worst-case SS reform scenario.</div>
       </div>
 
+      <details style="margin-top:4px;border-top:1px solid #e3edf2;padding-top:10px;">
+        <summary style="cursor:pointer;font-size:11px;font-weight:800;color:#0c8a92;">+ Add a second crash later in retirement (optional)</summary>
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div><div style="font-size:8.5px;color:#607d8b;font-weight:700;margin-bottom:3px;letter-spacing:.3px;">STARTS (YEAR)</div><input id="lt-start" type="number" placeholder="2045" style="width:100%;box-sizing:border-box;border:1px solid #cfd8dd;border-radius:6px;padding:6px 7px;font-size:12px;font-family:inherit;"></div>
+          <div><div style="font-size:8.5px;color:#607d8b;font-weight:700;margin-bottom:3px;letter-spacing:.3px;">YR-1 RETURN %</div><input id="lt-ret" type="number" placeholder="-20" style="width:100%;box-sizing:border-box;border:1px solid #cfd8dd;border-radius:6px;padding:6px 7px;font-size:12px;font-family:inherit;"></div>
+          <div><div style="font-size:8.5px;color:#607d8b;font-weight:700;margin-bottom:3px;letter-spacing:.3px;">LASTS (YRS)</div><input id="lt-yrs" type="number" placeholder="2" style="width:100%;box-sizing:border-box;border:1px solid #cfd8dd;border-radius:6px;padding:6px 7px;font-size:12px;font-family:inherit;"></div>
+        </div>
+        <div style="font-size:9px;color:#90a4ae;margin-top:6px;line-height:1.4;">Leave blank for no second crash. Models a downturn <i>later</i> in retirement, on top of the early one set by the sliders.</div>
+      </details>
+
       <button class="reset-btn" onclick="setScenario('custom')">↺ Reset to Base</button>
       <button id="run-new-test-btn" onclick="runNewTest()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#f4b86a,#e09a3e);color:#041E2F;font-weight:900;font-size:14px;border:none;border-radius:12px;padding:14px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 4px 14px rgba(244,184,106,.3);">▶ Run New Test</button>
       <div style="margin-top:8px;font-size:10px;line-height:1.5;color:#8aaabb;text-align:center;">Runs your <b>real engine</b> on these settings — give it <b>~20–30 sec</b> (thousands of calculations). No estimates: this is a true run of your plan.</div>
@@ -468,47 +478,11 @@ window.addEventListener('storage', function(e) {
   </div>
 </div>
 
-<!-- ════ ENGINE STRESS TESTS (real Master-formula bear-market tests) ════ -->
-<div id="engine-stress-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);overflow:hidden;">
+<!-- ════ SAVED TESTS (comparison of your real-engine runs) ════ -->
+<div id="saved-tests-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);overflow:hidden;">
   <div style="padding:20px 22px 6px;">
-    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">🎯 Engine Stress Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
-    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">
-      Unlike the sliders above (which estimate), these run a real bear market through your <strong style="color:#cfe3ef;">full plan engine</strong> — the same math behind your Dashboard — then show how your safe spending and legacy hold up. Each test is saved below so you can compare.
-    </div>
-    <div style="font-size:10.5px;color:#7e9aad;line-height:1.6;margin-top:10px;background:rgba(28,199,208,.06);border-left:3px solid #1CC7D0;border-radius:6px;padding:9px 12px;">
-      <strong style="color:#9fd5dd;">Drag %</strong> = the percentage points knocked off your growth accounts&rsquo; return rate during the bear years. Example: a 10% drag turns a 7% return into &minus;3% for those years. (Only affects accounts earning above 3%.)
-    </div>
-  </div>
-
-  <div style="padding:10px 22px 4px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-    <!-- EARLY bear -->
-    <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:14px 16px;">
-      <div style="font-size:10px;font-weight:800;color:#f4b86a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Early Bear Market</div>
-      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Start year</label>
-      <input type="number" id="es-eStart" value="2030" min="2024" max="2080" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
-      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Duration (years)</label>
-      <input type="number" id="es-eDur" value="3" min="0" max="15" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
-      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Drag % <span style="color:#6a8a9a;">(points off returns)</span></label>
-      <input type="number" id="es-eDrag" value="15" min="0" max="50" step="1" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
-    </div>
-    <!-- LATE bear -->
-    <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:14px 16px;">
-      <div style="font-size:10px;font-weight:800;color:#7e9aad;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Late Bear Market <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
-      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Start year</label>
-      <input type="number" id="es-lStart" value="2045" min="2024" max="2090" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
-      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Duration (years)</label>
-      <input type="number" id="es-lDur" value="0" min="0" max="15" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:9px;">
-      <label style="display:block;font-size:10px;color:#9fc1d6;margin-bottom:3px;">Drag % <span style="color:#6a8a9a;">(0 = none)</span></label>
-      <input type="number" id="es-lDrag" value="0" min="0" max="50" step="1" style="width:100%;background:#0A3145;color:#e0f0f4;border:1px solid #1a3a52;border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
-    </div>
-  </div>
-
-  <div style="padding:14px 22px 8px;text-align:center;">
-    <button id="es-run-btn" onclick="runEngineStressTest()" style="background:linear-gradient(135deg,#1CC7D0,#0c8a92);color:#041E2F;font-weight:800;font-size:13px;border:none;border-radius:10px;padding:12px 28px;cursor:pointer;font-family:inherit;letter-spacing:.3px;">▶ Run Engine Stress Test</button>
-    <div id="es-warning" style="display:none;font-size:11px;color:#f4b86a;margin-top:10px;line-height:1.5;">
-      ⏳ Running your full plan through the engine — this can take up to a minute. Please don&rsquo;t close this page.
-    </div>
-    <div id="es-error" style="display:none;font-size:11px;color:#ff6b6b;margin-top:10px;"></div>
+    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">🎯 Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
+    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">Every time you press <strong style="color:#cfe3ef;">▶ Run New Test</strong> above, that result saves here so you can compare your scenarios side by side — including any with a second, later crash.</div>
   </div>
 
   <!-- Saved test slots -->
@@ -1529,7 +1503,14 @@ function runNewTest(){
   //   >0 = crash (returns cut)   <0 = boom (returns boosted, IF the sheet supports it)   0 = normal
   var drag=Math.round(7 - yr1);
   var startYr=(proj.years && proj.years.length)?proj.years[0]:new Date().getFullYear();
-  var params={ action:'runStressTest', eType:'bear', eStart:startYr, eDur:(drag!==0?Math.max(1,yrs):0), eDrag:drag, lType:'bear', lStart:0, lDur:0, lDrag:0, infl:inf };
+  // Optional SECOND crash later in retirement (from the "Add a second crash" inputs)
+  var _ltS=document.getElementById('lt-start'), _ltR=document.getElementById('lt-ret'), _ltY=document.getElementById('lt-yrs');
+  var ltStart=_ltS?parseFloat(_ltS.value):NaN, ltRet=_ltR?parseFloat(_ltR.value):NaN, ltYrs=_ltY?parseFloat(_ltY.value):NaN;
+  var lStart=0, lDur=0, lDrag=0;
+  if(!isNaN(ltStart) && !isNaN(ltRet) && !isNaN(ltYrs) && ltYrs>0){
+    lStart=Math.round(ltStart); lDrag=Math.round(7-ltRet); lDur=Math.max(1,Math.round(ltYrs));
+  }
+  var params={ action:'runStressTest', eType:'bear', eStart:startYr, eDur:(drag!==0?Math.max(1,yrs):0), eDrag:drag, lType:'bear', lStart:lStart, lDur:lDur, lDrag:lDrag, infl:inf };
   if(btn){btn.disabled=true;btn.textContent='Running… (~20–30 sec)';btn.style.opacity='0.7';btn.style.cursor='wait';}
   if(st){st.style.display='block';st.innerHTML='<span style="color:#e09a3e;">⏳ Running your real engine — thousands of calculations. This takes ~20–30 seconds…</span>';}
   esJsonp(params, function(resp){
@@ -1541,6 +1522,16 @@ function runNewTest(){
     }
     if(st){st.style.display='none';}
     rbpRenderRealResult(resp, yr1, yrs, inf);
+    // Save to the comparison slots (ending = the real series-end stashed by the render)
+    try {
+      var _t={ ts:Date.now(),
+        params:{ eStart:startYr, eDur:(drag!==0?Math.max(1,yrs):0), eDrag:drag, lStart:lStart, lDur:lDur, lDrag:lDrag },
+        result:{ safeExtra:resp.safeExtra, ending:(window._ntLastEnd!=null?window._ntLastEnd:resp.ending), surplus:resp.surplus, legacyGoal:(resp.legacyGoal||0), belowYear:resp.belowYear } };
+      if(_esTests.length<5){ _esTests.push(_t); _esNextSlot=_esTests.length%5; }
+      else { _esTests[_esNextSlot]=_t; _esNextSlot=(_esNextSlot+1)%5; }
+      if(typeof esRenderSlots==='function') esRenderSlots();
+      if(typeof esPersist==='function') esPersist();
+    } catch(e){}
   }, function(err){
     if(btn){btn.disabled=false;btn.textContent='▶ Run New Test';btn.style.opacity='1';btn.style.cursor='pointer';}
     if(st){st.innerHTML='<span style="color:#ff6b6b;">⚠️ '+err+'</span>';}
@@ -1563,6 +1554,7 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
   // "With crash" ending = the actual END of the red line, NOT the solver's B133 (which
   // your engine pins to your legacy goal and which contradicted the chart).
   var stressEnd = stressSeries.length ? stressSeries[stressSeries.length-1].bal : (resp.ending||0);
+  window._ntLastEnd = stressEnd;
   var minBal = stressSeries.length ? Math.min.apply(null, stressSeries.map(function(p){return p.bal;})) : stressEnd;
   var zeroYr=null; for(var z=0;z<stressSeries.length;z++){ if(stressSeries[z].bal<=0){ zeroYr=stressSeries[z].year; break; } }
   var depletes = minBal<=0;
@@ -1659,7 +1651,7 @@ function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
 function esRenderSlots() {
   var wrap=document.getElementById('es-slots');
   if(!wrap) return;
-  if(!_esTests.length){ wrap.innerHTML='<div style="font-size:11px;color:#6a8a9a;padding:10px 0;">No tests yet — set a bear market above and click Run. Your results will save here.</div>'; return; }
+  if(!_esTests.length){ wrap.innerHTML='<div style="font-size:11px;color:#6a8a9a;padding:10px 0;">No tests yet — press ▶ Run New Test above and your results will save here to compare.</div>'; return; }
   var base=esBaseNumbers()||{};
   var html='';
   _esTests.forEach(function(t,i){
