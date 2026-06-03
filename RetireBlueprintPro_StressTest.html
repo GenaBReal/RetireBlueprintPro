@@ -1456,10 +1456,8 @@ function rbpDrawBars(yr1, yrs, baseRes){
     var yr=(baseRes&&baseRes[bi]?baseRes[bi].year:curYear+bi);
     barLabels.push(yr);
     var ret;
-    if(bi===0) ret=0;
-    else if(bi===1) ret=yr1;
-    else if(bi<=yrs) ret=yr1*(1-(bi-1)/yrs)+7*((bi-1)/yrs);
-    else ret=7;
+    if(bi < yrs) ret = yr1;   // crash years: flat at the drag depth the engine actually applies
+    else ret = 7;             // baseline / recovery
     ret=Math.round(ret);
     barData.push(ret);
     barColors.push(ret<0?'rgba(214,69,69,0.75)':'rgba(28,199,208,0.6)');
@@ -1488,7 +1486,8 @@ function rbpDrawRealChart(baseSeries, stressSeries, crashYrs){
   var curYear=new Date().getFullYear();
   var allVals=baseData.concat(stressData).filter(function(v){return v!=null;}).concat([goal]);
   var maxVal=allVals.length?Math.max.apply(null,allVals):goal;
-  var crashData=labels.map(function(yr){ return (crashYrs>0 && yr>curYear && yr<=curYear+Math.max(crashYrs,1))?maxVal*1.05:null; });
+  var startY=labels.length?labels[0]:curYear;
+  var crashData=labels.map(function(yr){ return (crashYrs>0 && yr>=startY && yr<startY+crashYrs)?maxVal*1.05:null; });
   var ds=[
     {label:'',data:crashData,type:'bar',backgroundColor:'rgba(214,69,69,0.13)',borderColor:'transparent',borderWidth:0,barPercentage:1.0,categoryPercentage:1.0,order:3},
     {label:'Legacy Goal',data:labels.map(function(){return goal;}),borderColor:'#f4b86a',borderDash:[6,4],fill:false,pointRadius:0,borderWidth:1.8,order:2}
@@ -1549,36 +1548,71 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
   var leg=planData.legacy||{};
   var legGoal=resp.legacyGoal||leg.goal||0;
   var baseEnd=leg.projectedEnding||0;
-  var stressEnd=resp.ending||0;
-  var stressConf=legGoal>0?Math.min(100,Math.round(stressEnd/legGoal*100)):100;
-  var seEl=document.getElementById('res-stress-end'); if(seEl){seEl.textContent=fmt(stressEnd);seEl.style.fontSize='18px';seEl.style.color=stressEnd>=baseEnd?'#1CC7D0':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';}
-  var scEl=document.getElementById('res-stress-conf'); if(scEl){scEl.textContent=stressEnd<=0?'⚠️ Portfolio depletes':(stressConf+'% of $'+Math.round(legGoal/1000)+'K goal');scEl.style.color=stressConf>=100?'#1CC7D0':stressConf>=80?'#f4b86a':'#ff6b6b';}
+  var proj=planData.projections||{};
+  var planEnd=rbpPlanEndYear();
+
+  // Build base + stressed series FIRST (clipped to the plan horizon) so EVERY number
+  // we display is read straight off the same lines the chart draws — no separate cell.
+  var baseSeries=[];
+  if(proj.years&&proj.endLiquid){ for(var i=0;i<proj.years.length;i++){ if(!planEnd||proj.years[i]<=planEnd) baseSeries.push({year:proj.years[i],bal:proj.endLiquid[i]}); } }
+  var stressSeries=(resp.series||[]).filter(function(p){return !planEnd || p.year<=planEnd;});
+
+  // "With crash" ending = the actual END of the red line, NOT the solver's B133 (which
+  // your engine pins to your legacy goal and which contradicted the chart).
+  var stressEnd = stressSeries.length ? stressSeries[stressSeries.length-1].bal : (resp.ending||0);
+  var minBal = stressSeries.length ? Math.min.apply(null, stressSeries.map(function(p){return p.bal;})) : stressEnd;
+  var zeroYr=null; for(var z=0;z<stressSeries.length;z++){ if(stressSeries[z].bal<=0){ zeroYr=stressSeries[z].year; break; } }
+  var depletes = minBal<=0;
+  var belowYr  = resp.belowYear;          // first year the line drops below the legacy goal
+  var safeX    = resp.safeExtra;          // solver: extra spend that keeps you ON your legacy goal
+  var isBull   = (yr1>7);
+
+  var seEl=document.getElementById('res-stress-end');
+  if(seEl){ seEl.textContent = depletes?'$0':fmt(stressEnd); seEl.style.fontSize='18px';
+            seEl.style.color = depletes?'#ff6b6b':(stressEnd>=legGoal?'#1CC7D0':'#f4b86a'); }
+  var scEl=document.getElementById('res-stress-conf');
+  if(scEl){ scEl.textContent = depletes?('drains ~'+(zeroYr||belowYr||'')):(belowYr?('dips below goal '+belowYr):'stays above goal');
+            scEl.style.color = depletes?'#ff6b6b':(belowYr?'#f4b86a':'#1CC7D0'); }
+
   var title,detail,color,recs=[];
-  if(yr1 > 7){
-    title='📈 Strong-Market Run'; color='#1CC7D0';
-    detail = (stressEnd>baseEnd)
-      ? ('Real engine run — a better-than-normal market lifts your ending balance to '+fmt(stressEnd)+', above your base plan\u2019s '+fmt(baseEnd)+'.')
-      : ('Real engine run — ending balance '+fmt(stressEnd)+'. If that matches your base plan, your engine models downside stress but not an upside boost (your sheet only subtracts returns).');
-  } else if(stressEnd>=legGoal&&legGoal>0){ title='✅ Plan is Resilient';color='#1CC7D0'; detail='Real engine run — ending balance of '+fmt(stressEnd)+' meets or exceeds your '+fmt(legGoal)+' legacy goal under this scenario.'; }
-  else if(stressEnd>0&&stressConf>=70){ title='⚠️ Plan Under Stress';color='#f4b86a'; detail='Real engine run — plan survives but ends '+fmt(legGoal-stressEnd)+' below your legacy goal ('+stressConf+'% funded). Your safe extra spend adjusted to '+fmt(resp.safeExtra)+'/yr to absorb the hit.'; recs=['Trim discretionary spending during the downturn years','Delay large purchases until the market recovers','Consider a small part-time income bridge']; }
-  else if(stressEnd>0){ title='🚨 Plan At Risk';color='#ff6b6b'; detail='Real engine run — only '+stressConf+'% of your legacy goal is funded under this scenario. Your guaranteed income (Social Security + pension) continues regardless.'; recs=['Cut spending for the first few downturn years','Delay Social Security to maximize guaranteed income','Consider 1–2 more working years for a buffer']; }
-  else { title='⛔ Portfolio Depletes';color='#ff6b6b'; detail='Real engine run — under this scenario the portfolio is fully drawn down before the plan ends. Focus on maximizing guaranteed income and reducing reliance on the portfolio.'; recs=['Maximize Social Security by delaying','Reduce the legacy goal','Add part-time income for the first several years']; }
+  if(isBull){
+    title='\ud83d\udcc8 Strong-Market Run'; color='#1CC7D0';
+    detail=(stressEnd>baseEnd)
+      ? ('A better-than-normal market lifts your ending balance to '+fmt(stressEnd)+', above your base plan of '+fmt(baseEnd)+'.')
+      : ('Ending balance '+fmt(stressEnd)+'. If that matches your base plan, your engine models downside stress but not an upside boost (the sheet only subtracts returns).');
+  } else if(!belowYr && !depletes){
+    title='\u2705 Plan is Resilient'; color='#1CC7D0';
+    detail='Even at your current planned spending, your balance stays at or above your '+fmt(legGoal)+' legacy goal the whole way through this scenario. Safe extra spend holds around '+fmt(safeX)+'/yr.';
+  } else {
+    title = depletes ? '\ud83d\udea8 Drains at Current Spending' : '\u26a0\ufe0f Legacy at Risk at Current Spending';
+    color = depletes ? '#ff6b6b' : '#f4b86a';
+    detail='<b>If you don\u2019t adjust:</b> at your current planned spending, this scenario '
+      + (depletes ? ('drains the portfolio to $0 around <b>'+(zeroYr||belowYr||'')+'</b>') : ('drops below your '+fmt(legGoal)+' legacy goal in <b>'+belowYr+'</b>'))
+      + ' \u2014 that is the red line. <b>To ride it out and still leave your legacy:</b> your safe extra spend needs to drop to <b>'+fmt(safeX)+'/yr</b>. Trimming discretionary spending is how the plan absorbs the hit.';
+    recs=['Cut extra/discretionary spending toward '+fmt(safeX)+'/yr during the downturn','Delay large purchases until the market recovers','Lean on guaranteed income (Social Security + pension) while the portfolio heals'];
+  }
   set('verdict-title',title); var vt=document.getElementById('verdict-title'); if(vt) vt.style.color=color;
-  var vd=document.getElementById('verdict-detail'); if(vd) vd.innerHTML=detail;
+  var vd=document.getElementById('verdict-detail'); if(vd){ vd.innerHTML=detail; vd.style.textAlign='left'; }
   var rs=document.getElementById('recs-section'),rl=document.getElementById('recs-list');
-  if(rs&&rl){ rs.style.display=recs.length?'block':'none'; rl.innerHTML=recs.map(function(r){return '<div style="display:flex;gap:8px;font-size:11px;color:#e0f0f4;line-height:1.7;margin-bottom:4px;"><span style="color:#7ecfda;">→</span><span>'+r+'</span></div>';}).join(''); }
+  if(rs&&rl){ rs.style.display=recs.length?'block':'none'; rl.innerHTML=recs.map(function(r){return '<div style="display:flex;gap:8px;font-size:11px;color:#e0f0f4;line-height:1.7;margin-bottom:4px;"><span style="color:#7ecfda;">\u2192</span><span>'+r+'</span></div>';}).join(''); }
+
   var es=document.getElementById('chart-ending-summary');
   if(es){
-    var belowTxt=resp.belowYear?('drops below your legacy goal in <b style="color:#d64545;">'+resp.belowYear+'</b>'):('<b style="color:#2E7032;">stays at or above</b> your legacy goal the whole way ✓');
-    es.innerHTML='<b>Real run:</b> base plan ends at <b style="color:#0c8a92;">'+fmt(baseEnd)+'</b>; this scenario ends at <b style="color:'+(stressEnd>=legGoal?'#2E7032':'#d64545')+';">'+fmt(stressEnd)+'</b> — '+belowTxt+'. Safe extra spend under stress: <b>'+fmt(resp.safeExtra)+'/yr</b>.';
+    if(isBull){
+      es.innerHTML='<b>Real run:</b> base plan ends at <b style="color:#0c8a92;">'+fmt(baseEnd)+'</b>; this strong-market scenario ends at <b style="color:#2E7032;">'+fmt(stressEnd)+'</b>.';
+    } else if(!belowYr && !depletes){
+      es.innerHTML='<b>Real run:</b> the red line is your plan at <b>current spending</b> \u2014 it stays at/above your '+fmt(legGoal)+' legacy goal throughout. Safe extra spend holds ~<b>'+fmt(safeX)+'/yr</b>.';
+    } else {
+      es.innerHTML='<b>Real run:</b> the red line is your plan at <b>current spending</b> \u2014 it '
+        + (depletes ? ('drains to <b style="color:#d64545;">$0</b> around <b>'+(zeroYr||belowYr||'')+'</b>') : ('dips below your '+fmt(legGoal)+' goal in <b style="color:#d64545;">'+belowYr+'</b>'))
+        + '. To stay on track, your safe extra spend drops to <b>'+fmt(safeX)+'/yr</b>.';
+    }
   }
-  var proj=planData.projections||{};
-  var baseSeries=[];
-  if(proj.years&&proj.endLiquid){ for(var i=0;i<proj.years.length;i++){ baseSeries.push({year:proj.years[i],bal:proj.endLiquid[i]}); } }
+
   var crashYrs=((Math.round(7-yr1))>0?Math.max(1,yrs):0);
-  rbpDrawRealChart(baseSeries, resp.series, crashYrs);
+  rbpDrawRealChart(baseSeries, stressSeries, crashYrs);
   rbpDrawBars(yr1, yrs, baseSeries.length?baseSeries:null);
-  var scen=document.getElementById('active-scenario-label'); if(scen){scen.textContent='✓ Showing a REAL engine run';scen.style.color='#1CC7D0';}
+  var scen=document.getElementById('active-scenario-label'); if(scen){scen.textContent='\u2713 Showing a REAL engine run';scen.style.color='#1CC7D0';}
 }
 
 function runEngineStressTest() {
