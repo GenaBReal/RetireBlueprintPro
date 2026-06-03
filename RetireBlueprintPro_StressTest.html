@@ -579,7 +579,9 @@ window.addEventListener('storage', function(e) {
           <div style="flex:0 0 auto;background:#061620;border-radius:12px;border:2px solid #1a3a52;padding:20px 28px;text-align:center;min-width:160px;">
             <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Success Rate</div>
             <div id="mc-pct" style="font-size:52px;font-weight:900;line-height:1;color:#1CC7D0;letter-spacing:-2px;">—</div>
-            <div style="font-size:11px;color:#9fc1d6;margin-top:6px;">of <span id="mc-total-runs">1,000</span> scenarios</div>
+            <div style="font-size:11px;color:#9fc1d6;margin-top:6px;">of <span id="mc-total-runs">1,000</span> scenarios<br>reached the legacy goal</div>
+            <div id="mc-neverran" style="font-size:22px;font-weight:900;color:#f4b86a;margin-top:14px;line-height:1;">—</div>
+            <div style="font-size:10px;color:#9fc1d6;margin-top:4px;">never ran out of money</div>
           </div>
 
           <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:10px;">
@@ -1464,20 +1466,35 @@ function mcRandReturn(model, mu, sigma) {
   var u1 = Math.random(), u2 = Math.random();
   var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 
+  // ── Volatility-drag (geometric) correction ───────────────────────────────
+  // Your plan's expected return is the rate you expect to actually REALIZE over
+  // time (a long-run compound / CAGR figure). When you draw simple annual returns
+  // around a mean and then compound them year after year, the typical COMPOUNDED
+  // outcome lands ~sigma^2/2 BELOW that mean — the well-known "volatility drag."
+  // Without correcting for it, the simulation quietly penalizes the plan by about
+  // sigma^2/2 per year versus the deterministic projection, which sinks the median
+  // (this was the real cause of the $0 median). Adding the drift back centers the
+  // *compounded median* on your expected return, so Monte Carlo and the main
+  // projection agree at "average luck," and the spread around it is honest
+  // sequence-of-returns risk rather than a hidden double-penalty.
   if (model === 'historical') {
-    // Sample directly from historical returns
+    // Sample directly from real historical returns (already realized — no correction)
     return MC_HISTORICAL[Math.floor(Math.random() * MC_HISTORICAL.length)] / 100;
   } else if (model === 'fat') {
-    // Fat-tailed: blend normal with occasional large shocks
-    var base = mu + sigma * z;
+    // Fat tails add variance (~0.65*sigma^2 from the occasional shocks), so total
+    // drag is ~1.65*sigma^2/2. Correcting for it lets fat tails WIDEN the spread
+    // without dragging the median down — which is what was happening before.
+    var driftFat = 0.825 * sigma * sigma;
+    var base = (mu + driftFat) + sigma * z;
     // 5% chance of a "tail event" (either direction)
     if (Math.random() < 0.05) {
       base += (Math.random() < 0.5 ? -1 : 1) * sigma * (2 + Math.random() * 3);
     }
     return Math.max(-0.60, Math.min(0.80, base));
   } else {
-    // Pure normal
-    return mu + sigma * z;
+    // Pure normal: add sigma^2/2 so the compounded median centers on mu
+    var drift = 0.5 * sigma * sigma;
+    return (mu + drift) + sigma * z;
   }
 }
 
@@ -1672,6 +1689,9 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   pctEl.style.color = successPct >= 90 ? '#1CC7D0' : successPct >= 75 ? '#f4b86a' : '#ef5350';
 
   document.getElementById('mc-total-runs').textContent = nRuns.toLocaleString();
+  var neverRanPct = Math.round((nRuns - depleted) / nRuns * 100);
+  var nrEl = document.getElementById('mc-neverran');
+  if (nrEl) nrEl.textContent = neverRanPct + '%';
   document.getElementById('mc-median').textContent = fmt(p50);
   document.getElementById('mc-p10').textContent = p10 > 0 ? fmt(p10) : '💀 Depleted';
   document.getElementById('mc-p90').textContent = fmt(p90);
