@@ -565,7 +565,7 @@ function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, 
   html += '</div>';
 
   // Plain-language explanation of what to do
-  html += '<div style="font-size:12px;color:#cfe3ef;line-height:1.7;">';
+  html += '<div style="font-size:12px;color:#37474f;line-height:1.7;">';
   html += '  You have a <strong style="color:#1CC7D0;">' + windowYears + '-year window</strong> '
         + '(' + windowStart + '\u2013' + windowEnd + ') when your income is lowest \u2014 after you stop working '
         + 'but before RMDs force taxable withdrawals at age ' + rmdAgeFor(youngerAge) + '. '
@@ -583,8 +583,8 @@ function buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, 
   html += '</div>';
 
   // Reminder of the 5-year clock, since timing is this page's job
-  html += '<div style="font-size:11px;color:#8aaabb;margin-top:12px;line-height:1.6;">';
-  html += '  \uD83D\uDD52 <strong style="color:#cfe3ef;">Remember the 5-year clock:</strong> each year\u2019s converted principal '
+  html += '<div style="font-size:11px;color:#5a6b78;margin-top:12px;line-height:1.6;">';
+  html += '  \uD83D\uDD52 <strong style="color:#2a3a4a;">Remember the 5-year clock:</strong> each year\u2019s converted principal '
         + 'can be withdrawn penalty-free 5 years later. A conversion done in ' + windowStart + ' is accessible in '
         + (windowStart + 5) + '. Starting early keeps those clocks running while you still have other income to live on.';
   html += '</div>';
