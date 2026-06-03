@@ -34,12 +34,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(1200
 #plan-fingerprint{display:none;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;padding:22px 22px 20px;margin-bottom:16px;border:1px solid rgba(28,199,208,.18);box-shadow:var(--sh-dark);position:relative;overflow:hidden;}
 #plan-fingerprint::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--gold));opacity:.8;}
 #plan-fingerprint::after{content:"";position:absolute;right:-80px;top:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(28,199,208,.12),transparent 70%);pointer-events:none;}
-.fp-label{font-size:8px;color:#5a6b7a;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;font-weight:800;}
-.fp-cell{text-align:center;padding:14px 10px;background:#fff;border-radius:10px;border-top:3px solid #f4b86a;box-shadow:0 6px 24px rgba(4,30,47,.36),0 1px 4px rgba(4,30,47,.20);position:relative;z-index:1;}
-.fp-cell:nth-child(3),.fp-cell:nth-child(4){border-top-color:#1CC7D0;}
-.fp-cell:last-child{border-top-color:#d64545;}
-.fp-val{font-size:20px;font-weight:900;color:#0B2239;line-height:1.1;margin:2px 0;}
-.fp-note{font-size:9.5px;color:#5a6b7a;margin-top:5px;font-weight:600;}
+.fp-label{font-size:8px;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;font-weight:800;}
+.fp-cell{text-align:center;padding:14px 10px;background:linear-gradient(165deg,rgba(28,199,208,.10),rgba(255,255,255,.04));border-radius:10px;border:1px solid rgba(28,199,208,.22);border-top:3px solid #f4b86a;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative;z-index:1;}
+.fp-cell:nth-child(3),.fp-cell:nth-child(4){border-top-color:#1CC7D0;background:linear-gradient(165deg,rgba(28,199,208,.16),rgba(255,255,255,.04));}
+.fp-cell:nth-child(2){border-top-color:#f4b86a;background:linear-gradient(165deg,rgba(244,184,106,.14),rgba(255,255,255,.04));}
+.fp-cell:last-child{border-top-color:#ff6b6b;background:linear-gradient(165deg,rgba(255,107,107,.14),rgba(255,255,255,.04));}
+.fp-val{font-size:20px;font-weight:900;color:#eaf4f8;line-height:1.1;margin:2px 0;}
+.fp-note{font-size:9.5px;color:#9fc1d6;margin-top:5px;font-weight:600;}
 .scenario-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
 .tab-btn{padding:9px 16px;border-radius:9px;border:1px solid #d3dbe4;background:var(--card);color:var(--muted);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .18s;box-shadow:var(--sh-sm);}
 .tab-btn:hover{border-color:var(--teal);color:var(--teal-deep);}
@@ -233,13 +234,13 @@ window.addEventListener('storage', function(e) {
     <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔍 Your Plan Fingerprint — Confirm This Is Your Data</div>
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
       <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
-      <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#7a4e00;">—</div><div class="fp-note">Target end</div></div>
+      <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#f4b86a;">—</div><div class="fp-note">Target end</div></div>
       <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#0B2239;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
-      <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#006677;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
+      <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#7ecfda;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
       <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Essentials + extra</div></div>
       <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
-    <div style="margin-top:8px;font-size:9px;color:#dceaf5;text-align:center;">If these numbers match your Dashboard, your real plan is loaded. The 🛡️ Crash card shows a worst-case stress preview — not your actual projection. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">Need real data? Open on GitHub Pages →</a></div>
+    <div style="margin-top:10px;font-size:9.5px;color:#dceaf5;text-align:center;line-height:1.6;">These are your <b>real saved plan</b> numbers. Anything you test on this page is a <b>safe what-if</b> — it never changes your saved plan. To make a change <b style="color:#f4b86a;">permanent</b>, update it in your actual plan on the <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;">Inputs page</a> and Save — it then flows through every page. The 🛡️ Crash card is a worst-case preview, not your projection.</div>
   </div>
 
   <!-- HOW TO READ -->
@@ -357,7 +358,10 @@ window.addEventListener('storage', function(e) {
 <!-- ══ 6-KPI STRESS RESULT (3 + 3) ══ -->
 <style>
 #stress-kpi-grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px;}
-#stress-kpi-grid .kpi-card{background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.18);border-radius:12px;padding:13px 14px 12px;text-align:center;}
+#stress-kpi-grid .kpi-card{background:linear-gradient(165deg,rgba(28,199,208,.10),rgba(255,255,255,.04));border:1px solid rgba(28,199,208,.22);border-top:3px solid #1CC7D0;border-radius:12px;padding:13px 14px 12px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.25);}
+#stress-kpi-grid .kpi-card:nth-child(2){border-top-color:#ff6b6b;background:linear-gradient(165deg,rgba(255,107,107,.13),rgba(255,255,255,.04));}
+#stress-kpi-grid .kpi-card:nth-child(3){border-top-color:#f4b86a;background:linear-gradient(165deg,rgba(244,184,106,.14),rgba(255,255,255,.04));}
+#stress-kpi-grid .kpi-card:nth-child(5){border-top-color:#f4b86a;background:linear-gradient(165deg,rgba(244,184,106,.14),rgba(255,255,255,.04));}
 #stress-kpi-grid .kpi-lbl{font-size:8.5px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;line-height:1.3;}
 #stress-kpi-grid .kpi-val{font-size:19px;font-weight:900;line-height:1.1;}
 #stress-kpi-grid .kpi-sub{font-size:9.5px;color:#9fc1d6;margin-top:5px;font-weight:600;line-height:1.3;}
