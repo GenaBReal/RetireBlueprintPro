@@ -319,6 +319,7 @@ window.addEventListener('storage', function(e) {
         <div style="display:flex;gap:16px;margin-top:8px;font-size:9px;color:#8aaabb;">
           <span style="color:#1CC7D0;">── Base Plan</span>  <span style="color:#ef5350;">── With Crash</span>  <span style="color:#f4b86a;">- - Legacy Goal</span>  <span style="background:rgba(214,69,69,.2);padding:1px 6px;border-radius:3px;font-size:9px;">▓ Crash Period</span>
         </div>
+        <div id="chart-ending-summary" style="margin-top:10px;font-size:11px;line-height:1.5;color:#37474f;background:#f6fafc;border:1px solid #e3edf2;border-radius:8px;padding:8px 12px;"></div>
     <!-- CRASH IMPACT CHART -->
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line);">
       <div style="font-size:9.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">
@@ -1048,6 +1049,29 @@ function recalc() {
     stressData.push(stressEnd);
     goalData.push(legGoal);
   }
+  // ── Ending summary: where the crash line lands + how far from the legacy goal ──
+  (function(){
+    var es = document.getElementById('chart-ending-summary');
+    if(!es) return;
+    var crashEnd = stressEnd;
+    var baseEndVal = (typeof baseEndChart!=='undefined' && baseEndChart) ? baseEndChart : baseEnd;
+    var goal = legGoal;
+    var html = 'Base plan ends <b style="color:#0e9aa3;">'+fmt(baseEndVal)+'</b>'
+             + ' &nbsp;·&nbsp; With this crash it ends <b style="color:#ef5350;">'+fmt(crashEnd)+'</b>';
+    if(goal && goal>0){
+      var gap = goal - crashEnd;
+      if(gap > 1000){
+        html += ' &mdash; <b style="color:#ef5350;">'+fmt(gap)+' below</b> your '+fmt(goal)+' legacy goal.';
+      } else if(gap < -1000){
+        html += ' &mdash; <b style="color:#2E7032;">'+fmt(-gap)+' above</b> your '+fmt(goal)+' legacy goal. ✓';
+      } else {
+        html += ' &mdash; <b style="color:#2E7032;">right at</b> your '+fmt(goal)+' legacy goal. ✓';
+      }
+    } else {
+      html += '.';
+    }
+    es.innerHTML = html;
+  })();
   if(stressChart) stressChart.destroy();
   var ctx=document.getElementById('stress-chart');
   if(ctx){
@@ -1151,7 +1175,7 @@ function recalc() {
     var crashCtx = document.getElementById('crash-bar-chart');
     if(crashCtx) {
       if(window.crashBarChart) window.crashBarChart.destroy();
-      var nBars = Math.min(15, baseRes.length);
+      var nBars = Math.min(45, baseRes.length); // full plan horizon (was capped at 15 ≈ 2041)
       var barLabels = [], barData = [], barColors = [], barBorders = [];
       for(var bi=0; bi<nBars; bi++) {
         var yr = (baseRes[bi] ? baseRes[bi].year : curYear+bi);
