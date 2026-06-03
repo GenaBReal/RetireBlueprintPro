@@ -348,57 +348,69 @@ window.addEventListener('storage', function(e) {
     </div>
 
       </div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:4px;" id="action-summary-row">
+<!-- ══ 6-KPI STRESS RESULT (3 + 3) ══ -->
+<style>
+#stress-kpi-grid .kpi-card{background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.18);border-radius:12px;padding:13px 14px 12px;text-align:center;}
+#stress-kpi-grid .kpi-lbl{font-size:8.5px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;line-height:1.3;}
+#stress-kpi-grid .kpi-val{font-size:19px;font-weight:900;line-height:1.1;}
+#stress-kpi-grid .kpi-sub{font-size:9.5px;color:#9fc1d6;margin-top:5px;font-weight:600;line-height:1.3;}
+</style>
+<div style="margin-top:4px;" id="stress-kpi-block">
+  <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;">📊 Stress Test Result — at a glance</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" id="stress-kpi-grid">
 
-  <!-- CARD 1: Stress Results & Verdict -->
-  <div style="background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:20px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;display:flex;flex-direction:column;" id="verdict-banner">
-    <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;text-align:center;">📊 Stress Results</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;text-align:center;">
-        <div style="font-size:9px;font-weight:700;color:#7ecfda;margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;">Base Plan</div>
-        <div id="res-base-end" style="font-size:18px;font-weight:900;color:#1CC7D0;">—</div>
-        <div id="res-base-conf" style="font-size:10px;color:#b8dde6;margin-top:3px;font-weight:600;">—</div>
-      </div>
-      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;text-align:center;">
-        <div style="font-size:9px;font-weight:700;color:#7ecfda;margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;">With Crash</div>
-        <div id="res-stress-end" style="font-size:18px;font-weight:900;color:#ff6b6b;">—</div>
-        <div id="res-stress-conf" style="font-size:10px;color:#b8dde6;margin-top:3px;font-weight:600;">—</div>
-      </div>
+    <!-- 1 Base ending -->
+    <div class="kpi-card">
+      <div class="kpi-lbl">Base Plan Ending</div>
+      <div id="res-base-end" class="kpi-val" style="color:#1CC7D0;">—</div>
+      <div id="res-base-conf" class="kpi-sub">no crash</div>
     </div>
-    <div id="verdict-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;text-align:center;">—</div>
-    <div id="verdict-detail" style="font-size:11px;color:#b8dde6;line-height:1.65;text-align:center;"></div>
-    <div id="recs-section" style="display:none;margin-top:10px;">
-      <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;text-align:center;">💡 Top Actions</div>
+    <!-- 2 With this scenario -->
+    <div class="kpi-card">
+      <div class="kpi-lbl">With This Scenario</div>
+      <div id="res-stress-end" class="kpi-val" style="color:#ff6b6b;">—</div>
+      <div id="res-stress-conf" class="kpi-sub">—</div>
+    </div>
+    <!-- 3 The hit -->
+    <div class="kpi-card">
+      <div class="kpi-lbl">The Hit</div>
+      <div id="kpi-hit" class="kpi-val" style="color:#f4b86a;">—</div>
+      <div class="kpi-sub">base − scenario</div>
+    </div>
+    <!-- 4 Safe extra spend -->
+    <div class="kpi-card">
+      <div class="kpi-lbl">Safe Extra Spend</div>
+      <div id="kpi-safe" class="kpi-val" style="color:#1CC7D0;">—</div>
+      <div class="kpi-sub">per year, this scenario</div>
+    </div>
+    <!-- 5 Drops below legacy -->
+    <div class="kpi-card">
+      <div class="kpi-lbl">Drops Below Legacy</div>
+      <div id="kpi-below" class="kpi-val" style="color:#1CC7D0;">—</div>
+      <div class="kpi-sub">year, or holds</div>
+    </div>
+    <!-- 6 Legacy target -->
+    <div class="kpi-card">
+      <div class="kpi-lbl">Your Legacy Target</div>
+      <div id="kpi-legacy" class="kpi-val" style="color:#cfe3ef;">—</div>
+      <div class="kpi-sub">tested against</div>
+    </div>
+
+  </div>
+
+  <!-- verdict banner under the KPIs -->
+  <div style="margin-top:14px;background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:18px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;" id="verdict-banner">
+    <div id="verdict-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;">—</div>
+    <div id="verdict-detail" style="font-size:11.5px;color:#b8dde6;line-height:1.7;"></div>
+    <div id="recs-section" style="display:none;margin-top:12px;">
+      <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">💡 Top Actions</div>
       <div id="recs-list" style="font-size:11px;color:#e0f0f4;line-height:2.0;"></div>
     </div>
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#f4b86a,#e8a245);color:#041E2F;font-size:12px;font-weight:900;padding:11px 20px;border-radius:10px;text-decoration:none;letter-spacing:.3px;box-shadow:0 4px 16px rgba(244,184,106,.35);">Open Inputs → Make Changes</a>
+    <span style="font-size:10px;color:#7ecfda;margin-left:10px;font-weight:600;">Save in Inputs → click 🔄 Reload Data above</span>
   </div>
-
-  <!-- CARD 2: Slider Combos -->
-  <div style="background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:20px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;">
-    <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;text-align:center;">🎛️ Try These Slider Combos</div>
-    <div style="font-size:12px;color:#e0f0f4;line-height:2.2;">
-      <div><strong style="color:#fff;font-weight:800;">Spend -10%</strong> → biggest single improvement</div>
-      <div><strong style="color:#fff;font-weight:800;">Bad Years = 2-3</strong> → prolonged downturn test</div>
-      <div><strong style="color:#fff;font-weight:800;">COLA 0%</strong> → SS reform worst case</div>
-      <div><strong style="color:#fff;font-weight:800;">Inflation 5%</strong> → 1970s combo</div>
-      <div><strong style="color:#fff;font-weight:800;">Bull Market preset</strong> → see your upside</div>
-    </div>
-  </div>
-
-  <!-- CARD 3: Input Changes + Button -->
-  <div style="background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:20px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;display:flex;flex-direction:column;">
-    <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;text-align:center;">⚙️ Change in Inputs → Reload</div>
-    <div style="font-size:11px;color:#e0f0f4;line-height:1.95;margin-bottom:0;">
-      <div><strong style="color:#fff;font-weight:800;">Delay SS</strong> → bigger guaranteed income floor</div>
-      <div><strong style="color:#fff;font-weight:800;">Lower Phase 1 spending</strong> → less early withdrawal</div>
-      <div><strong style="color:#fff;font-weight:800;">More Roth</strong> → tax-free, no RMDs</div>
-      <div><strong style="color:#fff;font-weight:800;">Adjust return rates</strong> → conservative vs optimistic</div>
-    </div>
-    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="display:block;margin-top:16px;background:linear-gradient(135deg,#f4b86a,#e8a245);color:#041E2F;font-size:12px;font-weight:900;padding:12px 18px;border-radius:10px;text-decoration:none;text-align:center;letter-spacing:.3px;box-shadow:0 4px 16px rgba(244,184,106,.35);">Open Inputs → Make Changes</a>
-    <div style="font-size:10px;color:#7ecfda;margin-top:8px;text-align:center;font-weight:600;">Save in Inputs → click 🔄 Reload Data above</div>
-  </div>
-
 </div>
+
 
 
   
@@ -1481,6 +1493,15 @@ function rbpDrawRealChart(baseSeries, stressSeries, crashYrs){
 }
 
 function rbpStressPending(baseRes){
+  // pre-run KPI state: base ending + legacy target are known from the plan; the rest wait for a real run
+  (function(){
+    function S(id,v,c){var e=document.getElementById(id); if(e){e.textContent=v; if(c!=null)e.style.color=c;}}
+    var leg=(planData&&planData.legacy)||{};
+    var be=leg.projectedEnding||0, lg=leg.goal||0;
+    if(be) S('res-base-end', fmt(be), '#1CC7D0');
+    if(lg) S('kpi-legacy', fmt(lg), '#cfe3ef');
+    S('kpi-hit','—','#8aaabb'); S('kpi-safe','—','#8aaabb'); S('kpi-below','—','#8aaabb');
+  })();
   var seEl=document.getElementById('res-stress-end'); if(seEl){seEl.textContent='— run —';seEl.style.color='#8aaabb';seEl.style.fontSize='14px';}
   var scEl=document.getElementById('res-stress-conf'); if(scEl){scEl.textContent='press ▶ Run New Test';scEl.style.color='#8aaabb';}
   set('verdict-title','Ready to run');
@@ -1568,6 +1589,20 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
   var scEl=document.getElementById('res-stress-conf');
   if(scEl){ scEl.textContent = depletes?('drains ~'+(zeroYr||belowYr||'')):(belowYr?('dips below goal '+belowYr):'stays above goal');
             scEl.style.color = depletes?'#ff6b6b':(belowYr?'#f4b86a':'#1CC7D0'); }
+
+  // ── 6-KPI fills (all read straight off the same real run) ──
+  (function(){
+    function S(id,v,c){var e=document.getElementById(id); if(e){e.textContent=v; if(c)e.style.color=c;}}
+    S('res-base-end', fmt(baseEnd), '#1CC7D0');
+    // The Hit: base minus the scenario ending (a drained plan counts as 0 left)
+    if(isBull && stressEnd>baseEnd){ S('kpi-hit', '+'+fmt(stressEnd-baseEnd), '#1CC7D0'); }
+    else { var hit=baseEnd-(depletes?0:stressEnd); S('kpi-hit', (hit>0?'−':'')+fmt(Math.abs(hit)), hit>0?'#f4b86a':'#1CC7D0'); }
+    S('kpi-safe', fmt(safeX), '#1CC7D0');
+    if(belowYr){ S('kpi-below', String(belowYr), '#f4b86a'); }
+    else if(depletes){ S('kpi-below', String(zeroYr||'—'), '#ff6b6b'); }
+    else { S('kpi-below', 'Holds', '#1CC7D0'); }
+    S('kpi-legacy', fmt(legGoal), '#cfe3ef');
+  })();
 
   var title,detail,color,recs=[];
   if(isBull){
