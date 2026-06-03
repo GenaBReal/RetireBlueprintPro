@@ -595,12 +595,14 @@ window.addEventListener('storage', function(e) {
         <!-- Big success rate number -->
         <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;align-items:stretch;">
 
-          <div style="flex:0 0 auto;background:#061620;border-radius:12px;border:2px solid #1a3a52;padding:20px 28px;text-align:center;min-width:160px;">
-            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Success Rate</div>
-            <div id="mc-pct" style="font-size:52px;font-weight:900;line-height:1;color:#1CC7D0;letter-spacing:-2px;">—</div>
-            <div style="font-size:11px;color:#9fc1d6;margin-top:6px;">of <span id="mc-total-runs">1,000</span> scenarios<br>reached the legacy goal</div>
-            <div id="mc-neverran" style="font-size:22px;font-weight:900;color:#f4b86a;margin-top:14px;line-height:1;">—</div>
-            <div style="font-size:10px;color:#9fc1d6;margin-top:4px;">never ran out of money</div>
+          <div style="flex:0 0 auto;background:#061620;border-radius:12px;border:2px solid #f4b86a;padding:20px 28px;text-align:center;min-width:180px;">
+            <div style="font-size:11px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Won't Run Out of Money</div>
+            <div id="mc-pct" style="font-size:52px;font-weight:900;line-height:1;color:#f4b86a;letter-spacing:-2px;">—</div>
+            <div style="font-size:10.5px;color:#9fc1d6;margin-top:6px;line-height:1.45;">of <span id="mc-total-runs">1,000</span> futures &mdash; <b style="color:#cfe3ef;">if you trim discretionary spending in down years</b> (what most retirees do)</div>
+            <div style="border-top:1px solid #1a3a52;margin-top:13px;padding-top:11px;display:flex;gap:18px;justify-content:center;">
+              <div><div id="mc-neverran" style="font-size:18px;font-weight:900;color:#1CC7D0;line-height:1;">—</div><div style="font-size:9px;color:#9fc1d6;margin-top:3px;max-width:92px;">never ran out at full spending</div></div>
+              <div><div id="mc-goalpct" style="font-size:18px;font-weight:900;color:#9fc1d6;line-height:1;">—</div><div style="font-size:9px;color:#9fc1d6;margin-top:3px;max-width:92px;">reached full legacy goal</div></div>
+            </div>
           </div>
 
           <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:10px;">
@@ -739,10 +741,10 @@ var stressChart = null;
 
 var SCENARIOS = {
   custom:      {yr1:-20, yrs:1, inf:3.0, spend:0,   cola:2.5, label:'Custom'},
-  crash2008:   {yr1:-37, yrs:2, inf:0.1, spend:-5,  cola:0,   label:'2008 Crisis'},
-  dotcom:      {yr1:-22, yrs:3, inf:2.8, spend:-10, cola:2.5, label:'Dot-Com Bust'},
+  crash2008:   {yr1:-37, yrs:1, inf:0.5, spend:-5,  cola:0,   label:'2008 Crisis'},
+  dotcom:      {yr1:-14, yrs:3, inf:2.5, spend:-10, cola:2.5, label:'Dot-Com Bust'},
   covid:       {yr1:-34, yrs:1, inf:1.2, spend:-8,  cola:0,   label:'COVID 2020'},
-  stagflation: {yr1:-14, yrs:4, inf:9.0, spend:10,  cola:5.0, label:'Stagflation'},
+  stagflation: {yr1:-12, yrs:3, inf:9.0, spend:10,  cola:5.0, label:'Stagflation'},
   bestcase:    {yr1:25,  yrs:1, inf:2.5, spend:5,   cola:2.5, label:'Bull Market'},
 };
 
@@ -2003,15 +2005,23 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     mcPercentile(depleteYears, 50) : null;
   var earliestDeplete = depleteYears.length > 0 ? Math.min.apply(null, depleteYears) : null;
 
-  // ── Big success % ─────────────────────────────────────────
-  var pctEl = document.getElementById('mc-pct');
-  pctEl.textContent = successPct + '%';
-  pctEl.style.color = successPct >= 90 ? '#1CC7D0' : successPct >= 75 ? '#f4b86a' : '#ef5350';
-
+  // ── Headline: "won't run out IF you trim discretionary in down years" (essentials-only) ──
   document.getElementById('mc-total-runs').textContent = nRuns.toLocaleString();
   var neverRanPct = Math.round((nRuns - depleted) / nRuns * 100);
+  // essentials-only survival (discretionary extra paused in bad years) — the realistic-behavior rate;
+  // falls back to the full-spending rate if there is no discretionary extra to pause.
+  var neverRanNXBig = neverRanPct;
+  if (endingsNX && endingsNX.length && safeExtraAmt > 0) {
+    var _dNXb = endingsNX.filter(function(b){ return b <= 0; }).length;
+    neverRanNXBig = Math.round((endingsNX.length - _dNXb) / endingsNX.length * 100);
+  }
+  var pctEl = document.getElementById('mc-pct');
+  pctEl.textContent = neverRanNXBig + '%';
+  pctEl.style.color = neverRanNXBig >= 60 ? '#f4b86a' : '#ef5350'; // orange = positive (brand); red only if alarmingly low
   var nrEl = document.getElementById('mc-neverran');
   if (nrEl) nrEl.textContent = neverRanPct + '%';
+  var gpEl = document.getElementById('mc-goalpct');
+  if (gpEl) gpEl.textContent = successPct + '%';
 
   // ── Essentials-only comparison (discretionary extra paused) ──
   var cmpBox = document.getElementById('mc-extra-compare');
