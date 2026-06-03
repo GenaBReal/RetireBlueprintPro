@@ -34,13 +34,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(1200
 #plan-fingerprint{display:none;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;padding:22px 22px 20px;margin-bottom:16px;border:1px solid rgba(28,199,208,.18);box-shadow:var(--sh-dark);position:relative;overflow:hidden;}
 #plan-fingerprint::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--gold));opacity:.8;}
 #plan-fingerprint::after{content:"";position:absolute;right:-80px;top:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(28,199,208,.12),transparent 70%);pointer-events:none;}
-.fp-label{font-size:8px;color:#5a6b7a;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;font-weight:800;}
-.fp-cell{text-align:center;padding:14px 10px;background:#fff;border-radius:10px;border-top:3px solid #f4b86a;box-shadow:0 6px 24px rgba(4,30,47,.36),0 1px 4px rgba(4,30,47,.20);position:relative;z-index:1;}
-.fp-cell:nth-child(2){border-top-color:#f4b86a;}
-.fp-cell:nth-child(3),.fp-cell:nth-child(4){border-top-color:#1CC7D0;}
-.fp-cell:last-child{border-top-color:#d64545;}
-.fp-val{font-size:20px;font-weight:900;color:#0B2239;line-height:1.1;margin:2px 0;}
-.fp-note{font-size:9.5px;color:#5a6b7a;margin-top:5px;font-weight:600;}
+.fp-label{font-size:8px;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;font-weight:800;}
+.fp-cell{text-align:center;padding:14px 10px;background:linear-gradient(165deg,rgba(28,199,208,.10),rgba(255,255,255,.04));border-radius:10px;border:1px solid rgba(28,199,208,.22);border-top:3px solid #f4b86a;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative;z-index:1;}
+.fp-cell:nth-child(2){border-top-color:#f4b86a;background:linear-gradient(165deg,rgba(244,184,106,.14),rgba(255,255,255,.04));}
+.fp-cell:nth-child(3),.fp-cell:nth-child(4){border-top-color:#1CC7D0;background:linear-gradient(165deg,rgba(28,199,208,.16),rgba(255,255,255,.04));}
+.fp-cell:last-child{border-top-color:#ff6b6b;background:linear-gradient(165deg,rgba(255,107,107,.14),rgba(255,255,255,.04));}
+.fp-val{font-size:20px;font-weight:900;color:#eaf4f8;line-height:1.1;margin:2px 0;}
+.fp-note{font-size:9.5px;color:#9fc1d6;margin-top:5px;font-weight:600;}
 .scenario-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
 .tab-btn{padding:9px 16px;border-radius:9px;border:1px solid #d3dbe4;background:var(--card);color:var(--muted);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .18s;box-shadow:var(--sh-sm);}
 .tab-btn:hover{border-color:var(--teal);color:var(--teal-deep);}
@@ -234,9 +234,9 @@ window.addEventListener('storage', function(e) {
     <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔍 Your Plan Fingerprint — Confirm This Is Your Data</div>
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
       <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
-      <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#7a4e00;">—</div><div class="fp-note">Target end</div></div>
+      <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#f4b86a;">—</div><div class="fp-note">Target end</div></div>
       <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#0B2239;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
-      <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#006677;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
+      <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#7ecfda;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
       <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Essentials + extra</div></div>
       <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
@@ -600,7 +600,7 @@ window.addEventListener('storage', function(e) {
             <div style="font-size:10.5px;color:#9fc1d6;margin-top:6px;line-height:1.45;">of <span id="mc-total-runs">1,000</span> futures &mdash; <b style="color:#cfe3ef;">if you trim discretionary spending in down years</b> (what most retirees do)</div>
             <div style="border-top:1px solid #1a3a52;margin-top:13px;padding-top:11px;display:flex;gap:18px;justify-content:center;">
               <div><div id="mc-neverran" style="font-size:18px;font-weight:900;color:#1CC7D0;line-height:1;">—</div><div style="font-size:9px;color:#9fc1d6;margin-top:3px;max-width:92px;">never ran out at full spending</div></div>
-              <div><div id="mc-goalpct" style="font-size:18px;font-weight:900;color:#9fc1d6;line-height:1;">—</div><div style="font-size:9px;color:#9fc1d6;margin-top:3px;max-width:92px;">reached full legacy goal</div></div>
+              <div><div id="mc-goalpct" style="font-size:18px;font-weight:900;color:#9fc1d6;line-height:1;">—</div><div style="font-size:9px;color:#9fc1d6;margin-top:3px;max-width:118px;">reached full legacy goal at full spending</div></div>
             </div>
             <div id="mc-fullspend-note" style="font-size:9px;color:#9fc1d6;margin-top:9px;line-height:1.45;font-style:italic;">—</div>
           </div>
@@ -2138,7 +2138,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // ── Verdict ───────────────────────────────────────────────
   var verdictHtml;
   if (successPct >= 90) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:1px solid rgba(76,175,80,0.3);color:#a5d6a7;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #1CC7D0;color:#2c3e50;font-size:13px;line-height:1.8;">' +
       '✅ <strong style="color:#1CC7D0;font-size:15px;">Excellent — ' + successPct + '% success rate</strong><br><br>' +
       'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' random market scenarios</strong> — including crashes, recessions, prolonged low-return decades, and high-inflation periods. ' +
       'The median ending balance across all runs is <strong>' + fmt(p50) + '</strong>. Even your worst-10% scenario ends at <strong>' + fmt(p10) + '</strong>.<br><br>' +
@@ -2147,14 +2147,14 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       'portfolio size, and spending level creates a resilient plan that holds up across a wide range of possible futures.' +
       '</div>';
   } else if (successPct >= 75) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:1px solid rgba(244,184,106,0.3);color:#ffcba4;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #f4b86a;color:#2c3e50;font-size:13px;line-height:1.8;">' +
       '⚠️ <strong style="color:#f4b86a;font-size:15px;">Acceptable — ' + successPct + '% success rate</strong><br><br>' +
       'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' scenarios</strong>. The 75–89% range is workable but leaves meaningful risk. ' +
       'The median outcome is <strong>' + fmt(p50) + '</strong>. In the worst 10% of scenarios the portfolio ends at <strong>' + (p10 > 0 ? fmt(p10) : '$0 (depleted)') + '</strong>.<br><br>' +
       '<strong style="color:#f4b86a;">Ways to strengthen your plan:</strong> (1) Delay retirement by 1–2 years, (2) Reduce base spending by 5–10%, (3) Delay Social Security to increase the guaranteed income floor, (4) Increase Roth allocation to reduce sequence-of-returns risk. Any combination of these typically moves the needle above 85%.' +
       '</div>';
   } else if (successPct >= 50) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.3);color:#ffcdd2;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #ef5350;color:#2c3e50;font-size:13px;line-height:1.8;">' +
       '❌ <strong style="color:#ef5350;font-size:15px;">Needs Attention — ' + successPct + '% success rate</strong><br><br>' +
       'Only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' scenarios</strong> reach your legacy goal. This warrants a closer look at your plan numbers. ' +
       (medDepleteYr ? 'In failing scenarios, the portfolio typically depletes around <strong>' + medDepleteYr + '</strong>. ' : '') +
@@ -2162,7 +2162,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       'But it does mean your portfolio-funded spending is at elevated risk. Go to Inputs, try reducing spending or adjusting your retirement date, then re-run.' +
       '</div>';
   } else {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid rgba(239,83,80,0.4);color:#ffcdd2;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #ef5350;color:#2c3e50;font-size:13px;line-height:1.8;">' +
       '🚨 <strong style="color:#ef5350;font-size:15px;">Significant Risk — ' + successPct + '% success rate</strong><br><br>' +
       'Only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' scenarios</strong> reach your goal. ' +
       (earliestDeplete ? 'Some scenarios deplete as early as <strong>' + earliestDeplete + '</strong>. ' : '') +
