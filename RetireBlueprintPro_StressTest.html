@@ -230,7 +230,7 @@ window.addEventListener('storage', function(e) {
       <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#7a4e00;">—</div><div class="fp-note">Target end</div></div>
       <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#0B2239;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
       <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#006677;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
-      <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Base + extra</div></div>
+      <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Essentials + extra</div></div>
       <div class="fp-cell" style="border:1px solid rgba(244,184,106,0.3);" title="Shows your ending balance if the market drops 30% in your first year of retirement — the worst case sequence-of-returns scenario"><div class="fp-label" style="color:#f4b86a;">🛡️ -30% Crash</div><div class="fp-val" id="fp-stress30">—</div><div class="fp-note" id="fp-stress30-note">—</div></div>
     </div>
     <div style="margin-top:8px;font-size:9px;color:#dceaf5;text-align:center;">If these numbers match your Dashboard, your real plan is loaded. The 🛡️ Crash card shows a worst-case stress preview — not your actual projection. <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html" style="color:#1CC7D0;">Need real data? Open on GitHub Pages →</a></div>
@@ -653,18 +653,21 @@ window.addEventListener('storage', function(e) {
 
         <!-- Extra-spend comparison: full plan vs essentials only -->
         <div id="mc-extra-compare" style="display:none;background:#061620;border:1px solid #1a3a52;border-radius:10px;padding:14px 18px;margin-bottom:16px;">
-          <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">What if you treat your "extra" spending as optional?</div>
+          <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">What if you treat your "extra" spending as optional?</div>
+          <div id="mc-floor-note" style="font-size:10.5px;color:#cfe3ef;line-height:1.5;margin-bottom:10px;"></div>
           <div style="display:flex;gap:14px;flex-wrap:wrap;">
             <div style="flex:1;min-width:220px;background:#08202e;border-left:3px solid #1CC7D0;border-radius:6px;padding:10px 14px;">
-              <div style="font-size:11px;font-weight:700;color:#c8dae8;margin-bottom:3px;">Full plan (base + extras)</div>
+              <div style="font-size:11px;font-weight:700;color:#c8dae8;margin-bottom:1px;">Extras rigid — spent through crashes</div>
+              <div style="font-size:9px;color:#8aaabb;margin-bottom:4px;">base + debt + extras · worst case for behavior</div>
               <div id="mc-cmp-full" style="font-size:13px;font-weight:800;color:#fff;">&mdash;</div>
             </div>
             <div style="flex:1;min-width:220px;background:#08202e;border-left:3px solid #f4b86a;border-radius:6px;padding:10px 14px;">
-              <div style="font-size:11px;font-weight:700;color:#f4b86a;margin-bottom:3px;">Essentials only (extras paused)</div>
+              <div style="font-size:11px;font-weight:700;color:#f4b86a;margin-bottom:1px;">Extras flexible — paused in rough years</div>
+              <div style="font-size:9px;color:#c9a978;margin-bottom:4px;">base + debt only · what most retirees actually do</div>
               <div id="mc-cmp-ess" style="font-size:13px;font-weight:800;color:#fff;">&mdash;</div>
             </div>
           </div>
-          <div style="font-size:10px;color:#9fc1d6;margin-top:9px;line-height:1.5;">Both run on the same market scenarios &mdash; the only difference is whether your discretionary extra spending is in or out. The gap is the safety you'd buy by trimming the extras in a rough stretch. This is a what-if only; it doesn't change your saved plan.</div>
+          <div style="font-size:10px;color:#9fc1d6;margin-top:9px;line-height:1.55;">Same 1,000 market histories &mdash; the only thing that changes is your <strong style="color:#cfe3ef;">extra (discretionary) spending</strong>. Your base living + debt is the <strong style="color:#cfe3ef;">non-negotiable floor</strong> and is never cut here. The left number keeps spending every extra dollar even through crashes; the right number pauses the extras in rough years. <strong style="color:#cfe3ef;">Your real resilience sits between the two</strong> &mdash; the closer to the flexible number the more willing you are to trim extras when markets are down. This is a what-if only; it doesn't change your saved plan.</div>
         </div>
 
         <!-- Fan chart -->
@@ -745,6 +748,32 @@ function fmt(n) {
   if (Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(2)+'M';
   if (Math.abs(n)>=1000) return '$'+Math.round(n/1000)+'K';
   return '$'+Math.round(n).toLocaleString();
+}
+
+// Essential (non-negotiable) annual floor for the CURRENT (year-1) plan year, read straight
+// from the master's own computed totals: base lifestyle + healthcare + debt = TOTAL ANNUAL
+// BASE EXPENSES. Discretionary extra is NOT included. (The MC sim reads all years separately.)
+function rbpEssentialFloor() {
+  var sp = (planData && planData.spending) || {};
+  var proj = (planData && planData.projections) || {};
+  var by = null;
+  if (proj.byYear && proj.byYear.length) {
+    var curYr = new Date().getFullYear();
+    for (var k = 0; k < proj.byYear.length; k++) {
+      if (proj.byYear[k] && proj.byYear[k].year === curYr) { by = proj.byYear[k]; break; }
+    }
+    if (!by) by = proj.byYear[0]; // fall back to first (current) projection year
+  }
+  if (by) {
+    var living = +by.baseLiving || 0;
+    var health = +by.healthcare || 0;
+    var debt   = +by.debt || 0;
+    var floor  = (+by.totalNeed) || (living + health + debt);
+    return { living: living, healthcare: health, debt: debt, floor: floor, year: by.year || null };
+  }
+  // Fallback (sample data / no per-year breakdown): base lifestyle only
+  var fb = sp.baseAnnual || 0;
+  return { living: fb, healthcare: 0, debt: 0, floor: fb, year: null };
 }
 
 function setScenario(key) {
@@ -876,7 +905,7 @@ function updateFingerprint(baseRes) {
   if(planEndYr>0) endYr=planEndYr;
   set('fp-end-year', endYr);
   set('fp-end-note','Through age '+longestAge);
-  set('fp-spending', fmt((sp.baseAnnual||0)+(sp.safeExtra||0)));
+  set('fp-spending', fmt(rbpEssentialFloor().floor + (sp.safeExtra||0)));
 
   // -30% CRASH CARD — use the SAME method as the Dashboard stress panel so the
   // two pages agree. Anchor to the REAL death-year ending balance from the sheet
@@ -1581,7 +1610,7 @@ function runMonteCarlo() {
   var p2Name = p2.name || window.rbpP2Name || localStorage.getItem('rbp_p2_name') || 'Partner 2';
 
   var totalPF   = port.total || 0;
-  var baseSpend = (sp.baseAnnual || 0) + (sp.safeExtra || 0);
+  var baseSpend = rbpEssentialFloor().floor + (sp.safeExtra || 0); // base living + debt + extra (debt-inclusive)
   var safeExtra = (sp.safeExtra || 0); // discretionary extra, removed in the "essentials only" run
   // Does the SAVED plan already include the extra? ("Assume Extra Spending Used?" = Yes on Inputs, cell B11)
   var extraInPlan = String(gl.assumeExtraSpend || 'Yes').trim().toLowerCase().charAt(0) !== 'n';
@@ -1790,6 +1819,11 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       var neverRanNX = Math.round((endingsNX.length - depletedNX) / endingsNX.length * 100);
       var medianNX   = mcPercentile(endingsNX, 50);
       cmpBox.style.display = '';
+      var _ef = rbpEssentialFloor();
+      var fnEl = document.getElementById('mc-floor-note');
+      if (fnEl) fnEl.innerHTML = 'Your non-negotiable floor (living + healthcare + debt): <strong style="color:#fff;">' + fmt(_ef.floor) + '/yr</strong>'
+        + ((_ef.debt > 0 || _ef.healthcare > 0) ? ' <span style="color:#8aaabb;">(' + fmt(_ef.living) + ' living + ' + fmt(_ef.healthcare) + ' healthcare + ' + fmt(_ef.debt) + ' debt)</span>' : '')
+        + ' &nbsp;·&nbsp; Discretionary extra you could pause: <strong style="color:#f4b86a;">' + fmt(safeExtraAmt) + '/yr</strong>.';
       var sFull = document.getElementById('mc-cmp-full');
       var sEss  = document.getElementById('mc-cmp-ess');
       var tagFull = extraInPlan ? '   ← your current plan' : '';
