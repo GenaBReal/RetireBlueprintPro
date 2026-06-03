@@ -1139,32 +1139,26 @@ function populate(d){
     var curYr = meta.planYear || new Date().getFullYear();
     function moOf(annual){ return Math.round(annual/12); }
     var rows = [];
-    // 1) Base living costs — sum of included monthly expenses ×12 (fallback to sp.baseAnnual)
-    var living = 0;
-    if (d.expenses && d.expenses.length) {
-      d.expenses.forEach(function(e){ if(e && e.monthly>0) living += e.monthly*12; });
+    // Floor read STRAIGHT from your master's own per-year totals (TOTAL ANNUAL BASE EXPENSES):
+    // base living + healthcare + debt = totalNeed. No reconstruction. Falls back only if byYear absent.
+    var proj = d.projections || {};
+    var by = null;
+    if (proj.byYear && proj.byYear.length) {
+      for (var _k=0; _k<proj.byYear.length; _k++){ if(proj.byYear[_k] && proj.byYear[_k].year===curYr){ by=proj.byYear[_k]; break; } }
+      if(!by) by = proj.byYear[0];
     }
-    if (!living && sp && sp.baseAnnual) living = sp.baseAnnual;
-    if (living > 0) rows.push({label:'Base living costs', annual:living});
-    // 2) Healthcare — not separately read by connector; show only if available via expenses note (skip otherwise)
-    // 3) Debts — each included debt active this year (mortgage, RV, cars, etc.)
-    var debts = d.debts || [];
-    var debtTotal = 0;
-    debts.forEach(function(db){
-      if(!db) return;
-      var inc = String(db.inc||'').toLowerCase()==='yes';
-      var annual = db.ann || (db.mo? db.mo*12 : 0);
-      if(!inc || annual<=0) return;
-      // respect start/end window if present
-      var okStart = true, okEnd = true;
-      try { if(db.start){ okStart = (new Date(db.start)).getFullYear() <= curYr; } } catch(e){}
-      try { if(db.end){ okEnd = (new Date(db.end)).getFullYear() >= curYr; } } catch(e){}
-      if(okStart && okEnd){
-        rows.push({label:(db.name||'Debt'), annual:annual});
-        debtTotal += annual;
-      }
-    });
-    var requiredFloor = rows.reduce(function(s,r){return s+r.annual;},0);
+    var requiredFloor;
+    if (by) {
+      var _living = +by.baseLiving||0, _health = +by.healthcare||0, _debt = +by.debt||0;
+      if(_living>0) rows.push({label:'Base living costs', annual:_living});
+      if(_health>0) rows.push({label:'Healthcare', annual:_health});
+      if(_debt>0)   rows.push({label:'Debt (mortgage, RV, etc.)', annual:_debt});
+      requiredFloor = (+by.totalNeed) || (_living+_health+_debt);
+    } else {
+      var living = (sp && sp.baseAnnual) ? sp.baseAnnual : 0;
+      if(living>0) rows.push({label:'Base living costs', annual:living});
+      requiredFloor = living;
+    }
 
     // ── EXTRA SPEND: what you COULD safely add vs what you're CHOOSING this year ──
     // "Could" = this year's solver guidance for the active smile phase (falls back to blended safeExtra).
@@ -1184,6 +1178,8 @@ function populate(d){
       var assume = String(gl.assumeExtraSpend||'').toLowerCase()==='yes';
       chosenExtra = assume ? (override>0? override : guidance) : 0;
     })();
+    // Prefer the master's OWN applied "Chosen Extra Spend" value if present (no client re-derivation).
+    if (by && typeof by.chosenExtra === 'number') chosenExtra = by.chosenExtra;
 
     // Render the two extra-spend rows: a muted "could" row, then the highlighted "chosen" row.
     var moOfFn = moOf;
