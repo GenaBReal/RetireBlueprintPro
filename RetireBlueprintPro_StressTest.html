@@ -309,6 +309,9 @@ window.addEventListener('storage', function(e) {
       </div>
 
       <button class="reset-btn" onclick="setScenario('custom')">↺ Reset to Base</button>
+      <button id="run-new-test-btn" onclick="runNewTest()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#f4b86a,#e09a3e);color:#041E2F;font-weight:900;font-size:14px;border:none;border-radius:12px;padding:14px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 4px 14px rgba(244,184,106,.3);">▶ Run New Test</button>
+      <div style="margin-top:8px;font-size:10px;line-height:1.5;color:#8aaabb;text-align:center;">Runs your <b>real engine</b> on these settings — give it <b>~20–30 sec</b> (thousands of calculations). No estimates: this is a true run of your plan.</div>
+      <div id="run-status" style="margin-top:8px;font-size:11px;line-height:1.5;text-align:center;display:none;"></div>
     </div>
 
     <!-- RESULTS -->
@@ -926,15 +929,11 @@ function updateFingerprint(baseRes) {
     }
   }
   // -30% crash: identical multipliers to Dashboard updateStressTest (end30)
-  var s30End = Math.max(0, Math.round(baseEnd * 0.7 * 0.85));
+  // -30% card: NO fake estimate. The real downside comes from a real engine run.
   var fp30=document.getElementById('fp-stress30');
   var fp30n=document.getElementById('fp-stress30-note');
-  if(fp30){fp30.textContent=fmt(s30End);fp30.style.color=s30End>=(leg.goal||0)?'#1CC7D0':s30End>0?'#f4b86a':'#ff6b6b';}
-  var note30;
-  if(s30End>=(leg.goal||0)) note30='✅ Goal still met';
-  else if(s30End>0) note30='⚠️ '+fmt((leg.goal||0)-s30End)+' below legacy goal';
-  else note30='⛔ Portfolio depletes';
-  if(fp30n){fp30n.textContent=note30;fp30n.style.color=fp30.style.color;}
+  if(fp30){fp30.textContent='Run a test ↓';fp30.style.color='#f4b86a';fp30.style.fontSize='13px';}
+  if(fp30n){fp30n.textContent='Press ▶ Run New Test for a real −30% run';fp30n.style.color='#8aaabb';}
 }
 
 function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
@@ -963,6 +962,23 @@ function recalc() {
   var leg=planData.legacy||{};
   var legGoal=leg.goal||0;
   var baseEnd=leg.projectedEnding||(baseRes.length>0?baseRes[baseRes.length-1].bal:0);
+
+  // ── NO FAKE NUMBERS ───────────────────────────────────────────────────────
+  // Sliders/presets only SET the scenario. Real stress numbers come ONLY from a
+  // real engine run (Run New Test). Here: update the real base case + fingerprint
+  // + the assumption bars, then stop. The crude estimate below is now dead code.
+  var _be=document.getElementById('res-base-end'); if(_be) _be.textContent=fmt(baseEnd);
+  set('res-base-conf', legGoal>0?(Math.min(100,Math.round(baseEnd/legGoal*100))+'% of $'+Math.round(legGoal/1000)+'K goal'):'—');
+  var _scen=document.getElementById('active-scenario-label');
+  if(_scen){
+    if(yr1===0 && sp===0 && Math.abs(inf-(gi.inflation||0.03)*100)<0.05){ _scen.textContent='✅ Base case (no stress applied)'; _scen.style.color='#1CC7D0'; }
+    else { _scen.textContent='⚡ Scenario set — press ▶ Run New Test for your real result'; _scen.style.color='#f4b86a'; }
+  }
+  updateFingerprint(baseRes);
+  rbpDrawBars(yr1, yrs, baseRes);
+  rbpStressPending(baseRes);
+  return;
+  // ── crude estimate below is now unreachable (kept to avoid touching refs) ──
   // ROBUST STRESS — anchored to the REAL ending balance (same approach as the
   // Dashboard panel), NOT a crude lump-sum re-simulation that could bleed to a
   // false $0. We translate the slider settings into a proportional impact on
@@ -1409,6 +1425,140 @@ function esRenderBase() {
   if(!b){ el.textContent='load your plan to see base numbers'; return; }
   el.innerHTML = 'Safe extra spend <strong style="color:#cfe3ef;">'+esFmt(b.safeExtra)+'/yr</strong> · Ending '+
     '<strong style="color:#cfe3ef;">'+esFmt(b.ending)+'</strong> · Legacy goal <strong style="color:#cfe3ef;">'+esFmt(b.legacyGoal)+'</strong>';
+}
+
+// ════════ STAGE 2: REAL ENGINE RUN ("Run New Test") ════════
+// Sliders/presets set a scenario; this runs it through the REAL engine and shows
+// only real numbers. If the engine returns no detailed series, we say so plainly —
+// we never show an estimate dressed up as a result.
+
+function rbpDrawBars(yr1, yrs, baseRes){
+  var crashCtx=document.getElementById('crash-bar-chart'); if(!crashCtx) return;
+  if(window.crashBarChart) window.crashBarChart.destroy();
+  var curYear=new Date().getFullYear();
+  var nBars=Math.min(45, (baseRes&&baseRes.length)?baseRes.length:30);
+  var barLabels=[],barData=[],barColors=[],barBorders=[];
+  for(var bi=0;bi<nBars;bi++){
+    var yr=(baseRes&&baseRes[bi]?baseRes[bi].year:curYear+bi);
+    barLabels.push(yr);
+    var ret;
+    if(bi===0) ret=0;
+    else if(bi===1) ret=yr1;
+    else if(bi<=yrs) ret=yr1*(1-(bi-1)/yrs)+7*((bi-1)/yrs);
+    else ret=7;
+    ret=Math.round(ret);
+    barData.push(ret);
+    barColors.push(ret<0?'rgba(214,69,69,0.75)':'rgba(28,199,208,0.6)');
+    barBorders.push(ret<0?'#d64545':'#1CC7D0');
+  }
+  window.crashBarChart=new Chart(crashCtx,{ type:'bar',
+    data:{ labels:barLabels, datasets:[{ label:'Annual Return %', data:barData, backgroundColor:barColors, borderColor:barBorders, borderWidth:1.5, borderRadius:2 }] },
+    options:{ responsive:true, maintainAspectRatio:false, animation:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:function(c){ return (c.raw>0?'+':'')+c.raw+'%'; } } } },
+      scales:{ x:{ ticks:{font:{size:9},color:'#92a1b2',maxTicksLimit:10}, grid:{display:false} },
+               y:{ ticks:{font:{size:9},color:'#92a1b2',callback:function(v){return v+'%';}}, grid:{color:'rgba(0,0,0,0.05)'} } } }
+  });
+}
+
+function rbpDrawRealChart(baseSeries, stressSeries, crashYrs){
+  var ctx=document.getElementById('stress-chart'); if(!ctx) return;
+  if(stressChart) stressChart.destroy();
+  baseSeries=baseSeries||[];
+  var labels=baseSeries.map(function(p){return p.year;});
+  var baseData=baseSeries.map(function(p){return p.bal;});
+  var sMap={}; (stressSeries||[]).forEach(function(p){sMap[p.year]=p.bal;});
+  var stressData= stressSeries ? labels.map(function(y){return (sMap[y]!=null)?sMap[y]:null;}) : labels.map(function(){return null;});
+  var leg=planData.legacy||{}; var goal=leg.goal||0;
+  var curYear=new Date().getFullYear();
+  var allVals=baseData.concat(stressData).filter(function(v){return v!=null;}).concat([goal]);
+  var maxVal=allVals.length?Math.max.apply(null,allVals):goal;
+  var crashData=labels.map(function(yr){ return (crashYrs>0 && yr>curYear && yr<=curYear+Math.max(crashYrs,1))?maxVal*1.05:null; });
+  var ds=[
+    {label:'',data:crashData,type:'bar',backgroundColor:'rgba(214,69,69,0.13)',borderColor:'transparent',borderWidth:0,barPercentage:1.0,categoryPercentage:1.0,order:3},
+    {label:'Legacy Goal',data:labels.map(function(){return goal;}),borderColor:'#f4b86a',borderDash:[6,4],fill:false,pointRadius:0,borderWidth:1.8,order:2}
+  ];
+  if(stressSeries) ds.push({label:'With Crash',data:stressData,borderColor:'#ef5350',backgroundColor:'transparent',fill:false,tension:0.3,pointRadius:0,borderWidth:3,order:1});
+  ds.push({label:'Base Plan',data:baseData,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.06)',fill:false,tension:0.3,pointRadius:0,borderWidth:3,order:0});
+  stressChart=new Chart(ctx,{ type:'line', data:{labels:labels,datasets:ds},
+    options:{ responsive:true, maintainAspectRatio:false, animation:false,
+      plugins:{ legend:{display:true,labels:{font:{size:10},color:'#566576',boxWidth:14,filter:function(it){return it.text!=='';}}},
+        tooltip:{ callbacks:{ label:function(c){ if(c.dataset.type==='bar') return null; var v=c.raw; if(!v&&v!==0) return null; return c.dataset.label+': '+(v>=1000000?'$'+(v/1000000).toFixed(2)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0'); } } } },
+      scales:{ x:{ticks:{font:{size:10},color:'#8aaabb',maxTicksLimit:8},grid:{display:false}},
+        y:{ticks:{font:{size:10},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(0,0,0,0.04)'}} } }
+  });
+}
+
+function rbpStressPending(baseRes){
+  var seEl=document.getElementById('res-stress-end'); if(seEl){seEl.textContent='— run —';seEl.style.color='#8aaabb';seEl.style.fontSize='14px';}
+  var scEl=document.getElementById('res-stress-conf'); if(scEl){scEl.textContent='press ▶ Run New Test';scEl.style.color='#8aaabb';}
+  set('verdict-title','Ready to run');
+  var vt=document.getElementById('verdict-title'); if(vt) vt.style.color='#7ecfda';
+  var vd=document.getElementById('verdict-detail'); if(vd) vd.innerHTML='Set your scenario with the sliders or a preset, then press <b>▶ Run New Test</b>. Your real engine runs the scenario through your full plan and shows the actual result — no estimates.';
+  var rs=document.getElementById('recs-section'); if(rs) rs.style.display='none';
+  var es=document.getElementById('chart-ending-summary'); if(es) es.innerHTML='<span style="color:#8aaabb;">The blue line is your real base plan (from your sheet). Press <b>▶ Run New Test</b> to add your real crash line and ending balance.</span>';
+  rbpDrawRealChart(baseRes, null, 0);
+}
+
+function runNewTest(){
+  var st=document.getElementById('run-status');
+  var btn=document.getElementById('run-new-test-btn');
+  if(!planData){ if(st){st.style.display='block';st.innerHTML='<span style="color:#ff6b6b;">Load your plan first (🔄 Reload above).</span>';} return; }
+  var yr1=parseInt(document.getElementById('sl-yr1').value);
+  var yrs=parseInt(document.getElementById('sl-yrs').value);
+  var inf=parseFloat(document.getElementById('sl-inf').value);
+  var proj=planData.projections||{};
+  // Map sliders -> engine's native bear levers. Drag = points cut from a ~7% baseline
+  // growth year (your Inputs help convention). Non-negative only: a flat/positive
+  // year-1 = no bear, so the engine runs your base plan (+ any inflation change).
+  var eDrag=Math.max(0, Math.round(7 - yr1));
+  var startYr=(proj.years && proj.years.length)?proj.years[0]:new Date().getFullYear();
+  var params={ action:'runStressTest', eType:'bear', eStart:startYr, eDur:(eDrag>0?Math.max(1,yrs):0), eDrag:eDrag, lType:'bear', lStart:0, lDur:0, lDrag:0, infl:inf };
+  if(btn){btn.disabled=true;btn.textContent='Running… (~20–30 sec)';btn.style.opacity='0.7';btn.style.cursor='wait';}
+  if(st){st.style.display='block';st.innerHTML='<span style="color:#e09a3e;">⏳ Running your real engine — thousands of calculations. This takes ~20–30 seconds…</span>';}
+  esJsonp(params, function(resp){
+    if(btn){btn.disabled=false;btn.textContent='▶ Run New Test';btn.style.opacity='1';btn.style.cursor='pointer';}
+    if(!resp || !resp.ok){ if(st){st.innerHTML='<span style="color:#ff6b6b;">⚠️ '+((resp&&resp.error)?('Engine error: '+resp.error):'The test did not complete. Please try again.')+'</span>';} return; }
+    if(!resp.series || !resp.series.length){
+      if(st){st.innerHTML='<span style="color:#ff6b6b;">⚠️ Your engine ran, but didn\u2019t return a detailed year-by-year result. The upgraded engine (Stage 1) may not be deployed yet — no estimate is shown.</span>';}
+      return;
+    }
+    if(st){st.style.display='none';}
+    rbpRenderRealResult(resp, yr1, yrs, inf);
+  }, function(err){
+    if(btn){btn.disabled=false;btn.textContent='▶ Run New Test';btn.style.opacity='1';btn.style.cursor='pointer';}
+    if(st){st.innerHTML='<span style="color:#ff6b6b;">⚠️ '+err+'</span>';}
+  });
+}
+
+function rbpRenderRealResult(resp, yr1, yrs, inf){
+  var leg=planData.legacy||{};
+  var legGoal=resp.legacyGoal||leg.goal||0;
+  var baseEnd=leg.projectedEnding||0;
+  var stressEnd=resp.ending||0;
+  var stressConf=legGoal>0?Math.min(100,Math.round(stressEnd/legGoal*100)):100;
+  var seEl=document.getElementById('res-stress-end'); if(seEl){seEl.textContent=fmt(stressEnd);seEl.style.fontSize='18px';seEl.style.color=stressEnd>=baseEnd?'#1CC7D0':stressEnd>=legGoal?'#f4b86a':'#ff6b6b';}
+  var scEl=document.getElementById('res-stress-conf'); if(scEl){scEl.textContent=stressEnd<=0?'⚠️ Portfolio depletes':(stressConf+'% of $'+Math.round(legGoal/1000)+'K goal');scEl.style.color=stressConf>=100?'#1CC7D0':stressConf>=80?'#f4b86a':'#ff6b6b';}
+  var title,detail,color,recs=[];
+  if(stressEnd>=legGoal&&legGoal>0){ title='✅ Plan is Resilient';color='#1CC7D0'; detail='Real engine run — ending balance of '+fmt(stressEnd)+' meets or exceeds your '+fmt(legGoal)+' legacy goal under this scenario.'; }
+  else if(stressEnd>0&&stressConf>=70){ title='⚠️ Plan Under Stress';color='#f4b86a'; detail='Real engine run — plan survives but ends '+fmt(legGoal-stressEnd)+' below your legacy goal ('+stressConf+'% funded). Your safe extra spend adjusted to '+fmt(resp.safeExtra)+'/yr to absorb the hit.'; recs=['Trim discretionary spending during the downturn years','Delay large purchases until the market recovers','Consider a small part-time income bridge']; }
+  else if(stressEnd>0){ title='🚨 Plan At Risk';color='#ff6b6b'; detail='Real engine run — only '+stressConf+'% of your legacy goal is funded under this scenario. Your guaranteed income (Social Security + pension) continues regardless.'; recs=['Cut spending for the first few downturn years','Delay Social Security to maximize guaranteed income','Consider 1–2 more working years for a buffer']; }
+  else { title='⛔ Portfolio Depletes';color='#ff6b6b'; detail='Real engine run — under this scenario the portfolio is fully drawn down before the plan ends. Focus on maximizing guaranteed income and reducing reliance on the portfolio.'; recs=['Maximize Social Security by delaying','Reduce the legacy goal','Add part-time income for the first several years']; }
+  set('verdict-title',title); var vt=document.getElementById('verdict-title'); if(vt) vt.style.color=color;
+  var vd=document.getElementById('verdict-detail'); if(vd) vd.innerHTML=detail;
+  var rs=document.getElementById('recs-section'),rl=document.getElementById('recs-list');
+  if(rs&&rl){ rs.style.display=recs.length?'block':'none'; rl.innerHTML=recs.map(function(r){return '<div style="display:flex;gap:8px;font-size:11px;color:#e0f0f4;line-height:1.7;margin-bottom:4px;"><span style="color:#7ecfda;">→</span><span>'+r+'</span></div>';}).join(''); }
+  var es=document.getElementById('chart-ending-summary');
+  if(es){
+    var belowTxt=resp.belowYear?('drops below your legacy goal in <b style="color:#d64545;">'+resp.belowYear+'</b>'):('<b style="color:#2E7032;">stays at or above</b> your legacy goal the whole way ✓');
+    es.innerHTML='<b>Real run:</b> base plan ends at <b style="color:#0c8a92;">'+fmt(baseEnd)+'</b>; this scenario ends at <b style="color:'+(stressEnd>=legGoal?'#2E7032':'#d64545')+';">'+fmt(stressEnd)+'</b> — '+belowTxt+'. Safe extra spend under stress: <b>'+fmt(resp.safeExtra)+'/yr</b>.';
+  }
+  var proj=planData.projections||{};
+  var baseSeries=[];
+  if(proj.years&&proj.endLiquid){ for(var i=0;i<proj.years.length;i++){ baseSeries.push({year:proj.years[i],bal:proj.endLiquid[i]}); } }
+  var crashYrs=(Math.max(0,Math.round(7-yr1))>0?Math.max(1,yrs):0);
+  rbpDrawRealChart(baseSeries, resp.series, crashYrs);
+  rbpDrawBars(yr1, yrs, baseSeries.length?baseSeries:null);
+  var scen=document.getElementById('active-scenario-label'); if(scen){scen.textContent='✓ Showing a REAL engine run';scen.style.color='#1CC7D0';}
 }
 
 function runEngineStressTest() {
