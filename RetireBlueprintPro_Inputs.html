@@ -556,7 +556,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         </div>
         <div class="field">
           <label>Early Bear Return Drag (%)</label>
-          <input type="number" id="f-B15" value="15" min="0" max="50" onchange="markDirty()">
+          <input type="number" id="f-B15" value="0" min="0" max="50" onchange="markDirty()">
           <span class="hint">Points cut from your growth-asset return <em>each</em> bear year (cash/bonds unaffected). A normal 7% year − 15 = −8%. Mild ≈ 10, Moderate ≈ 15, Severe ≈ 20–30. For a sharp 2008-style crash, use ~35 with a 1–2 yr duration.</span>
         </div>
         <div class="field">
@@ -579,7 +579,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         </div>
         <div class="field">
           <label>Late Bear Return Drag (%)</label>
-          <input type="number" id="f-B19" value="15" min="0" max="50" onchange="markDirty()">
+          <input type="number" id="f-B19" value="0" min="0" max="50" onchange="markDirty()">
           <span class="hint">Same idea as the Early Bear drag — points cut from growth returns during the late-bear years. Often a bit lower (≈ 10–15) than the early one.</span>
         </div>
       </div>
@@ -2896,6 +2896,15 @@ function saveAll() {
     }
     return plan;
   }
+
+  // ── STRESS GUARD ─────────────────────────────────────────
+  // The Master only applies a bear-market drag when the toggle (B12/B16)
+  // contains "Bear Market". To make that bullet-proof, whenever a toggle is
+  // left on "Normal Returns" we force its Return Drag to 0 before saving, so
+  // leftover numbers in the start/duration/drag cells can NEVER trigger a
+  // phantom crash on the base plan.
+  if (gv('f-B12') !== 'Bear Market') { var _e15 = document.getElementById('f-B15'); if (_e15) _e15.value = 0; }
+  if (gv('f-B16') !== 'Bear Market') { var _e19 = document.getElementById('f-B19'); if (_e19) _e19.value = 0; }
 
   var payload = {
     global: {
