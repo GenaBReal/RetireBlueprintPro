@@ -676,6 +676,39 @@ window.addEventListener('storage', function(e) {
   </div>
 </div>
 
+<div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,107,107,0.2);">
+  <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+    Stress Test — Sequence of Returns Risk
+    <span class="tooltip-icon" data-tip="BASE: Your plan as projected. DOWN 20%: Portfolio drops 20% in Year 1 (mild bear market — tests sequence of returns risk). DOWN 30%: Severe crash like 2008 or COVID 2020. HIGH INFLATION: 5% inflation instead of 3% — expenses grow faster. ✅ = legacy goal met · ⚠️ = below goal · ⛔ = depleted. To improve results: increase Roth %, delay SS, or reduce Phase 1 spending." style="border-color:#ff6b6b;color:#ff6b6b;">?</span>
+  </div>
+  <div style="font-size:10px;color:#f4b86a;margin-bottom:10px;">
+    💡 <strong>Try this:</strong> Change your Phase 1 spending or SS start date in Inputs, save, then refresh to see how it affects these numbers.
+    The goal: keep all 4 scenarios showing ✅.
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+      <div class="solver-kpi-lbl">Base Scenario</div>
+      <div class="solver-kpi-val" id="stress-base" style="color:#1CC7D0;">—</div>
+      <div class="solver-kpi-sub">Normal market returns</div>
+    </div>
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+      <div class="solver-kpi-lbl">Year 1 Down 20%</div>
+      <div class="solver-kpi-val" id="stress-20">—</div>
+      <div class="solver-kpi-sub">Mild bear market</div>
+    </div>
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+      <div class="solver-kpi-lbl">Year 1 Down 30%</div>
+      <div class="solver-kpi-val" id="stress-30">—</div>
+      <div class="solver-kpi-sub">Severe bear market</div>
+    </div>
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+      <div class="solver-kpi-lbl">High Inflation (5%)</div>
+      <div class="solver-kpi-val" id="stress-inf">—</div>
+      <div class="solver-kpi-sub">vs base 3% inflation</div>
+    </div>
+  </div>
+</div>
+
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr 195px;grid-template-rows:auto auto;gap:8px;margin-bottom:0;">
   <div class="chart-card">
     <div class="chart-title">Portfolio Sustainability</div>
@@ -757,39 +790,6 @@ window.addEventListener('storage', function(e) {
     <div id="completion-bar" style="height:12px;border-radius:8px;background:linear-gradient(90deg,#1CC7D0,#4CAF50);width:0%;transition:width 1s ease;"></div>
   </div>
   <div id="completion-items" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;font-size:15px;"></div>
-</div>
-
-<div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,107,107,0.2);">
-  <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-    Stress Test — Sequence of Returns Risk
-    <span class="tooltip-icon" data-tip="BASE: Your plan as projected. DOWN 20%: Portfolio drops 20% in Year 1 (mild bear market — tests sequence of returns risk). DOWN 30%: Severe crash like 2008 or COVID 2020. HIGH INFLATION: 5% inflation instead of 3% — expenses grow faster. ✅ = legacy goal met · ⚠️ = below goal · ⛔ = depleted. To improve results: increase Roth %, delay SS, or reduce Phase 1 spending." style="border-color:#ff6b6b;color:#ff6b6b;">?</span>
-  </div>
-  <div style="font-size:10px;color:#f4b86a;margin-bottom:10px;">
-    💡 <strong>Try this:</strong> Change your Phase 1 spending or SS start date in Inputs, save, then refresh to see how it affects these numbers.
-    The goal: keep all 4 scenarios showing ✅.
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
-      <div class="solver-kpi-lbl">Base Scenario</div>
-      <div class="solver-kpi-val" id="stress-base" style="color:#1CC7D0;">—</div>
-      <div class="solver-kpi-sub">Normal market returns</div>
-    </div>
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
-      <div class="solver-kpi-lbl">Year 1 Down 20%</div>
-      <div class="solver-kpi-val" id="stress-20">—</div>
-      <div class="solver-kpi-sub">Mild bear market</div>
-    </div>
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
-      <div class="solver-kpi-lbl">Year 1 Down 30%</div>
-      <div class="solver-kpi-val" id="stress-30">—</div>
-      <div class="solver-kpi-sub">Severe bear market</div>
-    </div>
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
-      <div class="solver-kpi-lbl">High Inflation (5%)</div>
-      <div class="solver-kpi-val" id="stress-inf">—</div>
-      <div class="solver-kpi-sub">vs base 3% inflation</div>
-    </div>
-  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
