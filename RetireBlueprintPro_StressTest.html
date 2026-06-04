@@ -2160,6 +2160,30 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   document.getElementById('mc-bar-survive').style.width = survivePct + '%';
   document.getElementById('mc-bar-fail').style.width    = fullFailPct + '%';
 
+  // ── SS + pension floor, shown honestly ───────────────────
+  // The year-1 snapshot badly understates the lifelong floor when claiming is
+  // staggered (one spouse not collecting yet). Show the year-1 figure rising to
+  // the eventual COMBINED SS+pension once both collect. Fair for any client:
+  // it's derived from each person's own SS, not a single-year snapshot.
+  var floorRows;
+  (function(){
+    var _pk = (planData && planData.people) ? Object.keys(planData.people) : [];
+    var _a = _pk[0] ? (planData.people[_pk[0]] || {}) : {};
+    var _b = _pk[1] ? (planData.people[_pk[1]] || {}) : {};
+    var ssFullFloor = (((+_a.ssMonthly || 0) + (+_b.ssMonthly || 0)) * 12) + (pension || 0);
+    var ssY1Floor   = (ssYear1 + pension) || 0;
+    if (!useSheetWithdrawals) {
+      floorRows = contextRow('Income credited', '\u26A0 Using simplified ' + fmt(ssY1Floor) + '/yr (SS + pension only) \u2014 your sheet income data was unavailable');
+      return;
+    }
+    floorRows = contextRow('Income credited each year', 'Your FULL plan income \u2014 salary, SS, pension &amp; RMDs, modeled year by year. Withdrawals below are what is left AFTER it.');
+    if (ssFullFloor > ssY1Floor + 2000) {
+      floorRows += contextRow('SS + pension floor', '\u2248' + fmt(ssY1Floor) + ' in ' + startYear + '  \u2192  rising to \u2248' + fmt(ssFullFloor) + '/yr once both are collecting');
+    } else {
+      floorRows += contextRow('SS + pension floor', fmt(Math.max(ssFullFloor, ssY1Floor)) + '/yr (continues for life)');
+    }
+  })();
+
   // ── Context panel: what does this mean in REAL numbers ────
   var contextHtml = '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.22);border-radius:12px;padding:16px;margin-bottom:16px;">' +
     '<div style="font-size:10px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">📋 What Your Simulation Actually Ran</div>' +
@@ -2172,10 +2196,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     contextRow('Chosen extra spending', fmt(chosenExtraAmt) + '/yr') +
     contextRow('Full spending modeled', fmt(baseSpend) + '/yr' + (chosenExtraAmt > 0 ? '  (floor + chosen extra)' : '  (floor only)')) +
     (suggestedExtraAmt > 0 ? contextRow('Safe extra (you could spend up to)', fmt(suggestedExtraAmt) + '/yr') : '') +
-    (useSheetWithdrawals
-      ? contextRow('Income credited each year', 'Your FULL plan income — salary, SS, pension &amp; RMDs (\u2248' + fmt((proj.income && proj.income.length) ? (+proj.income[0] || 0) : (ssYear1 + pension)) + ' in ' + startYear + ', changes every year). Withdrawals below are what is left AFTER this income.') +
-        contextRow('Lifelong SS + pension floor', fmt((ssYear1 + pension) || 0) + '/yr (the part that never stops)')
-      : contextRow('Income credited', '\u26A0 Using simplified ' + fmt((ssYear1 + pension) || 0) + '/yr (SS + pension only) \u2014 your sheet income data was unavailable')) +
+    floorRows +
     contextRow('Expected return assumption', (mu * 100).toFixed(1) + '% avg · ' + (sigma*100).toFixed(0) + '% std dev') +
     contextRow('Inflation assumption', (inflation * 100).toFixed(1) + '%/yr') +
     contextRow('Return model', {'normal':'Normal distribution','fat':'Fat-tailed (more realistic)','historical':'US historical 1928–2024'}[model] || model) +
