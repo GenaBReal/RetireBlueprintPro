@@ -389,7 +389,7 @@ window.addEventListener('storage', function(e) {
       <div class="kpi-sub">base − scenario</div>
     </div>
     <!-- 4 Safe extra spend -->
-    <div class="kpi-card" title="The most you could spend ON TOP of your essentials each year and still finish at/above your legacy goal in this scenario.">
+    <div class="kpi-card" title="You can spend up to this much extra each year, on top of your essentials, and still finish at or above your legacy goal in this scenario.">
       <div class="kpi-lbl">Safe Extra Spend</div>
       <div id="kpi-safe" class="kpi-val" style="color:#1CC7D0;">—</div>
       <div class="kpi-sub">per year, this scenario</div>
@@ -693,7 +693,7 @@ window.addEventListener('storage', function(e) {
             </div>
           </div>
           <div style="background:#061620;border-radius:10px;border:1px solid #1a3a52;padding:16px;">
-            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Ending Balance at Full Spending</div>
+            <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;">Ending Balance at Full Spending</div><div style="font-size:10px;color:#8aaabb;margin-bottom:10px;"><span style="color:#ef5350;">■</span> ran out &nbsp; <span style="color:#f4b86a;">■</span> below legacy goal &nbsp; <span style="color:#6cc070;">■</span> at/above goal</div>
             <div style="position:relative;height:160px;">
               <canvas id="mc-hist-chart"></canvas>
             </div>
@@ -828,7 +828,7 @@ function project(overrides) {
   if(typeof rbpApplyNames==='function') rbpApplyNames(p1.name||'Partner 1',p2.name||'Partner 2');
 
   var totalPF  = port.total || 0;
-  var baseSpend= (sp.baseAnnual||0) + (sp.safeExtra||0);
+  var baseSpend= rbpEssentialFloor().floor + ((proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))||0); // chosen plan: must-pay floor + CHOSEN extra (Master column), never the suggested max
   var baseRet  = rbpPortfolioStats(port).meanReturn;
   var baseInfl = gl.inflation  || 0.03;
   var baseCola = gl.ssCola     || 0.025;
@@ -908,7 +908,7 @@ function updateFingerprint(baseRes) {
   if(planEndYr>0) endYr=planEndYr;
   set('fp-end-year', endYr);
   set('fp-end-note','Through age '+longestAge);
-  set('fp-spending', fmt(rbpEssentialFloor().floor + (sp.safeExtra||0)));
+  set('fp-spending', fmt(rbpEssentialFloor().floor + ((proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))||0)));
 
   // -30% CRASH CARD — use the SAME method as the Dashboard stress panel so the
   // two pages agree. Anchor to the REAL death-year ending balance from the sheet
@@ -1856,8 +1856,12 @@ function runMonteCarlo() {
   var p2Name = p2.name || window.rbpP2Name || localStorage.getItem('rbp_p2_name') || 'Partner 2';
 
   var totalPF   = port.total || 0;
-  var baseSpend = rbpEssentialFloor().floor + (sp.safeExtra || 0); // base living + debt + extra (debt-inclusive)
-  var safeExtra = (sp.safeExtra || 0); // discretionary extra, removed in the "essentials only" run
+  var floorNow = rbpEssentialFloor().floor;                  // must-pay floor (base living + healthcare + debt)
+  // CHOSEN discretionary extra you actually plan to spend — ALWAYS from the Master's
+  // "Chosen Extra Spend" column (byYear.chosenExtra), per year. NOT the solver's suggested max.
+  var chosenExtraNow = (proj.byYear && proj.byYear[0] && (+proj.byYear[0].chosenExtra)) ? (+proj.byYear[0].chosenExtra) : 0;
+  var suggestedExtra = (+sp.safeExtra) || 0;                 // solver's SAFE max — a "you could spend up to" metric only
+  var baseSpend = floorNow + chosenExtraNow;                 // your CHOSEN spending = floor + chosen extra
   // Does the SAVED plan already include the extra? ("Assume Extra Spending Used?" = Yes on Inputs, cell B11)
   var extraInPlan = String(gl.assumeExtraSpend || 'Yes').trim().toLowerCase().charAt(0) !== 'n';
   var legacyGoal= leg.goal || 0;
@@ -1900,7 +1904,8 @@ function runMonteCarlo() {
 
   var allEndingBals = [];
   var allEndingBalsNX = []; // "essentials only" endings - discretionary extra paused
-  var depleteYears  = []; // which year each depleting scenario runs out
+  var depleteYears  = []; // run-out year at the MUST-PAY floor (base+healthcare+debt)
+  var depleteYearsFull = []; // run-out year at FULL spending (must-pay + chosen extra)
   var failYears     = new Array(yrs).fill(0);
   var yearlyBals    = [];
   for (var y = 0; y < yrs; y++) yearlyBals.push([]);
@@ -1921,24 +1926,23 @@ function runMonteCarlo() {
       var peakBal = bal;
       var peakBalNX = balNX;
       var depleteAt = null;
+      var depletedFull = false, depleteAtFull = null;
 
       for (var i = 0; i < yrs; i++) {
         if (yearlyBals[i]) yearlyBals[i].push(Math.round(bal));
 
         if (i === 0) continue; // Year 0 = starting balance, no withdrawal yet
 
-        // ── Full plan: spending INCLUDES your discretionary extra ──
-        var withdrawal, extraInflated = safeExtra * Math.pow(1 + inflation, i);
+        // ── Full plan: spend EXACTLY your chosen plan. Your Final Gross Withdrawal already
+        // reflects your Master's Chosen Extra Spend; we never add the solver's suggested max. ──
+        var withdrawal;
         if (useSheetWithdrawals && i < proj.withdrawals.length) {
-          // Real withdrawal from your sheet (already accounts for income, taxes, etc.).
-          // If the saved plan does NOT already include the extra, add it back for the full-plan line.
-          withdrawal = Math.max(0, (proj.withdrawals[i] || 0) + (extraInPlan ? 0 : extraInflated));
-          // Spending flexibility: cut if portfolio dropped 20%+ from peak
+          withdrawal = Math.max(0, (proj.withdrawals[i] || 0));
           if (flexPct > 0 && peakBal > 0 && (peakBal - bal) / peakBal >= 0.20) {
-            withdrawal *= (1 - flexPct * 0.5); // partial cut on actual withdrawals
+            withdrawal *= (1 - flexPct * 0.5);
           }
         } else {
-          // Fallback: simplified math
+          // Fallback: simplified math, spending your chosen amount (floor + chosen extra)
           var guaranteed = ssYear1 * Math.pow(1 + colaRate, i) + pension;
           var spend = baseSpend * Math.pow(1 + inflation, i);
           if (flexPct > 0 && peakBal > 0 && (peakBal - bal) / peakBal >= 0.20) {
@@ -1947,16 +1951,17 @@ function runMonteCarlo() {
           withdrawal = Math.max(0, spend - guaranteed);
         }
 
-        // ── Essentials only: SAME plan with the inflated discretionary extra removed ──
+        // ── Essentials only: your chosen plan with ONLY the chosen discretionary extra removed ──
         var withdrawalNX;
         if (useSheetWithdrawals && i < proj.withdrawals.length) {
-          withdrawalNX = Math.max(0, (proj.withdrawals[i] || 0) - (extraInPlan ? extraInflated : 0));
+          var chosenX_i = (proj.byYear[i] && (+proj.byYear[i].chosenExtra)) ? (+proj.byYear[i].chosenExtra) : 0;
+          withdrawalNX = Math.max(0, (proj.withdrawals[i] || 0) - chosenX_i);
           if (flexPct > 0 && peakBalNX > 0 && (peakBalNX - balNX) / peakBalNX >= 0.20) {
             withdrawalNX *= (1 - flexPct * 0.5);
           }
         } else {
           var guaranteedNX = ssYear1 * Math.pow(1 + colaRate, i) + pension;
-          var spendNX = Math.max(0, baseSpend - safeExtra) * Math.pow(1 + inflation, i);
+          var spendNX = floorNow * Math.pow(1 + inflation, i);
           if (flexPct > 0 && peakBalNX > 0 && (peakBalNX - balNX) / peakBalNX >= 0.20) {
             spendNX *= (1 - flexPct);
           }
@@ -1969,6 +1974,11 @@ function runMonteCarlo() {
         bal = Math.max(0, bal - withdrawal);
         bal = Math.max(0, bal * (1 + ret));
         if (bal > peakBal) peakBal = bal;
+        // Run-out year at FULL spending (must-pay floor PLUS the chosen extra).
+        if (bal <= 0 && !depletedFull) {
+          depletedFull = true;
+          depleteAtFull = mcYears[i] || (curYear + i);
+        }
 
         balNX = Math.max(0, balNX - withdrawalNX);
         balNX = Math.max(0, balNX * (1 + ret));
@@ -1986,6 +1996,7 @@ function runMonteCarlo() {
       allEndingBals.push(Math.round(bal));
       allEndingBalsNX.push(Math.round(balNX));
       if (depleteAt !== null) depleteYears.push(depleteAt);
+      if (depleteAtFull !== null) depleteYearsFull.push(depleteAtFull);
     }
 
     completed = end;
@@ -2005,7 +2016,7 @@ function runMonteCarlo() {
         nRuns, yrs, mcYears, legacyGoal, curYear,
         p1Name, p2Name, p1DeathAge, p2DeathAge, p1.age||63, p2.age||55,
         mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
-        allEndingBalsNX, safeExtra, extraInPlan);
+        allEndingBalsNX, chosenExtraNow, extraInPlan, depleteYearsFull, suggestedExtra);
     }
   }
 
@@ -2022,7 +2033,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     nRuns, yrs, mcYears, legacyGoal, curYear,
     p1Name, p2Name, p1DeathAge, p2DeathAge, p1Age, p2Age,
     mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
-    endingsNX, safeExtraAmt, extraInPlan) {
+    endingsNX, chosenExtraAmt, extraInPlan, depleteYearsFull, suggestedExtraAmt) {
 
   var sorted = endings.slice().sort(function(a,b){return a-b;});
 
@@ -2033,6 +2044,14 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   var successPct  = Math.round(succeedGoal / nRuns * 100);
   var survivePct  = Math.round(survivePos  / nRuns * 100);
   var failPct     = Math.round(depleted    / nRuns * 100);
+  // depleted/failPct so far = ran out at FULL spending (used for breakdown bars).
+  // Re-point the headline "run-out" to the MUST-PAY floor so the verdict text,
+  // depletion detail, and never-ran-out % all speak the same language.
+  var depletedFull = depleted, fullFailPct = failPct;
+  depleted = (depleteYears && depleteYears.length) ? depleteYears.length : 0;
+  failPct  = Math.round(depleted / nRuns * 100);
+  var floorAmt = rbpEssentialFloor().floor;                  // the must-pay floor, in dollars
+  var mpSafePct = Math.round((nRuns - depleted) / nRuns * 100); // % of futures that always cover must-pay
 
   var p10 = mcPercentile(endings, 10);
   var p25 = mcPercentile(endings, 25);
@@ -2054,7 +2073,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // essentials-only survival (discretionary extra paused in bad years) — the realistic-behavior rate;
   // falls back to the full-spending rate if there is no discretionary extra to pause.
   var neverRanNXBig = neverRanPct;
-  if (endingsNX && endingsNX.length && safeExtraAmt > 0) {
+  if (endingsNX && endingsNX.length && chosenExtraAmt > 0) {
     var _dNXb = endingsNX.filter(function(b){ return b <= 0; }).length;
     neverRanNXBig = Math.round((endingsNX.length - _dNXb) / endingsNX.length * 100);
   }
@@ -2071,7 +2090,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // ── Essentials-only comparison (discretionary extra paused) ──
   var cmpBox = document.getElementById('mc-extra-compare');
   if (cmpBox) {
-    if (!endingsNX || !endingsNX.length || !(safeExtraAmt > 0)) {
+    if (!endingsNX || !endingsNX.length || !(chosenExtraAmt > 0)) {
       cmpBox.style.display = 'none'; // nothing discretionary to remove
     } else {
       var depletedNX = endingsNX.filter(function(b){ return b <= 0; }).length;
@@ -2082,7 +2101,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       var fnEl = document.getElementById('mc-floor-note');
       if (fnEl) fnEl.innerHTML = 'Your non-negotiable floor (living + healthcare + debt): <strong style="color:#fff;">' + fmt(_ef.floor) + '/yr</strong>'
         + ((_ef.debt > 0 || _ef.healthcare > 0) ? ' <span style="color:#8aaabb;">(' + fmt(_ef.living) + ' living + ' + fmt(_ef.healthcare) + ' healthcare + ' + fmt(_ef.debt) + ' debt)</span>' : '')
-        + ' &nbsp;·&nbsp; Discretionary extra you could pause: <strong style="color:#f4b86a;">' + fmt(safeExtraAmt) + '/yr</strong>.';
+        + ' &nbsp;·&nbsp; Chosen extra you could pause: <strong style="color:#f4b86a;">' + fmt(chosenExtraAmt) + '/yr</strong>.';
       var sFull = document.getElementById('mc-cmp-full');
       var sEss  = document.getElementById('mc-cmp-ess');
       var tagFull = extraInPlan ? '   ← your current plan' : '';
@@ -2098,10 +2117,10 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // ── Breakdown bars ────────────────────────────────────────
   document.getElementById('mc-exceed').textContent = succeedGoal.toLocaleString() + ' (' + successPct + '%)';
   document.getElementById('mc-survive').textContent = survivePos.toLocaleString() + ' (' + survivePct + '%)';
-  document.getElementById('mc-fail').textContent   = depleted.toLocaleString() + ' (' + failPct + '%)';
+  document.getElementById('mc-fail').textContent   = depletedFull.toLocaleString() + ' (' + fullFailPct + '%)';
   document.getElementById('mc-bar-exceed').style.width  = successPct + '%';
   document.getElementById('mc-bar-survive').style.width = survivePct + '%';
-  document.getElementById('mc-bar-fail').style.width    = failPct + '%';
+  document.getElementById('mc-bar-fail').style.width    = fullFailPct + '%';
 
   // ── Context panel: what does this mean in REAL numbers ────
   var contextHtml = '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.22);border-radius:12px;padding:16px;margin-bottom:16px;">' +
@@ -2111,7 +2130,10 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     contextRow(p1Name + ' lifespan modeled', 'Age ' + p1Age + ' → ' + p1DeathAge + ' (year ' + (curYear + p1DeathAge - p1Age) + ')') +
     contextRow(p2Name + ' lifespan modeled', 'Age ' + p2Age + ' → ' + p2DeathAge + ' (year ' + (curYear + p2DeathAge - p2Age) + ')') +
     contextRow('Starting portfolio', fmt(totalPF)) +
-    contextRow('Annual spending (base)', fmt(baseSpend)) +
+    contextRow('Must-pay floor (base + healthcare + debt)', fmt(floorAmt) + '/yr') +
+    contextRow('Chosen extra spending', fmt(chosenExtraAmt) + '/yr') +
+    contextRow('Full spending modeled', fmt(baseSpend) + '/yr' + (chosenExtraAmt > 0 ? '  (floor + chosen extra)' : '  (floor only)')) +
+    (suggestedExtraAmt > 0 ? contextRow('Safe extra (you could spend up to)', fmt(suggestedExtraAmt) + '/yr') : '') +
     contextRow('Guaranteed income (SS + pension)', fmt((ssYear1 + pension) || 0) + '/yr') +
     contextRow('Expected return assumption', (mu * 100).toFixed(1) + '% avg · ' + (sigma*100).toFixed(0) + '% std dev') +
     contextRow('Inflation assumption', (inflation * 100).toFixed(1) + '%/yr') +
@@ -2124,7 +2146,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   if (depleted > 0) {
     depleteHtml = '<div style="background:rgba(239,83,80,0.07);border:1px solid rgba(239,83,80,0.25);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:#ffcdd2;">' +
       '<strong style="color:#ef5350;font-size:13px;">⚠️ About the ' + depleted + ' scenarios that ran short of your must-pay floor</strong><br><br>' +
-      'In <strong>' + failPct + '%</strong> of simulations the portfolio could no longer cover your <strong>must-pay floor</strong> — base living + healthcare + debt — at some point in retirement.' +
+      'In <strong>' + failPct + '%</strong> of simulations the portfolio could no longer cover your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) at some point in retirement.' +
       (earliestDeplete ? ' The earliest this happened was <strong>' + earliestDeplete + '</strong>.' : '') +
       (medDepleteYr ? ' The median run-out year was <strong>' + medDepleteYr + '</strong> — half of the failing scenarios held the must-pay floor at least until then.' : '') +
       '<br><br>This is the line that matters most: it is the year your essential, cannot-skip expenses outlast the portfolio. Your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong> in Social Security + pension) keeps coming, but on its own it does not cover the full must-pay floor.' +
@@ -2136,43 +2158,71 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       '</div>';
   }
 
-  // ── Verdict ───────────────────────────────────────────────
+  // ── Verdict (tiered on the MUST-PAY floor — the sustainability number) ──
   var verdictHtml;
-  if (successPct >= 90) {
+  var goalTxt = 'Reaching your full legacy goal of <strong>' + fmt(legacyGoal) + '</strong> at full spending (<strong>' + fmt(baseSpend) + '/yr</strong>) is a higher bar \u2014 <strong>' + successPct + '%</strong> of futures clear that.';
+  var incomeTxt = 'Your guaranteed income of <strong>' + fmt(ssYear1 + pension) + '/yr</strong> (Social Security + pension) continues for life on top of the portfolio.';
+  var failYrTxt = (medDepleteYr ? ', typically around <strong>' + medDepleteYr + '</strong>' : '') + (earliestDeplete ? ' and as early as <strong>' + earliestDeplete + '</strong> in the worst cases' : '');
+  if (mpSafePct >= 90) {
     verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #1CC7D0;color:#2c3e50;font-size:13px;line-height:1.8;">' +
-      '✅ <strong style="color:#1CC7D0;font-size:15px;">Excellent — ' + successPct + '% success rate</strong><br><br>' +
-      'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' random market scenarios</strong> — including crashes, recessions, prolonged low-return decades, and high-inflation periods. ' +
-      'The median ending balance across all runs is <strong>' + fmt(p50) + '</strong>. Even your worst-10% scenario ends at <strong>' + fmt(p10) + '</strong>.<br><br>' +
-      'This is above the <strong>90% threshold</strong> that most financial planners consider robust. Your combination of ' +
-      (ssYear1 > 0 ? 'Social Security income, ' : '') + (pension > 0 ? 'pension income, ' : '') +
-      'portfolio size, and spending level creates a resilient plan that holds up across a wide range of possible futures.' +
+      '\u2705 <strong style="color:#1CC7D0;font-size:15px;">Strong \u2014 your must-pay floor holds in ' + mpSafePct + '% of futures</strong><br><br>' +
+      'Across ' + nRuns.toLocaleString() + ' random futures \u2014 crashes, recessions, low-return decades, high inflation \u2014 your portfolio keeps covering your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) in <strong>' + mpSafePct + '%</strong> of them' +
+      (depleted > 0 ? ', falling short in only <strong>' + depleted.toLocaleString() + '</strong>' + failYrTxt + '. ' : ' \u2014 it never ran short. ') +
+      goalTxt + ' ' + incomeTxt +
       '</div>';
-  } else if (successPct >= 75) {
+  } else if (mpSafePct >= 75) {
     verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #f4b86a;color:#2c3e50;font-size:13px;line-height:1.8;">' +
-      '⚠️ <strong style="color:#f4b86a;font-size:15px;">Acceptable — ' + successPct + '% success rate</strong><br><br>' +
-      'Your plan succeeds in <strong>' + succeedGoal.toLocaleString() + ' out of ' + nRuns.toLocaleString() + ' scenarios</strong>. The 75–89% range is workable but leaves meaningful risk. ' +
-      'The median outcome is <strong>' + fmt(p50) + '</strong>. In the worst 10% of scenarios the portfolio ends at <strong>' + (p10 > 0 ? fmt(p10) : '$0 (depleted)') + '</strong>.<br><br>' +
-      '<strong style="color:#f4b86a;">Ways to strengthen your plan:</strong> (1) Delay retirement by 1–2 years, (2) Reduce base spending by 5–10%, (3) Delay Social Security to increase the guaranteed income floor, (4) Increase Roth allocation to reduce sequence-of-returns risk. Any combination of these typically moves the needle above 85%.' +
+      '\u26A0\uFE0F <strong style="color:#f4b86a;font-size:15px;">Solid floor \u2014 must-pay holds in ' + mpSafePct + '% of futures</strong><br><br>' +
+      'Your portfolio covers your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) in <strong>' + mpSafePct + '%</strong> of futures. It falls short in <strong>' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + '</strong>' + failYrTxt + '. ' +
+      goalTxt + ' ' + incomeTxt +
+      '<br><br><strong style="color:#f4b86a;">To firm up the floor:</strong> trim base spending, delay retirement or Social Security, or pay down debt faster.' +
       '</div>';
-  } else if (successPct >= 50) {
+  } else if (mpSafePct >= 50) {
     verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #ef5350;color:#2c3e50;font-size:13px;line-height:1.8;">' +
-      '❌ <strong style="color:#ef5350;font-size:15px;">Needs Attention — ' + successPct + '% success rate</strong><br><br>' +
-      'Only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + ' scenarios</strong> reach your legacy goal. This warrants a closer look at your plan numbers. ' +
-      (medDepleteYr ? 'In failing scenarios, the portfolio typically depletes around <strong>' + medDepleteYr + '</strong>. ' : '') +
-      "<br><br>This does not mean retirement is impossible — your guaranteed income (<strong>" + fmt(ssYear1 + pension) + '/yr</strong>) continues regardless. ' +
-      'But it does mean your portfolio-funded spending is at elevated risk. Go to Inputs, try reducing spending or adjusting your retirement date, then re-run.' +
+      '\u2757 <strong style="color:#ef5350;font-size:15px;">Floor at risk \u2014 must-pay holds in only ' + mpSafePct + '% of futures</strong><br><br>' +
+      'In <strong>' + failPct + '% (' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + ')</strong> your portfolio can no longer cover your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) before the plan ends' + failYrTxt + '. ' +
+      goalTxt + ' ' + incomeTxt + ' But on its own that income does not cover the floor, so the run-out year is your real sustainability limit.' +
+      '<br><br>Go to Inputs, trim base spending or delay retirement / Social Security, then re-run.' +
       '</div>';
   } else {
     verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #ef5350;color:#2c3e50;font-size:13px;line-height:1.8;">' +
-      '🚨 <strong style="color:#ef5350;font-size:15px;">Significant Risk — ' + successPct + '% success rate</strong><br><br>' +
-      'The number that matters most: in <strong>' + failPct + '% of futures (' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + ')</strong> the portfolio can no longer cover your <strong>must-pay floor</strong> — base living + healthcare + debt — before the plan ends. ' +
-      (medDepleteYr ? 'In a typical failure that happens around <strong>' + medDepleteYr + '</strong>' + (earliestDeplete ? ', and as early as <strong>' + earliestDeplete + '</strong> in the worst cases' : '') + '. ' : (earliestDeplete ? 'Some run dry as early as <strong>' + earliestDeplete + '</strong>. ' : '')) +
-      'Separately, only <strong>' + succeedGoal.toLocaleString() + ' of ' + nRuns.toLocaleString() + '</strong> futures also finish with your full legacy goal still intact. ' +
-      '<br><br>Your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong> in Social Security + pension) keeps coming for life — but on its own it does not cover the must-pay floor, so the run-out year above is your real sustainability limit. Use the Inputs page to trim base spending, delay retirement or Social Security, or pay down debt, then re-run.' +
+      '\uD83D\uDEA8 <strong style="color:#ef5350;font-size:15px;">Significant Risk \u2014 must-pay floor fails in ' + failPct + '% of futures</strong><br><br>' +
+      'The number that matters most: in <strong>' + failPct + '% (' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + ')</strong> your portfolio can no longer cover your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) before the plan ends' + failYrTxt + '. ' +
+      goalTxt + ' ' + incomeTxt + ' But on its own that income does not cover the floor, so the run-out year is your real sustainability limit.' +
+      '<br><br>Use Inputs to trim base spending, delay retirement or Social Security, or pay down debt, then re-run.' +
       '</div>';
   }
 
-  document.getElementById('mc-verdict').innerHTML = verdictHtml + depleteHtml + contextHtml;
+  // ── Run-out trade-off: must-pay floor vs. full spend (with chosen extra) ──
+  var runoutCompareHtml = '';
+  if (chosenExtraAmt > 0) {
+    var floorAmt   = rbpEssentialFloor().floor;
+    var mpSafePct  = Math.round((nRuns - depleted) / nRuns * 100);
+    var fullSafePct= Math.round((nRuns - depletedFull) / nRuns * 100);
+    var medFull    = (depleteYearsFull && depleteYearsFull.length) ? mcPercentile(depleteYearsFull, 50) : null;
+    var mpYrTxt    = medDepleteYr ? ('of the rest, half are gone by ~' + medDepleteYr) : 'every scenario lasted your whole plan';
+    var fullYrTxt  = medFull ? ('of the rest, half are gone by ~' + medFull) : 'every scenario lasted your whole plan';
+    runoutCompareHtml =
+      '<div style="background:rgba(28,199,208,.06);border:1px solid rgba(28,199,208,.28);border-radius:12px;padding:16px;margin-bottom:16px;">' +
+        '<div style="font-size:10px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">⏳ How Long Your Money Lasts — And What The Extra Costs You</div>' +
+        '<div style="font-size:12px;color:#cfe3ef;margin-bottom:10px;">Spending more shortens your runway. Here is the trade-off, so you can pick the extra you are comfortable with.</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);">' +
+          '<div><div style="font-weight:700;color:#fff;">Must-pay only — ' + fmt(floorAmt) + '/yr</div>' +
+          '<div style="font-size:11px;color:#8aaabb;">base living + healthcare + debt (no extras)</div></div>' +
+          '<div style="text-align:right;"><div style="font-weight:800;color:#1CC7D0;font-size:16px;">' + mpSafePct + '% safe for life</div>' +
+          '<div style="font-size:11px;color:#8aaabb;">' + mpYrTxt + '</div></div>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;">' +
+          '<div><div style="font-weight:700;color:#fff;">With your chosen extra — ' + fmt(baseSpend) + '/yr</div>' +
+          '<div style="font-size:11px;color:#8aaabb;">includes ' + fmt(chosenExtraAmt) + '/yr chosen extra on top</div></div>' +
+          '<div style="text-align:right;"><div style="font-weight:800;color:#f4b86a;font-size:16px;">' + fullSafePct + '% safe for life</div>' +
+          '<div style="font-size:11px;color:#8aaabb;">' + fullYrTxt + '</div></div>' +
+        '</div>' +
+        '<div style="font-size:11px;color:#8aaabb;margin-top:8px;">Want to spend somewhere in between? Adjust the extra on the Inputs page and re-run — these two numbers move toward each other.</div>' +
+      '</div>';
+  }
+
+  document.getElementById('mc-verdict').innerHTML = verdictHtml + runoutCompareHtml + depleteHtml + contextHtml;
   document.getElementById('mc-run-info').textContent =
     'Ran ' + nRuns.toLocaleString() + ' scenarios · ' + yrs + '-year horizon (' + startYear + '–' + endYearLabel + ') · ' +
     p1Name + ' to age ' + p1DeathAge + ' · ' + p2Name + ' to age ' + p2DeathAge +
@@ -2321,12 +2371,23 @@ function buildSurvivalChart(failYears, yrs, curYear, projYears, nRuns, depleteYe
         fill: true,
         borderWidth: 2,
         pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#1CC7D0',
         tension: 0.4
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: function(items){ return 'By ' + items[0].label; },
+            label: function(c){ return c.parsed.y + '% of futures can no longer cover must-pay'; }
+          }
+        }
+      },
       scales: {
         x: { ticks: { color: '#6a8a9a', font: { size: 9 } }, grid: { color: '#0d2a3a' } },
         y: {
@@ -2340,24 +2401,32 @@ function buildSurvivalChart(failYears, yrs, curYear, projYears, nRuns, depleteYe
 }
 
 function buildHistChart(endings, legacyGoal) {
-  // Build histogram of ending balances
-  var maxVal = Math.max.apply(null, endings);
-  var bins = 20;
-  var binSize = maxVal / bins;
-  var counts = new Array(bins).fill(0);
-  var colors = [];
-  endings.forEach(function(b) {
-    var idx = Math.min(Math.floor(b / binSize), bins - 1);
-    counts[idx]++;
+  // Separate the "ran out" pile, then bin survivors over a CAPPED range so a few
+  // runaway futures don't crush everything into the first bar.
+  var zeroCount = endings.filter(function(b){ return b <= 0; }).length;
+  var pos = endings.filter(function(b){ return b > 0; }).slice().sort(function(a,b){ return a-b; });
+  var p90 = pos.length ? pos[Math.floor(0.90 * (pos.length - 1))] : 0;
+  var capMax = Math.max(p90, (legacyGoal||0) * 2, 100000);
+  var bins = 10;
+  var binSize = capMax / bins;
+  var posCounts = new Array(bins + 1).fill(0); // last slot = "over cap" catch-all
+  pos.forEach(function(b){
+    var idx = (b > capMax) ? bins : Math.min(Math.floor(b / binSize), bins - 1);
+    posCounts[idx]++;
   });
-
-  var labels = [];
+  function _hf(v){ return v >= 1000000 ? '$'+(v/1000000).toFixed(1)+'M' : '$'+Math.round(v/1000)+'K'; }
+  var labels = ['Ran out'];
+  var counts = [zeroCount];
+  var colors = ['rgba(239,83,80,0.85)'];
   for (var i = 0; i < bins; i++) {
-    var lo = i * binSize;
-    labels.push(lo >= 1000000 ? '$'+(lo/1000000).toFixed(1)+'M' : '$'+(lo/1000).toFixed(0)+'K');
-    var midpoint = (i + 0.5) * binSize;
-    colors.push(midpoint >= legacyGoal ? 'rgba(76,175,80,0.7)' : midpoint > 0 ? 'rgba(244,184,106,0.7)' : 'rgba(239,83,80,0.7)');
+    labels.push(_hf(i * binSize));
+    counts.push(posCounts[i]);
+    var mid = (i + 0.5) * binSize;
+    colors.push(mid >= (legacyGoal||0) ? 'rgba(76,175,80,0.78)' : 'rgba(244,184,106,0.78)');
   }
+  labels.push(_hf(capMax) + '+');
+  counts.push(posCounts[bins]);
+  colors.push('rgba(76,175,80,0.78)');
 
   var ctx = document.getElementById('mc-hist-chart').getContext('2d');
   if (window._mcHistChart) window._mcHistChart.destroy();
@@ -2375,7 +2444,10 @@ function buildHistChart(endings, legacyGoal) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: function(c){ return c.raw.toLocaleString() + ' of ' + endings.length.toLocaleString() + ' futures'; } } }
+      },
       scales: {
         x: { ticks: { color: '#6a8a9a', font: { size: 8 }, maxRotation: 45 }, grid: { display: false } },
         y: { ticks: { color: '#6a8a9a', font: { size: 9 } }, grid: { color: '#0d2a3a' } }
