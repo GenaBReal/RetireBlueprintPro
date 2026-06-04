@@ -1817,9 +1817,15 @@ function mcRandReturn(model, mu, sigma) {
     // was making the P90 run hot.
     var driftFat = 0.5 * sigma * sigma;
     var base = (mu + driftFat) + sigma * z;
-    // 5% chance of a "tail event" (either direction)
-    if (Math.random() < 0.05) {
-      base += (Math.random() < 0.5 ? -1 : 1) * sigma * (2 + Math.random() * 3);
+    // Tail event: a rarer, milder shock that WIDENS the tails without torpedoing
+    // the median. The prior calibration (5% chance of a 2-5 sigma / +-36-90% move)
+    // fired catastrophic crashes far more often than real markets ever have, and
+    // because a deep drop hurts a portfolio you're drawing income from more than an
+    // equal-size gain helps it, those "symmetric" shocks quietly dragged the MEDIAN
+    // outcome to $0 while a few un-shocked runs ballooned. ~3% chance of a 1-3 sigma
+    // move keeps honest fat tails (an occasional ~20-55% swing) without the carnage.
+    if (Math.random() < 0.03) {
+      base += (Math.random() < 0.5 ? -1 : 1) * sigma * (1 + Math.random() * 2);
     }
     return Math.max(-0.60, Math.min(0.80, base));
   } else {
