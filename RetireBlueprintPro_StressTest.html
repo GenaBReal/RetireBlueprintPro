@@ -567,9 +567,9 @@ window.addEventListener('storage', function(e) {
         <div>
           <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Spending Flexibility</div>
           <select id="mc-flex" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
-            <option value="0">Fixed spending (rigid)</option>
-            <option value="10" selected>Cut 10% when portfolio down 20%</option>
-            <option value="20">Cut 20% when portfolio down 20%</option>
+            <option value="0">Fixed spending — rigid (no adjustments)</option>
+            <option value="10" selected>Guardrails — trim 10% in strained markets (standard)</option>
+            <option value="20">Guardrails — trim 20% in strained markets (deeper)</option>
           </select>
         </div>
       </div>
@@ -1884,6 +1884,27 @@ function runMonteCarlo() {
   var pension   = ((p1.pension || 0) + (p2.pension || 0)) * 12;
   var curYear   = new Date().getFullYear();
 
+  // ── Guyton-Klinger guardrail baseline ──────────────────────────────────────
+  // Industry-standard dynamic spending (Guyton & Klinger, 2006). We fix the
+  // withdrawal RATE at the point real withdrawals begin (first-year withdrawal /
+  // portfolio at that time), then each simulated year compare the path's CURRENT
+  // withdrawal rate to it. If the rate climbs more than 20% above that baseline
+  // (the "capital preservation" trigger — the portfolio is strained), we trim
+  // that year's withdrawal by the chosen guardrail %. This is what real retirees
+  // and professional planners do; rigid (flexPct=0) disables it.
+  var GK_TRIGGER = 1.20;     // trim once current WR exceeds 120% of the baseline WR
+  var initialWR  = 0.04;     // sensible fallback if we can't derive it
+  if (useSheetWithdrawals) {
+    for (var _gi = 0; _gi < proj.withdrawals.length; _gi++) {
+      var _w = +proj.withdrawals[_gi] || 0;
+      var _b = (proj.endLiquid && +proj.endLiquid[_gi]) ? +proj.endLiquid[_gi] : 0;
+      if (_w > 0 && _b > 0) { initialWR = _w / _b; break; }
+    }
+  } else if (totalPF > 0) {
+    initialWR = Math.max(0, baseSpend - (ssYear1 + pension)) / totalPF;
+  }
+  initialWR = Math.max(0.02, Math.min(0.10, initialWR));  // keep the baseline sane
+
   // ── Determine simulation length from ACTUAL death ages ──
   // Use the later of the two projected death years, cap at age 110
   var p1DeathAge = Math.min(p1.deathAge || 90, 110);
@@ -1951,17 +1972,17 @@ function runMonteCarlo() {
         var withdrawal;
         if (useSheetWithdrawals && i < proj.withdrawals.length) {
           withdrawal = Math.max(0, (proj.withdrawals[i] || 0));
-          if (flexPct > 0 && peakBal > 0 && (peakBal - bal) / peakBal >= 0.20) {
-            withdrawal *= (1 - flexPct * 0.5);
-          }
         } else {
           // Fallback: simplified math, spending your chosen amount (floor + chosen extra)
           var guaranteed = ssYear1 * Math.pow(1 + colaRate, i) + pension;
           var spend = baseSpend * Math.pow(1 + inflation, i);
-          if (flexPct > 0 && peakBal > 0 && (peakBal - bal) / peakBal >= 0.20) {
-            spend *= (1 - flexPct);
-          }
           withdrawal = Math.max(0, spend - guaranteed);
+        }
+        // Guyton-Klinger capital-preservation guardrail: if THIS path's current
+        // withdrawal rate has climbed >20% above the baseline, trim spending by
+        // the full chosen guardrail % (the label's promise, applied honestly).
+        if (flexPct > 0 && bal > 0 && (withdrawal / bal) > initialWR * GK_TRIGGER) {
+          withdrawal *= (1 - flexPct);
         }
 
         // ── Essentials only: your chosen plan with ONLY the chosen discretionary extra removed ──
@@ -1969,23 +1990,26 @@ function runMonteCarlo() {
         if (useSheetWithdrawals && i < proj.withdrawals.length) {
           var chosenX_i = (proj.byYear[i] && (+proj.byYear[i].chosenExtra)) ? (+proj.byYear[i].chosenExtra) : 0;
           withdrawalNX = Math.max(0, (proj.withdrawals[i] || 0) - chosenX_i);
-          if (flexPct > 0 && peakBalNX > 0 && (peakBalNX - balNX) / peakBalNX >= 0.20) {
-            withdrawalNX *= (1 - flexPct * 0.5);
-          }
         } else {
           var guaranteedNX = ssYear1 * Math.pow(1 + colaRate, i) + pension;
           var spendNX = floorNow * Math.pow(1 + inflation, i);
-          if (flexPct > 0 && peakBalNX > 0 && (peakBalNX - balNX) / peakBalNX >= 0.20) {
-            spendNX *= (1 - flexPct);
-          }
           withdrawalNX = Math.max(0, spendNX - guaranteedNX);
+        }
+        if (flexPct > 0 && balNX > 0 && (withdrawalNX / balNX) > initialWR * GK_TRIGGER) {
+          withdrawalNX *= (1 - flexPct);
         }
 
         // One shared market return drives BOTH paths (clean apples-to-apples)
         var ret = mcRandReturn(model, mu, sigma);
+        // Mid-year (half-year) convention: you withdraw monthly, not in a lump on
+        // Jan 1, so each withdrawal gets ~half the year's growth before it leaves.
+        // Grow half a year, withdraw mid-year, grow the second half — matching how
+        // your sheet projects. (ret is clamped > -0.6, so 1+ret > 0; sqrt is safe.)
+        var half = Math.sqrt(1 + ret);
 
+        bal = bal * half;
         bal = Math.max(0, bal - withdrawal);
-        bal = Math.max(0, bal * (1 + ret));
+        bal = Math.max(0, bal * half);
         if (bal > peakBal) peakBal = bal;
         // Run-out year at FULL spending (must-pay floor PLUS the chosen extra).
         if (bal <= 0 && !depletedFull) {
@@ -1993,8 +2017,9 @@ function runMonteCarlo() {
           depleteAtFull = mcYears[i] || (curYear + i);
         }
 
+        balNX = balNX * half;
         balNX = Math.max(0, balNX - withdrawalNX);
-        balNX = Math.max(0, balNX * (1 + ret));
+        balNX = Math.max(0, balNX * half);
         if (balNX > peakBalNX) peakBalNX = balNX;
         // ── RUN-OUT / loss of sustainability = portfolio can no longer cover the
         // MUST-PAY floor (base + healthcare + debt), discretionary extra excluded.
