@@ -2167,6 +2167,8 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // it's derived from each person's own SS, not a single-year snapshot.
   var floorRows;
   (function(){
+    var _proj = (planData && planData.projections) || {};
+    var useSheetWithdrawals = !!(_proj.withdrawals && _proj.withdrawals.length > 5 && _proj.endLiquid && _proj.endLiquid.length > 5);
     var _pk = (planData && planData.people) ? Object.keys(planData.people) : [];
     var _a = _pk[0] ? (planData.people[_pk[0]] || {}) : {};
     var _b = _pk[1] ? (planData.people[_pk[1]] || {}) : {};
