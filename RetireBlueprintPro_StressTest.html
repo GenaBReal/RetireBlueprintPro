@@ -2172,7 +2172,10 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     contextRow('Chosen extra spending', fmt(chosenExtraAmt) + '/yr') +
     contextRow('Full spending modeled', fmt(baseSpend) + '/yr' + (chosenExtraAmt > 0 ? '  (floor + chosen extra)' : '  (floor only)')) +
     (suggestedExtraAmt > 0 ? contextRow('Safe extra (you could spend up to)', fmt(suggestedExtraAmt) + '/yr') : '') +
-    contextRow('Guaranteed income (SS + pension)', fmt((ssYear1 + pension) || 0) + '/yr') +
+    (useSheetWithdrawals
+      ? contextRow('Income credited each year', 'Your FULL plan income — salary, SS, pension &amp; RMDs (\u2248' + fmt((proj.income && proj.income.length) ? (+proj.income[0] || 0) : (ssYear1 + pension)) + ' in ' + startYear + ', changes every year). Withdrawals below are what is left AFTER this income.') +
+        contextRow('Lifelong SS + pension floor', fmt((ssYear1 + pension) || 0) + '/yr (the part that never stops)')
+      : contextRow('Income credited', '\u26A0 Using simplified ' + fmt((ssYear1 + pension) || 0) + '/yr (SS + pension only) \u2014 your sheet income data was unavailable')) +
     contextRow('Expected return assumption', (mu * 100).toFixed(1) + '% avg · ' + (sigma*100).toFixed(0) + '% std dev') +
     contextRow('Inflation assumption', (inflation * 100).toFixed(1) + '%/yr') +
     contextRow('Return model', {'normal':'Normal distribution','fat':'Fat-tailed (more realistic)','historical':'US historical 1928–2024'}[model] || model) +
