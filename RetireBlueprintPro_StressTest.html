@@ -796,18 +796,25 @@ function setScenario(key) {
 // Centers the simulation on THIS client's actual mix rather than a flat average,
 // so the Monte Carlo AVERAGE tracks the Master projection (median stays lower by design).
 function rbpPortfolioStats(port){
-  var EQUITY_THRESHOLD = 0.045;          // returns above this count as "growth/equity" for volatility
+  // Volatility is derived from the portfolio's expected RETURN so the two stay
+  // internally consistent: a 7% portfolio is a balanced ~stock/bond mix (~13% vol),
+  // NOT pure equity (~18%). Pairing a 7% return with 18% vol describes a portfolio
+  // that does not exist. We map the blended return to an equity weight between a
+  // bond-like floor (~4%) and an all-equity ceiling (~9%), then blend the vols.
+  var R_BOND = 0.04, R_EQUITY = 0.09;      // long-run expected returns of the two ends
   var VOL_FIXED = 0.06, VOL_EQUITY = 0.18; // ~bond-like vs ~stock-like annual volatility
-  var wRet = 0.07, eqFrac = 0.6;          // fallbacks if no account detail is available
+  var wRet = 0.07;                          // fallback blended return if no account detail
   if (port && port.accounts && port.accounts.length){
-    var totBal = 0, retBal = 0, eqBal = 0;
+    var totBal = 0, retBal = 0;
     port.accounts.forEach(function(a){
       var bal = (a.balance > 0) ? a.balance : 0;
       var r   = (a.expectedReturn > 0) ? a.expectedReturn / 100 : 0;
-      if (bal > 0 && r > 0){ totBal += bal; retBal += bal * r; if (r > EQUITY_THRESHOLD) eqBal += bal; }
+      if (bal > 0 && r > 0){ totBal += bal; retBal += bal * r; }
     });
-    if (totBal > 0){ wRet = retBal / totBal; eqFrac = eqBal / totBal; }
+    if (totBal > 0){ wRet = retBal / totBal; }
   }
+  // Equity weight implied by the blended return (0 = all bonds, 1 = all equity)
+  var eqFrac = Math.max(0, Math.min(1, (wRet - R_BOND) / (R_EQUITY - R_BOND)));
   var sigma = VOL_FIXED + (VOL_EQUITY - VOL_FIXED) * eqFrac;
   sigma = Math.max(0.05, Math.min(0.19, sigma));
   return { meanReturn: wRet, equityFraction: eqFrac, sigma: sigma };
