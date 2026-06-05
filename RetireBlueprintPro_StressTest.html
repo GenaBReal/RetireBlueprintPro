@@ -695,13 +695,17 @@ window.addEventListener('storage', function(e) {
         <div id="mc-extra-compare" style="display:none;background:#061620;border:1px solid #1a3a52;border-radius:10px;padding:14px 18px;margin-bottom:16px;">
           <div style="font-size:11px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">What if you treat your "extra" spending as optional?</div>
           <div id="mc-floor-note" style="font-size:10.5px;color:#cfe3ef;line-height:1.5;margin-bottom:10px;"></div>
-          <div style="display:flex;gap:14px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:220px;background:#08202e;border-left:3px solid #1CC7D0;border-radius:6px;padding:10px 14px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;background:#08202e;border-left:3px solid #ef6b6b;border-radius:6px;padding:10px 14px;">
               <div style="font-size:11px;font-weight:700;color:#c8dae8;margin-bottom:1px;">Extras rigid — spent through crashes</div>
               <div style="font-size:9px;color:#8aaabb;margin-bottom:4px;">base + debt + extras · worst case for behavior</div>
               <div id="mc-cmp-full" style="font-size:13px;font-weight:800;color:#fff;">&mdash;</div>
             </div>
-            <div style="flex:1;min-width:220px;background:#08202e;border-left:3px solid #f4b86a;border-radius:6px;padding:10px 14px;">
+            <div style="flex:0 0 auto;min-width:180px;max-width:220px;background:#061e2e;border:1px solid rgba(244,184,106,.35);border-radius:6px;padding:10px 14px;text-align:center;">
+              <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Cut to this &rarr; sustainable</div>
+              <div id="mc-cmp-mid" style="font-size:12px;color:#dceaf5;line-height:1.6;">&mdash;</div>
+            </div>
+            <div style="flex:1;min-width:200px;background:#08202e;border-left:3px solid #f4b86a;border-radius:6px;padding:10px 14px;">
               <div style="font-size:11px;font-weight:700;color:#f4b86a;margin-bottom:1px;">Extras flexible — paused in rough years</div>
               <div style="font-size:9px;color:#c9a978;margin-bottom:4px;">base + debt only · what most retirees actually do</div>
               <div id="mc-cmp-ess" style="font-size:13px;font-weight:800;color:#fff;">&mdash;</div>
@@ -2412,8 +2416,53 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       var sEss  = document.getElementById('mc-cmp-ess');
       var tagFull = extraInPlan ? '   ← your current plan' : '';
       var tagEss  = extraInPlan ? '' : '   ← your current plan';
-      if (sFull) sFull.textContent = neverRanPct + '% never ran out · median ' + fmt(p50) + tagFull;
-      if (sEss)  sEss.textContent  = neverRanNX  + '% never ran out · median ' + fmt(medianNX) + tagEss;
+      var neverRanFull = Math.round((nRuns - depletedFull) / nRuns * 100);
+      var rigidCol = neverRanFull >= 75 ? '#1CC7D0' : neverRanFull >= 50 ? '#f4b86a' : '#ff6b6b';
+      if (sFull) sFull.innerHTML = '<span style="color:' + rigidCol + ';">' + neverRanFull + '% never ran out</span> · median ' + fmt(p50) + (tagFull ? '   <em style="color:#f4b86a;font-size:9px;">' + tagFull.trim() + '</em>' : '');
+      if (sEss)  sEss.textContent = neverRanNX + '% never ran out · median ' + fmt(medianNX) + tagEss;
+
+      // ── Middle column: safe extra estimate at expected return ─────────────
+      var sMid = document.getElementById('mc-cmp-mid');
+      if (sMid) {
+        try {
+          var _pj = proj, _by = _pj.byYear || [], _wd = _pj.withdrawals || [];
+          var _mr = rbpPortfolioStats(port).meanReturn;
+          var _fw = [], _pm = [], _p1 = 0;
+          for (var _mi = 0; _mi < _wd.length; _mi++) {
+            var _mcx = (_by[_mi] && (+_by[_mi].chosenExtra)) || 0;
+            _fw.push(Math.max(0, (+_wd[_mi]||0) - _mcx));
+            if (_mcx > 0 && _p1 === 0) _p1 = _mcx;
+          }
+          var _hasP = _by.some(function(y){ return (y&&+y.chosenExtra)>0; });
+          _pm = _by.map(function(y){ var c=(y&&+y.chosenExtra)||0; return (_hasP&&_p1>0)?c/_p1:1; });
+          function _mprojE(ret1, p1x) {
+            var b = totalPF;
+            for (var _i2=1;_i2<_fw.length;_i2++){
+              var _h=Math.sqrt(Math.max(0.1,1+(_i2===1?ret1:_mr)));
+              b=Math.max(0,b*_h-(_fw[_i2]+p1x*(_pm[_i2]||0)));
+              b=Math.max(0,b*_h);
+              if(b<=0)return 0;
+            }
+            return b;
+          }
+          var _mlo=0,_mhi=300000,_mbest=0;
+          for(var _mit=0;_mit<30;_mit++){var _mm=(_mlo+_mhi)/2;if(_mprojE(0,_mm)>=legacyGoal){_mbest=_mm;_mlo=_mm;}else{_mhi=_mm;}}
+          _mbest = Math.round(_mbest/500)*500;
+          if (_mbest > 0 && _p1 > 0) {
+            var _ratio = _mbest / _p1;
+            var _phHtml = extraSummary && extraSummary.phases && extraSummary.phases.length > 1
+              ? extraSummary.phases.map(function(p, idx) {
+                  return '<strong>Phase '+(idx+1)+': '+fmt(Math.round(p.amt*_ratio/500)*500)+'/yr</strong>';
+                }).join('<br>')
+              : '<strong>' + fmt(_mbest) + '/yr</strong>';
+            sMid.innerHTML = _phHtml + '<br><span style="font-size:9px;color:#8aaabb;line-height:1.5;">At expected returns, cutting to these amounts clears your legacy goal.<br>Below this = sustainable · Above this = some scenarios fail.</span>';
+          } else {
+            sMid.innerHTML = '<span style="font-size:10px;color:#566576;">Run Scenario Sweep above for safe spending levels.</span>';
+          }
+        } catch(e) {
+          sMid.innerHTML = '<span style="font-size:10px;color:#566576;">Run Scenario Sweep above.</span>';
+        }
+      }
     }
   }
   document.getElementById('mc-median').textContent = fmt(p50);
