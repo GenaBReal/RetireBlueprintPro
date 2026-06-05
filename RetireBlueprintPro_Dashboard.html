@@ -1653,7 +1653,7 @@ function loadViaJSONP(sheetId) {
     }
   };
 
-  var s = document.createElement('script');
+  var s = document.createElement('script'); s.crossOrigin='anonymous';
   s.src = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
   s.onerror = function() {
     clearTimeout(timer);
