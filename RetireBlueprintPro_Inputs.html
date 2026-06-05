@@ -1175,7 +1175,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
           <td><input type="number" id="f-C122" value="2026" min="2020" max="2080" style="width:75px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-D122" value="2033" min="2020" max="2080" style="width:75px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-E122" value="1.15" min="0.5" max="2.0" step="0.05" style="width:65px;" onchange="markDirty()"></td>
-          <td><input type="number" id="f-F122" value="0" min="0" step="100" placeholder="0 = use solver" style="width:120px;" onchange="markDirty()">
+          <td><div style="display:flex;align-items:center;gap:4px;"><span style="color:var(--muted);font-size:13px;font-weight:700;">$</span><input type="text" inputmode="numeric" id="f-F122" value="0" placeholder="0 = solver" style="width:108px;" onchange="markDirty()" onfocus="this.value=this.value.replace(/[,$]/g,'')" onblur="var n=parseFloat(this.value.replace(/,/g,''))||0;this.value=n>0?n.toLocaleString():'0';"></div>
               <div style="font-size:8px;color:var(--muted);margin-top:2px;">0 = use solver guidance</div></td>
           <td><strong id="g-phase1" style="color:var(--teal);">—</strong></td>
         </tr>
@@ -1185,7 +1185,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
           <td><input type="number" id="f-C123" value="2034" min="2020" max="2080" style="width:75px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-D123" value="2044" min="2020" max="2080" style="width:75px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-E123" value="1.0" min="0.5" max="2.0" step="0.05" style="width:65px;" onchange="markDirty()"></td>
-          <td><input type="number" id="f-F123" value="0" min="0" step="100" placeholder="0 = use solver" style="width:120px;" onchange="markDirty()">
+          <td><div style="display:flex;align-items:center;gap:4px;"><span style="color:var(--muted);font-size:13px;font-weight:700;">$</span><input type="text" inputmode="numeric" id="f-F123" value="0" placeholder="0 = solver" style="width:108px;" onchange="markDirty()" onfocus="this.value=this.value.replace(/[,$]/g,'')" onblur="var n=parseFloat(this.value.replace(/,/g,''))||0;this.value=n>0?n.toLocaleString():'0';"></div>
               <div style="font-size:8px;color:var(--muted);margin-top:2px;">0 = use solver guidance</div></td>
           <td><strong id="g-phase2" style="color:var(--teal);">—</strong></td>
         </tr>
@@ -1195,7 +1195,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
           <td><input type="number" id="f-C124" value="2045" min="2020" max="2080" style="width:75px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-D124" value="2075" min="2020" max="2090" style="width:75px;" onchange="markDirty()"></td>
           <td><input type="number" id="f-E124" value="0.9" min="0.5" max="2.0" step="0.05" style="width:65px;" onchange="markDirty()"></td>
-          <td><input type="number" id="f-F124" value="0" min="0" step="100" placeholder="0 = use solver" style="width:120px;" onchange="markDirty()">
+          <td><div style="display:flex;align-items:center;gap:4px;"><span style="color:var(--muted);font-size:13px;font-weight:700;">$</span><input type="text" inputmode="numeric" id="f-F124" value="0" placeholder="0 = solver" style="width:108px;" onchange="markDirty()" onfocus="this.value=this.value.replace(/[,$]/g,'')" onblur="var n=parseFloat(this.value.replace(/,/g,''))||0;this.value=n>0?n.toLocaleString():'0';"></div>
               <div style="font-size:8px;color:var(--muted);margin-top:2px;">0 = use solver guidance</div></td>
           <td><strong id="g-phase3" style="color:var(--teal);">—</strong></td>
         </tr>
@@ -2626,9 +2626,9 @@ var incEl  = document.getElementById('d-inc-'+i);
   if (sp.phase1Weight) sv('f-E122', sp.phase1Weight);
   if (sp.phase2Weight) sv('f-E123', sp.phase2Weight);
   if (sp.phase3Weight) sv('f-E124', sp.phase3Weight);
-  if (sp.phase1Override !== undefined) sv('f-F122', sp.phase1Override);
-  if (sp.phase2Override !== undefined) sv('f-F123', sp.phase2Override);
-  if (sp.phase3Override !== undefined) sv('f-F124', sp.phase3Override);
+  if (sp.phase1Override !== undefined) { sv('f-F122', sp.phase1Override); var _e122=document.getElementById('f-F122'); if(_e122){var _n=parseFloat(_e122.value)||0;_e122.value=_n>0?_n.toLocaleString():'0';} }
+  if (sp.phase2Override !== undefined) { sv('f-F123', sp.phase2Override); var _e123=document.getElementById('f-F123'); if(_e123){var _n=parseFloat(_e123.value)||0;_e123.value=_n>0?_n.toLocaleString():'0';} }
+  if (sp.phase3Override !== undefined) { sv('f-F124', sp.phase3Override); var _e124=document.getElementById('f-F124'); if(_e124){var _n=parseFloat(_e124.value)||0;_e124.value=_n>0?_n.toLocaleString():'0';} }
 
   // ── SOLVER OUTPUT (read-only display) ─────────────────
   function fmt(n) {
@@ -2841,7 +2841,7 @@ function toISO(val) {
 function gn(id) {
   var el = document.getElementById(id);
   if (!el) return 0;
-  var val = String(el.value).replace(/[$,%]/g, '').trim();
+  var val = String(el.value).replace(/[$%,]/g, '').trim();
   return parseFloat(val) || 0;
 }
 function gpct(id) {
@@ -3068,15 +3068,15 @@ function buildPayload() {
       C122: document.getElementById('f-C122').value,
       D122: document.getElementById('f-D122').value,
       E122: document.getElementById('f-E122').value,
-      F122: document.getElementById('f-F122').value,
+      F122: +(document.getElementById('f-F122').value.replace(/,/g,'')||0),
       C123: document.getElementById('f-C123').value,
       D123: document.getElementById('f-D123').value,
       E123: document.getElementById('f-E123').value,
-      F123: document.getElementById('f-F123').value,
+      F123: +(document.getElementById('f-F123').value.replace(/,/g,'')||0),
       C124: document.getElementById('f-C124').value,
       D124: document.getElementById('f-D124').value,
       E124: document.getElementById('f-E124').value,
-      F124: document.getElementById('f-F124').value,
+      F124: +(document.getElementById('f-F124').value.replace(/,/g,'')||0),
     },
     rothPlan: (function() {
       var plan = [];
