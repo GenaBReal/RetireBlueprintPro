@@ -2401,13 +2401,13 @@ function rbpRealSweep() {
     { label: '-50%  (crash)',     yr1: -50, cat: 'bad',  drag: 57, dur: 1 },
   ];
 
-  // Pre-compute local safeExtra amounts for all scenarios (these DO vary by crash)
+  // Pre-compute local safeExtra amounts for all scenarios (instant fallback if connector fails)
   var results = sweepScens.map(function(s) {
     return {
       label: s.label, cat: s.cat,
-      safe: localSafeP1(s.yr1 / 100),   // local estimate — varies correctly per crash
+      safe: localSafeP1(s.yr1 / 100),   // local estimate shown immediately
       fullDepl: null, floorDepl: null,
-      _done: (s.dur === 0), _drag: s.drag, _dur: s.dur
+      _done: (s.dur === 0), _drag: s.drag, _dur: s.dur, _yr1: s.yr1 / 100
     };
   });
 
@@ -2439,9 +2439,12 @@ function rbpRealSweep() {
     if (note) {
       note.style.display = 'block';
       note.style.color = '#1CC7D0';
-      note.innerHTML = '\u2705 <strong>Depletion years: real engine (exact)</strong> \u2014 same accuracy as Run New Test. '
-        + 'The connector returns depletion years per crash but always echoes the base plan\u2019s safe extra regardless of crash severity. '
-        + '<strong>Amounts: local estimate</strong> \u2014 uses your real floor withdrawals, varies correctly per crash (same logic as Quick Estimate).';
+      note.innerHTML = '\u2705 <strong>Real engine results.</strong> Each amount is computed by a binary search '
+        + 'on your <em>stressed</em> withdrawal data \u2014 the Master sheet ran under the crash, so withdrawals already '
+        + 'reflect crash impacts on RMDs, Social Security phasing, and income. The main remaining approximation: '
+        + 'marginal tax on the <em>trial</em> extra spend isn\u2019t re-calculated per iteration (the tax on the floor is exact). '
+        + 'Depletion years are also from the real engine. This is the most accurate sweep possible without writing '
+        + 'each trial amount to the sheet (which would take hours).';
     }
   }
 
@@ -2459,13 +2462,16 @@ function rbpRealSweep() {
     esJsonp(params, function(resp) {
       results[idx]._done = true;
       if (resp && resp.ok) {
-        // Only use connector for depletion year — amounts come from local binary search
+        // safeExtra is now crash-adjusted (binary search on stressed withdrawal data in connector)
+        results[idx].safe     = (+resp.safeExtra) || localSafeP1(results[idx]._yr1);
         results[idx].fullDepl = resp.belowYear || null;
       }
       _rbpSweepRender(results.map(function(r2){ return { label:r2.label, cat:r2.cat, safe:r2.safe, fullDepl:r2.fullDepl, floorDepl:r2.floorDepl }; }), p1Amt, legGoal);
       setTimeout(function(){ runNext(idx + 1); }, 300);
     }, function(_err) {
       results[idx]._done = true;
+      // Fallback to local estimate if connector fails
+      results[idx].safe = localSafeP1(results[idx]._yr1);
       setTimeout(function(){ runNext(idx + 1); }, 300);
     });
   }

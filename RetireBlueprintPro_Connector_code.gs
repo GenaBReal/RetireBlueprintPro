@@ -357,8 +357,13 @@ function readAll(ss, inp) {
         if (!yr || yr < 2020 || yr > 2200) return;
         projections.years.push(yr);
         projections.income.push(Math.round(Number(row[14])||0));     // O  = Total Gross Income (unchanged)
-        projections.withdrawals.push(Math.round(Number(row[44])||0)); // AN = Final Gross Withdrawal (+5)
-        projections.endLiquid.push(Math.round(Number(row[80])||0));   // BX = End of Year Liquid (+5)
+        // row[44]=var_Display_AH = MAX(Total_RMD, Funding_Required) — a DISPLAY figure.
+        // row[45]=var_Reinvested_RMDs = the RMD cash that goes BACK into the portfolio.
+        // The true net portfolio outflow the MC should spend = Display_AH - Reinvested_RMDs
+        // = var_Funding_Required (spending + taxes - income). Reading row[44] alone counted
+        // reinvested RMDs as spent, over-withdrawing in years where RMD exceeds the cash need.
+        projections.withdrawals.push(Math.round((Number(row[44])||0) - (Number(row[45])||0)));
+        projections.endLiquid.push(Math.round(Number(row[80])||0));   // BX = End of Year Liquid
         // Federal taxes for effective rate calculation
         var fedTaxes     = Number(row[40])||0;  // AJ = Total Federal Taxes (+5)
         var taxableIncome= Number(row[39])||0;  // AI = Total Taxable Income (+5)
@@ -1033,18 +1038,75 @@ function runStressTest(ss, inp, p) {
     // Year balance first drops below legacy goal + full stressed year-by-year series (for a real chart)
     var belowYear = null;
     var series = []; // [{year, bal}] stressed ending-liquid per year, straight from the recalculated Master
+
+    // ── Crash-adjusted safeExtra binary search ───────────────────────────────
+    // B119 (safeExtra) is the base-plan solver value — it doesn't change with crash params.
+    // Instead, use the stressed Master data to find the MAX Phase-1 extra that still
+    // clears the legacy goal UNDER this crash. This uses real RMD/SS/tax-adjusted
+    // withdrawals from the stressed sheet, making it far more accurate than a client-side estimate.
+    var safeExtraCrashAdj = Math.round(safeExtra); // fallback: base plan value
     var master = ss.getSheetByName('Master');
     if (master) {
       var md = master.getRange('A8:CC200').getValues();
+
+      // ── 1. Build series + extract stressed floor withdrawals from same pass ──
+      var stressFloorW = [];   // net portfolio draw per year (extras removed)
+      var phaseRatios  = [];   // chosenExtra[i] / p1Amount (phase scaling)
+      var p1Amt = 0;
+
       for (var i=0;i<md.length;i++){
         var row = md[i];
         var rawYr = row[0], yr;
         if (rawYr instanceof Date) yr = rawYr.getFullYear();
         else { yr = Number(rawYr); if (yr>40000 && yr<100000){ var d=new Date((yr-25569)*86400*1000); yr=d.getFullYear(); } }
         if (!yr || yr<2020 || yr>2200) continue;
+
         var endLiq = Number(row[80])||0;
         series.push({ year:yr, bal:Math.round(endLiq) });
         if (belowYear===null && legacyGoal>0 && endLiq < legacyGoal){ belowYear = yr; }
+
+        // Funding_Required = Display_AH - Reinvested_RMDs (cols 44, 45 zero-indexed)
+        var wNet = (Number(row[44])||0) - (Number(row[45])||0);
+        var cxAmt = Number(row[31])||0; // var_Chosen_Extra
+        stressFloorW.push(Math.max(0, wNet - cxAmt));
+        phaseRatios.push(cxAmt);
+        if (cxAmt > 0 && p1Amt === 0) p1Amt = cxAmt;
+      }
+
+      // ── 2. Normalize phase ratios & run binary search ────────────────────
+      var nYrs = stressFloorW.length;
+      if (nYrs > 2 && p1Amt > 0) {
+        for (var pi = 0; pi < phaseRatios.length; pi++) {
+          phaseRatios[pi] = phaseRatios[pi] / p1Amt;
+        }
+
+        // Starting portfolio: back-calculate from series[0].bal using mid-year convention
+        // series[0].bal = P * (1+yr1Ret) - floor[0] approx (simplified)
+        var yr1Ret  = (7 - eDrag) / 100;  // eDrag=37 → yr1Ret=-0.30
+        var expRet  = 0.07;                // expected return for post-crash years
+        var startPF = series.length > 0
+          ? (series[0].bal / Math.max(0.1, 1 + yr1Ret) + stressFloorW[0])
+          : 1000000;
+
+        function projEnd(p1x) {
+          var b = startPF;
+          for (var gi = 0; gi < nYrs; gi++) {
+            var gr = (gi === 0) ? yr1Ret : expRet;
+            var gh = Math.sqrt(Math.max(0.1, 1 + gr));
+            b = Math.max(0, b * gh - (stressFloorW[gi] + p1x * (phaseRatios[gi]||0)));
+            b = Math.max(0, b * gh);
+            if (b <= 0) return 0;
+          }
+          return b;
+        }
+
+        var bsLo = 0, bsHi = 600000, bsBest = 0;
+        for (var bsIt = 0; bsIt < 35; bsIt++) {
+          var bsMid = (bsLo + bsHi) / 2;
+          if (projEnd(bsMid) >= legacyGoal) { bsBest = bsMid; bsLo = bsMid; }
+          else { bsHi = bsMid; }
+        }
+        safeExtraCrashAdj = Math.round(bsBest / 500) * 500;
       }
     }
 
@@ -1054,7 +1116,8 @@ function runStressTest(ss, inp, p) {
 
     return {
       ok:true,
-      safeExtra:Math.round(safeExtra),
+      safeExtra:safeExtraCrashAdj,        // crash-adjusted (binary search on stressed withdrawals)
+      safeExtraBase:Math.round(safeExtra), // base-plan solver value (for reference)
       ending:Math.round(ending),
       surplus:Math.round(surplus),
       legacyGoal:Math.round(legacyGoal),
