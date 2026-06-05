@@ -387,10 +387,10 @@ window.addEventListener('storage', function(e) {
       <div class="kpi-sub">base − scenario</div>
     </div>
     <!-- 4 Safe extra spend -->
-    <div class="kpi-card" title="You can spend up to this much extra each year, on top of your essentials, and still finish at or above your legacy goal in this scenario.">
-      <div class="kpi-lbl">Safe Extra Spend</div>
+    <div class="kpi-card" title="The most extra you can spend on top of your must-pay floor each year and still finish at or above your legacy goal in this crash scenario. This is ABOVE the floor — it doesn't replace it.">
+      <div class="kpi-lbl">Extra You Can Still Add</div>
       <div id="kpi-safe" class="kpi-val" style="color:#1CC7D0;">—</div>
-      <div class="kpi-sub">per year, this scenario</div>
+      <div class="kpi-sub">above your floor, this crash</div>
     </div>
     <!-- 5 Drops below legacy -->
     <div class="kpi-card" title="The first year your portfolio would fall below your legacy goal in this scenario — or "Holds" if it never does.">
@@ -1392,7 +1392,7 @@ function loadData() {
 
   var s=document.createElement('script');
   s.setAttribute('data-rbp-stress','true');
-  s.src=SCRIPT_URL+'?action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
+  s.src=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
   s.onerror=function(){if(!done){done=true;clearTimeout(t);clearInterval(prog);
     var isGH=window.location.hostname.indexOf('github.io')>=0;
     if(isGH){
@@ -1420,7 +1420,7 @@ function esJsonp(params, onResult, onError) {
   var t = setTimeout(function(){ if(!done){ done=true; cleanup(); if(onError) onError('Timed out. The engine can be slow — please try again.'); } }, 90000);
   window[cb] = function(resp){ if(done) return; done=true; clearTimeout(t); cleanup(); if(onResult) onResult(resp); };
   function cleanup(){ try{ delete window[cb]; }catch(e){} if(s&&s.parentNode) s.parentNode.removeChild(s); }
-  var qs = '?callback='+cb+'&sheetId='+encodeURIComponent(sheetId)+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
+  var qs = '?authuser=0&callback='+cb+'&sheetId='+encodeURIComponent(sheetId)+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
   for (var k in params) { if(params.hasOwnProperty(k)) qs += '&'+k+'='+encodeURIComponent(params[k]); }
   var s=document.createElement('script');
   s.src = SCRIPT_URL + qs;
@@ -1739,7 +1739,7 @@ function esRenderSlots() {
       +   '<span style="font-size:9.5px;color:#6a8a9a;">'+pTxt+'</span>'
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">'
-      +   '<div><div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Safe extra spend</div>'
+      +   '<div><div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Extra above floor</div>'
       +     '<div style="font-size:15px;font-weight:800;color:'+spColor+';">'+esFmt(r.safeExtra)+'/yr'
       +       (spDelta!=null?' <span style="font-size:10px;font-weight:600;">('+(spDelta>=0?'+':'')+esFmt(spDelta)+')</span>':'')+'</div></div>'
       +   '<div><div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Ending balance</div>'

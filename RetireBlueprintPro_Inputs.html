@@ -1366,7 +1366,7 @@ var SHEET_ID = (function() {
 })();
 
 function scriptUrl(action) {
-  var url = SCRIPT_URL + '?action=' + action;
+  var url = SCRIPT_URL + '?authuser=0&action=' + action;
   if (SHEET_ID) url += '&sheetId=' + encodeURIComponent(SHEET_ID);
   return url;
 }
@@ -2306,7 +2306,7 @@ function loadLiveData() {
   document.getElementById('dl-sub').textContent = 'Reading your Google Sheet…';
 
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
-  var url = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
+  var url = SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&_=' + Date.now();
 
   fetch(url)
     .then(function(resp) {
@@ -2366,7 +2366,7 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
   }
 
   var script = document.createElement('script');
-  script.src = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + callbackName + '&_=' + Date.now();
+  script.src = SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + callbackName + '&_=' + Date.now();
   script.onerror = function() {
     if (!done) {
       cleanup();
@@ -2983,7 +2983,7 @@ function saveAll() {
         localStorage.setItem('rbp_last_saved', Date.now().toString());
       };
       var s = document.createElement('script');
-      s.src = SCRIPT + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName;
+      s.src = SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName;
       document.body.appendChild(s);
       setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 15000);
     }, 5000);
