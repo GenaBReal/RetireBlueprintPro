@@ -1390,7 +1390,7 @@ function loadData() {
     },400);
   };
 
-  var s=document.createElement('script');
+  var s=document.createElement('script'); s.crossOrigin='anonymous';
   s.setAttribute('data-rbp-stress','true');
   s.src=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
   s.onerror=function(){if(!done){done=true;clearTimeout(t);clearInterval(prog);
@@ -1422,7 +1422,7 @@ function esJsonp(params, onResult, onError) {
   function cleanup(){ try{ delete window[cb]; }catch(e){} if(s&&s.parentNode) s.parentNode.removeChild(s); }
   var qs = '?authuser=0&callback='+cb+'&sheetId='+encodeURIComponent(sheetId)+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
   for (var k in params) { if(params.hasOwnProperty(k)) qs += '&'+k+'='+encodeURIComponent(params[k]); }
-  var s=document.createElement('script');
+  var s=document.createElement('script'); s.crossOrigin='anonymous';
   s.src = SCRIPT_URL + qs;
   s.onerror=function(){ if(!done){ done=true; clearTimeout(t); cleanup(); if(onError) onError('Could not reach your sheet.'); } };
   document.head.appendChild(s);

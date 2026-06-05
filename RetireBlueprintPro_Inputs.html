@@ -2365,7 +2365,7 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
     delete window[callbackName];
   }
 
-  var script = document.createElement('script');
+  var script = document.createElement('script'); script.crossOrigin='anonymous';
   script.src = SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + callbackName + '&_=' + Date.now();
   script.onerror = function() {
     if (!done) {
@@ -2982,7 +2982,7 @@ function saveAll() {
         isDirty = false; document.getElementById('save-btn').disabled = false;
         localStorage.setItem('rbp_last_saved', Date.now().toString());
       };
-      var s = document.createElement('script');
+      var s = document.createElement('script'); s.crossOrigin='anonymous';
       s.src = SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName;
       document.body.appendChild(s);
       setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 15000);
