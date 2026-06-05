@@ -475,7 +475,12 @@ window.addEventListener('storage', function(e) {
     </div>
   </div>
   <div id="sweep-body">
-    <div id="sweep-placeholder" style="font-size:12px;color:#566576;text-align:center;padding:14px 0;">Click Sweep to see how much extra spend survives each market scenario.</div>
+    <div id="sweep-placeholder" style="font-size:11.5px;color:#7a9aaa;line-height:1.7;padding:6px 2px;">
+      <strong style="color:#dceaf5;">How this works:</strong> The crash test asks one question — <em>"if the market drops X% in year 1, what's the most extra I can safely spend and still hit my legacy goal?"</em> This sweep runs that question at every crash level automatically.<br><br>
+      <span style="color:#1CC7D0;">&#9654; Quick Estimate</span> — instant. Uses your real floor withdrawals from the sheet, but doesn't re-run taxes or RMDs for each trial spending level. Off by maybe 15–30% in dollars. Good for direction.<br>
+      <span style="color:#f4b86a;">&#9654; Real Numbers (~2 min)</span> — calls your live engine 5 times, one per crash level. Same calculation as clicking "Run New Test" manually — full Master formula, taxes, RMDs, SS staggering. These numbers are exact for each scenario.<br><br>
+      <em style="color:#566576;">Other phases scale proportionally to Phase 1. All scenarios assume normal returns after year 1.</em>
+    </div>
     <div id="sweep-chart-area" style="display:none;">
       <div style="font-size:10px;color:#566576;display:grid;grid-template-columns:160px 1fr 80px;gap:8px;padding:0 2px;margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase;">
         <span>Scenario</span><span>Safe extra/yr · Phase 1</span><span style="text-align:right;">Amount</span>
@@ -618,10 +623,24 @@ window.addEventListener('storage', function(e) {
             <option value="20">Guardrails — trim 20% in strained markets (deeper)</option>
           </select>
         </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Year 1 Return <span style="color:#566576;font-weight:400;">(stress-condition)</span></div>
+          <select id="mc-fixed-yr1" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
+            <option value="" selected>Random — all years fully random (standard)</option>
+            <option value="-0.10">Pin year 1 at -10% · then random</option>
+            <option value="-0.20">Pin year 1 at -20% · then random</option>
+            <option value="-0.30">Pin year 1 at -30% · then random</option>
+            <option value="-0.40">Pin year 1 at -40% · then random</option>
+            <option value="-0.50">Pin year 1 at -50% · then random</option>
+          </select>
+        </div>
       </div>
 
       <!-- Results area — hidden until run -->
       <div id="mc-results" style="display:none;padding:22px;">
+
+        <!-- Stress-conditioned banner — shown only when year 1 is pinned -->
+        <div id="mc-stress-banner" style="display:none;background:rgba(244,184,106,.12);border:1px solid rgba(244,184,106,.4);border-left:4px solid #f4b86a;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11.5px;color:#dceaf5;line-height:1.6;"></div>
 
         <!-- Plain-language explainer -->
         <details style="background:#061620;border:1px solid #1a3a52;border-radius:10px;margin-bottom:18px;">
@@ -1927,6 +1946,8 @@ function runMonteCarlo() {
   var nRuns   = parseInt(document.getElementById('mc-runs').value);
   var model   = document.getElementById('mc-model').value;
   var flexPct = parseInt(document.getElementById('mc-flex').value) / 100;
+  var _fyr1El = document.getElementById('mc-fixed-yr1');
+  var fixedYr1 = _fyr1El && _fyr1El.value ? parseFloat(_fyr1El.value) : null; // null = fully random
 
   // ── Pull plan data ───────────────────────────────────────
   var port  = planData.portfolio || {};
@@ -2091,7 +2112,8 @@ function runMonteCarlo() {
         // guardrail only trims discretionary extra, so it doesn't apply here. ──
 
         // One shared market return drives BOTH paths (clean apples-to-apples)
-        var ret = mcRandReturn(model, mu, sigma);
+        // Stress-conditioned: pin year 1 to a known crash, then random for all remaining years
+        var ret = (i === 1 && fixedYr1 !== null) ? fixedYr1 : mcRandReturn(model, mu, sigma);
         // Mid-year (half-year) convention: you withdraw monthly, not in a lump on
         // Jan 1, so each withdrawal gets ~half the year's growth before it leaves.
         // Grow half a year, withdraw mid-year, grow the second half — matching how
@@ -2145,7 +2167,7 @@ function runMonteCarlo() {
         nRuns, yrs, mcYears, legacyGoal, curYear,
         p1Name, p2Name, p1DeathAge, p2DeathAge, p1.age||63, p2.age||55,
         mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
-        allEndingBalsNX, chosenExtraNow, extraInPlan, depleteYearsFull, suggestedExtra, extraSummary);
+        allEndingBalsNX, chosenExtraNow, extraInPlan, depleteYearsFull, suggestedExtra, extraSummary, fixedYr1);
     }
   }
 
@@ -2435,7 +2457,20 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     nRuns, yrs, mcYears, legacyGoal, curYear,
     p1Name, p2Name, p1DeathAge, p2DeathAge, p1Age, p2Age,
     mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
-    endingsNX, chosenExtraAmt, extraInPlan, depleteYearsFull, suggestedExtraAmt, extraSummary) {
+    endingsNX, chosenExtraAmt, extraInPlan, depleteYearsFull, suggestedExtraAmt, extraSummary, fixedYr1) {
+
+  // ── Stress-conditioned banner ──────────────────────────────────────────────
+  (function(){
+    var banner = document.getElementById('mc-stress-banner');
+    if (!banner) return;
+    if (fixedYr1 !== null && fixedYr1 !== undefined) {
+      var pct = Math.round(fixedYr1 * 100);
+      banner.style.display = 'block';
+      banner.innerHTML = '<strong style="color:#f4b86a;">&#9889; Stress-Conditioned Monte Carlo</strong> &mdash; year 1 is pinned to <strong>' + pct + '%</strong>, then all remaining years are fully random. This answers: <em>"Given we\'re already in a downturn, how does the plan hold up?"</em> Results will be worse than standard — that\'s correct. This is sequence-of-returns risk made visible.';
+    } else {
+      banner.style.display = 'none';
+    }
+  })();
 
   var sorted = endings.slice().sort(function(a,b){return a-b;});
 
