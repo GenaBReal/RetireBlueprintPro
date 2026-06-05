@@ -434,7 +434,7 @@ window.addEventListener('storage', function(e) {
 
 
 <!-- ════ SAVED TESTS (comparison of your real-engine runs) ════ -->
-<div id="saved-tests-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);overflow:hidden;">
+<div id="saved-tests-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #f4b86a;overflow:hidden;box-shadow:0 6px 22px rgba(4,30,47,.3);">
   <div style="padding:20px 22px 6px;">
     <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">🎯 Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
     <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">Every time you press <strong style="color:#cfe3ef;">▶ Run New Test</strong> above, that result saves here so you can compare your scenarios side by side — including any with a second, later crash.</div>
@@ -1730,9 +1730,9 @@ function esRenderSlots() {
                                : ('<span style="color:#1CC7D0;">Stays at/above legacy goal throughout ✓</span>');
     var pTxt = 'Early: '+(Number(p.eDur)>0&&Number(p.eDrag)>0?(p.eDrag+'% for '+p.eDur+'yr from '+p.eStart):'none');
     if(Number(p.lDur)>0 && Number(p.lDrag)>0) pTxt += ' · Late: '+p.lDrag+'% for '+p.lDur+'yr from '+p.lStart;
-    html += '<div style="background:rgba(255,255,255,.04);border:1px solid #163348;border-radius:11px;padding:12px 14px;">'
+    html += '<div style="background:rgba(255,255,255,.04);border:1px solid #163348;border-top:3px solid #f4b86a;border-radius:11px;padding:12px 14px;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
-      +   '<span style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.6px;">Test '+(i+1)+'</span>'
+      +   '<span style="font-size:10px;font-weight:900;color:#f4b86a;text-transform:uppercase;letter-spacing:.6px;">Test '+(i+1)+'</span>'
       +   '<span style="font-size:9.5px;color:#6a8a9a;">'+pTxt+'</span>'
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">'
@@ -2178,6 +2178,13 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // staggered (one spouse not collecting yet). Show the year-1 figure rising to
   // the eventual COMBINED SS+pension once both collect. Fair for any client:
   // it's derived from each person's own SS, not a single-year snapshot.
+  // Shared (used by both the context row below and the verdict income line):
+  var _vpk = (planData && planData.people) ? Object.keys(planData.people) : [];
+  var _vA  = _vpk[0] ? (planData.people[_vpk[0]] || {}) : {};
+  var _vB  = _vpk[1] ? (planData.people[_vpk[1]] || {}) : {};
+  var vSsFull  = (((+_vA.ssMonthly || 0) + (+_vB.ssMonthly || 0)) * 12) + (pension || 0);
+  var vSsY1    = (ssYear1 + pension) || 0;
+  var vSsRamps = (vSsFull > vSsY1 + 2000);   // staggered claiming: starts low, climbs
   var floorRows;
   (function(){
     var _proj = (planData && planData.projections) || {};
@@ -2226,7 +2233,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       'In <strong>' + failPct + '%</strong> of simulations the portfolio could no longer cover your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) at some point in retirement.' +
       (earliestDeplete ? ' The earliest this happened was <strong>' + earliestDeplete + '</strong>.' : '') +
       (medDepleteYr ? ' The median run-out year was <strong>' + medDepleteYr + '</strong> — half of the failing scenarios held the must-pay floor at least until then.' : '') +
-      '<br><br>This is the line that matters most: it is the year your essential, cannot-skip expenses outlast the portfolio. Your guaranteed income (<strong>' + fmt(ssYear1 + pension) + '/yr</strong> in Social Security + pension) keeps coming, but on its own it does not cover the full must-pay floor.' +
+      '<br><br>This is the line that matters most: it is the year your essential, cannot-skip expenses outlast the portfolio. Your Social Security + pension (about <strong>' + fmt(vSsFull) + '/yr</strong> once both of you are collecting) keeps coming, but on its own it does not cover the full must-pay floor.' +
       '<br><br><span style="color:#8aaabb;">To push the run-out year later: trim base spending, delay retirement, delay Social Security, or pay down debt faster to shrink the must-pay floor.</span>' +
       '</div>';
   } else {
@@ -2238,32 +2245,34 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   // ── Verdict (tiered on the MUST-PAY floor — the sustainability number) ──
   var verdictHtml;
   var goalTxt = 'Reaching your full legacy goal of <strong>' + fmt(legacyGoal) + '</strong> at full spending (<strong>' + fmt(baseSpend) + '/yr</strong>) is a higher bar \u2014 <strong>' + successPct + '%</strong> of futures clear that.';
-  var incomeTxt = 'Your guaranteed income of <strong>' + fmt(ssYear1 + pension) + '/yr</strong> (Social Security + pension) continues for life on top of the portfolio.';
+  var incomeTxt = vSsRamps
+    ? 'Your Social Security + pension floor starts around <strong>' + fmt(vSsY1) + '/yr</strong> and climbs to about <strong>' + fmt(vSsFull) + '/yr</strong> once both of you are collecting \u2014 and continues for life on top of the portfolio.'
+    : 'Your Social Security + pension floor of <strong>' + fmt(vSsFull) + '/yr</strong> continues for life on top of the portfolio.';
   var failYrTxt = (medDepleteYr ? ', typically around <strong>' + medDepleteYr + '</strong>' : '') + (earliestDeplete ? ' and as early as <strong>' + earliestDeplete + '</strong> in the worst cases' : '');
   if (mpSafePct >= 90) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #1CC7D0;color:#2c3e50;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:12px;padding:18px 22px;background:linear-gradient(135deg,#06243a,#0A3145);border:1px solid rgba(28,199,208,.18);border-top:4px solid #1CC7D0;color:#dceaf5;font-size:13px;line-height:1.8;box-shadow:0 8px 26px rgba(4,30,47,.35);">' +
       '\u2705 <strong style="color:#1CC7D0;font-size:15px;">Strong \u2014 your must-pay floor holds in ' + mpSafePct + '% of futures</strong><br><br>' +
       'Across ' + nRuns.toLocaleString() + ' random futures \u2014 crashes, recessions, low-return decades, high inflation \u2014 your portfolio keeps covering your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) in <strong>' + mpSafePct + '%</strong> of them' +
       (depleted > 0 ? ', falling short in only <strong>' + depleted.toLocaleString() + '</strong>' + failYrTxt + '. ' : ' \u2014 it never ran short. ') +
       goalTxt + ' ' + incomeTxt +
       '</div>';
   } else if (mpSafePct >= 75) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #f4b86a;color:#2c3e50;font-size:13px;line-height:1.8;">' +
+    verdictHtml = '<div style="border-radius:12px;padding:18px 22px;background:linear-gradient(135deg,#06243a,#0A3145);border:1px solid rgba(244,184,106,.22);border-top:4px solid #f4b86a;color:#dceaf5;font-size:13px;line-height:1.8;box-shadow:0 8px 26px rgba(4,30,47,.35);">' +
       '\u26A0\uFE0F <strong style="color:#f4b86a;font-size:15px;">Solid floor \u2014 must-pay holds in ' + mpSafePct + '% of futures</strong><br><br>' +
       'Your portfolio covers your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) in <strong>' + mpSafePct + '%</strong> of futures. It falls short in <strong>' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + '</strong>' + failYrTxt + '. ' +
       goalTxt + ' ' + incomeTxt +
       '<br><br><strong style="color:#f4b86a;">To firm up the floor:</strong> trim base spending, delay retirement or Social Security, or pay down debt faster.' +
       '</div>';
   } else if (mpSafePct >= 50) {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #ef5350;color:#2c3e50;font-size:13px;line-height:1.8;">' +
-      '\u2757 <strong style="color:#ef5350;font-size:15px;">Floor at risk \u2014 must-pay holds in only ' + mpSafePct + '% of futures</strong><br><br>' +
+    verdictHtml = '<div style="border-radius:12px;padding:18px 22px;background:linear-gradient(135deg,#06243a,#0A3145);border:1px solid rgba(240,147,74,.25);border-top:4px solid #f0934a;color:#dceaf5;font-size:13px;line-height:1.8;box-shadow:0 8px 26px rgba(4,30,47,.35);">' +
+      '\u2757 <strong style="color:#f0934a;font-size:15px;">Floor at risk \u2014 must-pay holds in only ' + mpSafePct + '% of futures</strong><br><br>' +
       'In <strong>' + failPct + '% (' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + ')</strong> your portfolio can no longer cover your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) before the plan ends' + failYrTxt + '. ' +
       goalTxt + ' ' + incomeTxt + ' But on its own that income does not cover the floor, so the run-out year is your real sustainability limit.' +
       '<br><br>Go to Inputs, trim base spending or delay retirement / Social Security, then re-run.' +
       '</div>';
   } else {
-    verdictHtml = '<div style="border-radius:10px;padding:16px 20px;background:#fff;border:2px solid #ef5350;color:#2c3e50;font-size:13px;line-height:1.8;">' +
-      '\uD83D\uDEA8 <strong style="color:#ef5350;font-size:15px;">Significant Risk \u2014 must-pay floor fails in ' + failPct + '% of futures</strong><br><br>' +
+    verdictHtml = '<div style="border-radius:12px;padding:18px 22px;background:linear-gradient(135deg,#2a1012,#0A3145 60%);border:1px solid rgba(255,107,107,.3);border-top:4px solid #ff6b6b;color:#dceaf5;font-size:13px;line-height:1.8;box-shadow:0 8px 26px rgba(4,30,47,.35);">' +
+      '\uD83D\uDEA8 <strong style="color:#ff6b6b;font-size:15px;">Significant Risk \u2014 must-pay floor fails in ' + failPct + '% of futures</strong><br><br>' +
       'The number that matters most: in <strong>' + failPct + '% (' + depleted.toLocaleString() + ' of ' + nRuns.toLocaleString() + ')</strong> your portfolio can no longer cover your <strong>must-pay floor of ' + fmt(floorAmt) + '/yr</strong> (base living + healthcare + debt) before the plan ends' + failYrTxt + '. ' +
       goalTxt + ' ' + incomeTxt + ' But on its own that income does not cover the floor, so the run-out year is your real sustainability limit.' +
       '<br><br>Use Inputs to trim base spending, delay retirement or Social Security, or pay down debt, then re-run.' +
