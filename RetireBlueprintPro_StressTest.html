@@ -390,7 +390,7 @@ window.addEventListener('storage', function(e) {
     <div class="kpi-card" title="The most extra you can spend on top of your must-pay floor each year and still finish at or above your legacy goal in this crash scenario. This is ABOVE the floor — it doesn't replace it.">
       <div class="kpi-lbl">Extra You Can Still Add</div>
       <div id="kpi-safe" class="kpi-val" style="color:#1CC7D0;">—</div>
-      <div class="kpi-sub">above your floor, this crash</div>
+      <div id="kpi-safe-sub" class="kpi-sub">above your floor, this crash</div>
     </div>
     <!-- 5 Drops below legacy -->
     <div class="kpi-card" title="The first year your portfolio would fall below your legacy goal in this scenario — or "Holds" if it never does.">
@@ -1631,7 +1631,15 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
     // The Hit: base minus the scenario ending (a drained plan counts as 0 left)
     if(isBull && stressEnd>baseEnd){ S('kpi-hit', '+'+fmt(stressEnd-baseEnd), '#1CC7D0'); }
     else { var hit=baseEnd-(depletes?0:stressEnd); S('kpi-hit', (hit>0?'−':'')+fmt(Math.abs(hit)), hit>0?'#f4b86a':'#1CC7D0'); }
-    S('kpi-safe', fmt(safeX), '#1CC7D0');
+    if (depletes) {
+      S('kpi-safe', '$0', '#ff6b6b');
+      var _ksub = document.getElementById('kpi-safe-sub');
+      if (_ksub) _ksub.textContent = 'plan depletes — no extra is safe';
+    } else {
+      S('kpi-safe', fmt(safeX), safeX > 0 ? '#1CC7D0' : '#f4b86a');
+      var _ksub2 = document.getElementById('kpi-safe-sub');
+      if (_ksub2) _ksub2.textContent = 'above your floor, this crash';
+    }
     if(belowYr){ S('kpi-below', String(belowYr), '#f4b86a'); }
     else if(depletes){ S('kpi-below', String(zeroYr||'—'), '#ff6b6b'); }
     else { S('kpi-below', 'Holds', '#1CC7D0'); }
@@ -1650,10 +1658,24 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
   } else {
     title = depletes ? '\ud83d\udea8 Drains at Current Spending' : '\u26a0\ufe0f Legacy at Risk at Current Spending';
     color = depletes ? '#ff6b6b' : '#f4b86a';
-    detail='<b>If you don\u2019t adjust:</b> at your current planned spending, this scenario '
-      + (depletes ? ('drains the portfolio to $0 around <b>'+(zeroYr||belowYr||'')+'</b>') : ('drops below your '+fmt(legGoal)+' legacy goal in <b>'+belowYr+'</b>'))
-      + ' \u2014 that is the red line. <b>To ride it out and still leave your legacy:</b> your safe extra spend needs to drop to <b>'+fmt(safeX)+'/yr</b>. Trimming discretionary spending is how the plan absorbs the hit.';
-    recs=['Cut extra/discretionary spending toward '+fmt(safeX)+'/yr during the downturn','Delay large purchases until the market recovers','Lean on guaranteed income (Social Security + pension) while the portfolio heals'];
+    if (depletes) {
+      detail = '<b>If you don\u2019t adjust:</b> at your current planned spending, this crash drains the portfolio to <b>$0</b> around <b>' + (zeroYr || belowYr || '') + '</b>. '
+        + 'No extra spending is safe here \u2014 the plan can\u2019t sustain even current spending through this scenario. '
+        + 'Try a milder crash to find your cushion, or look at trimming essential spending.';
+      recs = [
+        'This crash is too severe to survive at current spending \u2014 test a milder scenario to find your limit',
+        'Consider what essential spending you could reduce in a real downturn',
+        'Remember: this is a stress test, not a prediction \u2014 most downturns are shorter and shallower than this'
+      ];
+    } else {
+      detail = '<b>If you don\u2019t adjust:</b> at your current planned spending, this scenario drops below your ' + fmt(legGoal) + ' legacy goal in <b>' + belowYr + '</b>'
+        + ' \u2014 that is the red line. <b>To ride it out and still leave your legacy:</b> your safe extra spend needs to drop to <b>' + fmt(safeX) + '/yr</b>. Trimming discretionary spending is how the plan absorbs the hit.';
+      recs = [
+        'Cut extra/discretionary spending toward ' + fmt(safeX) + '/yr during the downturn',
+        'Delay large purchases until the market recovers',
+        'Lean on guaranteed income (Social Security + pension) while the portfolio heals'
+      ];
+    }
   }
   set('verdict-title',title); var vt=document.getElementById('verdict-title'); if(vt) vt.style.color=color;
   var vd=document.getElementById('verdict-detail'); if(vd){ vd.innerHTML=detail; vd.style.textAlign='left'; }
@@ -1669,7 +1691,7 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
     } else {
       es.innerHTML='<b>Real run:</b> the red line is your plan at <b>current spending</b> \u2014 it '
         + (depletes ? ('drains to <b style="color:#d64545;">$0</b> around <b>'+(zeroYr||belowYr||'')+'</b>') : ('dips below your '+fmt(legGoal)+' goal in <b style="color:#d64545;">'+belowYr+'</b>'))
-        + '. To stay on track, your safe extra spend drops to <b>'+fmt(safeX)+'/yr</b>.';
+        + '. ' + (depletes ? '<b style="color:#ff6b6b;">No extra spending is safe in this scenario</b> \u2014 the plan can\u2019t sustain current spending.' : 'To stay on track, your safe extra spend drops to <b>'+fmt(safeX)+'/yr</b>.');
     }
   }
 
@@ -2017,9 +2039,9 @@ function runMonteCarlo() {
           var spendNX = floorNow * Math.pow(1 + inflation, i);
           withdrawalNX = Math.max(0, spendNX - guaranteedNX);
         }
-        if (flexPct > 0 && balNX > 0 && (withdrawalNX / balNX) > initialWR * GK_TRIGGER) {
-          withdrawalNX *= (1 - flexPct);
-        }
+        // ── Floor-only path: NO guardrail trim — the floor is must-pay expenses
+        // (rent, food, healthcare). You can't cut those in a bad market. The
+        // guardrail only trims discretionary extra, so it doesn't apply here. ──
 
         // One shared market return drives BOTH paths (clean apples-to-apples)
         var ret = mcRandReturn(model, mu, sigma);
