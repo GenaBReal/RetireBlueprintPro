@@ -1917,7 +1917,16 @@ function runMonteCarlo() {
   var _exArr = (proj.byYear || []).map(function(y){ return (y && +y.chosenExtra) || 0; });
   var _exMax = 0, _exFirst = -1, _exLast = -1;
   for (var _ei = 0; _ei < _exArr.length; _ei++) { var _ev = _exArr[_ei]; if (_ev > _exMax) _exMax = _ev; if (_ev > 0) { if (_exFirst < 0) _exFirst = _ei; _exLast = _ei; } }
-  var extraSummary = { max: _exMax, anyExtra: (_exMax > 0), firstIdx: _exFirst, lastIdx: _exLast };
+  var _phases = [];
+  var _pi2 = 0;
+  while (_pi2 < _exArr.length) {
+    if (_exArr[_pi2] > 0) {
+      var _pAmt = _exArr[_pi2], _pStart = _pi2;
+      while (_pi2 < _exArr.length && Math.abs(_exArr[_pi2] - _pAmt) < 1) _pi2++;
+      _phases.push({ amt: _pAmt, firstIdx: _pStart, lastIdx: _pi2 - 1 });
+    } else { _pi2++; }
+  }
+  var extraSummary = { max: _exMax, anyExtra: (_exMax > 0), firstIdx: _exFirst, lastIdx: _exLast, phases: _phases };
   var baseSpend = floorNow + chosenExtraNow;                 // your CHOSEN spending = floor + chosen extra
   // Does the SAVED plan already include the extra? ("Assume Extra Spending Used?" = Yes on Inputs, cell B11)
   var extraInPlan = String(gl.assumeExtraSpend || 'Yes').trim().toLowerCase().charAt(0) !== 'n';
@@ -2153,12 +2162,19 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     if (!extraInPlan) {
       out = '\uD83D\uDCB5 <strong>This run spends your must-pay floor only</strong> (' + floorTxt + '). The extra is switched off \u2014 "Assume Extra Spending Used?" is set to <b>No</b> in Inputs.';
     } else if (extraSummary && extraSummary.anyExtra) {
-      var fy = startYear + extraSummary.firstIdx, ly = startYear + extraSummary.lastIdx;
-      var span = fy + (ly > fy ? ('\u2013' + ly) : '');
-      var src = (chosenExtraAmt > 0) ? 'your chosen amount' : 'the solver\u2019s suggested amount, since your chosen extra is 0';
-      out = '\uD83D\uDCB5 <strong>This run is spending:</strong> must-pay floor ' + floorTxt
-          + ' &nbsp;+&nbsp; extra of <strong style="color:#f4b86a;">up to ' + fmt(extraSummary.max) + '/yr</strong> during <strong>' + span + '</strong> '
-          + '<span style="color:#9fc1d6;">(' + src + ')</span>.';
+      var _phaseTxt;
+      if (extraSummary.phases && extraSummary.phases.length > 1) {
+        _phaseTxt = extraSummary.phases.map(function(p, idx) {
+          var fy = startYear + p.firstIdx, ly = startYear + p.lastIdx;
+          return '<strong style="color:#f4b86a;">Phase ' + (idx+1) + ': ' + fmt(p.amt) + '/yr</strong> <span style="color:#9fc1d6;">(' + fy + (ly>fy?'\u2013'+ly:'') + ')</span>';
+        }).join(' &nbsp;&middot;&nbsp; ');
+      } else {
+        var fy2 = startYear + extraSummary.firstIdx, ly2 = startYear + extraSummary.lastIdx;
+        _phaseTxt = '<strong style="color:#f4b86a;">' + fmt(extraSummary.max) + '/yr</strong> <span style="color:#9fc1d6;">(' + fy2 + (ly2>fy2?'\u2013'+ly2:'') + ')</span>';
+      }
+      var _src2 = (chosenExtraAmt > 0) ? 'your chosen amounts' : 'the solver\u2019s suggested amounts (your chosen extra is 0)';
+      out = '\uD83D\uDCB5 <strong>This run is spending:</strong> must-pay floor ' + floorTxt + ' &nbsp;+&nbsp; extra: ' + _phaseTxt
+          + ' <span style="color:#9fc1d6;">(' + _src2 + ')</span>.';
     } else {
       out = '\uD83D\uDCB5 <strong>This run spends your must-pay floor only</strong> (' + floorTxt + '). No extra reached the simulation \u2014 check that your amounts saved and that you clicked \uD83D\uDD04 Reload Data.';
     }
@@ -2272,7 +2288,10 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
       var span = '';
       if (extraSummary && extraSummary.firstIdx >= 0) { var _fy = startYear + extraSummary.firstIdx, _ly = startYear + extraSummary.lastIdx; span = ' during ' + _fy + (_ly > _fy ? ('\u2013' + _ly) : ''); }
       if (extraSummary && extraSummary.anyExtra) {
-        return contextRow('Extra spending (on top of floor)', 'Up to <strong>' + fmt(extraSummary.max) + '/yr</strong>' + span + (chosenExtraAmt > 0 ? ' \u2014 your chosen amount' : ' \u2014 your chosen extra is 0, so the plan spends the solver\u2019s <strong>suggested</strong> amount for those dates'));
+        var _phLines = extraSummary.phases && extraSummary.phases.length > 1
+          ? extraSummary.phases.map(function(p,i){ var fy=startYear+p.firstIdx,ly=startYear+p.lastIdx; return 'Phase '+(i+1)+': <strong>'+fmt(p.amt)+'/yr</strong> ('+fy+(ly>fy?'\u2013'+ly:'')+')'+(chosenExtraAmt>0?'':' \u2014 solver suggested'); }).join(' &nbsp;&middot;&nbsp; ')
+          : 'Up to <strong>' + fmt(extraSummary.max) + '/yr</strong>' + span + (chosenExtraAmt > 0 ? ' \u2014 your chosen amount' : ' \u2014 your chosen extra is 0, so the plan spends the solver\u2019s <strong>suggested</strong> amount for those dates');
+        return contextRow('Extra spending (on top of floor)', _phLines);
       }
       return contextRow('Extra spending (on top of floor)', '$0 in every year \u2014 no spending phase is set, so there is nothing extra to spend. Add one on Inputs to spend above the floor.');
     })() +
