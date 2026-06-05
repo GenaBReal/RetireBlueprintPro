@@ -234,7 +234,7 @@ window.addEventListener('storage', function(e) {
       <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#f4b86a;">—</div><div class="fp-note">Target end</div></div>
       <div class="fp-cell"><div class="fp-label">Base Ending</div><div class="fp-val" id="fp-ending" style="color:#0B2239;">—</div><div class="fp-note" id="fp-ending-note">Matches Dashboard ✓</div></div>
       <div class="fp-cell"><div class="fp-label">Plan Through</div><div class="fp-val" id="fp-end-year" style="color:#7ecfda;">—</div><div class="fp-note" id="fp-end-note">Both partners</div></div>
-      <div class="fp-cell"><div class="fp-label">Annual Spend</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">Essentials + extra</div></div>
+      <div class="fp-cell"><div class="fp-label">Must-Pay Floor</div><div class="fp-val" id="fp-spending">—</div><div class="fp-note">base + health + debt</div></div>
     </div>
     <div style="margin-top:10px;font-size:9.5px;color:#dceaf5;text-align:center;line-height:1.6;">These are your <b>real saved plan</b> numbers, pulled straight from your sheet &mdash; give them a quick look to confirm this is your data before you test.</div>
   </div>
@@ -928,7 +928,7 @@ function updateFingerprint(baseRes) {
   if(planEndYr>0) endYr=planEndYr;
   set('fp-end-year', endYr);
   set('fp-end-note','Through age '+longestAge);
-  set('fp-spending', fmt(rbpEssentialFloor().floor + ((proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))||0)));
+  set('fp-spending', fmt(rbpEssentialFloor().floor));
 
   // -30% CRASH CARD — use the SAME method as the Dashboard stress panel so the
   // two pages agree. Anchor to the REAL death-year ending balance from the sheet
@@ -1887,6 +1887,12 @@ function runMonteCarlo() {
   // "Chosen Extra Spend" column (byYear.chosenExtra), per year. NOT the solver's suggested max.
   var chosenExtraNow = (proj.byYear && proj.byYear[0] && (+proj.byYear[0].chosenExtra)) ? (+proj.byYear[0].chosenExtra) : 0;
   var suggestedExtra = (+sp.safeExtra) || 0;                 // solver's SAFE max — a "you could spend up to" metric only
+  // Per-year extra actually modeled (the "smile"). byYear.chosenExtra already resolves
+  // to chosen-or-suggested per the Master (IF F>0 use F, else G), gated by the toggle.
+  var _exArr = (proj.byYear || []).map(function(y){ return (y && +y.chosenExtra) || 0; });
+  var _exMax = 0, _exFirst = -1, _exLast = -1;
+  for (var _ei = 0; _ei < _exArr.length; _ei++) { var _ev = _exArr[_ei]; if (_ev > _exMax) _exMax = _ev; if (_ev > 0) { if (_exFirst < 0) _exFirst = _ei; _exLast = _ei; } }
+  var extraSummary = { max: _exMax, anyExtra: (_exMax > 0), firstIdx: _exFirst, lastIdx: _exLast };
   var baseSpend = floorNow + chosenExtraNow;                 // your CHOSEN spending = floor + chosen extra
   // Does the SAVED plan already include the extra? ("Assume Extra Spending Used?" = Yes on Inputs, cell B11)
   var extraInPlan = String(gl.assumeExtraSpend || 'Yes').trim().toLowerCase().charAt(0) !== 'n';
@@ -2067,7 +2073,7 @@ function runMonteCarlo() {
         nRuns, yrs, mcYears, legacyGoal, curYear,
         p1Name, p2Name, p1DeathAge, p2DeathAge, p1.age||63, p2.age||55,
         mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
-        allEndingBalsNX, chosenExtraNow, extraInPlan, depleteYearsFull, suggestedExtra);
+        allEndingBalsNX, chosenExtraNow, extraInPlan, depleteYearsFull, suggestedExtra, extraSummary);
     }
   }
 
@@ -2084,7 +2090,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     nRuns, yrs, mcYears, legacyGoal, curYear,
     p1Name, p2Name, p1DeathAge, p2DeathAge, p1Age, p2Age,
     mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
-    endingsNX, chosenExtraAmt, extraInPlan, depleteYearsFull, suggestedExtraAmt) {
+    endingsNX, chosenExtraAmt, extraInPlan, depleteYearsFull, suggestedExtraAmt, extraSummary) {
 
   var sorted = endings.slice().sort(function(a,b){return a-b;});
 
@@ -2215,9 +2221,17 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     contextRow(p2Name + ' lifespan modeled', 'Age ' + p2Age + ' → ' + p2DeathAge + ' (year ' + (curYear + p2DeathAge - p2Age) + ')') +
     contextRow('Starting portfolio', fmt(totalPF)) +
     contextRow('Must-pay floor (base + healthcare + debt)', fmt(floorAmt) + '/yr') +
-    contextRow('Chosen extra spending', fmt(chosenExtraAmt) + '/yr') +
-    contextRow('Full spending modeled', fmt(baseSpend) + '/yr' + (chosenExtraAmt > 0 ? '  (floor + chosen extra)' : '  (floor only)')) +
-    (suggestedExtraAmt > 0 ? contextRow('Safe extra (you could spend up to)', fmt(suggestedExtraAmt) + '/yr') : '') +
+    (function(){
+      if (!extraInPlan) return contextRow('Extra spending (on top of floor)', 'Off \u2014 "Assume Extra Spending Used?" is set to No in Inputs, so only the must-pay floor is spent.');
+      var span = '';
+      if (extraSummary && extraSummary.firstIdx >= 0) { var _fy = startYear + extraSummary.firstIdx, _ly = startYear + extraSummary.lastIdx; span = ' during ' + _fy + (_ly > _fy ? ('\u2013' + _ly) : ''); }
+      if (extraSummary && extraSummary.anyExtra) {
+        return contextRow('Extra spending (on top of floor)', 'Up to <strong>' + fmt(extraSummary.max) + '/yr</strong>' + span + (chosenExtraAmt > 0 ? ' \u2014 your chosen amount' : ' \u2014 your chosen extra is 0, so the plan spends the solver\u2019s <strong>suggested</strong> amount for those dates'));
+      }
+      return contextRow('Extra spending (on top of floor)', '$0 in every year \u2014 no spending phase is set, so there is nothing extra to spend. Add one on Inputs to spend above the floor.');
+    })() +
+    contextRow('How to change it', 'In <strong>Chosen Extra Spend</strong> on Inputs: any amount above 0 is used as-is; <strong>0 means \u201cuse the solver\u2019s suggested spend\u201d</strong> for those dates.') +
+    (suggestedExtraAmt > 0 ? contextRow('Solver\u2019s safe ceiling', 'About ' + fmt(suggestedExtraAmt) + '/yr \u2014 the most you could add and still hold the plan') : '') +
     floorRows +
     contextRow('Expected return assumption', (mu * 100).toFixed(1) + '% avg · ' + (sigma*100).toFixed(0) + '% std dev') +
     contextRow('Inflation assumption', (inflation * 100).toFixed(1) + '%/yr') +
