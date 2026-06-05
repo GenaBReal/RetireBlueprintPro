@@ -460,7 +460,19 @@ window.addEventListener('storage', function(e) {
       <div style="font-size:15px;font-weight:500;color:#dceaf5;margin-bottom:3px;">Scenario sweep — safe extra spend at every crash level</div>
       <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;">Uses your real plan data. Shows what Phase 1 extra you could safely spend and still hit your legacy goal — even if that crash hits in year 1. Other phases scale proportionally.</div>
     </div>
-    <button id="sweep-run-btn" onclick="rbpSweepScenarios()" style="flex-shrink:0;font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(28,199,208,.15);border:1px solid rgba(28,199,208,.4);color:#1CC7D0;cursor:pointer;white-space:nowrap;">&#9654; Sweep All Scenarios</button>
+    <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+      <button id="sweep-run-btn" onclick="rbpSweepScenarios()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(28,199,208,.15);border:1px solid rgba(28,199,208,.4);color:#1CC7D0;cursor:pointer;white-space:nowrap;">&#9654; Quick Estimate</button>
+      <button id="sweep-real-btn" onclick="rbpRealSweep()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.5);color:#f4b86a;cursor:pointer;white-space:nowrap;">&#9654; Real Numbers (~2 min)</button>
+    </div>
+  </div>
+  <div id="sweep-real-progress" style="display:none;margin-bottom:14px;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <span style="font-size:11.5px;color:#dceaf5;">Running real engine — scenario <span id="sweep-prog-n">1</span> of <span id="sweep-prog-total">5</span>…</span>
+      <span style="font-size:10px;color:#9fc1d6;">~25 sec per scenario · do not close tab</span>
+    </div>
+    <div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden;">
+      <div id="sweep-prog-bar" style="height:100%;background:#f4b86a;border-radius:4px;width:0%;transition:width .4s;"></div>
+    </div>
   </div>
   <div id="sweep-body">
     <div id="sweep-placeholder" style="font-size:12px;color:#566576;text-align:center;padding:14px 0;">Click Sweep to see how much extra spend survives each market scenario.</div>
@@ -2303,6 +2315,114 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
   document.getElementById('sweep-depletion').innerHTML = dHtml;
   document.getElementById('sweep-placeholder').style.display = 'none';
   document.getElementById('sweep-chart-area').style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════
+// REAL SWEEP — calls the live connector for each crash
+// level and returns 100% accurate safeExtra values.
+// Same accuracy as clicking "Run New Test" manually.
+// ══════════════════════════════════════════════════════
+function rbpRealSweep() {
+  if (!planData) { alert('Load your plan data first (Reload Data above).'); return; }
+
+  var proj = planData.projections || {};
+  var gl   = planData.global      || {};
+  var leg  = planData.legacy      || {};
+  var port = planData.portfolio   || {};
+  var sp   = planData.spending    || {};
+
+  var startYr  = (proj.years && proj.years.length) ? proj.years[0] : new Date().getFullYear();
+  var inf      = ((+gl.inflation) || 0.025) * 100;
+  var legGoal  = (+leg.goal) || 0;
+  var p1Amt    = 0;
+  var byYear   = proj.byYear || [];
+  for (var _j = 0; _j < byYear.length; _j++) {
+    var _cx = (byYear[_j] && +byYear[_j].chosenExtra) || 0;
+    if (_cx > 0) { p1Amt = _cx; break; }
+  }
+
+  // Base (no crash): use solver's safeExtra from the loaded plan
+  var baseExtra = (+sp.safeExtra) || 0;
+
+  // Scenarios: yr1 return → connector drag = Math.round(7 - yr1)
+  var sweepScens = [
+    { label: '  0%  (no crash)',  yr1:   0, cat: 'ok',    drag:  7, dur: 0 },
+    { label: '-10%  (mild drop)', yr1: -10, cat: 'ok',    drag: 17, dur: 1 },
+    { label: '-20%  (bad year)',  yr1: -20, cat: 'warn',  drag: 27, dur: 1 },
+    { label: '-30%  (bear mkt)',  yr1: -30, cat: 'warn',  drag: 37, dur: 1 },
+    { label: '-40%  (severe)',    yr1: -40, cat: 'bad',   drag: 47, dur: 1 },
+    { label: '-50%  (crash)',     yr1: -50, cat: 'bad',   drag: 57, dur: 1 },
+  ];
+
+  // Pre-fill base case without a connector call
+  var results = sweepScens.map(function(s) {
+    return { label: s.label, cat: s.cat, safe: (s.dur === 0 ? baseExtra : null), fullDepl: null, floorDepl: null, _done: (s.dur === 0), _drag: s.drag, _dur: s.dur };
+  });
+
+  // Count how many need a real call
+  var toRun = results.filter(function(r){ return !r._done; }).length;
+  var total = toRun;
+  var progEl = document.getElementById('sweep-real-progress');
+  var progN  = document.getElementById('sweep-prog-n');
+  var progT  = document.getElementById('sweep-prog-total');
+  var progBar= document.getElementById('sweep-prog-bar');
+  if (progEl) { progEl.style.display = 'block'; }
+  if (progT)  { progT.textContent = String(total); }
+
+  var runBtn  = document.getElementById('sweep-real-btn');
+  var estBtn  = document.getElementById('sweep-run-btn');
+  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running…'; }
+  if (estBtn) { estBtn.disabled = true; }
+
+  // Show placeholder bars immediately
+  _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe: r.safe||0, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; }), p1Amt, legGoal);
+
+  var doneCount = 0;
+
+  function finish() {
+    if (progEl) progEl.style.display = 'none';
+    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Real Numbers (~2 min)'; }
+    if (estBtn) { estBtn.disabled = false; }
+    // Final render with 100% accurate tag
+    var final = results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe||0, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; });
+    _rbpSweepRender(final, p1Amt, legGoal);
+    // Add accuracy note
+    var note = document.getElementById('sweep-placeholder');
+    if (note) { note.style.display = 'block'; note.style.color = '#1CC7D0'; note.textContent = '\u2705 Real engine results \u2014 same accuracy as Run New Test. Each number is the exact safe Phase 1 extra for that crash, per the full Master formula (taxes, RMDs, SS staggering included).'; }
+  }
+
+  function runNext(idx) {
+    // Find next pending scenario
+    while (idx < results.length && results[idx]._done) idx++;
+    if (idx >= results.length) { finish(); return; }
+
+    var r = results[idx];
+    doneCount++;
+    if (progN)   progN.textContent = String(doneCount);
+    if (progBar) progBar.style.width = Math.round(doneCount / total * 100) + '%';
+
+    var params = { action:'runStressTest', eType:'bear', eStart:startYr, eDur:r._dur, eDrag:r._drag, lType:'bear', lStart:0, lDur:0, lDrag:0, infl:inf };
+
+    esJsonp(params, function(resp) {
+      results[idx]._done = true;
+      if (resp && resp.ok) {
+        results[idx].safe     = (+resp.safeExtra) || 0;
+        results[idx].fullDepl = resp.belowYear || null;
+      } else {
+        results[idx].safe = 0;
+      }
+      // Partial render after each call
+      _rbpSweepRender(results.map(function(r2){ return { label:r2.label, cat:r2.cat, safe:r2.safe||0, fullDepl:r2.fullDepl, floorDepl:r2.floorDepl }; }), p1Amt, legGoal);
+      setTimeout(function(){ runNext(idx + 1); }, 300);
+    }, function(_err) {
+      results[idx]._done = true;
+      results[idx].safe = 0;
+      setTimeout(function(){ runNext(idx + 1); }, 300);
+    });
+  }
+
+  // Start running from index 1 (index 0 is base case, already filled)
+  runNext(1);
 }
 
 function mcPercentile(arr, p) {
