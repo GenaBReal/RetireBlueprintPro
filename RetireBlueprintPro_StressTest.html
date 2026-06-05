@@ -2351,99 +2351,125 @@ function rbpRealSweep() {
   var gl   = planData.global      || {};
   var leg  = planData.legacy      || {};
   var port = planData.portfolio   || {};
-  var sp   = planData.spending    || {};
 
   var startYr  = (proj.years && proj.years.length) ? proj.years[0] : new Date().getFullYear();
   var inf      = ((+gl.inflation) || 0.025) * 100;
   var legGoal  = (+leg.goal) || 0;
-  var p1Amt    = 0;
+  var meanRet  = rbpPortfolioStats(port).meanReturn;
+  var withdrawals = proj.withdrawals || [];
   var byYear   = proj.byYear || [];
-  for (var _j = 0; _j < byYear.length; _j++) {
-    var _cx = (byYear[_j] && +byYear[_j].chosenExtra) || 0;
-    if (_cx > 0) { p1Amt = _cx; break; }
+  var yrsLen   = withdrawals.length || 38;
+
+  // ── Local binary search for amounts (connector can't recompute safeExtra per crash) ──
+  var floorW = [], p1Amt = 0;
+  for (var _i = 0; _i < yrsLen; _i++) {
+    var _cx = (byYear[_i] && (+byYear[_i].chosenExtra)) || 0;
+    floorW.push(Math.max(0, (+withdrawals[_i]||0) - _cx));
+    if (_cx > 0 && p1Amt === 0) p1Amt = _cx;
+  }
+  var phaseMult = byYear.map(function(y){ var c=(y&&+y.chosenExtra)||0; return (p1Amt>0)?c/p1Amt:0; });
+  var hasPhase = phaseMult.some(function(m){ return m > 0; });
+  if (!hasPhase) phaseMult = phaseMult.map(function(){ return 1; });
+
+  function localProjectEnd(yr1Ret, p1x) {
+    var b = (planData.portfolio||{}).total || 0;
+    for (var i = 1; i < floorW.length; i++) {
+      var r = (i===1) ? yr1Ret : meanRet;
+      var h = Math.sqrt(Math.max(0.1, 1 + r));
+      b = Math.max(0, b * h - (floorW[i] + p1x * (phaseMult[i]||0)));
+      b = Math.max(0, b * h);
+      if (b <= 0) return 0;
+    }
+    return b;
+  }
+  function localSafeP1(yr1Ret) {
+    var lo = 0, hi = 400000, best = 0;
+    for (var it = 0; it < 30; it++) {
+      var m = (lo + hi) / 2;
+      if (localProjectEnd(yr1Ret, m) >= legGoal) { best = m; lo = m; } else { hi = m; }
+    }
+    return Math.round(best / 500) * 500;
   }
 
-  // Base (no crash): use solver's safeExtra from the loaded plan
-  var baseExtra = (+sp.safeExtra) || 0;
-
-  // Scenarios: yr1 return → connector drag = Math.round(7 - yr1)
+  // ── Scenarios ──────────────────────────────────────────────────────────────
   var sweepScens = [
-    { label: '  0%  (no crash)',  yr1:   0, cat: 'ok',    drag:  7, dur: 0 },
-    { label: '-10%  (mild drop)', yr1: -10, cat: 'ok',    drag: 17, dur: 1 },
-    { label: '-20%  (bad year)',  yr1: -20, cat: 'warn',  drag: 27, dur: 1 },
-    { label: '-30%  (bear mkt)',  yr1: -30, cat: 'warn',  drag: 37, dur: 1 },
-    { label: '-40%  (severe)',    yr1: -40, cat: 'bad',   drag: 47, dur: 1 },
-    { label: '-50%  (crash)',     yr1: -50, cat: 'bad',   drag: 57, dur: 1 },
+    { label: '  0%  (no crash)',  yr1:   0, cat: 'ok',   drag:  7, dur: 0 },
+    { label: '-10%  (mild drop)', yr1: -10, cat: 'ok',   drag: 17, dur: 1 },
+    { label: '-20%  (bad year)',  yr1: -20, cat: 'warn', drag: 27, dur: 1 },
+    { label: '-30%  (bear mkt)',  yr1: -30, cat: 'warn', drag: 37, dur: 1 },
+    { label: '-40%  (severe)',    yr1: -40, cat: 'bad',  drag: 47, dur: 1 },
+    { label: '-50%  (crash)',     yr1: -50, cat: 'bad',  drag: 57, dur: 1 },
   ];
 
-  // Pre-fill base case without a connector call
+  // Pre-compute local safeExtra amounts for all scenarios (these DO vary by crash)
   var results = sweepScens.map(function(s) {
-    return { label: s.label, cat: s.cat, safe: (s.dur === 0 ? baseExtra : null), fullDepl: null, floorDepl: null, _done: (s.dur === 0), _drag: s.drag, _dur: s.dur };
+    return {
+      label: s.label, cat: s.cat,
+      safe: localSafeP1(s.yr1 / 100),   // local estimate — varies correctly per crash
+      fullDepl: null, floorDepl: null,
+      _done: (s.dur === 0), _drag: s.drag, _dur: s.dur
+    };
   });
 
-  // Count how many need a real call
-  var toRun = results.filter(function(r){ return !r._done; }).length;
-  var total = toRun;
+  // ── UI setup ───────────────────────────────────────────────────────────────
+  var toRun  = results.filter(function(r){ return !r._done; }).length;
   var progEl = document.getElementById('sweep-real-progress');
   var progN  = document.getElementById('sweep-prog-n');
   var progT  = document.getElementById('sweep-prog-total');
   var progBar= document.getElementById('sweep-prog-bar');
-  if (progEl) { progEl.style.display = 'block'; }
-  if (progT)  { progT.textContent = String(total); }
+  if (progEl) progEl.style.display = 'block';
+  if (progT)  progT.textContent = String(toRun);
 
-  var runBtn  = document.getElementById('sweep-real-btn');
-  var estBtn  = document.getElementById('sweep-run-btn');
+  var runBtn = document.getElementById('sweep-real-btn');
+  var estBtn = document.getElementById('sweep-run-btn');
   if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running…'; }
   if (estBtn) { estBtn.disabled = true; }
 
-  // Show placeholder bars immediately
-  _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe: r.safe||0, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; }), p1Amt, legGoal);
+  // Show initial amounts immediately (local estimates load instantly)
+  _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:null, floorDepl:null }; }), p1Amt, legGoal);
 
   var doneCount = 0;
 
   function finish() {
     if (progEl) progEl.style.display = 'none';
     if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Real Numbers (~2 min)'; }
-    if (estBtn) { estBtn.disabled = false; }
-    // Final render with 100% accurate tag
-    var final = results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe||0, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; });
-    _rbpSweepRender(final, p1Amt, legGoal);
-    // Add accuracy note
+    if (estBtn) estBtn.disabled = false;
+    _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; }), p1Amt, legGoal);
     var note = document.getElementById('sweep-placeholder');
-    if (note) { note.style.display = 'block'; note.style.color = '#1CC7D0'; note.textContent = '\u2705 Real engine results \u2014 same accuracy as Run New Test. Each number is the exact safe Phase 1 extra for that crash, per the full Master formula (taxes, RMDs, SS staggering included).'; }
+    if (note) {
+      note.style.display = 'block';
+      note.style.color = '#1CC7D0';
+      note.innerHTML = '\u2705 <strong>Depletion years: real engine (exact)</strong> \u2014 same accuracy as Run New Test. '
+        + 'The connector returns depletion years per crash but always echoes the base plan\u2019s safe extra regardless of crash severity. '
+        + '<strong>Amounts: local estimate</strong> \u2014 uses your real floor withdrawals, varies correctly per crash (same logic as Quick Estimate).';
+    }
   }
 
   function runNext(idx) {
-    // Find next pending scenario
     while (idx < results.length && results[idx]._done) idx++;
     if (idx >= results.length) { finish(); return; }
-
     var r = results[idx];
     doneCount++;
     if (progN)   progN.textContent = String(doneCount);
-    if (progBar) progBar.style.width = Math.round(doneCount / total * 100) + '%';
+    if (progBar) progBar.style.width = Math.round(doneCount / toRun * 100) + '%';
 
-    var params = { action:'runStressTest', eType:'bear', eStart:startYr, eDur:r._dur, eDrag:r._drag, lType:'bear', lStart:0, lDur:0, lDrag:0, infl:inf };
-
+    var params = { action:'runStressTest', eType:'bear', eStart:startYr,
+                   eDur:r._dur, eDrag:r._drag, lType:'bear',
+                   lStart:0, lDur:0, lDrag:0, infl:inf };
     esJsonp(params, function(resp) {
       results[idx]._done = true;
       if (resp && resp.ok) {
-        results[idx].safe     = (+resp.safeExtra) || 0;
+        // Only use connector for depletion year — amounts come from local binary search
         results[idx].fullDepl = resp.belowYear || null;
-      } else {
-        results[idx].safe = 0;
       }
-      // Partial render after each call
-      _rbpSweepRender(results.map(function(r2){ return { label:r2.label, cat:r2.cat, safe:r2.safe||0, fullDepl:r2.fullDepl, floorDepl:r2.floorDepl }; }), p1Amt, legGoal);
+      _rbpSweepRender(results.map(function(r2){ return { label:r2.label, cat:r2.cat, safe:r2.safe, fullDepl:r2.fullDepl, floorDepl:r2.floorDepl }; }), p1Amt, legGoal);
       setTimeout(function(){ runNext(idx + 1); }, 300);
     }, function(_err) {
       results[idx]._done = true;
-      results[idx].safe = 0;
       setTimeout(function(){ runNext(idx + 1); }, 300);
     });
   }
 
-  // Start running from index 1 (index 0 is base case, already filled)
   runNext(1);
 }
 
