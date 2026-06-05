@@ -293,10 +293,10 @@ window.addEventListener('storage', function(e) {
       </div>
 
       <div class="slider-group">
-        <div class="slider-label">Inflation Rate <span class="slider-val" id="lbl-inf">3.0%</span></div>
+        <div class="slider-label">Inflation Rate <span class="slider-val" id="lbl-inf">3.0%</span> <span style="font-size:8.5px;font-weight:700;color:#f4b86a;background:rgba(244,184,106,.15);border-radius:4px;padding:1px 6px;letter-spacing:.3px;vertical-align:middle;">CRASH TEST ONLY</span></div>
         <input type="range" id="sl-inf" min="1" max="10" step="0.5" value="3" oninput="recalc()">
         <div class="slider-range"><span>1%</span><span>3%</span><span>10%</span></div>
-        <div class="slider-desc">Higher inflation erodes purchasing power every year. 1970s saw 8-12%.</div>
+        <div class="slider-desc">Higher inflation erodes purchasing power every year. 1970s saw 8-12%. <b style="color:#f4b86a;">This slider only changes the crash test above — not the Monte Carlo below, which uses your saved plan's inflation.</b></div>
       </div>
 
       <div class="slider-group" style="display:none;">
@@ -453,6 +453,22 @@ window.addEventListener('storage', function(e) {
       <strong style="color:#1CC7D0;">Base plan:</strong> <span id="es-base-vals">load your plan to see base numbers</span>
     </div>
     <div id="es-slots" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+  </div>
+</div>
+
+<!-- ════════ INDEPENDENCE DIVIDER — two separate tests ════════ -->
+<div style="margin:46px 0 0;display:flex;align-items:center;gap:14px;">
+  <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(244,184,106,.55));"></div>
+  <div style="background:#f4b86a;color:#041E2F;font-size:11px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:8px 20px;border-radius:22px;box-shadow:0 4px 16px rgba(244,184,106,.4);white-space:nowrap;">A Second, Separate Test ↓</div>
+  <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(244,184,106,.55),transparent);"></div>
+</div>
+<div style="margin:16px 0 0;padding:16px 22px;background:rgba(244,184,106,.07);border:1px dashed rgba(244,184,106,.5);border-radius:12px;text-align:center;">
+  <div style="font-size:13px;color:#f4b86a;font-weight:900;letter-spacing:.3px;margin-bottom:6px;">The Monte Carlo below is independent of everything above.</div>
+  <div style="font-size:12px;color:#e7d2b3;line-height:1.7;max-width:720px;margin:0 auto;">
+    The sliders up top &mdash; <b>including the inflation slider</b> &mdash; only shape the one crash scenario in the crash-test chart.
+    The Monte Carlo ignores them completely: it builds its own 1,000 random futures and takes inflation from your <b>saved plan</b>.
+    So to change the inflation the Monte Carlo uses, edit it on the
+    <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:700;">Inputs page</a> and reload &mdash; not with the slider here.
   </div>
 </div>
 
