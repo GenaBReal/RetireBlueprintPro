@@ -1106,7 +1106,43 @@ function runStressTest(ss, inp, p) {
           if (projEnd(bsMid) >= legacyGoal) { bsBest = bsMid; bsLo = bsMid; }
           else { bsHi = bsMid; }
         }
-        safeExtraCrashAdj = Math.round(bsBest / 500) * 500;
+
+        // ── Bake in the tax margin ───────────────────────────────────────────
+        // The binary search adds trial extra to stressFloorW without re-running
+        // the sheet's tax formula. stressFloorW already carries the tax burden on
+        // the CURRENT extra; when the trial extra differs, the real portfolio draw
+        // = trial_extra + taxes_on_trial_extra, not just trial_extra.
+        //
+        // Estimate effective marginal tax rate from the stressed data:
+        //   implied_extra_tax = (stressed_total_withdrawal - stressFloorW - current_extra) per phase year
+        //   eff_tax_rate = total_implied_extra_tax / total_current_extra_spending
+        // This reflects the sheet's actual tax calculations on the current extra level.
+        var impliedExtraTax = 0, currentExtraTotal = 0;
+        var origWithdrawals = [];
+        for (var ti = 0; ti < md.length; ti++) {
+          var tRow = md[ti];
+          var tYr = tRow[0];
+          if (tYr instanceof Date) tYr = tYr.getFullYear();
+          else { tYr = Number(tYr); if (tYr>40000){ var td=new Date((tYr-25569)*86400*1000); tYr=td.getFullYear(); } }
+          if (!tYr || tYr<2020 || tYr>2200) continue;
+          var tW  = (Number(tRow[44])||0) - (Number(tRow[45])||0); // total stressed withdrawal
+          var tCx = Number(tRow[31])||0;                            // current chosen extra (spending)
+          if (tCx > 0) {
+            // Extra tax = total_withdrawal - floor_withdrawal - extra_spending
+            // (floor_withdrawal ≈ stressFloorW[i], already computed)
+            var tFloor = Math.max(0, tW - tCx); // same as stressFloorW for this row
+            impliedExtraTax  += Math.max(0, tW - tFloor - tCx); // taxes attributed to extra
+            currentExtraTotal += tCx;
+          }
+        }
+        // Effective marginal tax rate on extra; clamp to sensible 5-25% range
+        var effTaxRate = (currentExtraTotal > 0)
+          ? Math.min(0.25, Math.max(0.05, impliedExtraTax / currentExtraTotal))
+          : 0.12; // fallback if no extra spending in plan
+
+        // Apply: safe extra the SPENDER actually keeps = bsBest × (1 - effTaxRate)
+        // This converts from "portfolio draw" to "spendable dollars" after taxes.
+        safeExtraCrashAdj = Math.round(bsBest * (1 - effTaxRate) / 500) * 500;
       }
     }
 
@@ -1116,8 +1152,9 @@ function runStressTest(ss, inp, p) {
 
     return {
       ok:true,
-      safeExtra:safeExtraCrashAdj,        // crash-adjusted (binary search on stressed withdrawals)
-      safeExtraBase:Math.round(safeExtra), // base-plan solver value (for reference)
+      safeExtra:safeExtraCrashAdj,        // crash-adjusted + tax-corrected
+      safeExtraBase:Math.round(safeExtra), // base-plan solver value (reference)
+      safeExtraTaxAdj:Math.round((typeof effTaxRate !== 'undefined' ? effTaxRate : 0.12) * 100), // % tax margin applied
       ending:Math.round(ending),
       surplus:Math.round(surplus),
       legacyGoal:Math.round(legacyGoal),

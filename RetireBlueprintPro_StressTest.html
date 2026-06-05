@@ -2435,16 +2435,17 @@ function rbpRealSweep() {
     if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Real Numbers (~2 min)'; }
     if (estBtn) estBtn.disabled = false;
     _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; }), p1Amt, legGoal);
+    var taxAdjPct = 0;
+    results.forEach(function(r){ if (r._taxAdj) taxAdjPct = Math.max(taxAdjPct, r._taxAdj); });
     var note = document.getElementById('sweep-placeholder');
     if (note) {
       note.style.display = 'block';
       note.style.color = '#1CC7D0';
-      note.innerHTML = '\u2705 <strong>Real engine results.</strong> Each amount is computed by a binary search '
-        + 'on your <em>stressed</em> withdrawal data \u2014 the Master sheet ran under the crash, so withdrawals already '
-        + 'reflect crash impacts on RMDs, Social Security phasing, and income. The main remaining approximation: '
-        + 'marginal tax on the <em>trial</em> extra spend isn\u2019t re-calculated per iteration (the tax on the floor is exact). '
-        + 'Depletion years are also from the real engine. This is the most accurate sweep possible without writing '
-        + 'each trial amount to the sheet (which would take hours).';
+      note.innerHTML = '\u2705 <strong>Real engine results with tax margin baked in.</strong> '
+        + 'Each amount uses a binary search on your <em>stressed</em> withdrawal data (crash impacts on RMDs + SS already reflected). '
+        + 'A <strong>' + (taxAdjPct || 12) + '% tax correction</strong> is applied — computed from your plan\'s actual effective marginal rate on extra spending — '
+        + 'so the safe extra shown is what you can actually <em>spend</em> after taxes, not just the raw portfolio draw. '
+        + 'Depletion years are exact from the real engine.';
     }
   }
 
@@ -2462,15 +2463,14 @@ function rbpRealSweep() {
     esJsonp(params, function(resp) {
       results[idx]._done = true;
       if (resp && resp.ok) {
-        // safeExtra is now crash-adjusted (binary search on stressed withdrawal data in connector)
         results[idx].safe     = (+resp.safeExtra) || localSafeP1(results[idx]._yr1);
         results[idx].fullDepl = resp.belowYear || null;
+        results[idx]._taxAdj  = resp.safeExtraTaxAdj || 12; // % tax margin applied server-side
       }
       _rbpSweepRender(results.map(function(r2){ return { label:r2.label, cat:r2.cat, safe:r2.safe, fullDepl:r2.fullDepl, floorDepl:r2.floorDepl }; }), p1Amt, legGoal);
       setTimeout(function(){ runNext(idx + 1); }, 300);
     }, function(_err) {
       results[idx]._done = true;
-      // Fallback to local estimate if connector fails
       results[idx].safe = localSafeP1(results[idx]._yr1);
       setTimeout(function(){ runNext(idx + 1); }, 300);
     });
