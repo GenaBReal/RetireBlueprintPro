@@ -462,13 +462,13 @@ window.addEventListener('storage', function(e) {
     </div>
     <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
       <button id="sweep-run-btn" onclick="rbpSweepScenarios()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(28,199,208,.15);border:1px solid rgba(28,199,208,.4);color:#1CC7D0;cursor:pointer;white-space:nowrap;">&#9654; Quick Estimate</button>
-      <button id="sweep-real-btn" onclick="rbpRealSweep()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.5);color:#f4b86a;cursor:pointer;white-space:nowrap;">&#9654; Real Numbers (~2 min)</button>
+      <button id="sweep-real-btn" onclick="rbpRealSweep()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.5);color:#f4b86a;cursor:pointer;white-space:nowrap;">&#9654; Real Numbers (~3.5 min)</button>
     </div>
   </div>
   <div id="sweep-real-progress" style="display:none;margin-bottom:14px;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
       <span style="font-size:11.5px;color:#dceaf5;">Running real engine — scenario <span id="sweep-prog-n">1</span> of <span id="sweep-prog-total">5</span>…</span>
-      <span style="font-size:10px;color:#9fc1d6;">~25 sec per scenario · do not close tab</span>
+    <span style="font-size:10px;color:#9fc1d6;">~25 sec per scenario · 8 total · do not close tab</span>
     </div>
     <div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden;">
       <div id="sweep-prog-bar" style="height:100%;background:#f4b86a;border-radius:4px;width:0%;transition:width .4s;"></div>
@@ -2295,43 +2295,64 @@ function _rbpRunSweep() {
 }
 
 function _rbpSweepRender(results, p1Planned, legacyGoal) {
-  var catColor = { great: '#1CC7D0', good: '#7ecfda', ok: '#b8dde6', warn: '#f4b86a', bad: '#ff6b6b' };
-  var maxSafe  = Math.max.apply(null, results.map(function(r){ return r.safe; }));
-  var fmtK     = function(v) { return v >= 1000 ? ('$' + Math.round(v/1000) + 'K/yr') : (v > 0 ? ('$' + v + '/yr') : 'Cut to $0'); };
+  var catColor = { great:'#1CC7D0', good:'#7ecfda', ok:'#b8dde6', warn:'#f4b86a', bad:'#ff6b6b' };
+  var maxSafe = Math.max.apply(null, results.map(function(r){ return r.safe||0; }));
+  var fmtKno = function(v){ return v>=1000?('$'+Math.round(v/1000)+'K'):(v>0?('$'+v):'$0'); };
 
-  // Bar chart rows
-  var bHtml = '';
+  // ── 4-column bar chart: Scenario | Your Plan | Bar | Amount ──
+  var GRID = '150px 80px 1fr 100px';
+  var bHtml = '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:'+GRID+';gap:8px;padding:0 2px;margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;">'
+    +'<span>Scenario</span>'
+    +'<span style="color:#f4b86a;">Your Plan</span>'
+    +'<span>Safe extra/yr \u00b7 Phase 1 (\u2192 cut to this if scenario hits)</span>'
+    +'<span style="text-align:right;">Amount</span></div>';
+
   results.forEach(function(r) {
-    var pct = maxSafe > 0 ? Math.round(r.safe / maxSafe * 100) : 0;
-    var col = catColor[r.cat];
-    var tag = (r.safe > 0 && p1Planned > 0 && r.safe < p1Planned)
-      ? '<span style="font-size:9px;color:#f4b86a;margin-left:6px;">\u25BC below plan</span>' : '';
-    bHtml += '<div style="display:grid;grid-template-columns:160px 1fr 100px;gap:8px;align-items:center;margin-bottom:6px;">'
-      + '<div style="font-size:11px;color:#dceaf5;font-family:monospace;">' + r.label + '</div>'
-      + '<div style="background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden;">'
-      +   '<div style="width:' + pct + '%;height:100%;background:' + col + ';border-radius:4px;transition:width .4s;"></div></div>'
-      + '<div style="font-size:12px;font-weight:500;color:' + col + ';text-align:right;">' + fmtK(r.safe) + tag + '</div>'
-      + '</div>';
+    var safe = r.safe||0;
+    var pct = maxSafe>0 ? Math.round(safe/maxSafe*100) : 0;
+    var col = catColor[r.cat]||'#1CC7D0';
+    var planDepletes = r.fullDepl && safe>0;
+    var depleteNote = planDepletes
+      ? '<div style="font-size:9px;color:#f4b86a;margin-top:2px;line-height:1.4;">\u2193 Plan depletes at planned spending \u2014 must cut to this amount to survive</div>'
+      : '';
+    var amtCol = planDepletes ? '#f4b86a' : col;
+    var belowTag = (safe>0&&p1Planned>0&&safe<p1Planned)
+      ? '<div style="font-size:9px;color:#f4b86a;">\u25bc below plan</div>' : '';
+    bHtml += '<div style="display:grid;grid-template-columns:'+GRID+';gap:8px;align-items:start;margin-bottom:8px;">'
+      +'<div style="font-size:11px;color:#dceaf5;font-family:monospace;padding-top:2px;">'+r.label+'</div>'
+      +'<div style="font-size:11.5px;color:#8aaabb;padding-top:2px;">'+(p1Planned>0?fmtKno(p1Planned)+'/yr':'\u2014')+'</div>'
+      +'<div>'
+        +'<div style="background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden;">'
+          +'<div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;"></div></div>'
+        +depleteNote
+      +'</div>'
+      +'<div style="text-align:right;font-size:13px;font-weight:500;color:'+amtCol+';">'+fmtKno(safe)+'/yr'+belowTag+'</div>'
+      +'</div>';
   });
 
-  // Depletion comparison table
+  // ── Depletion table: Scenario | Floor/yr | At planned | Floor only ──
+  var floor = 0; try { floor = rbpEssentialFloor().floor; } catch(e){}
+  var DGRID = '150px 85px 1fr 1fr';
   var dHtml = '<div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">'
-    + '<div style="font-size:11.5px;font-weight:500;color:#dceaf5;margin-bottom:8px;">When does the portfolio deplete at each scenario?</div>'
-    + '<div style="font-size:10px;color:#566576;display:grid;grid-template-columns:160px 1fr 1fr;gap:8px;margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase;">'
-    + '<span>Scenario</span><span>At your planned spending</span><span>Floor only (no extra)</span></div>';
+    +'<div style="font-size:11.5px;font-weight:500;color:#dceaf5;margin-bottom:8px;">When does the portfolio deplete at each scenario?</div>'
+    +'<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:'+DGRID+';gap:8px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;">'
+    +'<span>Scenario</span><span>Floor/yr</span><span>At planned spending</span><span>Floor only (no extra)</span></div>';
   results.forEach(function(r) {
-    var fCol = r.fullDepl  ? (r.fullDepl  < 2045 ? '#ff6b6b' : '#f4b86a') : '#1CC7D0';
+    var fCol = r.fullDepl  ? (r.fullDepl<2045?'#ff6b6b':'#f4b86a') : '#1CC7D0';
     var lCol = r.floorDepl ? '#f4b86a' : '#1CC7D0';
-    dHtml += '<div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:8px;align-items:center;margin-bottom:4px;font-size:11.5px;">'
-      + '<div style="color:#9fc1d6;font-family:monospace;">' + r.label + '</div>'
-      + '<div style="color:' + fCol + ';font-weight:500;">' + (r.fullDepl  ? r.fullDepl  : '\u2705 Survives plan') + '</div>'
-      + '<div style="color:' + lCol + ';font-weight:500;">' + (r.floorDepl ? r.floorDepl : '\u2705 Survives plan') + '</div>'
-      + '</div>';
+    dHtml += '<div style="display:grid;grid-template-columns:'+DGRID+';gap:8px;align-items:center;margin-bottom:4px;font-size:11.5px;">'
+      +'<div style="color:#9fc1d6;font-family:monospace;">'+r.label+'</div>'
+      +'<div style="color:#566576;">'+(floor>0?'$'+Math.round(floor/1000)+'K/yr':'\u2014')+'</div>'
+      +'<div style="color:'+fCol+';font-weight:500;">'+(r.fullDepl?r.fullDepl:'\u2705 Survives plan')+'</div>'
+      +'<div style="color:'+lCol+';font-weight:500;">'+(r.floorDepl?r.floorDepl:'\u2705 Survives plan')+'</div>'
+      +'</div>';
   });
+  var p1str = p1Planned>0 ? ('$'+Math.round(p1Planned/1000)+'K/yr') : 'your planned amount';
   dHtml += '<div style="margin-top:10px;font-size:10px;color:#566576;line-height:1.6;">'
-    + 'These use your real floor withdrawals from the sheet + your expected portfolio return. '
-    + 'They are close estimates \u2014 the full engine (Run New Test) includes taxes and RMDs for the precise number.'
-    + '</div></div>';
+    +'<strong style="color:#9fc1d6;">At planned spending</strong> = '+p1str+' held through the crash. '
+    +'<strong style="color:#9fc1d6;">Floor only</strong> = all extra paused, only the $'+Math.round(floor/1000)+'K/yr must-pay floor. '
+    +'Bars in the safe extra chart show what to cut to if that scenario hits.'
+    +'</div></div>';
 
   document.getElementById('sweep-bars').innerHTML = bHtml;
   document.getElementById('sweep-depletion').innerHTML = dHtml;
@@ -2391,28 +2412,32 @@ function rbpRealSweep() {
     return Math.round(best / 500) * 500;
   }
 
-  // ── Scenarios ──────────────────────────────────────────────────────────────
+  // ── Scenarios — match Quick Estimate's 8 levels ────────────────────────────
+  // All go through connector (no local-only shortcuts) for consistent tax treatment.
+  // drag = Math.round(7 - yr1): yr1=+10 → drag=-3, yr1=0 → drag=7, yr1=-30 → drag=37
   var sweepScens = [
-    { label: '  0%  (no crash)',  yr1:   0, cat: 'ok',   drag:  7, dur: 0 },
-    { label: '-10%  (mild drop)', yr1: -10, cat: 'ok',   drag: 17, dur: 1 },
-    { label: '-20%  (bad year)',  yr1: -20, cat: 'warn', drag: 27, dur: 1 },
-    { label: '-30%  (bear mkt)',  yr1: -30, cat: 'warn', drag: 37, dur: 1 },
-    { label: '-40%  (severe)',    yr1: -40, cat: 'bad',  drag: 47, dur: 1 },
-    { label: '-50%  (crash)',     yr1: -50, cat: 'bad',  drag: 57, dur: 1 },
+    { label: '+10%  (great year)', yr1:  10, cat: 'great', drag: -3, dur: 1 },
+    { label: ' +5%  (good year)',  yr1:   5, cat: 'good',  drag:  2, dur: 1 },
+    { label: '  0%  (flat year)',  yr1:   0, cat: 'ok',    drag:  7, dur: 1 },
+    { label: '-10%  (mild drop)',  yr1: -10, cat: 'ok',    drag: 17, dur: 1 },
+    { label: '-20%  (bad year)',   yr1: -20, cat: 'warn',  drag: 27, dur: 1 },
+    { label: '-30%  (bear mkt)',   yr1: -30, cat: 'warn',  drag: 37, dur: 1 },
+    { label: '-40%  (severe)',     yr1: -40, cat: 'bad',   drag: 47, dur: 1 },
+    { label: '-50%  (crash)',      yr1: -50, cat: 'bad',   drag: 57, dur: 1 },
   ];
 
-  // Pre-compute local safeExtra amounts for all scenarios (instant fallback if connector fails)
+  // Pre-compute local safeExtra amounts for all scenarios (shown instantly while connector runs)
   var results = sweepScens.map(function(s) {
     return {
       label: s.label, cat: s.cat,
       safe: localSafeP1(s.yr1 / 100),   // local estimate shown immediately
       fullDepl: null, floorDepl: null,
-      _done: (s.dur === 0), _drag: s.drag, _dur: s.dur, _yr1: s.yr1 / 100
+      _done: false, _drag: s.drag, _dur: s.dur, _yr1: s.yr1 / 100
     };
   });
 
   // ── UI setup ───────────────────────────────────────────────────────────────
-  var toRun  = results.filter(function(r){ return !r._done; }).length;
+  var toRun  = results.length;  // all 8 scenarios call the connector
   var progEl = document.getElementById('sweep-real-progress');
   var progN  = document.getElementById('sweep-prog-n');
   var progT  = document.getElementById('sweep-prog-total');
@@ -2476,7 +2501,7 @@ function rbpRealSweep() {
     });
   }
 
-  runNext(1);
+  runNext(0);
 }
 
 function mcPercentile(arr, p) {
