@@ -452,6 +452,14 @@ window.addEventListener('storage', function(e) {
   </div>
 </div>
 
+<!-- ════════ DIVIDER: separates the Scenario Sweep from the crash test above and the Monte Carlo below ════════ -->
+<div style="display:flex;align-items:center;gap:14px;margin:34px 2px 8px;">
+  <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(28,199,208,.4));"></div>
+  <div style="font-size:12px;font-weight:900;letter-spacing:1px;color:#1CC7D0;text-transform:uppercase;white-space:nowrap;padding:5px 16px;border:1px solid rgba(28,199,208,.45);border-radius:20px;background:rgba(28,199,208,.08);">Test 2 &middot; Scenario Sweep</div>
+  <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(28,199,208,.4),transparent);"></div>
+</div>
+<div style="text-align:center;font-size:12px;color:#9fc1d6;margin:0 2px 6px;line-height:1.5;">A separate, standalone test &mdash; independent of the crash test above and the Monte Carlo below.</div>
+
 <!-- ════════ SCENARIO SWEEP — crash severity vs safe extra spend ════════ -->
 <div id="sweep-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #1CC7D0;overflow:hidden;padding:20px 22px;">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
@@ -1915,7 +1923,9 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
       +     '<div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;transition:width .4s;"></div></div>'
       +   depleteNote
       + '</div>'
-      + '<div style="text-align:right;font-size:13px;font-weight:500;'+amtStyle+'">' + fmtKno(safe) + '/yr' + belowTag + '</div>'
+      + '<div style="text-align:right;font-size:13px;font-weight:500;'+amtStyle+'">' + fmtKno(safe) + '/yr' + belowTag
+      +   (r.safeBase != null ? '<div style="font-size:9.5px;font-weight:600;color:#7fd6df;margin-top:3px;">sheet raw: ' + fmtKno(r.safeBase) + '</div>' : '')
+      + '</div>'
       + '</div>';
   });
 
@@ -2052,7 +2062,7 @@ function rbpRealSweep() {
   // Each row is then overwritten with the real engine number as its scenario returns.
   function reRender() {
     _rbpSweepRender(results.map(function(r){
-      return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl };
+      return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl, safeBase:r.safeBase };
     }), p1Amt, legGoal);
   }
   reRender();
@@ -2076,6 +2086,7 @@ function rbpRealSweep() {
       if (resp && resp.ok) {
         if (resp.safeExtra != null) results[i].safe = (+resp.safeExtra) || results[i].safe;
         results[i].fullDepl = resp.belowYear || null;
+        results[i].safeBase = (resp.safeExtraBase != null) ? (+resp.safeExtraBase) : null;
         results[i]._real = true;
         realCount++;
       } else {
@@ -2101,8 +2112,10 @@ function rbpRealSweep() {
       note.style.display = 'block';
       if (failCount === 0) {
         note.style.color = '#1CC7D0';
-        note.innerHTML = '\u2705 <strong>Real engine results.</strong> All ' + realCount + ' scenarios ran live, one at a time, each restoring your sheet before the next. '
-          + 'Tax correction baked in from your plan\u2019s actual effective marginal rate. Depletion years exact from the real engine.';
+        note.innerHTML = '\ud83d\udd0d <strong>Diagnostic view.</strong> All ' + realCount + ' scenarios ran live. '
+          + 'The large number is after the JavaScript reconstruction (re-applies the crash + a tax haircut). '
+          + 'The teal <strong style="color:#7fd6df;">\u201csheet raw\u201d</strong> beneath it is the unadjusted value straight from your Master formula (cell B119). '
+          + 'Compare the two columns down the list \u2014 whichever one slopes down sensibly as the crash deepens is the trustworthy half.';
       } else {
         note.style.color = '#f4b86a';
         note.innerHTML = '\u26a0\ufe0f <strong>' + realCount + ' of ' + toRun + ' scenarios ran live;</strong> ' + failCount
