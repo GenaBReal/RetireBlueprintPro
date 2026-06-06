@@ -461,8 +461,7 @@ window.addEventListener('storage', function(e) {
       <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;">Uses your real plan data. Shows what Phase 1 extra you could safely spend and still hit your legacy goal — even if that crash hits in year 1. Other phases scale proportionally.</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-      <button id="sweep-run-btn" onclick="rbpSweepScenarios()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(28,199,208,.15);border:1px solid rgba(28,199,208,.4);color:#1CC7D0;cursor:pointer;white-space:nowrap;">&#9654; Quick Estimate</button>
-      <button id="sweep-real-btn" onclick="rbpRealSweep()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.5);color:#f4b86a;cursor:pointer;white-space:nowrap;">&#9654; Real Numbers (~3.5 min)</button>
+      <button id="sweep-real-btn" onclick="rbpRealSweep()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.5);color:#f4b86a;cursor:pointer;white-space:nowrap;">&#9654; Sweep All Scenarios</button>
     </div>
   </div>
   <div id="sweep-real-progress" style="display:none;margin-bottom:14px;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 14px;">
@@ -477,8 +476,7 @@ window.addEventListener('storage', function(e) {
   <div id="sweep-body">
     <div id="sweep-placeholder" style="font-size:11.5px;color:#7a9aaa;line-height:1.7;padding:6px 2px;">
       <strong style="color:#dceaf5;">How this works:</strong> The crash test asks one question — <em>"if the market drops X% in year 1, what's the most extra I can safely spend and still hit my legacy goal?"</em> This sweep runs that question at every crash level automatically.<br><br>
-      <span style="color:#1CC7D0;">&#9654; Quick Estimate</span> — instant. Uses your real floor withdrawals from the sheet, but doesn't re-run taxes or RMDs for each trial spending level. Off by maybe 15–30% in dollars. Good for direction.<br>
-      <span style="color:#f4b86a;">&#9654; Real Numbers (~2 min)</span> — calls your live engine 5 times, one per crash level. Same calculation as clicking "Run New Test" manually — full Master formula, taxes, RMDs, SS staggering. These numbers are exact for each scenario.<br><br>
+      <span style="color:#f4b86a;">&#9654; Sweep All Scenarios</span> — calls your live engine for each crash level using full Master formula calculations: taxes, RMDs, and SS staggering all reflected. Takes ~2 minutes. Do not close the tab while running.<br><br>
       <em style="color:#566576;">Other phases scale proportionally to Phase 1. All scenarios assume normal returns after year 1.</em>
     </div>
     <div id="sweep-chart-area" style="display:none;">
@@ -2184,212 +2182,7 @@ function rbpShowSweepSection() {
   if (s) s.style.display = 'block';
 }
 
-function rbpSweepScenarios() {
-  if (!planData) { alert('Load your plan data first (Reload Data above).'); return; }
-  var btn = document.getElementById('sweep-run-btn');
-  if (btn) { btn.textContent = 'Computing\u2026'; btn.disabled = true; }
-  setTimeout(function() {
-    try { _rbpRunSweep(); } catch(e) { console.error('Sweep error', e); }
-    if (btn) { btn.textContent = '\u25B6 Sweep All Scenarios'; btn.disabled = false; }
-  }, 30);
-}
 
-function _rbpRunSweep() {
-  var proj  = planData.projections || {};
-  var gl    = planData.global     || {};
-  var leg   = planData.legacy     || {};
-  var port  = planData.portfolio  || {};
-
-  var totalPF     = (+port.total)   || 0;
-  var legacyGoal  = (+leg.goal)     || 0;
-  var inflation   = (+gl.inflation) || 0.025;
-  var meanRet     = rbpPortfolioStats(port).meanReturn;
-  var withdrawals = proj.withdrawals || [];
-  var byYear      = proj.byYear      || [];
-  var yrs         = withdrawals.length || 38;
-
-  // Floor net withdrawal per year = sheet withdrawal minus chosen extra
-  var floorW = [];
-  for (var i = 0; i < yrs; i++) {
-    var w  = (+withdrawals[i]) || 0;
-    var cx = (byYear[i] && (+byYear[i].chosenExtra)) || 0;
-    floorW.push(Math.max(0, w - cx));
-  }
-
-  // Phase multiplier per year (how each year's extra scales relative to Phase 1)
-  var p1Amt = 0;
-  for (var j = 0; j < yrs; j++) {
-    var cj = (byYear[j] && (+byYear[j].chosenExtra)) || 0;
-    if (cj > 0) { p1Amt = cj; break; }
-  }
-  var phaseMult = [];
-  for (var k = 0; k < yrs; k++) {
-    var ck = (byYear[k] && (+byYear[k].chosenExtra)) || 0;
-    phaseMult.push(p1Amt > 0 ? ck / p1Amt : (ck > 0 ? 1 : 0));
-  }
-  // If no phases at all, apply extra uniformly to all plan years
-  var hasPhase = phaseMult.some(function(m){ return m > 0; });
-  if (!hasPhase) { phaseMult = phaseMult.map(function(){ return 1; }); }
-
-  // Project ending balance given a first-year crash and a Phase-1 extra amount
-  function projectEnd(yr1Ret, p1Extra) {
-    var bal = totalPF;
-    for (var i = 1; i < yrs; i++) {
-      var ret  = (i === 1) ? yr1Ret : meanRet;
-      var xtra = p1Extra * (phaseMult[i] || 0);
-      var draw = floorW[i] + xtra;
-      var half = Math.sqrt(Math.max(0.1, 1 + ret));
-      bal = Math.max(0, bal * half - draw);
-      bal = Math.max(0, bal * half);
-      if (bal <= 0) return 0;
-    }
-    return Math.round(bal);
-  }
-
-  // Year the portfolio hits $0 (null = survives)
-  function depleteAt(yr1Ret, p1Extra) {
-    var bal     = totalPF;
-    var baseYr  = new Date().getFullYear();
-    for (var i = 1; i < yrs; i++) {
-      var ret  = (i === 1) ? yr1Ret : meanRet;
-      var xtra = p1Extra * (phaseMult[i] || 0);
-      var draw = floorW[i] + xtra;
-      var half = Math.sqrt(Math.max(0.1, 1 + ret));
-      bal = Math.max(0, bal * half - draw);
-      bal = Math.max(0, bal * half);
-      if (bal <= 0) return baseYr + i;
-    }
-    return null;
-  }
-
-  // Binary search: maximum Phase-1 extra that still clears the legacy goal
-  function safeP1At(yr1Ret) {
-    var lo = 0, hi = 400000, best = 0;
-    for (var iter = 0; iter < 30; iter++) {
-      var mid = (lo + hi) / 2;
-      if (projectEnd(yr1Ret, mid) >= legacyGoal) { best = mid; lo = mid; }
-      else { hi = mid; }
-    }
-    return Math.round(best / 500) * 500;
-  }
-
-  var scenarios = [
-    { label: '+10%  (great year)', ret:  0.10, cat: 'great' },
-    { label: ' +5%  (good year)',  ret:  0.05, cat: 'good'  },
-    { label: '  0%  (flat year)',  ret:  0.00, cat: 'ok'    },
-    { label: '-10%  (mild drop)',  ret: -0.10, cat: 'ok'    },
-    { label: '-20%  (bad year)',   ret: -0.20, cat: 'warn'  },
-    { label: '-30%  (bear mkt)',   ret: -0.30, cat: 'warn'  },
-    { label: '-40%  (severe)',     ret: -0.40, cat: 'bad'   },
-    { label: '-50%  (crash)',      ret: -0.50, cat: 'bad'   },
-  ];
-
-  var results = scenarios.map(function(s) {
-    var safe      = safeP1At(s.ret);
-    var fullDepl  = depleteAt(s.ret, p1Amt);
-    var floorDepl = depleteAt(s.ret, 0);
-    return { label: s.label, cat: s.cat, safe: safe, fullDepl: fullDepl, floorDepl: floorDepl };
-  });
-
-  _rbpSweepRender(results, p1Amt, legacyGoal);
-}
-
-function _rbpSweepRender(results, p1Planned, legacyGoal) {
-  var catColor = { great:'#1CC7D0', good:'#7ecfda', ok:'#b8dde6', warn:'#f4b86a', bad:'#ff6b6b' };
-  var maxSafe = Math.max.apply(null, results.map(function(r){ return r.safe||0; }));
-  var fmtKno = function(v){ return v>=1000?('$'+Math.round(v/1000)+'K'):(v>0?('$'+v):'$0'); };
-
-  // ── 4-column bar chart: Scenario | Your Plan | Bar | Amount ──
-  var GRID = '150px 80px 1fr 100px';
-  var bHtml = '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:'+GRID+';gap:8px;padding:0 2px;margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;">'
-    +'<span>Scenario</span>'
-    +'<span style="color:#f4b86a;">Your Plan</span>'
-    +'<span>Safe extra/yr \u00b7 Phase 1 (\u2192 cut to this if scenario hits)</span>'
-    +'<span style="text-align:right;">Amount</span></div>';
-
-  results.forEach(function(r) {
-    var safe = r.safe||0;
-    var pct = maxSafe>0 ? Math.round(safe/maxSafe*100) : 0;
-    var col = catColor[r.cat]||'#1CC7D0';
-    // Only show the warning when the depletion is a near-term concern (before 2050)
-    // Far-future drops (2055+) just mean it dips below the legacy GOAL near end of life — not an emergency
-    var planDepletes = r.fullDepl && r.fullDepl < 2050 && safe > 0;
-    var depleteNote = planDepletes
-      ? '<div style="font-size:9px;color:#f4b86a;margin-top:2px;line-height:1.4;">\u2193 Plan depletes at planned spending \u2014 must cut to this amount to survive</div>'
-      : '';
-    var amtCol = planDepletes ? '#f4b86a' : col;
-    var belowTag = (safe>0&&p1Planned>0&&safe<p1Planned)
-      ? '<div style="font-size:9px;color:#f4b86a;">\u25bc below plan</div>' : '';
-    bHtml += '<div style="display:grid;grid-template-columns:'+GRID+';gap:8px;align-items:start;margin-bottom:8px;">'
-      +'<div style="font-size:11px;color:#dceaf5;font-family:monospace;padding-top:2px;">'+r.label+'</div>'
-      +'<div style="font-size:11.5px;color:#8aaabb;padding-top:2px;">'+(p1Planned>0?fmtKno(p1Planned)+'/yr':'\u2014')+'</div>'
-      +'<div>'
-        +'<div style="background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden;">'
-          +'<div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;"></div></div>'
-        +depleteNote
-      +'</div>'
-      +'<div style="text-align:right;font-size:13px;font-weight:500;color:'+amtCol+';">'+fmtKno(safe)+'/yr'+belowTag+'</div>'
-      +'</div>';
-  });
-
-  // ── Depletion table: story per row ───────────────────────────────────────
-  // Scenario | Floor/yr | Floor only | At full planned | Reduce to | At reduced: Survives
-  var floor = 0; try { floor = rbpEssentialFloor().floor; } catch(e){}
-  var DGRID = '130px 68px 1fr 1fr 80px 1fr';
-  var floorStr = floor>0 ? '$'+Math.round(floor/1000)+'K/yr' : '\u2014';
-  var p1str = p1Planned>0 ? '$'+Math.round(p1Planned/1000)+'K/yr' : 'planned';
-  var dHtml = '<div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">'
-    +'<div style="font-size:11.5px;font-weight:500;color:#dceaf5;margin-bottom:8px;">When does the portfolio deplete at each scenario?</div>'
-    +'<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:'+DGRID+';gap:8px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;">'
-    +'<span>Scenario</span>'
-    +'<span>Floor/yr</span>'
-    +'<span>Floor only \u2014 no extra</span>'
-    +'<span>At full extra ('+p1str+')</span>'
-    +'<span>Reduce to</span>'
-    +'<span>At reduced plan</span>'
-    +'</div>';
-
-  results.forEach(function(r) {
-    var safe = r.safe || 0;
-    var floorCol   = r.floorDepl ? '#f4b86a' : '#1CC7D0';
-    var plannedCol = r.fullDepl  ? (r.fullDepl<2045?'#ff6b6b':'#f4b86a') : '#1CC7D0';
-
-    // "Reduce to" column
-    var reduceTxt, reduceCol;
-    if (safe >= p1Planned && p1Planned > 0) {
-      reduceTxt = 'No cut needed'; reduceCol = '#1CC7D0';
-    } else if (safe > 0) {
-      reduceTxt = '$'+Math.round(safe/1000)+'K/yr'; reduceCol = '#f4b86a';
-    } else {
-      reduceTxt = '$0 \u2014 floor'; reduceCol = '#ff6b6b';
-    }
-
-    // "At reduced plan" — survives by definition if safe > 0
-    var atRedTxt = safe > 0 ? '\u2705 Survives' : (r.floorDepl ? String(r.floorDepl) : '\u2705 Floor survives');
-    var atRedCol = safe > 0 ? '#1CC7D0' : (r.floorDepl ? '#f4b86a' : '#1CC7D0');
-
-    dHtml += '<div style="display:grid;grid-template-columns:'+DGRID+';gap:8px;align-items:center;margin-bottom:4px;font-size:11.5px;">'
-      +'<div style="color:#9fc1d6;font-family:monospace;">'+r.label+'</div>'
-      +'<div style="color:#566576;">'+floorStr+'</div>'
-      +'<div style="color:'+floorCol+';font-weight:500;">'+(r.floorDepl?r.floorDepl:'\u2705 Survives')+'</div>'
-      +'<div style="color:'+plannedCol+';font-weight:500;">'+(r.fullDepl?r.fullDepl:'\u2705 Survives')+'</div>'
-      +'<div style="color:'+reduceCol+';font-weight:500;">'+reduceTxt+'</div>'
-      +'<div style="color:'+atRedCol+';font-weight:500;">'+atRedTxt+'</div>'
-      +'</div>';
-  });
-
-  dHtml += '<div style="margin-top:10px;font-size:10px;color:#566576;line-height:1.6;">'
-    +'<strong style="color:#9fc1d6;">Floor only</strong> = paused all extra, just the '+floorStr+' must-pay. &nbsp;'
-    +'<strong style="color:#9fc1d6;">At full extra</strong> = current '+p1str+' held rigid through the crash. &nbsp;'
-    +'<strong style="color:#f4b86a;">Reduce to</strong> = Phase 1 spending cap that clears your legacy goal. &nbsp;'
-    +'<strong style="color:#1CC7D0;">At reduced plan</strong> = if you cut to that number, the plan survives.'
-    +'</div></div>';
-
-  document.getElementById('sweep-bars').innerHTML = bHtml;
-  document.getElementById('sweep-depletion').innerHTML = dHtml;
-  document.getElementById('sweep-placeholder').style.display = 'none';
-  document.getElementById('sweep-chart-area').style.display = 'block';
-}
 
 // ══════════════════════════════════════════════════════
 // REAL SWEEP — calls the live connector for each crash
@@ -2443,7 +2236,7 @@ function rbpRealSweep() {
     return Math.round(best / 500) * 500;
   }
 
-  // ── Scenarios — match Quick Estimate's 8 levels ────────────────────────────
+  // ── 8 crash scenarios ────────────────────────────────────────────────────────
   // All go through connector (no local-only shortcuts) for consistent tax treatment.
   // drag = Math.round(7 - yr1): yr1=+10 → drag=-3, yr1=0 → drag=7, yr1=-30 → drag=37
   var sweepScens = [
@@ -2477,9 +2270,7 @@ function rbpRealSweep() {
   if (progT)  progT.textContent = String(toRun);
 
   var runBtn = document.getElementById('sweep-real-btn');
-  var estBtn = document.getElementById('sweep-run-btn');
-  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running batch\u2026 (~2 min)'; }
-  if (estBtn) { estBtn.disabled = true; }
+  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running\u2026 (~2 min)'; }
 
   // Show local estimates immediately while batch runs
   _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:null, floorDepl:null }; }), p1Amt, legGoal);
@@ -2492,8 +2283,7 @@ function rbpRealSweep() {
   var batchParams = { action:'runSweep', startYr:startYr, infl:inf };
   esJsonp(batchParams, function(resp) {
     if (progEl) progEl.style.display = 'none';
-    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Real Numbers (~2 min)'; }
-    if (estBtn) estBtn.disabled = false;
+    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Sweep All Scenarios'; }
 
     if (resp && resp.ok && resp.results && resp.results.length) {
       resp.results.forEach(function(bRes, idx) {
@@ -2512,9 +2302,8 @@ function rbpRealSweep() {
     }
   }, function(err) {
     if (progEl) progEl.style.display = 'none';
-    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Real Numbers (~2 min)'; }
-    if (estBtn) estBtn.disabled = false;
-    alert('Batch sweep error: ' + err + '. Try Quick Estimate for approximate results.');
+    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Sweep All Scenarios'; }
+    alert('Batch sweep error: ' + err + '. Please try again.');
   });
 }
 
