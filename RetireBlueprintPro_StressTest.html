@@ -454,7 +454,7 @@ window.addEventListener('storage', function(e) {
 </div>
 
 <!-- ════════ SCENARIO SWEEP — crash severity vs safe extra spend ════════ -->
-<div id="sweep-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #1CC7D0;overflow:hidden;padding:20px 22px;display:none;">
+<div id="sweep-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #1CC7D0;overflow:hidden;padding:20px 22px;">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
     <div>
       <div style="font-size:15px;font-weight:500;color:#dceaf5;margin-bottom:3px;">Scenario sweep — safe extra spend at every crash level</div>
@@ -1883,6 +1883,84 @@ function runMonteCarlo() {
 function rbpShowSweepSection() {
   var s = document.getElementById('sweep-section');
   if (s) s.style.display = 'block';
+}
+
+function _rbpSweepRender(results, p1Planned, legacyGoal) {
+  var catColor = { great:'#1CC7D0', good:'#7ecfda', ok:'#b8dde6', warn:'#f4b86a', bad:'#ff6b6b' };
+  var maxSafe = Math.max.apply(null, results.map(function(r){ return r.safe || 0; }));
+  var fmtKno = function(v) { return v >= 1000 ? ('$'+Math.round(v/1000)+'K') : (v>0?('$'+v):'$0'); };
+
+  // ── Bar chart: 4 columns — Scenario | Your Plan | Bar | Safe Amount ──
+  var bHtml = '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:150px 80px 1fr 100px;gap:8px;padding:0 2px;margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;">'
+    + '<span>Scenario</span>'
+    + '<span style="color:#f4b86a;">Your Plan</span>'
+    + '<span>Safe extra/yr \u00b7 Phase 1</span>'
+    + '<span style="text-align:right;">Amount</span></div>';
+
+  results.forEach(function(r) {
+    var safe = r.safe || 0;
+    var pct  = maxSafe > 0 ? Math.round(safe / maxSafe * 100) : 0;
+    var col  = catColor[r.cat] || '#1CC7D0';
+    var planDepletes = r.fullDepl && r.fullDepl < 2050 && safe > 0;
+
+    var depleteNote = planDepletes
+      ? '<div style="font-size:9px;color:#f4b86a;margin-top:2px;line-height:1.4;">'
+        + '\u2193 Plan depletes \u2014 must cut to survive</div>'
+      : '';
+
+    var amtStyle = planDepletes ? 'color:#f4b86a;' : 'color:'+col+';';
+    var belowTag = (safe > 0 && p1Planned > 0 && safe < p1Planned)
+      ? '<div style="font-size:9px;color:#f4b86a;">\u25bc below plan</div>' : '';
+
+    bHtml += '<div style="display:grid;grid-template-columns:150px 80px 1fr 100px;gap:8px;align-items:start;margin-bottom:8px;">'
+      + '<div style="font-size:11px;color:#dceaf5;font-family:monospace;padding-top:2px;">' + r.label + '</div>'
+      + '<div style="font-size:11.5px;color:#566576;padding-top:2px;">' + (p1Planned>0 ? fmtKno(p1Planned)+'/yr' : '\u2014') + '</div>'
+      + '<div>'
+      +   '<div style="background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden;">'
+      +     '<div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;transition:width .4s;"></div></div>'
+      +   depleteNote
+      + '</div>'
+      + '<div style="text-align:right;font-size:13px;font-weight:500;'+amtStyle+'">' + fmtKno(safe) + '/yr' + belowTag + '</div>'
+      + '</div>';
+  });
+
+  // ── Depletion table ────────────────────────────────────────────────
+  var floor = 0;
+  try { floor = rbpEssentialFloor().floor; } catch(e){}
+  var floorStr = floor>0 ? '$'+Math.round(floor/1000)+'K/yr' : '\u2014';
+  var p1str = p1Planned>0 ? fmtKno(p1Planned)+'/yr' : '\u2014';
+
+  var dHtml = '<div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">'
+    + '<div style="font-size:11.5px;font-weight:500;color:#dceaf5;margin-bottom:8px;">When does the portfolio deplete at each scenario?</div>'
+    + '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:150px 85px 1fr 90px 1fr;gap:8px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;" id="sweep-dep-hdr">'
+    + '<span>Scenario</span><span>Floor/yr</span><span>Floor only \u2014 no extra</span><span>At full extra</span><span>Reduce to</span><span style="min-width:90px;">At reduced plan</span></div>';
+
+  results.forEach(function(r) {
+    var fCol = r.fullDepl ? (r.fullDepl < 2045 ? '#ff6b6b' : '#f4b86a') : '#1CC7D0';
+    var lCol = r.floorDepl ? '#f4b86a' : '#1CC7D0';
+    var safeStr = r.safe > 0 ? fmtKno(r.safe)+'/yr' : '$0 \u2014 floor';
+    var atReduced = r.safe > 0 ? '\u2705 Survives' : String(r.floorDepl || '\u2014');
+    var atReducedCol = r.safe > 0 ? '#1CC7D0' : '#f4b86a';
+    dHtml += '<div style="display:grid;grid-template-columns:150px 85px 1fr 90px 1fr;gap:8px;align-items:center;margin-bottom:5px;font-size:11.5px;">'
+      + '<div style="color:#9fc1d6;font-family:monospace;">' + r.label + '</div>'
+      + '<div style="color:#566576;">' + floorStr + '</div>'
+      + '<div style="color:'+lCol+';font-weight:500;">' + (r.floorDepl ? r.floorDepl : '\u2705 Survives') + '</div>'
+      + '<div style="color:'+fCol+';font-weight:500;">' + (r.fullDepl ? r.fullDepl : '\u2705 Survives') + '</div>'
+      + '<div style="color:#f4b86a;font-weight:700;">' + safeStr + '</div>'
+      + '<div style="color:'+atReducedCol+';font-weight:500;">' + atReduced + '</div>'
+      + '</div>';
+  });
+  dHtml += '<div style="margin-top:10px;font-size:10px;color:#566576;line-height:1.6;">'
+    +'<strong style="color:#9fc1d6;">Floor only</strong> = paused all extra, just the '+floorStr+' must-pay. &nbsp;'
+    +'<strong style="color:#9fc1d6;">At full extra</strong> = current '+p1str+' held rigid through the crash. &nbsp;'
+    +'<strong style="color:#f4b86a;">Reduce to</strong> = Phase 1 spending cap that clears your legacy goal. &nbsp;'
+    +'<strong style="color:#1CC7D0;">At reduced plan</strong> = if you cut to that number, the plan survives.'
+    +'</div></div>';
+
+  document.getElementById('sweep-bars').innerHTML = bHtml;
+  document.getElementById('sweep-depletion').innerHTML = dHtml;
+  document.getElementById('sweep-placeholder').style.display = 'none';
+  document.getElementById('sweep-chart-area').style.display = 'block';
 }
 
 
