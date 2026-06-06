@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Dashboard</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-connector.js"></script>
 <style>
 .header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
@@ -1612,57 +1613,19 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
 
 // ── LOAD FROM SHEET VIA APPS SCRIPT ────────────────────────────
 function loadData(){
-  var sheetId = localStorage.getItem('rbp_sheet_id');
-  if (!sheetId) {
-    $s('loading-overlay').style.display = 'none';
-    var b = $s('error-banner');
-    b.style.display = 'block';
-    b.textContent = '⚠ No sheet connected. Please complete Setup first.';
-    return;
-  }
   $s('loading-sub').textContent = 'Connecting to your Google Sheet…';
-  // Go straight to JSONP — fetch fails on hard refresh due to CORS
-  loadViaJSONP(sheetId);
-}
-
-function loadViaJSONP(sheetId) {
-  var cbName = 'rbp_cb_' + Date.now();
-  var timer = setTimeout(function() {
+  RBP.load(function(data){
     $s('loading-overlay').style.display = 'none';
-    var b = $s('error-banner');
-    b.style.display = 'block';
-    b.textContent = '⚠ Timeout — make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.';
-    delete window[cbName];
-  }, 60000);
-
-  window[cbName] = function(data) {
-    clearTimeout(timer);
-    delete window[cbName];
-    $s('loading-overlay').style.display = 'none';
-    if (data.error) {
-      var b = $s('error-banner');
-      b.style.display = 'block';
-      b.textContent = '⚠ ' + data.error;
-      return;
-    }
     try { populate(data); window.__DASH_DATA = data; initYearSelector(data); }
-    catch(e) {
-      var b = $s('error-banner');
-      b.style.display = 'block';
+    catch(e){
+      var b = $s('error-banner'); b.style.display = 'block';
       b.textContent = '⚠ Error displaying data: ' + e.message;
     }
-  };
-
-  var s = document.createElement('script'); s.crossOrigin='anonymous';
-  s.src = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
-  s.onerror = function() {
-    clearTimeout(timer);
+  }, function(msg){
     $s('loading-overlay').style.display = 'none';
-    var b = $s('error-banner');
-    b.style.display = 'block';
-    b.textContent = '⚠ Network error. Check your connection and refresh.';
-  };
-  document.head.appendChild(s);
+    var b = $s('error-banner'); b.style.display = 'block';
+    b.textContent = '⚠ ' + msg;
+  });
 }
 
 function reloadData() {
