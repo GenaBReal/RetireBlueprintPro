@@ -2330,28 +2330,57 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
       +'</div>';
   });
 
-  // ── Depletion table: Scenario | Floor/yr | At planned | Floor only ──
+  // ── Depletion table: story per row ───────────────────────────────────────
+  // Scenario | Floor/yr | Floor only | At full planned | Reduce to | At reduced: Survives
   var floor = 0; try { floor = rbpEssentialFloor().floor; } catch(e){}
-  var DGRID = '150px 85px 1fr 1fr';
+  var DGRID = '130px 68px 1fr 1fr 80px 1fr';
+  var floorStr = floor>0 ? '$'+Math.round(floor/1000)+'K/yr' : '\u2014';
+  var p1str = p1Planned>0 ? '$'+Math.round(p1Planned/1000)+'K/yr' : 'planned';
   var dHtml = '<div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">'
     +'<div style="font-size:11.5px;font-weight:500;color:#dceaf5;margin-bottom:8px;">When does the portfolio deplete at each scenario?</div>'
     +'<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:'+DGRID+';gap:8px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;">'
-    +'<span>Scenario</span><span>Floor/yr</span><span>At planned spending</span><span>Floor only (no extra)</span></div>';
+    +'<span>Scenario</span>'
+    +'<span>Floor/yr</span>'
+    +'<span>Floor only \u2014 no extra</span>'
+    +'<span>At full extra ('+p1str+')</span>'
+    +'<span>Reduce to</span>'
+    +'<span>At reduced plan</span>'
+    +'</div>';
+
   results.forEach(function(r) {
-    var fCol = r.fullDepl  ? (r.fullDepl<2045?'#ff6b6b':'#f4b86a') : '#1CC7D0';
-    var lCol = r.floorDepl ? '#f4b86a' : '#1CC7D0';
+    var safe = r.safe || 0;
+    var floorCol   = r.floorDepl ? '#f4b86a' : '#1CC7D0';
+    var plannedCol = r.fullDepl  ? (r.fullDepl<2045?'#ff6b6b':'#f4b86a') : '#1CC7D0';
+
+    // "Reduce to" column
+    var reduceTxt, reduceCol;
+    if (safe >= p1Planned && p1Planned > 0) {
+      reduceTxt = 'No cut needed'; reduceCol = '#1CC7D0';
+    } else if (safe > 0) {
+      reduceTxt = '$'+Math.round(safe/1000)+'K/yr'; reduceCol = '#f4b86a';
+    } else {
+      reduceTxt = '$0 \u2014 floor'; reduceCol = '#ff6b6b';
+    }
+
+    // "At reduced plan" — survives by definition if safe > 0
+    var atRedTxt = safe > 0 ? '\u2705 Survives' : (r.floorDepl ? String(r.floorDepl) : '\u2705 Floor survives');
+    var atRedCol = safe > 0 ? '#1CC7D0' : (r.floorDepl ? '#f4b86a' : '#1CC7D0');
+
     dHtml += '<div style="display:grid;grid-template-columns:'+DGRID+';gap:8px;align-items:center;margin-bottom:4px;font-size:11.5px;">'
       +'<div style="color:#9fc1d6;font-family:monospace;">'+r.label+'</div>'
-      +'<div style="color:#566576;">'+(floor>0?'$'+Math.round(floor/1000)+'K/yr':'\u2014')+'</div>'
-      +'<div style="color:'+fCol+';font-weight:500;">'+(r.fullDepl?r.fullDepl:'\u2705 Survives plan')+'</div>'
-      +'<div style="color:'+lCol+';font-weight:500;">'+(r.floorDepl?r.floorDepl:'\u2705 Survives plan')+'</div>'
+      +'<div style="color:#566576;">'+floorStr+'</div>'
+      +'<div style="color:'+floorCol+';font-weight:500;">'+(r.floorDepl?r.floorDepl:'\u2705 Survives')+'</div>'
+      +'<div style="color:'+plannedCol+';font-weight:500;">'+(r.fullDepl?r.fullDepl:'\u2705 Survives')+'</div>'
+      +'<div style="color:'+reduceCol+';font-weight:500;">'+reduceTxt+'</div>'
+      +'<div style="color:'+atRedCol+';font-weight:500;">'+atRedTxt+'</div>'
       +'</div>';
   });
-  var p1str = p1Planned>0 ? ('$'+Math.round(p1Planned/1000)+'K/yr') : 'your planned amount';
+
   dHtml += '<div style="margin-top:10px;font-size:10px;color:#566576;line-height:1.6;">'
-    +'<strong style="color:#9fc1d6;">At planned spending</strong> = '+p1str+' held through the crash. '
-    +'<strong style="color:#9fc1d6;">Floor only</strong> = all extra paused, only the $'+Math.round(floor/1000)+'K/yr must-pay floor. '
-    +'Bars in the safe extra chart show what to cut to if that scenario hits.'
+    +'<strong style="color:#9fc1d6;">Floor only</strong> = paused all extra, just the '+floorStr+' must-pay. &nbsp;'
+    +'<strong style="color:#9fc1d6;">At full extra</strong> = current '+p1str+' held rigid through the crash. &nbsp;'
+    +'<strong style="color:#f4b86a;">Reduce to</strong> = Phase 1 spending cap that clears your legacy goal. &nbsp;'
+    +'<strong style="color:#1CC7D0;">At reduced plan</strong> = if you cut to that number, the plan survives.'
     +'</div></div>';
 
   document.getElementById('sweep-bars').innerHTML = bHtml;
