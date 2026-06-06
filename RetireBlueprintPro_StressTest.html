@@ -166,7 +166,7 @@ window.addEventListener('storage', function(e) {
   </div>
   <div id="loading-detail" style="font-size:11px;color:#5a7a8a;max-width:320px;margin:0 auto;line-height:1.6;">Reading projections &amp; portfolio data...</div>
 </div>
-<div id="stress-content" style="display:none;">
+<div id="stress-content" style="display:block;">
 
   <!-- NOTICES -->
   <div id="your-data-notice">
@@ -1096,7 +1096,6 @@ function loadData() {
   oldScripts.forEach(function(s){s.parentNode.removeChild(s);});
   planData=null;
   document.getElementById('loading-msg').style.display='block';
-  document.getElementById('stress-content').style.display='none';
   var bar=document.getElementById('loading-progress');
   if(bar){bar.style.width='0%';bar.style.background='linear-gradient(90deg,#1CC7D0,#f4b86a)';}
   var pctEl=document.getElementById('loading-pct');if(pctEl)pctEl.textContent='0%';
@@ -1932,8 +1931,8 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
 
   var dHtml = '<div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">'
     + '<div style="font-size:11.5px;font-weight:500;color:#dceaf5;margin-bottom:8px;">When does the portfolio deplete at each scenario?</div>'
-    + '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:150px 85px 1fr 90px 1fr;gap:8px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;" id="sweep-dep-hdr">'
-    + '<span>Scenario</span><span>Floor/yr</span><span>Floor only \u2014 no extra</span><span>At full extra</span><span>Reduce to</span><span style="min-width:90px;">At reduced plan</span></div>';
+    + '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;">'
+    + '<span>Scenario</span><span>Floor/yr</span><span>Floor only</span><span>At full extra</span><span>Reduce to</span><span>At reduced plan</span></div>';
 
   results.forEach(function(r) {
     var fCol = r.fullDepl ? (r.fullDepl < 2045 ? '#ff6b6b' : '#f4b86a') : '#1CC7D0';
@@ -1941,7 +1940,7 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
     var safeStr = r.safe > 0 ? fmtKno(r.safe)+'/yr' : '$0 \u2014 floor';
     var atReduced = r.safe > 0 ? '\u2705 Survives' : String(r.floorDepl || '\u2014');
     var atReducedCol = r.safe > 0 ? '#1CC7D0' : '#f4b86a';
-    dHtml += '<div style="display:grid;grid-template-columns:150px 85px 1fr 90px 1fr;gap:8px;align-items:center;margin-bottom:5px;font-size:11.5px;">'
+    dHtml += '<div style="display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;align-items:center;margin-bottom:5px;font-size:11px;">'
       + '<div style="color:#9fc1d6;font-family:monospace;">' + r.label + '</div>'
       + '<div style="color:#566576;">' + floorStr + '</div>'
       + '<div style="color:'+lCol+';font-weight:500;">' + (r.floorDepl ? r.floorDepl : '\u2705 Survives') + '</div>'
