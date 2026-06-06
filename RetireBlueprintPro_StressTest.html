@@ -465,8 +465,8 @@ window.addEventListener('storage', function(e) {
   </div>
   <div id="sweep-real-progress" style="display:none;margin-bottom:14px;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-      <span style="font-size:11.5px;color:#dceaf5;">Running real engine — scenario <span id="sweep-prog-n">1</span> of <span id="sweep-prog-total">5</span>…</span>
-    <span style="font-size:10px;color:#9fc1d6;">All 8 scenarios run as one batch — ~2 min total · do not close tab</span>
+      <span style="font-size:11.5px;color:#dceaf5;">Running real engine — scenario <span id="sweep-prog-n">1</span> of <span id="sweep-prog-total">8</span>…</span>
+    <span style="font-size:10px;color:#9fc1d6;">Each scenario runs on its own — rows fill in as they finish · keep tab open</span>
     </div>
     <div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden;">
       <div id="sweep-prog-bar" style="height:100%;background:#f4b86a;border-radius:4px;width:0%;transition:width .4s;"></div>
@@ -475,7 +475,7 @@ window.addEventListener('storage', function(e) {
   <div id="sweep-body">
     <div id="sweep-placeholder" style="font-size:11.5px;color:#7a9aaa;line-height:1.7;padding:6px 2px;">
       <strong style="color:#dceaf5;">How this works:</strong> The crash test asks one question — <em>"if the market drops X% in year 1, what's the most extra I can safely spend and still hit my legacy goal?"</em> This sweep runs that question at every crash level automatically.<br><br>
-      <span style="color:#f4b86a;">&#9654; Sweep All Scenarios</span> — calls your live engine for each crash level using full Master formula calculations: taxes, RMDs, and SS staggering all reflected. Takes ~2 minutes. Do not close the tab while running.<br><br>
+      <span style="color:#f4b86a;">&#9654; Sweep All Scenarios</span> — calls your live engine for each crash level using full Master formula calculations: taxes, RMDs, and SS staggering all reflected. Each scenario runs on its own, so rows fill in one by one as they finish. Keep the tab open while it runs.<br><br>
       <em style="color:#566576;">Other phases scale proportionally to Phase 1. All scenarios assume normal returns after year 1.</em>
     </div>
     <div id="sweep-chart-area" style="display:none;">
@@ -2037,50 +2037,81 @@ function rbpRealSweep() {
   });
 
   // ── UI setup ───────────────────────────────────────────────────────────────
-  var toRun  = results.length;  // all 8 scenarios call the connector
+  var toRun  = results.length;  // all 8 scenarios call the connector, one at a time
   var progEl = document.getElementById('sweep-real-progress');
   var progN  = document.getElementById('sweep-prog-n');
   var progT  = document.getElementById('sweep-prog-total');
   var progBar= document.getElementById('sweep-prog-bar');
+
+  var runBtn = document.getElementById('sweep-real-btn');
+  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running\u2026 1 of ' + toRun; }
   if (progEl) progEl.style.display = 'block';
   if (progT)  progT.textContent = String(toRun);
 
-  var runBtn = document.getElementById('sweep-real-btn');
-  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running\u2026 (~2 min)'; }
+  // Show local estimates immediately, so all 8 rows are visible right away.
+  // Each row is then overwritten with the real engine number as its scenario returns.
+  function reRender() {
+    _rbpSweepRender(results.map(function(r){
+      return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl };
+    }), p1Amt, legGoal);
+  }
+  reRender();
 
-  // Show local estimates immediately while batch runs
-  _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:null, floorDepl:null }; }), p1Amt, legGoal);
-  if (progEl) { progEl.style.display = 'block'; }
-  if (progN)  { progN.textContent = 'all 8 at once'; }
-  if (progT)  { progT.textContent = '1 batch call'; }
-  if (progBar) { progBar.style.width = '15%'; }
+  var realCount = 0;   // how many scenarios came back from the real engine
+  var failCount = 0;   // how many couldn't be reached (kept as estimate)
 
-  // One batch call — all 8 scenarios run server-side in sequence, one round-trip
-  var batchParams = { action:'runSweep', startYr:startYr, infl:inf };
-  esJsonp(batchParams, function(resp) {
+  // ── Sequential per-scenario calls ──
+  // Each scenario is its own connector round-trip (well under the 90s timeout).
+  // Sequential (not parallel) on purpose: every call writes then restores B12:B20,
+  // so they must not overlap. A single failed scenario just keeps its estimate and
+  // we move on — the rest still complete.
+  function runNext(i) {
+    if (i >= results.length) { finish(); return; }
+
+    if (progN)   progN.textContent = String(i + 1);
+    if (progBar) progBar.style.width = Math.round(i / results.length * 100) + '%';
+    if (runBtn)  runBtn.textContent = 'Running\u2026 ' + (i + 1) + ' of ' + toRun;
+
+    esJsonp({ action:'runSweepOne', idx:i, startYr:startYr, infl:inf }, function(resp) {
+      if (resp && resp.ok) {
+        if (resp.safeExtra != null) results[i].safe = (+resp.safeExtra) || results[i].safe;
+        results[i].fullDepl = resp.belowYear || null;
+        results[i]._real = true;
+        realCount++;
+      } else {
+        failCount++;   // keep the local estimate already in results[i].safe
+      }
+      if (progBar) progBar.style.width = Math.round((i + 1) / results.length * 100) + '%';
+      reRender();
+      runNext(i + 1);
+    }, function(err) {
+      failCount++;     // unreachable — keep the estimate and continue
+      if (progBar) progBar.style.width = Math.round((i + 1) / results.length * 100) + '%';
+      reRender();
+      runNext(i + 1);
+    });
+  }
+
+  function finish() {
     if (progEl) progEl.style.display = 'none';
     if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Sweep All Scenarios'; }
-
-    if (resp && resp.ok && resp.results && resp.results.length) {
-      resp.results.forEach(function(bRes, idx) {
-        if (idx < results.length) {
-          if (bRes.safeExtra != null) results[idx].safe = (+bRes.safeExtra) || results[idx].safe;
-          results[idx].fullDepl = bRes.belowYear || null;
-        }
-      });
-    }
-    _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; }), p1Amt, legGoal);
+    reRender();
     var note = document.getElementById('sweep-placeholder');
     if (note) {
-      note.style.display = 'block'; note.style.color = '#1CC7D0';
-      note.innerHTML = '\u2705 <strong>Real engine results — batch sweep.</strong> All 8 scenarios ran in one connector call (one save/restore cycle). '
-        + 'Tax correction baked in from your plan\u2019s actual effective marginal rate. Depletion years exact from the real engine.';
+      note.style.display = 'block';
+      if (failCount === 0) {
+        note.style.color = '#1CC7D0';
+        note.innerHTML = '\u2705 <strong>Real engine results.</strong> All ' + realCount + ' scenarios ran live, one at a time, each restoring your sheet before the next. '
+          + 'Tax correction baked in from your plan\u2019s actual effective marginal rate. Depletion years exact from the real engine.';
+      } else {
+        note.style.color = '#f4b86a';
+        note.innerHTML = '\u26a0\ufe0f <strong>' + realCount + ' of ' + toRun + ' scenarios ran live;</strong> ' + failCount
+          + ' couldn\u2019t be reached and still show a quick estimate (italic). Hit \u201cSweep All Scenarios\u201d again to retry the ones that timed out.';
+      }
     }
-  }, function(err) {
-    if (progEl) progEl.style.display = 'none';
-    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Sweep All Scenarios'; }
-    alert('Batch sweep error: ' + err + '. Please try again.');
-  });
+  }
+
+  runNext(0);
 }
 
 function mcPercentile(arr, p) {
