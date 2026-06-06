@@ -155,16 +155,15 @@ window.addEventListener('storage', function(e) {
 
 
 
-<div id="loading-msg" style="text-align:center;padding:54px 20px;">
-  <div style="font-size:32px;margin-bottom:14px;">📊</div>
-  <div id="loading-status" style="font-size:15px;font-weight:700;color:#0C2436;margin-bottom:12px;">Connecting to your Google Sheet...</div>
-  <div style="max-width:320px;margin:0 auto 12px;">
-    <div style="background:#d7e2ea;border-radius:10px;height:8px;overflow:hidden;">
-      <div id="loading-progress" style="height:8px;width:0%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);border-radius:10px;transition:width 0.5s ease;"></div>
+<div id="loading-msg" style="display:none;background:#0A3145;border-bottom:1px solid #1a3a52;padding:10px 20px;text-align:center;">
+  <div id="loading-status" style="font-size:12px;font-weight:700;color:#dceaf5;margin-bottom:6px;">Connecting to your Google Sheet...</div>
+  <div style="max-width:400px;margin:0 auto 4px;">
+    <div style="background:rgba(255,255,255,.12);border-radius:10px;height:6px;overflow:hidden;">
+      <div id="loading-progress" style="height:6px;width:0%;background:linear-gradient(90deg,#1CC7D0,#f4b86a);border-radius:10px;transition:width 0.5s ease;"></div>
     </div>
-    <div id="loading-pct" style="font-size:10px;color:#566576;margin-top:6px;">0%</div>
+    <div id="loading-pct" style="font-size:10px;color:#9fc1d6;margin-top:4px;">0%</div>
   </div>
-  <div id="loading-detail" style="font-size:11px;color:#5a7a8a;max-width:320px;margin:0 auto;line-height:1.6;">Reading projections &amp; portfolio data...</div>
+  <div id="loading-detail" style="font-size:10px;color:#7a9aaa;max-width:320px;margin:0 auto;line-height:1.5;">Reading projections &amp; portfolio data...</div>
 </div>
 <div id="stress-content" style="display:block;">
 
@@ -480,9 +479,6 @@ window.addEventListener('storage', function(e) {
       <em style="color:#566576;">Other phases scale proportionally to Phase 1. All scenarios assume normal returns after year 1.</em>
     </div>
     <div id="sweep-chart-area" style="display:none;">
-      <div style="font-size:10px;color:#566576;display:grid;grid-template-columns:160px 1fr 80px;gap:8px;padding:0 2px;margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase;">
-        <span>Scenario</span><span>Safe extra/yr · Phase 1</span><span style="text-align:right;">Amount</span>
-      </div>
       <div id="sweep-bars"></div>
       <div id="sweep-depletion"></div>
     </div>
