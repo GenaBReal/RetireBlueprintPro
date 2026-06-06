@@ -41,6 +41,12 @@ function doGet(e) {
       return respond(runStressTest(ss, inp, e.parameter));
     }
 
+    if (action === 'runSweep') {
+      // Batch sweep: runs ALL crash scenarios in one call, returning all results at once.
+      // Much faster than 8 separate runStressTest calls (one save/restore cycle, sequential recalcs).
+      return respond(runSweepBatch(ss, inp, e.parameter));
+    }
+
     if (action === 'loadStressTests') {
       // Return the saved Test 1-5 slots from the hidden _StressTests tab.
       return respond(loadStressTests(ss));
@@ -1199,5 +1205,115 @@ function saveStressTests(ss, tests) {
     return { ok:true };
   } catch(err) {
     return { ok:false, error: err.toString() };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// BATCH SWEEP — runs all crash scenarios in ONE call, one save/restore.
+// Returns an array of results (one per scenario) rather than 8 separate
+// network round-trips. Cuts total time from ~3.5 min to ~2 min.
+// drag = Math.round(7 - yr1): e.g. yr1=-30 → drag=37
+// ════════════════════════════════════════════════════════════════════════
+function runSweepBatch(ss, inp, p) {
+  var orig = inp.getRange('B12:B20').getValues();
+  var results = [];
+
+  function pnum(v, d){ var n=Number(v); return isNaN(n)?d:n; }
+  var inflPct = (p.infl !== undefined && p.infl !== '') ? pnum(p.infl, null) : null;
+  var startYr = pnum(p.startYr, 0);
+
+  // The 8 standard sweep scenarios (drag = 7 - yr1)
+  var scenarios = [
+    { label:'+10%  (great year)', drag:-3,  dur:1 },
+    { label:' +5%  (good year)',  drag: 2,  dur:1 },
+    { label:'  0%  (flat year)',  drag: 7,  dur:1 },
+    { label:'-10%  (mild drop)',  drag:17,  dur:1 },
+    { label:'-20%  (bad year)',   drag:27,  dur:1 },
+    { label:'-30%  (bear mkt)',   drag:37,  dur:1 },
+    { label:'-40%  (severe)',     drag:47,  dur:1 },
+    { label:'-50%  (crash)',      drag:57,  dur:1 },
+  ];
+
+  try {
+    for (var si = 0; si < scenarios.length; si++) {
+      var s = scenarios[si];
+
+      // ── Write crash params ──
+      var newVals = orig.map(function(r){ return [r[0]]; });
+      newVals[0] = ['bear']; newVals[1] = [startYr]; newVals[2] = [s.dur]; newVals[3] = [s.drag/100];
+      newVals[4] = [''];     // no second crash
+      if (inflPct !== null && !isNaN(inflPct)) newVals[8] = [inflPct/100];
+      inp.getRange('B12:B20').setValues(newVals);
+
+      // ── Poll B119 until stable ──
+      SpreadsheetApp.flush();
+      var _prev = null, _stable = 0;
+      for (var _w=0; _w<14; _w++) {
+        Utilities.sleep(1500);
+        SpreadsheetApp.flush();
+        var _cur = Number(inp.getRange('B119').getValue())||0;
+        if (_w>=2 && _prev!==null && Math.abs(_cur-_prev)<1) {
+          _stable++;
+          if (_stable>=2) break;
+        } else { _stable=0; }
+        _prev = _cur;
+      }
+
+      // ── Read results & run crash-adjusted binary search ──
+      function cell(a1){ return Number(inp.getRange(a1).getValue())||0; }
+      var safeBase  = cell('B119');
+      var legGoal   = cell('B8');
+      var belowYear = null;
+
+      var master = ss.getSheetByName('Master');
+      var safeAdj = Math.round(safeBase);
+      if (master) {
+        var md = master.getRange('A8:CC200').getValues();
+        var stFW=[], phR=[], p1A=0, ser=[];
+        for (var i=0;i<md.length;i++){
+          var row=md[i], rawYr=row[0], yr;
+          if (rawYr instanceof Date) yr=rawYr.getFullYear();
+          else{ yr=Number(rawYr); if(yr>40000&&yr<100000){var dd=new Date((yr-25569)*86400*1000);yr=dd.getFullYear();} }
+          if(!yr||yr<2020||yr>2200) continue;
+          var endLiq=Number(row[80])||0;
+          ser.push({year:yr,bal:Math.round(endLiq)});
+          if(belowYear===null&&legGoal>0&&endLiq<legGoal) belowYear=yr;
+          var gW=(Number(row[44])||0)-(Number(row[45])||0), gCx=Number(row[31])||0;
+          stFW.push(Math.max(0,gW-gCx)); phR.push(gCx);
+          if(gCx>0&&p1A===0) p1A=gCx;
+        }
+        var nYr=stFW.length;
+        if(nYr>2&&p1A>0){
+          for(var pi=0;pi<phR.length;pi++) phR[pi]=phR[pi]/p1A;
+          var yr1R=(7-s.drag)/100, expR=0.07;
+          var sPF=ser.length>0?(ser[0].bal/Math.max(0.1,1+yr1R)+stFW[0]):1000000;
+          function pE(px){ var b=sPF; for(var gi=0;gi<nYr;gi++){var gh=Math.sqrt(Math.max(0.1,1+(gi===0?yr1R:expR))); b=Math.max(0,b*gh-(stFW[gi]+px*(phR[gi]||0))); b=Math.max(0,b*gh); if(b<=0)return 0;} return b; }
+          var itTax=0,itTot=0;
+          for(var ti=0;ti<md.length;ti++){
+            var tr=md[ti]; var tW=(Number(tr[44])||0)-(Number(tr[45])||0); var tCx=Number(tr[31])||0;
+            if(tCx>0){itTax+=Math.max(0,tW-Math.max(0,tW-tCx)-tCx); itTot+=tCx;}
+          }
+          var effTax=itTot>0?Math.min(0.25,Math.max(0.05,itTax/itTot)):0.12;
+          var bLo=0,bHi=600000,bBest=0;
+          for(var bIt=0;bIt<35;bIt++){var bM=(bLo+bHi)/2; if(pE(bM)>=legGoal){bBest=bM;bLo=bM;}else bHi=bM;}
+          safeAdj=Math.round(bBest*(1-effTax)/500)*500;
+        }
+      }
+
+      results.push({
+        ok:true, label:s.label,
+        safeExtra:safeAdj, safeExtraBase:Math.round(safeBase),
+        belowYear:belowYear, legacyGoal:Math.round(legGoal)
+      });
+    }
+
+    // ── Restore ──
+    inp.getRange('B12:B20').setValues(orig);
+    SpreadsheetApp.flush();
+    return { ok:true, results:results };
+
+  } catch(err) {
+    try { inp.getRange('B12:B20').setValues(orig); SpreadsheetApp.flush(); } catch(e2){}
+    return { ok:false, error:err.toString() };
   }
 }

@@ -2311,7 +2311,9 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
     var safe = r.safe||0;
     var pct = maxSafe>0 ? Math.round(safe/maxSafe*100) : 0;
     var col = catColor[r.cat]||'#1CC7D0';
-    var planDepletes = r.fullDepl && safe>0;
+    // Only show the warning when the depletion is a near-term concern (before 2050)
+    // Far-future drops (2055+) just mean it dips below the legacy GOAL near end of life — not an emergency
+    var planDepletes = r.fullDepl && r.fullDepl < 2050 && safe > 0;
     var depleteNote = planDepletes
       ? '<div style="font-size:9px;color:#f4b86a;margin-top:2px;line-height:1.4;">\u2193 Plan depletes at planned spending \u2014 must cut to this amount to survive</div>'
       : '';
@@ -2476,61 +2478,44 @@ function rbpRealSweep() {
 
   var runBtn = document.getElementById('sweep-real-btn');
   var estBtn = document.getElementById('sweep-run-btn');
-  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running…'; }
+  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running batch\u2026 (~2 min)'; }
   if (estBtn) { estBtn.disabled = true; }
 
-  // Show initial amounts immediately (local estimates load instantly)
+  // Show local estimates immediately while batch runs
   _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:null, floorDepl:null }; }), p1Amt, legGoal);
+  if (progEl) { progEl.style.display = 'block'; }
+  if (progN)  { progN.textContent = 'all 8 at once'; }
+  if (progT)  { progT.textContent = '1 batch call'; }
+  if (progBar) { progBar.style.width = '15%'; }
 
-  var doneCount = 0;
-
-  function finish() {
+  // One batch call — all 8 scenarios run server-side in sequence, one round-trip
+  var batchParams = { action:'runSweep', startYr:startYr, infl:inf };
+  esJsonp(batchParams, function(resp) {
     if (progEl) progEl.style.display = 'none';
     if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Real Numbers (~2 min)'; }
     if (estBtn) estBtn.disabled = false;
+
+    if (resp && resp.ok && resp.results && resp.results.length) {
+      resp.results.forEach(function(bRes, idx) {
+        if (idx < results.length) {
+          if (bRes.safeExtra != null) results[idx].safe = (+bRes.safeExtra) || results[idx].safe;
+          results[idx].fullDepl = bRes.belowYear || null;
+        }
+      });
+    }
     _rbpSweepRender(results.map(function(r){ return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl }; }), p1Amt, legGoal);
-    var taxAdjPct = 0;
-    results.forEach(function(r){ if (r._taxAdj) taxAdjPct = Math.max(taxAdjPct, r._taxAdj); });
     var note = document.getElementById('sweep-placeholder');
     if (note) {
-      note.style.display = 'block';
-      note.style.color = '#1CC7D0';
-      note.innerHTML = '\u2705 <strong>Real engine results with tax margin baked in.</strong> '
-        + 'Each amount uses a binary search on your <em>stressed</em> withdrawal data (crash impacts on RMDs + SS already reflected). '
-        + 'A <strong>' + (taxAdjPct || 12) + '% tax correction</strong> is applied — computed from your plan\'s actual effective marginal rate on extra spending — '
-        + 'so the safe extra shown is what you can actually <em>spend</em> after taxes, not just the raw portfolio draw. '
-        + 'Depletion years are exact from the real engine.';
+      note.style.display = 'block'; note.style.color = '#1CC7D0';
+      note.innerHTML = '\u2705 <strong>Real engine results — batch sweep.</strong> All 8 scenarios ran in one connector call (one save/restore cycle). '
+        + 'Tax correction baked in from your plan\u2019s actual effective marginal rate. Depletion years exact from the real engine.';
     }
-  }
-
-  function runNext(idx) {
-    while (idx < results.length && results[idx]._done) idx++;
-    if (idx >= results.length) { finish(); return; }
-    var r = results[idx];
-    doneCount++;
-    if (progN)   progN.textContent = String(doneCount);
-    if (progBar) progBar.style.width = Math.round(doneCount / toRun * 100) + '%';
-
-    var params = { action:'runStressTest', eType:'bear', eStart:startYr,
-                   eDur:r._dur, eDrag:r._drag, lType:'bear',
-                   lStart:0, lDur:0, lDrag:0, infl:inf };
-    esJsonp(params, function(resp) {
-      results[idx]._done = true;
-      if (resp && resp.ok) {
-        results[idx].safe     = (+resp.safeExtra) || localSafeP1(results[idx]._yr1);
-        results[idx].fullDepl = resp.belowYear || null;
-        results[idx]._taxAdj  = resp.safeExtraTaxAdj || 12; // % tax margin applied server-side
-      }
-      _rbpSweepRender(results.map(function(r2){ return { label:r2.label, cat:r2.cat, safe:r2.safe, fullDepl:r2.fullDepl, floorDepl:r2.floorDepl }; }), p1Amt, legGoal);
-      setTimeout(function(){ runNext(idx + 1); }, 300);
-    }, function(_err) {
-      results[idx]._done = true;
-      results[idx].safe = localSafeP1(results[idx]._yr1);
-      setTimeout(function(){ runNext(idx + 1); }, 300);
-    });
-  }
-
-  runNext(0);
+  }, function(err) {
+    if (progEl) progEl.style.display = 'none';
+    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Real Numbers (~2 min)'; }
+    if (estBtn) estBtn.disabled = false;
+    alert('Batch sweep error: ' + err + '. Try Quick Estimate for approximate results.');
+  });
 }
 
 function mcPercentile(arr, p) {
