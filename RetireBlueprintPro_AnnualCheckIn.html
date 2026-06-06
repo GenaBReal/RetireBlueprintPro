@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Annual Check-In</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-connector.js"></script>
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:0 20px;display:flex;align-items:stretch;justify-content:flex-start;overflow:hidden;min-height:76px;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
 .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
@@ -330,9 +331,7 @@ function fmt(n) {
 }
 
 function loadData() {
-  var cb = 'ci_' + Date.now();
-  window[cb] = function(data) {
-    delete window[cb];
+  RBP.load(function(data) {
     if (data.checkIn && data.checkIn.length) {
       checkInData = data.checkIn;
       renderTable(data);
@@ -354,13 +353,7 @@ function loadData() {
       // Use embedded fallback
       loadEmbedded();
     }
-  };
-  var s = document.createElement('script');
-  var _sid = localStorage.getItem('rbp_sheet_id')||'';
-  s.src = SCRIPT_URL + '?callback=' + cb + '&sheetId=' + encodeURIComponent(_sid) + '&_=' + Date.now();
-  s.onerror = function() { delete window[cb]; loadEmbedded(); };
-  setTimeout(function() { if(window[cb]) { delete window[cb]; loadEmbedded(); } }, 60000); // 60 seconds
-  document.head.appendChild(s);
+  }, function(){ loadEmbedded(); });
 }
 
 function loadEmbedded() {

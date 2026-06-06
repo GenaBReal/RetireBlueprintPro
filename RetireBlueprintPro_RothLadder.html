@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Roth Access Ladder</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-connector.js"></script>
 <script src="https://genabreal.github.io/RetireBlueprintPro/rbp-tax-config.js"></script>
 <script>
 // ── DYNAMIC PARTNER NAMES ─────────────────────────────────
@@ -637,9 +638,7 @@ function loadData() {
     return;
   }
 
-  var cb = 'rl_' + Date.now();
-  window[cb] = function(data) {
-    delete window[cb];
+  RBP.load(function(data) {
     try {
       var pkeys = Object.keys(data.people || {});
       var p1 = data.people[pkeys[0]] || {};
@@ -685,17 +684,11 @@ function loadData() {
     document.getElementById('loading-msg').style.display = 'none';
     document.getElementById('ladder-content').style.display = 'block';
     buildLadder();
-  };
-
-  var s = document.createElement('script');
-  s.src = SCRIPT_URL + '?action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&_=' + Date.now();
-  s.onerror = function() {
-    delete window[cb];
+  }, function() {
     document.getElementById('loading-msg').innerHTML = '⚠️ Could not load sheet — showing defaults. <button onclick="loadData()" style="background:#1CC7D0;color:#041E2F;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-weight:700;">Retry</button>';
     document.getElementById('ladder-content').style.display = 'block';
     buildLadder();
-  };
-  document.head.appendChild(s);
+  });
 }
 
 loadData();

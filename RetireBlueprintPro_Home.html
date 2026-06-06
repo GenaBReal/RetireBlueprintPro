@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-connector.js"></script>
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:0 20px;display:flex;align-items:stretch;justify-content:flex-start;overflow:hidden;min-height:76px;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
 .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
@@ -558,9 +559,7 @@ var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU
 function fmt(n){if(!n&&n!==0)return'--';if(Math.abs(n)>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString();}
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function loadData(){
-  var cb='home_'+Date.now();
-  window[cb]=function(d){
-    delete window[cb];
+  RBP.load(function(d){
     try{
       var p=d.people,port=d.portfolio,sp=d.spending,leg=d.legacy,tax=d.tax,meta=d.meta;
       var p1=p.craig||p.person1||{},p2=p.gena||p.person2||{};
@@ -622,13 +621,7 @@ function loadData(){
       set('kpi-legacy-sub', fmtK(legGoal)+' target · '+(legVar>=0?'+':'')+fmtK(legVar));
     }catch(e){
 }
-  };
-  var s=document.createElement('script');
-  var _sid=localStorage.getItem('rbp_sheet_id')||'';
-  s.src=SCRIPT_URL+'?action=read&callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
-  s.onerror=function(){delete window[cb];};
-  setTimeout(function(){if(window[cb])delete window[cb];},60000);
-  document.head.appendChild(s);
+  }, function(){});
 }
 loadData();
 </script>

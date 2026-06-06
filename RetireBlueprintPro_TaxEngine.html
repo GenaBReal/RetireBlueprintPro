@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Tax Engine</title>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-connector.js"></script>
 <script src="https://genabreal.github.io/RetireBlueprintPro/rbp-tax-config.js"></script>
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:0 20px;display:flex;align-items:stretch;justify-content:flex-start;overflow:hidden;min-height:76px;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
@@ -823,14 +824,10 @@ document.getElementById('status-msg').textContent = '⚠️ Error displaying dat
 }
 
 function loadData() {
-  var cb='tax_'+Date.now();
-  window[cb]=function(data){ delete window[cb]; populate(data); };
-  var s=document.createElement('script');
-  var _sid=localStorage.getItem('rbp_sheet_id')||'';
-  s.src=SCRIPT_URL+'?callback='+cb+'&sheetId='+encodeURIComponent(_sid)+'&_='+Date.now();
-  s.onerror=function(){ delete window[cb]; populate({}); document.getElementById('status-msg').textContent='⚠️ Could not load your sheet — check your connection and refresh. Some values shown are estimates.'; };
-  setTimeout(function(){if(window[cb]){delete window[cb];populate({});} },60000);
-  document.head.appendChild(s);
+  RBP.load(function(data){ populate(data); }, function(){
+    populate({});
+    document.getElementById('status-msg').textContent='⚠️ Could not load your sheet — check your connection and refresh. Some values shown are estimates.';
+  });
 }
 
 // Render immediately with defaults
