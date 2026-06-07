@@ -87,10 +87,12 @@ window.RBP = window.RBP || {};
 
     window[cb] = function (data) { finish(data, (data && data.error) ? 'server' : null); };
 
-    // NOTE: do NOT set crossOrigin here. On a JSONP <script> tag it forces a
-    // strict CORS check, and Apps Script does not send an Access-Control-Allow-Origin
-    // header — so the browser blocks the response. A plain script tag is exempt from
-    // CORS (that's the whole point of JSONP) and works against an "Anyone" deployment.
+    // crossOrigin='anonymous' makes the browser send NO Google session cookies.
+    // THIS is the multiple-accounts fix: with no cookies, Google can't see that the
+    // user has work + personal accounts signed in, so it never redirects to an account
+    // chooser — the request just runs and returns data, like it does in incognito.
+    // (Requires the Apps Script deployment to be set to "Anyone".)
+    s.crossOrigin = 'anonymous';
     s.src = RBP.SCRIPT_URL +
             '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) +
             '&callback=' + cb + '&_=' + Date.now();

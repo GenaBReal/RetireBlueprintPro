@@ -746,7 +746,7 @@ loadEl.innerHTML = '⚠️ Error loading data: '+e.message+'<br><button onclick=
     }
   };
 
-  var s = document.createElement('script');
+  var s = document.createElement('script'); s.crossOrigin='anonymous';
   s.onerror = function() {
     if (!done) {
       done = true;
