@@ -7,7 +7,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Dashboard</title>
-<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-connector.js"></script>
 <style>
 .header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
@@ -796,6 +795,31 @@ window.addEventListener('storage', function(e) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
+var RBP = {
+  load: function(onSuccess, onError){
+    var sheetId = '';
+    try { sheetId = localStorage.getItem('rbp_sheet_id') || ''; } catch(e){}
+    var host = window.location.hostname || '';
+    var isPreview = (window.location.protocol === 'file:' || host === '' || host === 'localhost' || host.indexOf('claude.ai') >= 0);
+    if (!sheetId || isPreview) {
+      if (onError) onError('No sheet connected yet — open the Setup Guide to connect your Google Sheet.');
+      return;
+    }
+    var cb = 'rbpDash_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var done = false, s = null;
+    function cleanup(){ try { delete window[cb]; } catch(e){} if (s && s.parentNode) s.parentNode.removeChild(s); }
+    var t = setTimeout(function(){ if (!done){ done = true; cleanup(); if (onError) onError('Connection timed out. The engine can be slow — please try again.'); } }, 90000);
+    window[cb] = function(d){
+      if (done) return; done = true; clearTimeout(t); cleanup();
+      if (d && d.error) { if (onError) onError(d.error); return; }
+      if (onSuccess) onSuccess(d);
+    };
+    s = document.createElement('script'); s.crossOrigin = 'anonymous';
+    s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2);
+    s.onerror = function(){ if (!done){ done = true; clearTimeout(t); cleanup(); if (onError) onError('Could not reach your sheet. Check your connection and try again.'); } };
+    document.head.appendChild(s);
+  }
+};
 var navy='#041E2F', teal='#1CC7D0', orange='#f4b86a', green='#051628', plum='#6A4A6D';
 var _charts = {};
 
@@ -1508,6 +1532,7 @@ function populateFIRE(d) {
 
 function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   var proj=d.projections, leg=d.legacy, sp=d.spending;
+  var single = !(p2 && p2.name && String(p2.name).trim());
 
   // Build key year indices — ~10 points across full range
   var endYr = longestP.projectedDeathYear || (proj.years ? proj.years[proj.years.length-1] : new Date().getFullYear()+30);
