@@ -134,19 +134,21 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
   .rl-chip .rl-ic{width:9px;height:9px;border-radius:50%;flex:none}
   .rl-chip.open{background:rgba(28,199,208,.14);color:#bfeef2;border-color:rgba(28,199,208,.4)}
   .rl-chip.open .rl-ic{background:#1CC7D0}
-  .rl-chip.pre{background:rgba(255,157,77,.20);color:#ff9d4d;border-color:rgba(255,157,77,.6)}
-  .rl-chip.pre .rl-ic{background:#ff9d4d}
+  .rl-chip.pre{background:#eef4f7;color:#06222f;border-color:rgba(63,143,191,.65)}
+  .rl-chip.pre .rl-ic{background:#3f8fbf}
   .rl-chip.rp{background:rgba(93,202,165,.14);color:#aee6cf;border-color:rgba(93,202,165,.4)}
   .rl-chip.rp .rl-ic{background:#5DCAA5}
+  .rl-chip.conv{background:rgba(28,199,208,.22);color:#d6f6f8;border-color:rgba(28,199,208,.7)}
+  .rl-chip.conv .rl-ic{background:#1CC7D0}
   .rl-chip.rg{background:rgba(185,164,240,.16);color:#d8ccf7;border-color:rgba(185,164,240,.45)}
   .rl-chip.rg .rl-ic{background:#b9a4f0}
-  .rl-chip.hsa{background:rgba(242,156,166,.14);color:#f6c4ca;border-color:rgba(242,156,166,.4)}
-  .rl-chip.hsa .rl-ic{background:#f29ca6}
+  .rl-chip.hsa{background:rgba(244,184,106,.18);color:#f4b86a;border-color:rgba(244,184,106,.5)}
+  .rl-chip.hsa .rl-ic{background:#f4b86a}
   .rl-chip.lock{background:rgba(90,115,131,.18);color:#9db4c1;border-color:rgba(90,115,131,.45)}
   .rl-chip.lock .rl-ic{background:#5a7383}
   .rl-chip .rl-sub{font-weight:600;opacity:1;font-size:12px}
   .rl-new{margin-top:12px;display:inline-flex;align-items:center;gap:8px;background:rgba(28,199,208,.12);border:1px solid rgba(28,199,208,.4);color:#1CC7D0;padding:6px 12px;border-radius:9px;font-size:13px;font-weight:600}
-  .rl-mile{display:flex;align-items:center;gap:11px;background:rgba(255,157,77,.16);border:1px solid rgba(255,157,77,.55);border-left:5px solid #ff9d4d;border-radius:10px;padding:12px 16px;margin:12px 0;color:#ff9d4d;font-size:14px;font-weight:700}
+  .rl-mile{display:flex;align-items:center;gap:11px;background:#eef6f8;border:1px solid rgba(28,199,208,.45);border-top:4px solid #1CC7D0;border-radius:10px;padding:12px 16px;margin:12px 0;color:#06222f;font-size:14px;font-weight:700}
   @media(max-width:560px){.rl-yr{grid-template-columns:74px 1fr}.rl-rail{padding:12px 9px}.rl-rail .rl-y{font-size:21px}.rl-kpi .rl-big{font-size:15px}.rl-bd{padding:12px 12px}}
 </style>
 <style id="rbp-mobile-fix">
@@ -267,10 +269,11 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 
       <div class="legend">
         <div class="legend-item"><div class="legend-dot" style="background:#1CC7D0;"></div> Taxable Brokerage (no restrictions)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ff9d4d;"></div> Pre-Tax 401k/IRA (age 59½+ or Rule of 55)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3f8fbf;"></div> Pre-Tax 401k/IRA (age 59½+ or Rule of 55)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5;"></div> Roth Principal (contributions always open)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1CC7D0;"></div> Roth Conversions (each matured after its 5-yr window)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#b9a4f0;"></div> Roth Growth (fully unlocked at 59½)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#f29ca6;"></div> HSA (tax-free medical after 65)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f4b86a;"></div> HSA (tax-free medical after 65)</div>
         <div class="legend-item" style="opacity:0.5;"><div class="legend-dot" style="background:#5a7383;"></div> 🔒 Locked (penalty applies)</div>
       </div>
 
@@ -511,7 +514,7 @@ function buildLadder() {
       { key:'tax',  cls:'open', label:'Taxable',           open:sTaxOpen,  sub:(sTaxOpen?'':'none in plan') },
       { key:'pre',  cls:'pre',  label:'Pre\u2011Tax 401k/IRA', open:sPreOpen,  sub:preSub },
       { key:'rp',   cls:'rp',   label:'Roth Principal',     open:sRpOpen,   sub:rpSub },
-      { key:'conv', cls:'rp',   label:'Roth Conversions',   open:sConvOpen, sub:convSub },
+      { key:'conv', cls:'conv', label:'Roth Conversions',   open:sConvOpen, sub:convSub },
       { key:'rg',   cls:'rg',   label:'Roth Growth',        open:sRgOpen,   sub:rgSub },
       { key:'hsa',  cls:'hsa',  label:'HSA',                open:sHsaOpen,  sub:hsaSub }
     ];
