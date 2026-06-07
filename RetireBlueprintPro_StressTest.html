@@ -2103,6 +2103,7 @@ function rbpRealSweep() {
 
   var realCount = 0;   // how many scenarios came back from the real engine
   var failCount = 0;   // how many couldn't be reached (kept as estimate)
+  var firstErr  = null; // capture the first failure reason so we stop guessing
 
   // ── Sequential per-scenario calls ──
   // Each scenario is its own connector round-trip (well under the 90s timeout).
@@ -2125,12 +2126,14 @@ function rbpRealSweep() {
         realCount++;
       } else {
         failCount++;   // keep the local estimate already in results[i].safe
+        if (firstErr == null) firstErr = (resp && resp.error) ? String(resp.error) : 'connector returned no data';
       }
       if (progBar) progBar.style.width = Math.round((i + 1) / results.length * 100) + '%';
       reRender();
       runNext(i + 1);
     }, function(err) {
       failCount++;     // unreachable — keep the estimate and continue
+      if (firstErr == null) firstErr = err ? String(err) : 'could not reach the connector';
       if (progBar) progBar.style.width = Math.round((i + 1) / results.length * 100) + '%';
       reRender();
       runNext(i + 1);
@@ -2153,7 +2156,8 @@ function rbpRealSweep() {
       } else {
         note.style.color = '#f4b86a';
         note.innerHTML = '\u26a0\ufe0f <strong>' + realCount + ' of ' + toRun + ' scenarios ran live;</strong> ' + failCount
-          + ' couldn\u2019t be reached and still show a quick estimate (italic). Hit \u201cSweep All Scenarios\u201d again to retry the ones that timed out.';
+          + ' couldn\u2019t be reached and still show a quick estimate (italic). Hit \u201cSweep All Scenarios\u201d again to retry the ones that timed out.'
+          + (firstErr ? '<div style="margin-top:8px;font-size:11px;color:#ff9b9b;font-family:monospace;word-break:break-word;">Engine said: ' + firstErr + '</div>' : '');
       }
     }
   }
