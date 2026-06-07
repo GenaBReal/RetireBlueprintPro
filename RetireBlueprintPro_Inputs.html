@@ -1157,7 +1157,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       <thead>
         <tr>
           <th>Include?</th><th>Account Name</th><th>Owner</th><th>Type</th>
-          <th>Balance ($)</th><th>Return (%)</th><th>Ann. Contrib ($)</th><th>Emp. Match ($)</th><th>Contrib Start</th><th>Contrib End</th><th>Withdraw Start</th><th>Status</th><th>Show on Summary?</th>
+          <th>Balance ($)</th><th title="For TAXABLE accounts only: what you originally paid (cost basis). Used to estimate capital-gains tax when these are sold. Leave blank for IRAs/401k/Roth/HSA.">Cost Basis ($)</th><th>Return (%)</th><th>Ann. Contrib ($)</th><th>Emp. Match ($)</th><th>Contrib Start</th><th>Contrib End</th><th>Withdraw Start</th><th>Status</th><th>Show on Summary?</th>
         </tr>
       </thead>
       <tbody id="accounts-body">
@@ -1505,6 +1505,20 @@ function buildAccountsTable() {
     });
     td5.appendChild(balInp);
 
+    // Col 5b: Cost Basis (taxable accounts only — used for capital-gains tax)
+    var td5b = document.createElement('td');
+    var basisInp = document.createElement('input');
+    basisInp.type = 'text'; basisInp.inputMode = 'numeric'; basisInp.style.width = '110px';
+    basisInp.placeholder = '0';
+    basisInp.title = 'For taxable accounts only: what you originally paid (cost basis). Used to estimate capital-gains tax. Leave blank for tax-advantaged accounts.';
+    basisInp.value = a.basis ? parseInt(a.basis).toLocaleString() : '';
+    (function(i){ basisInp.addEventListener('input', function() {
+      var v = this.value.replace(/[^0-9]/g,'');
+      this.value = v ? parseInt(v).toLocaleString() : '';
+      accountsData[i].basis = parseInt(v)||0; markDirty();
+    }); })(idx);
+    td5b.appendChild(basisInp);
+
     // Col 6: Return %
     var td6 = document.createElement('td');
     var retInp = document.createElement('input');
@@ -1583,7 +1597,7 @@ function buildAccountsTable() {
 
     // Append ALL columns in correct order
     tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
-    tr.appendChild(td5); tr.appendChild(td6); tr.appendChild(td7); tr.appendChild(td8);
+    tr.appendChild(td5); tr.appendChild(td5b); tr.appendChild(td6); tr.appendChild(td7); tr.appendChild(td8);
     tr.appendChild(td9); tr.appendChild(td10); tr.appendChild(td11);
     tr.appendChild(td12); tr.appendChild(td13);
     tbody.appendChild(tr);
@@ -2673,7 +2687,8 @@ var incEl  = document.getElementById('d-inc-'+i);
         contribEnd:   toISO(a.contribEnd),    // M = Contrib End Date
         withdrawStart:toISO(a.withdrawStart), // N = Withdrawal Start Date
         status:       a.status || 'Use for Withdrawals',
-        dash:         a.showOnDashboard || 'No'
+        dash:         a.showOnDashboard || 'No',
+        basis:        a.costBasis || 0
       };
     });
     buildAccountsTable();
