@@ -260,16 +260,7 @@ window.addEventListener('storage', function(e) {
 
 <div class="page">
 
-  <div style="background:#fff;border-left:4px solid #2E7D32;border-radius:8px;padding:14px 18px;margin-bottom:16px;">
-  <div style="font-size:13px;font-weight:700;color:#1b5e20;margin-bottom:6px;">📅 How to Use Annual Check-In</div>
-  <div style="font-size:11px;color:#2E7D32;line-height:1.7;">
-    Once a year (January is ideal), enter your actual account balances in the <strong>Actual Balance</strong> column.
-    The chart above shows whether you're ahead of plan (green dots) or behind (red dots).
-    Add notes about major events — job changes, big purchases, market crashes — to build your financial history.
-    <strong>Your entries are saved directly to your Google Sheet.</strong>
-  </div>
-</div>
-<div class="instructions">
+  <div class="instructions">
     <div class="inst-icon">📋</div>
     <div class="inst-text">
       <strong>How to use this tab:</strong> Every January, enter your actual December 31 portfolio balance in the <strong>Actual Balance</strong> column for the previous year.
@@ -316,12 +307,51 @@ window.addEventListener('storage', function(e) {
     </div>
   </div>
 
+  <div style="background:#fff;border:1px solid #e0e4e8;border-top:4px solid #1CC7D0;border-radius:10px;padding:18px 20px;margin-bottom:16px;">
+    <div style="font-size:13px;font-weight:800;color:#0e7f88;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">When Things Change &mdash; Life Events</div>
+    <div style="font-size:11px;color:#5F6368;margin-bottom:14px;">Your plan only stays accurate if it reflects real life. When any of these happen, update your Inputs and reload your data.</div>
+    <div style="background:#f0f7f9;border-left:3px solid #1CC7D0;border-radius:6px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:800;color:#2F3E46;margin-bottom:6px;">&#128188; Changing jobs?</div>
+      <div style="font-size:11px;color:#2F3E46;line-height:1.7;">
+        1. <strong style="color:#0e7f88;">Roll over your old 401(k)</strong> into an IRA or your new plan &mdash; never cash it out (taxes + penalties).<br>
+        2. Update your <strong style="color:#0e7f88;">income, contributions, and employer match</strong> on the Inputs page to match the new job.<br>
+        3. Click <strong style="color:#0e7f88;">Reload Data</strong> so every page recalculates with the new numbers.
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:#2F3E46;line-height:1.6;">
+      <div style="background:#f0f7f9;border-radius:6px;padding:9px 12px;"><strong>&#128200; Got a raise?</strong><br>Update income &amp; contribution amounts.</div>
+      <div style="background:#f0f7f9;border-radius:6px;padding:9px 12px;"><strong>&#128141; Married / divorced?</strong><br>Update partner info, accounts &amp; goals.</div>
+      <div style="background:#f0f7f9;border-radius:6px;padding:9px 12px;"><strong>&#128118; New child?</strong><br>Revisit expenses and timeline.</div>
+      <div style="background:#f0f7f9;border-radius:6px;padding:9px 12px;"><strong>&#128176; Windfall / inheritance?</strong><br>Add the new balance to the right account.</div>
+      <div style="background:#f0f7f9;border-radius:6px;padding:9px 12px;"><strong>&#128201; Big market move?</strong><br>Enter your real balance here at your next check-in.</div>
+      <div style="background:#f0f7f9;border-radius:6px;padding:9px 12px;"><strong>&#127968; Bought / sold a home?</strong><br>Update assets, debts &amp; expenses.</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 var checkInData = [];
 var currentYear = new Date().getFullYear();
+
+if (typeof window.RBP === 'undefined' || !window.RBP || typeof window.RBP.load !== 'function') {
+  window.RBP = window.RBP || {};
+  window.RBP.load = function(onOk, onErr){
+    var sheetId = localStorage.getItem('rbp_sheet_id');
+    var host = window.location.hostname || '';
+    var isPreview = (window.location.protocol==='file:' || host==='' || host==='localhost' || host.indexOf('claude.ai')>=0);
+    if (!sheetId || isPreview) { if(onErr) onErr('no sheet / preview'); return; }
+    var cb = 'rbpACI_' + Date.now(), done = false;
+    var t = setTimeout(function(){ if(!done){ done=true; try{delete window[cb];}catch(e){} if(onErr) onErr('timeout'); } }, 90000);
+    window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); try{delete window[cb];}catch(e){}
+      if(d && d.error){ if(onErr) onErr(d.error); return; } if(onOk) onOk(d); };
+    var sc = document.createElement('script'); sc.crossOrigin='anonymous';
+    sc.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2);
+    sc.onerror = function(){ if(!done){ done=true; clearTimeout(t); try{delete window[cb];}catch(e){} if(onErr) onErr('network'); } };
+    document.head.appendChild(sc);
+  };
+}
 
 function fmt(n) {
   if (!n && n !== 0) return '--';
