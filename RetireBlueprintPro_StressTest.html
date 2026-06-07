@@ -1971,7 +1971,6 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
       +   depleteNote
       + '</div>'
       + '<div style="text-align:right;font-size:13px;font-weight:500;'+amtStyle+'">' + fmtKno(safe) + '/yr' + belowTag
-      +   (r.safeBase != null ? '<div style="font-size:9.5px;font-weight:600;color:#7fd6df;margin-top:3px;">sheet raw: ' + fmtKno(r.safeBase) + '</div>' : '')
       + '</div>'
       + '</div>';
   });
@@ -2162,10 +2161,9 @@ function rbpRealSweep() {
       note.style.display = 'block';
       if (failCount === 0) {
         note.style.color = '#1CC7D0';
-        note.innerHTML = '\ud83d\udd0d <strong>Diagnostic view.</strong> All ' + realCount + ' scenarios ran live. '
-          + 'The large number is after the JavaScript reconstruction (re-applies the crash + a tax haircut). '
-          + 'The teal <strong style="color:#7fd6df;">\u201csheet raw\u201d</strong> beneath it is the unadjusted value straight from your Master formula (cell B119). '
-          + 'Compare the two columns down the list \u2014 whichever one slopes down sensibly as the crash deepens is the trustworthy half.';
+        note.innerHTML = '\u2705 <strong>All ' + realCount + ' scenarios ran live</strong> against your real plan data. '
+          + 'Each amount is the most Phase\u20111 extra you could safely spend and still hit your legacy goal if that crash hit in year 1 \u2014 '
+          + 'taxes, RMDs, and Social Security timing all reflected. The deeper the crash, the less you can safely spend.';
       } else {
         note.style.color = '#f4b86a';
         note.innerHTML = '\u26a0\ufe0f <strong>' + realCount + ' of ' + toRun + ' scenarios ran live;</strong> ' + failCount
@@ -2189,6 +2187,12 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     p1Name, p2Name, p1DeathAge, p2DeathAge, p1Age, p2Age,
     mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
     endingsNX, chosenExtraAmt, extraInPlan, depleteYearsFull, suggestedExtraAmt, extraSummary, fixedYr1) {
+
+  // "single" = no partner 2 in the plan (recomputed here from planData, since this
+  // function runs in its own scope). Matches the run-side definition.
+  var _mcPk = Object.keys((planData && planData.people) || {});
+  var _mcP2 = (planData && planData.people && planData.people[_mcPk[1]]) || {};
+  var p2single = !(_mcP2 && _mcP2.name && String(_mcP2.name).trim());
 
   // ── Stress-conditioned banner ──────────────────────────────────────────────
   (function(){
