@@ -202,8 +202,8 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
   calculates your IRMAA surcharges based on your planned income, and shows your total estimated healthcare cost in retirement —
   for <strong data-rbp-p1>Partner 1</strong> and <strong data-rbp-p2>Partner 2</strong>.</p>
 <div class="grid3" style="margin-bottom:24px;" id="kpi-strip">
-    <div class="kpi"><div class="kpi-label">Est. Monthly (Both)</div><div class="kpi-val" id="k-monthly">—</div><div class="kpi-sub">Part B + D + Medigap</div></div>
-    <div class="kpi"><div class="kpi-label">Est. Annual (Both)</div><div class="kpi-val" id="k-annual">—</div><div class="kpi-sub">All parts combined</div></div>
+    <div class="kpi"><div class="kpi-label" id="k-monthly-lbl">Est. Monthly (Both)</div><div class="kpi-val" id="k-monthly">—</div><div class="kpi-sub">Part B + D + Medigap</div></div>
+    <div class="kpi"><div class="kpi-label" id="k-annual-lbl">Est. Annual (Both)</div><div class="kpi-val" id="k-annual">—</div><div class="kpi-sub">All parts combined</div></div>
     <div class="kpi"><div class="kpi-label">Lifetime Total</div><div class="kpi-val" id="k-lifetime">—</div><div class="kpi-sub">From age 65 to end of plan</div></div>
   </div></div>
 
@@ -788,7 +788,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
       <div class="grid2">
         <div>
           <div class="field"><label><span data-rbp-p1>P1</span> Current Age</label><input type="number" id="p1-age" value="63" min="40" max="80" onchange="calc()"></div>
-          <div class="field"><label><span data-rbp-p2>P2</span> Current Age</label><input type="number" id="p2-age" value="55" min="40" max="80" onchange="calc()"></div>
+          <div class="field" id="field-p2-age"><label><span data-rbp-p2>P2</span> Current Age</label><input type="number" id="p2-age" value="55" min="40" max="80" onchange="calc()"></div>
           <div class="field"><label>Expected Retirement Income (Annual)</label><input type="number" id="ret-income" value="80000" min="0" step="5000" onchange="calc()"><span style="font-size:10px;color:#46586a;">Include SS, pension, Roth conversions, RMDs</span></div>
         </div>
         <div>
@@ -803,7 +803,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
           </div>
           <div class="field"><label>Part D Drug Plan (monthly)</label><input type="number" id="part-d" value="40" min="0" max="300" onchange="calc()"></div>
           <div class="field"><label><span data-rbp-p1>P1</span> Life Expectancy</label><input type="number" id="p1-death" value="88" min="65" max="105" onchange="calc()"></div>
-          <div class="field"><label><span data-rbp-p2>P2</span> Life Expectancy</label><input type="number" id="p2-death" value="92" min="65" max="105" onchange="calc()"></div>
+          <div class="field" id="field-p2-death"><label><span data-rbp-p2>P2</span> Life Expectancy</label><input type="number" id="p2-death" value="92" min="65" max="105" onchange="calc()"></div>
         </div>
       </div>
     </div>
@@ -982,7 +982,9 @@ function calc() {
   var partBPerPerson = PARTB_BASE + tier.partB;
   var partDPerPerson = partD + tier.partD;
   var monthlyPerPerson = partBPerPerson + partDPerPerson + medigap;
-  var monthlyCouple = monthlyPerPerson * 2;
+  var medSingle = !!window.rbpMedSingle;
+  var nPeople = medSingle ? 1 : 2;
+  var monthlyCouple = monthlyPerPerson * nPeople;
   var annualCouple = monthlyCouple * 12;
 
   // Lifetime: from each person's 65th birthday
@@ -992,11 +994,13 @@ function calc() {
   // Lifetime cost with 3% medical inflation compounded year by year (nominal future dollars).
   var medInfl = 0.03, annualPerPerson = monthlyPerPerson * 12;
   function inflatedLifetime(years){ var t = 0; for (var y = 0; y < years; y++) t += annualPerPerson * Math.pow(1 + medInfl, y); return t; }
-  var lifetime = inflatedLifetime(p1Yrs65) + inflatedLifetime(p2Yrs65);
+  var lifetime = inflatedLifetime(p1Yrs65) + (medSingle ? 0 : inflatedLifetime(p2Yrs65));
 
   document.getElementById('k-monthly').textContent = fmt(monthlyCouple) + '/mo';
   document.getElementById('k-annual').textContent = fmt(annualCouple);
   document.getElementById('k-lifetime').textContent = fmt(lifetime);
+  var _kml=document.getElementById('k-monthly-lbl'); if(_kml) _kml.textContent = medSingle ? 'Est. Monthly (You)' : 'Est. Monthly (Both)';
+  var _kal=document.getElementById('k-annual-lbl'); if(_kal) _kal.textContent = medSingle ? 'Est. Annual (You)' : 'Est. Annual (Both)';
 
   // IRMAA result banner
   var irmaaBanner = document.getElementById('irmaa-result');
@@ -1005,7 +1009,7 @@ function calc() {
     irmaaBanner.innerHTML = '✅ <strong>No IRMAA surcharge</strong> at your income level ($' + income.toLocaleString() + '/yr). Your income is below the $218,000 threshold. Standard Part B premium applies: $' + PARTB_BASE + '/mo per person.';
   } else {
     irmaaBanner.style.cssText = 'margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#fff;border:1px solid #f48fb1;font-size:13px;color:#7f1d1d;';
-    irmaaBanner.innerHTML = '⚠️ <strong>IRMAA ' + tier.label + ' applies</strong> at $' + income.toLocaleString() + '/yr income. Your Part B premium is <strong>$' + partBPerPerson.toFixed(0) + '/mo per person</strong> (standard $' + PARTB_BASE + ' + $' + tier.partB.toFixed(0) + ' surcharge). Combined extra cost for a couple: <strong>$' + Math.round(tier.partB * 2 * 12).toLocaleString() + '/year</strong> just from IRMAA.';
+    irmaaBanner.innerHTML = '⚠️ <strong>IRMAA ' + tier.label + ' applies</strong> at $' + income.toLocaleString() + '/yr income. Your Part B premium is <strong>$' + partBPerPerson.toFixed(0) + '/mo per person</strong> (standard $' + PARTB_BASE + ' + $' + tier.partB.toFixed(0) + ' surcharge). Combined extra cost ' + (medSingle ? 'for you' : 'for a couple') + ': <strong>$' + Math.round(tier.partB * 12 * nPeople).toLocaleString() + '/year</strong> just from IRMAA.';
   }
 
   // IRMAA table
@@ -1038,12 +1042,12 @@ function calc() {
   var p2Name = window.rbpP2Name || 'Partner 2';
   var lbEl = document.getElementById('lifetime-breakdown');
   lbEl.innerHTML = '<div class="grid2">' +
-    '<div><div style="font-size:12px;color:#37474f;margin-bottom:12px;line-height:1.7;">Based on <strong>' + p1Name + '</strong> living to <strong>' + p1Death + '</strong> and <strong>' + p2Name + '</strong> living to <strong>' + p2Death + '</strong>, enrolled in Medicare from age 65.</div>' +
+    '<div><div style="font-size:12px;color:#37474f;margin-bottom:12px;line-height:1.7;">Based on <strong>' + p1Name + '</strong> living to <strong>' + p1Death + '</strong>' + (medSingle ? '' : (' and <strong>' + p2Name + '</strong> living to <strong>' + p2Death + '</strong>')) + ', enrolled in Medicare from age 65.</div>' +
     '<div style="display:grid;gap:8px;">' +
-    makeBreakdownRow('Part B (both)', fmt(partBPerPerson * 24) + '/yr', 'var(--orange)') +
-    makeBreakdownRow('Medigap Supplement (both)', fmt(medigap * 24) + '/yr', '#1CC7D0') +
-    makeBreakdownRow('Part D Prescriptions (both)', fmt((partDPerPerson) * 24) + '/yr', '#ab47bc') +
-    makeBreakdownRow('IRMAA Surcharges (both)', tier.partB > 0 ? fmt(tier.partB * 24 * 12) + '/yr' : '$0 (none)', tier.partB > 0 ? '#ef5350' : '#051628') +
+    makeBreakdownRow('Part B ('+(medSingle?'you':'both')+')', fmt(partBPerPerson * 12 * nPeople) + '/yr', 'var(--orange)') +
+    makeBreakdownRow('Medigap Supplement ('+(medSingle?'you':'both')+')', fmt(medigap * 12 * nPeople) + '/yr', '#1CC7D0') +
+    makeBreakdownRow('Part D Prescriptions ('+(medSingle?'you':'both')+')', fmt((partDPerPerson) * 12 * nPeople) + '/yr', '#ab47bc') +
+    makeBreakdownRow('IRMAA Surcharges ('+(medSingle?'you':'both')+')', tier.partB > 0 ? fmt(tier.partB * 12 * nPeople) + '/yr' : '$0 (none)', tier.partB > 0 ? '#ef5350' : '#051628') +
     '</div></div>' +
     '<div>' +
     '<div style="background:#f8f9fa;border-radius:10px;border:1px solid #e8eaed;padding:16px;">' +
@@ -1065,6 +1069,7 @@ function makeBreakdownRow(label, value, color) {
 }
 
 function buildTimeline(p1Age, p2Age, p1Name, p2Name) {
+  var medSingle = !!window.rbpMedSingle;
   var curYear = new Date().getFullYear();
   var el = document.getElementById('enrollment-timeline');
   var items = [];
@@ -1078,9 +1083,10 @@ function buildTimeline(p1Age, p2Age, p1Name, p2Name) {
   function rmdAgeFor(age){ return (curYear - age) >= 1960 ? 75 : 73; } // SECURE 2.0
   var p1_73 = curYear + (rmdAgeFor(p1Age) - p1Age);
   var p2_73 = curYear + (rmdAgeFor(p2Age) - p2Age);
+  if (medSingle) { p2_65 = p1_65; p2_67 = p1_67; p2_70 = p1_70; p2_73 = p1_73; }
 
   if (p1_65 > curYear) items.push({year: p1_65, active: true, text: '<strong>' + p1Name + ' turns 65</strong> — Medicare eligible. 7-month enrollment window opens. Enroll in Parts A, B, and D. Choose Original Medicare + Medigap, or Medicare Advantage.'});
-  if (p2_65 > curYear) items.push({year: p2_65, active: true, text: '<strong>' + p2Name + ' turns 65</strong> — Medicare eligible. Same enrollment window and choices apply.'});
+  if (!medSingle && p2_65 > curYear) items.push({year: p2_65, active: true, text: '<strong>' + p2Name + ' turns 65</strong> — Medicare eligible. Same enrollment window and choices apply.'});
   if (Math.max(p1_65, p2_65) < Math.min(p1_67, p2_67)) {
     items.push({year: Math.min(p1_67, p2_67) - 1, active: false, text: 'Monitor income carefully for IRMAA look-back years. A large Roth conversion now = higher premiums 2 years later.'});
   }
@@ -1102,6 +1108,10 @@ function loadData() {
     try {
       var pkeys = Object.keys(data.people||{});
       var p1 = data.people[pkeys[0]]||{}, p2 = data.people[pkeys[1]]||{};
+      window.rbpMedSingle = !(p2 && p2.name && String(p2.name).trim());
+      var _f2a=document.getElementById('field-p2-age'), _f2d=document.getElementById('field-p2-death');
+      if(window.rbpMedSingle){ if(_f2a)_f2a.style.display='none'; if(_f2d)_f2d.style.display='none'; }
+      else { if(_f2a)_f2a.style.display=''; if(_f2d)_f2d.style.display=''; }
       if(p1.name){localStorage.setItem('rbp_p1_name',p1.name.trim());}
       if(p2.name){localStorage.setItem('rbp_p2_name',p2.name.trim());}
       if(typeof rbpApplyNames==='function') rbpApplyNames(p1.name||'',p2.name||'');

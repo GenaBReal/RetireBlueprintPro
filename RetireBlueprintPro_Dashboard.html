@@ -364,14 +364,14 @@ window.addEventListener('storage', function(e) {
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Survivor Runway <span class="tooltip-icon" data-tip="Years the plan covers the longer-lived partner after the first spouse passes. SS survivor benefit (keeping the higher of two SS amounts) is automatically included." style="font-size:9px;">?</span></div>
+      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span><span id="kpi-runway-title">Survivor Runway</span> <span class="tooltip-icon" data-tip="Years the plan covers the longer-lived partner after the first spouse passes. SS survivor benefit (keeping the higher of two SS amounts) is automatically included." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-runway">—</div>
       <div class="kc-sub" id="kpi-runway-sub">—</div>
       <div class="kc-delta-up" id="kpi-runway-delta">—</div>
     </div>
     <div>
       <div id="runway-dots" style="display:flex;gap:3px;margin-top:6px;flex-wrap:wrap;"></div>
-      <div class="kc-footer">Longest survivor fully funded</div>
+      <div class="kc-footer" id="kpi-runway-foot">Longest survivor fully funded</div>
     </div>
   </div>
 
@@ -997,11 +997,17 @@ function populate(d){
   var proj = d.projections || {}, meta = d.meta || {};
 
   // Determine longest-lived person
+  var single = !(p2 && p2.name && String(p2.name).trim());
   var p1dy = p1.projectedDeathYear||2070, p2dy = p2.projectedDeathYear||2080;
-  var longestP = p1dy > p2dy ? p1 : p2;
-  var longestN = p1dy > p2dy ? p1n : p2n;
-  var otherP   = p1dy > p2dy ? p2 : p1;
-  var otherN   = p1dy > p2dy ? p2n : p1n;
+  var longestP, longestN, otherP, otherN;
+  if (single) {
+    longestP = p1; longestN = p1n; otherP = p1; otherN = p1n;
+  } else {
+    longestP = p1dy > p2dy ? p1 : p2;
+    longestN = p1dy > p2dy ? p1n : p2n;
+    otherP   = p1dy > p2dy ? p2 : p1;
+    otherN   = p1dy > p2dy ? p2n : p1n;
+  }
   var longestYrs = longestP.projectedDeathYear - meta.planYear;
 
   // HERO
@@ -1080,8 +1086,10 @@ function populate(d){
   var zoneEl=$s('ph-zone'); if(zoneEl) zoneEl.textContent = fundedForLife ? 'SAFE ZONE' : 'REVIEW ZONE';
 
   set('kpi-runway', longestYrs+' years');
+  set('kpi-runway-title', single ? 'Plan Coverage' : 'Survivor Runway');
+  set('kpi-runway-foot', single ? 'Funded for life' : 'Longest survivor fully funded');
   set('kpi-runway-sub', 'Covers '+longestN+' to age '+longestP.deathAge+' ('+longestP.projectedDeathYear+')');
-  set('kpi-runway-delta', otherN+' covered to age '+otherP.deathAge+' ('+otherP.projectedDeathYear+')');
+  set('kpi-runway-delta', single ? '' : (otherN+' covered to age '+otherP.deathAge+' ('+otherP.projectedDeathYear+')'));
   var rd=$s('runway-dots'); if(rd){var rh='';for(var i=0;i<Math.min(10,longestYrs);i++) rh+='<span style="width:8px;height:8px;border-radius:50%;background:#041E2F;display:inline-block;"></span>';rd.innerHTML=rh;}
 
   var yr1inc = (proj.income&&proj.income.length&&proj.income[0]) ? proj.income[0] : 0; // already full dollars from GS
@@ -1385,7 +1393,7 @@ function populate(d){
   set('intel-hc', fmtP(tax.healthcareInflation)+'/yr');
   set('intel-ss', p1n+' start: '+p1.ssStartDate);
   set('intel-legacy', pct>=100?'✅ Met':pct+'%');
-  set('intel-surv-lbl', 'Survivor Plan ('+longestN+')');
+  set('intel-surv-lbl', single ? ('Longevity Plan ('+longestN+')') : ('Survivor Plan ('+longestN+')'));
   set('intel-roth', fmt(tax.rothConversionSavings));
 
   // CHART NOTES
@@ -1396,11 +1404,11 @@ function populate(d){
   var _peakStr = _peakVal>0 ? fmt(_peakVal)+' in '+_peakYr : fmt(port.peakValue||0);
   set('c1-note', 'Peak: '+_peakStr+' · Ends: '+fmt(leg.projectedEnding)+' · Goal '+(pct>=100?'met ✅':pct+'%'));
   set('c3-sub', 'Salary → SS + Pension · '+p2n+' SS starts '+p2.ssStartDate);
-  set('c3-note', p2n+' SS: '+fmt(p2.ssAnnual||0)+'/yr · '+p1n+' pension: '+fmt((p1.pension||0)*12)+'/yr');
+  set('c3-note', single ? (p1n+' SS: '+fmt(p1.ssAnnual||0)+'/yr · '+p1n+' pension: '+fmt((p1.pension||0)*12)+'/yr') : (p2n+' SS: '+fmt(p2.ssAnnual||0)+'/yr · '+p1n+' pension: '+fmt((p1.pension||0)*12)+'/yr'));
   set('c4-note', 'Phase 1: '+fmt((sp.baseAnnual||0)+(sp.phase1Extra||0))+'/yr · Phase 2: '+fmt((sp.baseAnnual||0)+(sp.phase2Extra||0))+'/yr · Phase 3: '+fmt((sp.baseAnnual||0)+(sp.phase3Extra||0))+'/yr');
-  set('c5-title', 'Survivor Plan — '+longestN+" runs to age "+longestP.deathAge);
-  set('c5-sub', 'Joint '+meta.planYear+'–'+otherP.projectedDeathYear+' · '+longestN+' survivor '+(otherP.projectedDeathYear+1)+'–'+longestP.projectedDeathYear);
-  set('c5-note', 'Joint plan → '+longestN+' survivor · '+longestN+' plan ends at '+fmt(leg.projectedEnding));
+  set('c5-title', single ? ('Longevity Plan — '+longestN+" runs to age "+longestP.deathAge) : ('Survivor Plan — '+longestN+" runs to age "+longestP.deathAge));
+  set('c5-sub', single ? (longestN+"'s plan · "+meta.planYear+'–'+longestP.projectedDeathYear) : ('Joint '+meta.planYear+'–'+otherP.projectedDeathYear+' · '+longestN+' survivor '+(otherP.projectedDeathYear+1)+'–'+longestP.projectedDeathYear));
+  set('c5-note', single ? (longestN+' plan ends at '+fmt(leg.projectedEnding)) : ('Joint plan → '+longestN+' survivor · '+longestN+' plan ends at '+fmt(leg.projectedEnding)));
 
   set('load-status', '✓ Plan loaded · '+meta.generated);
   drawCharts(d, p1, p2, p1n, p2n, longestN, longestP, otherP, otherN, meta);
@@ -1552,10 +1560,10 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
   ],true,true);
 
   // Survivor chart — use ALL projection years for proper scale
-  var splitYr = otherP.projectedDeathYear;
+  var splitYr = single ? null : otherP.projectedDeathYear;
   var allProjYrs = (proj.years||[]).map(function(y){ return String(y); });
   var allEndLiq  = (proj.endLiquid||[]).map(function(v){ return Math.max(0,v||0); });
-  var jDataFull  = allEndLiq.map(function(v,i){ return (!splitYr || proj.years[i]<=splitYr) ? v : null; });
+  var jDataFull  = single ? allEndLiq.slice() : allEndLiq.map(function(v,i){ return (!splitYr || proj.years[i]<=splitYr) ? v : null; });
   var sDataFull  = allEndLiq.map(function(v,i){ return (!splitYr || proj.years[i]>=splitYr) ? v : null; });
   if(jDataFull.every(function(v){return v===null;})) jDataFull = allEndLiq;
   if(_charts['c5']) _charts['c5'].destroy();
@@ -1563,9 +1571,10 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
     _charts['c5'] = new Chart(c5ctx,{
       type:'line',
       data:{labels:allProjYrs,datasets:[
-        {label:'Joint Plan',data:jDataFull,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.12)',fill:true,tension:0.3,pointRadius:0,borderWidth:3},
+        {label: single ? (longestN+"'s Plan") : 'Joint Plan',data:jDataFull,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.12)',fill:true,tension:0.3,pointRadius:0,borderWidth:3}
+      ].concat(single ? [] : [
         {label:longestN+' Survivor',data:sDataFull,borderColor:'#f4b86a',backgroundColor:'rgba(244,184,106,0.1)',fill:true,tension:0.3,pointRadius:0,borderWidth:3}
-      ]},
+      ])},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:true,labels:{font:{size:12},color:'#c8dae8',boxWidth:14}}},
         scales:{

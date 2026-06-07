@@ -388,7 +388,7 @@ window.addEventListener('storage', function(e) {
           <div class="partner-row"><span class="pr-label">Pre-Medicare HC/yr</span><span class="pr-value" id="r-p1-hc">—</span></div>
           <div class="partner-row"><span class="pr-label">Projected Lifespan</span><span class="pr-value" id="r-p1-life">—</span></div>
         </div>
-        <div class="partner-card">
+        <div class="partner-card" id="r-p2-card">
           <div class="partner-name" id="r-p2-name">Partner 2</div>
           <div class="partner-row"><span class="pr-label">Age</span><span class="pr-value" id="r-p2-age">—</span></div>
           <div class="partner-row"><span class="pr-label">Date of Birth</span><span class="pr-value" id="r-p2-dob">—</span></div>
@@ -783,10 +783,11 @@ function populateReport(d) {
   // ── HEADER ──
   var p1n = p1.name || 'Partner 1';
   var p2n = p2.name || 'Partner 2';
+  var single = !(p2 && p2.name && String(p2.name).trim());
   try{if(p1.name)localStorage.setItem('rbp_p1_name',p1.name.trim());}catch(e){}
   try{if(p2.name)localStorage.setItem('rbp_p2_name',p2.name.trim());}catch(e){}
   if(typeof rbpApplyNames==='function') rbpApplyNames(p1n, p2n);
-  set('r-names', p1n + ' & ' + p2n + ' — Retirement Plan');
+  set('r-names', (single ? p1n : p1n + ' & ' + p2n) + ' — Retirement Plan');
   set('r-date',  'Generated: ' + today.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}));
   set('r-plan-year', 'Plan Year: ' + (gl.planYear || curYear));
   set('r-footer-date', today.toLocaleDateString());
@@ -831,7 +832,9 @@ function populateReport(d) {
     set(pfx+'-life', p.deathAge ? 'To age '+p.deathAge : '—');
   }
   partnerBlock(p1, p1n, 'r-p1');
-  partnerBlock(p2, p2n, 'r-p2');
+  var _p2card = document.getElementById('r-p2-card');
+  if (single) { if (_p2card) _p2card.style.display = 'none'; }
+  else { if (_p2card) _p2card.style.display = ''; partnerBlock(p2, p2n, 'r-p2'); }
 
   // ── INCOME TABLE ──
   // Show each income source with active status — don't add inactive sources to total
@@ -1000,7 +1003,7 @@ function populateReport(d) {
   // survivorReduction may be decimal (0.25) or whole number (25)
   var _survRed = gl.survivorReduction || 0;
   if (_survRed > 0 && _survRed < 1) _survRed = Math.round(_survRed * 100);
-  set('r-survivor-pct', _survRed > 0 ? _survRed+'% reduction' : '—');
+  set('r-survivor-pct', single ? 'N/A (single)' : (_survRed > 0 ? _survRed+'% reduction' : '—'));
 
   // ── TAX ──
   set('r-filing', gl.filingStatus || 'Married / Joint');

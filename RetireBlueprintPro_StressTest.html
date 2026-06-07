@@ -1674,6 +1674,7 @@ function runMonteCarlo() {
 
   var p1Name = p1.name || window.rbpP1Name || localStorage.getItem('rbp_p1_name') || 'Partner 1';
   var p2Name = p2.name || window.rbpP2Name || localStorage.getItem('rbp_p2_name') || 'Partner 2';
+  var p2single = !(p2 && p2.name && String(p2.name).trim());
 
   var totalPF   = port.total || 0;
   var floorNow = rbpEssentialFloor().floor;                  // must-pay floor (base living + healthcare + debt)
@@ -2357,7 +2358,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">' +
     contextRow('Simulation period', startYear + ' → ' + endYearLabel + ' (' + yrs + ' years)') +
     contextRow(p1Name + ' lifespan modeled', 'Age ' + p1Age + ' → ' + p1DeathAge + ' (year ' + (curYear + p1DeathAge - p1Age) + ')') +
-    contextRow(p2Name + ' lifespan modeled', 'Age ' + p2Age + ' → ' + p2DeathAge + ' (year ' + (curYear + p2DeathAge - p2Age) + ')') +
+    (p2single ? '' : contextRow(p2Name + ' lifespan modeled', 'Age ' + p2Age + ' → ' + p2DeathAge + ' (year ' + (curYear + p2DeathAge - p2Age) + ')')) +
     contextRow('Starting portfolio', fmt(totalPF)) +
     contextRow('Must-pay floor (base + healthcare + debt)', fmt(floorAmt) + '/yr') +
     (function(){
@@ -2467,7 +2468,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   document.getElementById('mc-verdict').innerHTML = verdictHtml + runoutCompareHtml + depleteHtml + contextHtml;
   document.getElementById('mc-run-info').textContent =
     'Ran ' + nRuns.toLocaleString() + ' scenarios · ' + yrs + '-year horizon (' + startYear + '–' + endYearLabel + ') · ' +
-    p1Name + ' to age ' + p1DeathAge + ' · ' + p2Name + ' to age ' + p2DeathAge +
+    p1Name + ' to age ' + p1DeathAge + (p2single ? '' : (' · ' + p2Name + ' to age ' + p2DeathAge)) +
     ' · Expected return: ' + (mu*100).toFixed(1) + '% · σ=' + (sigma*100).toFixed(0) + '% · Inflation: ' + (inflation*100).toFixed(1) + '%';
 
   buildMCFanChart(yearlyBals, yrs, curYear, mcYears, nRuns);

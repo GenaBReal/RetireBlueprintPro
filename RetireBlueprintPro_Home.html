@@ -342,7 +342,7 @@ window.addEventListener('storage', function(e) {
       <div class="kpi-sub">Converting now vs later</div>
     </div>
     <div class="kpi">
-      <div class="kpi-lbl">Survivor Runway</div>
+      <div class="kpi-lbl" id="kpi-runway-lbl">Survivor Runway</div>
       <div class="kpi-val" id="kpi-runway">49 yrs</div>
       <div class="kpi-sub" id="kpi-runway-sub">Survivor covered</div>
     </div>
@@ -362,8 +362,8 @@ window.addEventListener('storage', function(e) {
   
   <div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:18px 24px;margin-bottom:16px;border:1px solid rgba(28,199,208,0.2);display:flex;align-items:center;justify-content:space-between;">
     <div>
-      <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">The retirement plan that runs up to 100 years — so you never outlive your money. 📊</div>
-      <div style="font-size:11px;color:#8aaabb;line-height:1.6;">Connect your Google Sheet once. Your 50-100 year projection updates automatically. Print a professional summary your financial advisor can read in 5 minutes.</div>
+      <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">The retirement plan that is modeled every year — all the way to age 110 — so you never outlive your money. 📊</div>
+      <div style="font-size:11px;color:#8aaabb;line-height:1.6;">Connect your Google Sheet once. Your full lifetime projection updates automatically. Print a professional summary your financial advisor can read in 5 minutes.</div>
     </div>
     <div style="flex-shrink:0;margin-left:24px;text-align:center;">
       <div style="font-size:28px;font-weight:900;color:#1CC7D0;" id="home-conf-big">—</div>
@@ -375,8 +375,8 @@ window.addEventListener('storage', function(e) {
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
     <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #1CC7D0;text-align:center;">
       <div style="font-size:24px;margin-bottom:6px;">📊</div>
-      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Up to 100-Year Projection</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Master spreadsheet calculates your complete financial picture year by year — up to 100 years. Perfect for FIRE planners and traditional retirees alike</div>
+      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Lifetime Projection — to Age 110</div>
+      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Master spreadsheet calculates your complete financial picture year by year — all the way to age 110. Perfect for FIRE planners and traditional retirees alike</div>
     </div>
     <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #f4b86a;text-align:center;">
       <div style="font-size:24px;margin-bottom:6px;">🔄</div>
@@ -434,7 +434,7 @@ window.addEventListener('storage', function(e) {
       <div class="app-card-inner">
         <div><span class="app-tag tag-primary"><span class="live-dot"></span> Live</span></div>
         <div class="app-title">Retirement Dashboard</div>
-        <div class="app-desc">Your complete 100-year financial picture. Portfolio sustainability arc, income bridge by source, tax bucket evolution, smile curve spending by phase, survivor plan through the full plan, and At-a-Glance intelligence sidebar. Reads live from your Google Sheet.</div>
+        <div class="app-desc">Your complete lifetime financial picture. Portfolio sustainability arc, income bridge by source, tax bucket evolution, smile curve spending by phase, survivor plan through the full plan, and At-a-Glance intelligence sidebar. Reads live from your Google Sheet.</div>
         <div class="app-footer">
           <span class="app-cta">Open Dashboard</span>
           <span class="app-arrow">→</span>
@@ -460,7 +460,7 @@ window.addEventListener('storage', function(e) {
       <div class="app-card-inner">
         <div><span class="app-tag tag-teal">Annual</span></div>
         <div class="app-title">Annual Check-In</div>
-        <div class="app-desc">Enter your December 31 actual balances each January. Track variance vs projection across 100 years. Green or red — are you ahead of the plan?</div>
+        <div class="app-desc">Enter your December 31 actual balances each January. Track variance vs projection every year of your plan. Green or red — are you ahead of the plan?</div>
         <div class="app-footer">
           <span class="app-cta">Open Check-In</span>
           <span class="app-arrow">→</span>
@@ -526,7 +526,7 @@ window.addEventListener('storage', function(e) {
       <div class="sheet-icon-box" style="background:#1a3a52;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
       </div>
-      <div><div class="sheet-name">Master Sheet</div><div class="sheet-desc">100-year projection</div></div>
+      <div><div class="sheet-name">Master Sheet</div><div class="sheet-desc">Lifetime projection</div></div>
     </a>
     <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html" class="sheet-card">
       <div class="sheet-icon-box" style="background:#2E4053;">
@@ -567,7 +567,10 @@ function loadData(){
   try { if(craig.name) localStorage.setItem("rbp_p1_name",craig.name.trim()); } catch(e){}
   try { if(gena.name) localStorage.setItem("rbp_p2_name",gena.name.trim()); } catch(e){}
   if (typeof rbpApplyNames==="function") rbpApplyNames(craig.name||"Partner 1", gena.name||"Partner 2");
-      var runway=gena.projectedDeathYear-meta.planYear;
+      var single = !(p2 && p2.name && String(p2.name).trim());
+      var coverPerson = single ? p1 : p2;
+      var runway=(coverPerson.projectedDeathYear||meta.planYear)-meta.planYear;
+      set('kpi-runway-lbl', single ? 'Plan Coverage' : 'Survivor Runway');
       set('k-confidence',Math.round(leg.achievedPct)+'%');
       set('k-portfolio',fmt(port.total));
       set('k-extra',fmt(sp.safeExtra));
@@ -579,10 +582,10 @@ function loadData(){
       set('kpi-legacy',leg.achievedPct>=100?'Met ✓':Math.round(leg.achievedPct)+'%');
       set('kpi-roth',fmt(tax.rothConversionSavings));
       set('kpi-runway',runway+' yrs');
-      set('kpi-runway-sub',p2.name+' covered to age '+p2.deathAge);
-      set('m-names',craig.name+' '+craig.age+' · '+gena.name+' '+gena.age);
+      set('kpi-runway-sub',(coverPerson.name||'Plan')+' covered to age '+(coverPerson.deathAge||'—'));
+      set('m-names', single ? (p1.name+' '+p1.age) : (p1.name+' '+p1.age+' · '+p2.name+' '+p2.age));
       set('m-year',meta.planYear);
-      set('m-runway',runway+' yrs ('+p2.name+')');
+      set('m-runway',runway+' yrs ('+(coverPerson.name||'')+')');
       set('m-status',leg.achievedPct>=100?'ON TRACK · Legacy Goal Met':'REVIEW PLAN');
 
       // Phase and Scenario
