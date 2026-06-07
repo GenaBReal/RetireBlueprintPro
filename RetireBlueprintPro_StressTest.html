@@ -1901,11 +1901,24 @@ function runMonteCarlo() {
       setTimeout(function() { runChunk(end); }, 0);
     } else {
       clearInterval(dotsInterval);
-      showMCResults(allEndingBals, yearlyBals, failYears, depleteYears,
-        nRuns, yrs, mcYears, legacyGoal, curYear,
-        p1Name, p2Name, p1DeathAge, p2DeathAge, p1.age||63, p2.age||55,
-        mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
-        allEndingBalsNX, chosenExtraNow, extraInPlan, depleteYearsFull, suggestedExtra, extraSummary, fixedYr1);
+      try {
+        showMCResults(allEndingBals, yearlyBals, failYears, depleteYears,
+          nRuns, yrs, mcYears, legacyGoal, curYear,
+          p1Name, p2Name, p1DeathAge, p2DeathAge, p1.age||63, p2.age||55,
+          mu, sigma, inflation, colaRate, totalPF, baseSpend, ssYear1, pension, model,
+          allEndingBalsNX, chosenExtraNow, extraInPlan, depleteYearsFull, suggestedExtra, extraSummary, fixedYr1);
+      } catch (mcErr) {
+        var mp = document.getElementById('mc-progress'); if (mp) mp.style.display = 'none';
+        var mr = document.getElementById('mc-results');
+        if (mr) {
+          mr.style.display = 'block';
+          mr.innerHTML = '<div style="background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.5);border-radius:10px;padding:16px 18px;color:#ff9b9b;font-size:13px;line-height:1.6;">'
+            + '\u26a0\ufe0f <strong>Monte Carlo finished its 1,000 runs but hit an error while drawing the results.</strong>'
+            + '<div style="margin-top:8px;font-family:monospace;color:#ffd0d0;word-break:break-word;">' + (mcErr && mcErr.message ? mcErr.message : String(mcErr)) + '</div>'
+            + '<div style="margin-top:6px;color:#f4b86a;">Send me this message and I\u2019ll pinpoint it.</div></div>';
+        }
+        var mb = document.getElementById('mc-run-btn'); if (mb) { mb.disabled = false; mb.textContent = '\u25B6 Run Again'; }
+      }
     }
   }
 
