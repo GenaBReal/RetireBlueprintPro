@@ -1198,7 +1198,10 @@ function loadData() {
   document.head.appendChild(s);
 }
 
-window.addEventListener('DOMContentLoaded', function(){ loadData(); });
+window.addEventListener('DOMContentLoaded', function(){
+  try { rbpRenderEmptySweep(); } catch(e){}   // show the sweep panel as a blank shell right away
+  loadData();
+});
 
 // ════ ENGINE STRESS TESTS ════════════════════════════════════════
 var _esTests = [];        // up to 5 saved tests
@@ -1933,6 +1936,26 @@ function runMonteCarlo() {
 function rbpShowSweepSection() {
   var s = document.getElementById('sweep-section');
   if (s) s.style.display = 'block';
+  rbpRenderEmptySweep();   // refresh the always-visible blank grid (now with real Floor/yr once data is loaded)
+}
+
+// Renders the full sweep grid as an empty shell — every safe-spend amount blank
+// ("—") until the real engine runs. Floor/yr (the base must-pay) fills in once
+// plan data is loaded; everything else stays blank until "Sweep All Scenarios".
+function rbpRenderEmptySweep() {
+  if (window._rbpSweepRan) return;   // don't wipe real results if a sweep already populated the grid
+  var scens = [
+    { label:'+10%  (great year)', cat:'great' },
+    { label:' +5%  (good year)',  cat:'good'  },
+    { label:'  0%  (flat year)',  cat:'ok'    },
+    { label:'-10%  (mild drop)',  cat:'ok'    },
+    { label:'-20%  (bad year)',   cat:'warn'  },
+    { label:'-30%  (bear mkt)',   cat:'warn'  },
+    { label:'-40%  (severe)',     cat:'bad'   },
+    { label:'-50%  (crash)',      cat:'bad'   }
+  ];
+  var rows = scens.map(function(s){ return { label:s.label, cat:s.cat, safe:null, fullDepl:null, floorDepl:null, safeBase:null }; });
+  _rbpSweepRender(rows, null, 0);   // p1Planned null → YOUR PLAN blank too
 }
 
 function _rbpSweepRender(results, p1Planned, legacyGoal) {
@@ -1948,10 +1971,11 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
     + '<span style="text-align:right;">Amount</span></div>';
 
   results.forEach(function(r) {
+    var blank = (r.safe == null);
     var safe = r.safe || 0;
-    var pct  = maxSafe > 0 ? Math.round(safe / maxSafe * 100) : 0;
+    var pct  = (!blank && maxSafe > 0) ? Math.round(safe / maxSafe * 100) : 0;
     var col  = catColor[r.cat] || '#1CC7D0';
-    var planDepletes = r.fullDepl && r.fullDepl < 2050 && safe > 0;
+    var planDepletes = !blank && r.fullDepl && r.fullDepl < 2050 && safe > 0;
 
     var depleteNote = planDepletes
       ? '<div style="font-size:9px;color:#f4b86a;margin-top:2px;line-height:1.4;">'
@@ -1959,8 +1983,9 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
       : '';
 
     var amtStyle = planDepletes ? 'color:#f4b86a;' : 'color:'+col+';';
-    var belowTag = (safe > 0 && p1Planned > 0 && safe < p1Planned)
+    var belowTag = (!blank && safe > 0 && p1Planned > 0 && safe < p1Planned)
       ? '<div style="font-size:9px;color:#f4b86a;">\u25bc below plan</div>' : '';
+    var amtHtml = blank ? '<span style="color:#4f6573;">\u2014</span>' : (fmtKno(safe) + '/yr' + belowTag);
 
     bHtml += '<div style="display:grid;grid-template-columns:150px 80px 1fr 100px;gap:8px;align-items:start;margin-bottom:8px;">'
       + '<div style="font-size:11px;color:#dceaf5;font-family:monospace;padding-top:2px;">' + r.label + '</div>'
@@ -1970,7 +1995,7 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
       +     '<div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;transition:width .4s;"></div></div>'
       +   depleteNote
       + '</div>'
-      + '<div style="text-align:right;font-size:13px;font-weight:500;'+amtStyle+'">' + fmtKno(safe) + '/yr' + belowTag
+      + '<div style="text-align:right;font-size:13px;font-weight:500;'+amtStyle+'">' + amtHtml
       + '</div>'
       + '</div>';
   });
@@ -1987,16 +2012,20 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
     + '<span>Scenario</span><span>Floor/yr</span><span>Floor only</span><span>At full extra</span><span>Reduce to</span><span>At reduced plan</span></div>';
 
   results.forEach(function(r) {
-    var fCol = r.fullDepl ? (r.fullDepl < 2045 ? '#ff6b6b' : '#f4b86a') : '#1CC7D0';
-    var lCol = r.floorDepl ? '#f4b86a' : '#1CC7D0';
-    var safeStr = r.safe > 0 ? fmtKno(r.safe)+'/yr' : '$0 \u2014 floor';
-    var atReduced = r.safe > 0 ? '\u2705 Survives' : String(r.floorDepl || '\u2014');
-    var atReducedCol = r.safe > 0 ? '#1CC7D0' : '#f4b86a';
+    var blank = (r.safe == null);
+    var dash = '<span style="color:#4f6573;">\u2014</span>';
+    var fCol = (!blank && r.fullDepl) ? (r.fullDepl < 2045 ? '#ff6b6b' : '#f4b86a') : '#1CC7D0';
+    var lCol = (!blank && r.floorDepl) ? '#f4b86a' : '#1CC7D0';
+    var floorOnlyCell = blank ? dash : (r.floorDepl ? r.floorDepl : '\u2705 Survives');
+    var fullExtraCell = blank ? dash : (r.fullDepl ? r.fullDepl : '\u2705 Survives');
+    var safeStr = blank ? dash : (r.safe > 0 ? fmtKno(r.safe)+'/yr' : '$0 \u2014 floor');
+    var atReduced = blank ? dash : (r.safe > 0 ? '\u2705 Survives' : String(r.floorDepl || '\u2014'));
+    var atReducedCol = (!blank && r.safe > 0) ? '#1CC7D0' : '#f4b86a';
     dHtml += '<div style="display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;align-items:center;margin-bottom:5px;font-size:11px;">'
       + '<div style="color:#9fc1d6;font-family:monospace;">' + r.label + '</div>'
       + '<div style="color:#566576;">' + floorStr + '</div>'
-      + '<div style="color:'+lCol+';font-weight:500;">' + (r.floorDepl ? r.floorDepl : '\u2705 Survives') + '</div>'
-      + '<div style="color:'+fCol+';font-weight:500;">' + (r.fullDepl ? r.fullDepl : '\u2705 Survives') + '</div>'
+      + '<div style="color:'+lCol+';font-weight:500;">' + floorOnlyCell + '</div>'
+      + '<div style="color:'+fCol+';font-weight:500;">' + fullExtraCell + '</div>'
       + '<div style="color:#f4b86a;font-weight:700;">' + safeStr + '</div>'
       + '<div style="color:'+atReducedCol+';font-weight:500;">' + atReduced + '</div>'
       + '</div>';
@@ -2023,6 +2052,7 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
 // ══════════════════════════════════════════════════════
 function rbpRealSweep() {
   if (!planData) { alert('Load your plan data first (Reload Data above).'); return; }
+  window._rbpSweepRan = true;   // real results now own the grid; don't let a refresh blank them
 
   var proj = planData.projections || {};
   var gl   = planData.global      || {};
@@ -2086,7 +2116,7 @@ function rbpRealSweep() {
   var results = sweepScens.map(function(s) {
     return {
       label: s.label, cat: s.cat,
-      safe: localSafeP1(s.yr1 / 100),   // local estimate shown immediately
+      safe: null,   // blank until the REAL engine number arrives for this scenario
       fullDepl: null, floorDepl: null,
       _done: false, _drag: s.drag, _dur: s.dur, _yr1: s.yr1 / 100
     };
@@ -2131,7 +2161,7 @@ function rbpRealSweep() {
 
     esJsonp({ action:'runSweepOne', idx:i, startYr:startYr, infl:inf }, function(resp) {
       if (resp && resp.ok) {
-        if (resp.safeExtra != null) results[i].safe = (+resp.safeExtra) || results[i].safe;
+        if (resp.safeExtra != null) results[i].safe = +resp.safeExtra;
         results[i].fullDepl = resp.belowYear || null;
         results[i].safeBase = (resp.safeExtraBase != null) ? (+resp.safeExtraBase) : null;
         results[i]._real = true;
