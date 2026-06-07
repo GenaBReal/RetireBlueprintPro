@@ -48,6 +48,7 @@ window.RBP_TAX = {
      (Source: CMS, published each fall.) */
   irmaa: {
     partBBase: 202.90,
+    partBDeductible: 283,   /* annual Part B deductible (CMS, published each fall) */
     tiers: [
       { label: 'Standard', singleMax: 109000,   mfjMax: 218000,   partBSurcharge: 0,      partD: 0     },
       { label: 'Tier 1',   singleMax: 137000,   mfjMax: 274000,   partBSurcharge: 81.20,  partD: 14.50 },
@@ -72,13 +73,16 @@ window.RBP_TAX = {
 window.RBP_TAX.applyText = function () {
   var C = window.RBP_TAX; if (!C || !C.irmaa) return;
   var base = C.irmaa.partBBase;
+  var ded = C.irmaa.partBDeductible || 283;
   var firstMfj = C.irmaa.tiers[0].mfjMax;
   var map = {
     'rbp-pb-base':     '$' + base.toFixed(2),
     'rbp-pb-base-mo':  '$' + base.toFixed(2) + '/mo',
+    'rbp-pb-deductible': '$' + ded.toLocaleString(),
     'rbp-year':        '' + C.year,
     'rbp-irmaa-mfj1':  '$' + firstMfj.toLocaleString(),
-    'rbp-irmaa-mfj1k': '$' + Math.round(firstMfj / 1000) + 'K'
+    'rbp-irmaa-mfj1k': '$' + Math.round(firstMfj / 1000) + 'K',
+    'rbp-current-year': '' + (new Date().getFullYear())
   };
   Object.keys(map).forEach(function (cls) {
     var els = document.querySelectorAll('.' + cls);

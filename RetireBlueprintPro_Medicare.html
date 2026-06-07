@@ -280,7 +280,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
         <div style="font-size:12.5px;color:#33424e;line-height:1.9;">
           The government pays part of your premium if your income is between <strong style="color:#16242f;">100%–400%+ of the federal poverty level.</strong>
           <br><br>
-          For a couple in 2025, that's roughly <strong style="color:#a8690f;">$21,000–$80,000/yr.</strong> At $60K income, a couple might pay <strong style="color:#0c7b84;">$400–700/month</strong> for a Silver plan instead of $1,500+/month full price.
+          For a couple, that's roughly <strong style="color:#a8690f;">$21,000–$85,000/yr</strong> in <span class="rbp-current-year">2026</span> (100%–400% of the federal poverty level — the figure rises a little each year). At $60K income, a couple might pay <strong style="color:#0c7b84;">$400–700/month</strong> for a Silver plan instead of $1,500+/month full price.
           <br><br>
           <div style="background:#fff;border-radius:6px;padding:8px;">
             <strong style="color:#a8690f;">⚠️ Roth conversion trap:</strong> Roth conversions count as income on the ACA. Converting $80K in a year can eliminate your subsidy and cost you $15,000+ extra in premiums. Plan conversions carefully if you are on ACA.
@@ -311,7 +311,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
     </div>
 
     <!-- ACA COST TABLE -->
-    <div style="font-size:13px;font-weight:800;color:#16242f;margin-bottom:12px;">Estimated ACA Monthly Premiums (2025, couple age 60, Silver plan):</div>
+    <div style="font-size:13px;font-weight:800;color:#16242f;margin-bottom:12px;">Estimated ACA Monthly Premiums (<span class="rbp-current-year">2026</span>, couple age 60, Silver plan):</div>
     <div style="overflow-x:auto;">
       <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
         <thead>
@@ -727,7 +727,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
         </tbody>
       </table>
     </div>
-    <div style="margin-top:10px;font-size:10px;color:#3f5260;font-style:italic;">2025 rates. Medigap premiums vary by state, age, and insurer — shop at least 3 quotes. Part D varies by plan and medications.</div>
+    <div style="margin-top:10px;font-size:10px;color:#3f5260;font-style:italic;"><span class="rbp-current-year">2026</span> estimates. Medigap premiums vary by state, age, and insurer — shop at least 3 quotes. Part D varies by plan and medications.</div>
   </div>
 
   <!-- WHAT TO ENTER IN INPUTS -->
@@ -832,7 +832,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
         <div class="part-card part-d">
           <div class="part-title">Part D — Prescriptions</div>
           <div class="part-cost" style="color:#8e24aa;">$20–$100/mo</div>
-          <div class="part-desc">Prescription drug coverage. Separate plan you add to Original Medicare. The $2,000 out-of-pocket cap (starting 2025) limits your annual drug costs regardless of how expensive your medications are.</div>
+          <div class="part-desc">Prescription drug coverage. Separate plan you add to Original Medicare. A yearly out-of-pocket cap (about $2,000, adjusted up slightly each year) now limits your annual drug costs no matter how expensive your medications are.</div>
         </div>
         <div class="part-card part-medigap">
           <div class="part-title">Medigap Supplement</div>
@@ -857,15 +857,15 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
     </div>
     <div class="card-body">
       <div class="alert alert-teal" style="margin-bottom:16px;">
-        IRMAA is calculated on your income from <strong>2 years ago</strong> (called the "look-back" period).
-        So your 2027 Medicare premium is based on your 2025 income. A large Roth conversion in a single year can trigger IRMAA surcharges 2 years later.
+        IRMAA is calculated on your income from <strong>2 years ago</strong> (the "look-back" period).
+        So the income you report this year sets your Medicare premium two years from now — a large Roth conversion in a single year can trigger IRMAA surcharges two years later.
         Your Tax Engine page shows the exact thresholds.
       </div>
       <div id="irmaa-result" style="margin-bottom:16px;padding:12px 16px;border-radius:8px;background:#f8f9fa;border:1px solid #e8eaed;font-size:13px;"></div>
       <table class="irmaa-table" id="irmaa-table">
         <thead>
           <tr>
-            <th>2025 Income (Married Filing Jointly)</th>
+            <th>Income — Married Filing Jointly (MAGI)</th>
             <th>Part B Surcharge (per person/mo)</th>
             <th>Part D Surcharge (per person/mo)</th>
             <th>Total Extra (couple/yr)</th>
@@ -939,7 +939,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
         <div>
           <div class="alert alert-green"><strong>Keep your income below $218K (married) in retirement</strong> if possible. Even one dollar over the IRMAA threshold adds $888/year per person. Time large Roth conversions to avoid crossing thresholds.</div>
           <div class="alert alert-orange"><strong>Enroll in Part B on time.</strong> The late enrollment penalty is 10% per year forever — a $203/mo premium becomes $204/mo permanently if you're 1 year late.</div>
-          <div class="alert alert-teal"><strong>Consider Plan G Medigap.</strong> Plan F was closed to new enrollees after 2020. Plan G covers everything Plan F did except the Part B deductible ($257/yr in 2025) — often the better value.</div>
+          <div class="alert alert-teal"><strong>Consider Plan G Medigap.</strong> Plan F was closed to new enrollees after 2020. Plan G covers everything Plan F did except the Part B deductible (<span class="rbp-pb-deductible">$283</span>/yr) — often the better value.</div>
         </div>
         <div>
           <div class="alert alert-green"><strong>HSA dollars can pay Medicare premiums.</strong> Part B, Part D, and Medicare Advantage premiums are all qualified HSA expenses — but NOT Medigap premiums. Build your HSA before 65 for this purpose.</div>
@@ -1126,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', function(){ loadData(); });
 </script>
 <div class="rbp-disclaimer" style="max-width:1140px;margin:28px auto 18px;padding:14px 20px;border-top:1px solid #e6ebf0;text-align:center;font-size:10.5px;color:#7a8a99;line-height:1.7;">
   <strong style="color:#566576;">Educational tool — not financial, tax, or legal advice.</strong>
-  RetireBlueprint Pro provides general retirement-planning projections for personal use only. Markets are unpredictable and your actual results will differ. Always consult a licensed financial, tax, or legal professional before making major retirement decisions. © 2026 RetireBlueprint Pro
+  RetireBlueprint Pro provides general retirement-planning projections for personal use only. Markets are unpredictable and your actual results will differ. Always consult a licensed financial, tax, or legal professional before making major retirement decisions. © <span class="rbp-current-year">2026</span> RetireBlueprint Pro
 </div>
 <script>
 /* mobile: wrap tables so wide ones scroll inside their own box instead of pushing the page wide */
