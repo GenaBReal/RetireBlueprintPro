@@ -1963,11 +1963,28 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
   var maxSafe = Math.max.apply(null, results.map(function(r){ return r.safe || 0; }));
   var fmtKno = function(v) { return v >= 1000 ? ('$'+Math.round(v/1000)+'K') : (v>0?('$'+v):'$0'); };
 
+  // Detect distinct spending phases (go-go / slow-go / no-go) from the plan: groups of
+  // consecutive years with the same chosen extra. Each phase's ratio to Phase 1 lets us
+  // show the implied Phase 2 / Phase 3 amounts alongside the solved Phase-1 figure.
+  var _phaseRatios = [];
+  try {
+    var _by = (planData && planData.projections && planData.projections.byYear) || [];
+    var _arr = _by.map(function(y){ return (y && +y.chosenExtra) || 0; });
+    var _phases = [], _i = 0;
+    while (_i < _arr.length) {
+      if (_arr[_i] > 0) { var _amt = _arr[_i]; while (_i < _arr.length && Math.abs(_arr[_i]-_amt) < 1) _i++; _phases.push(_amt); }
+      else _i++;
+    }
+    var _p1 = _phases[0] || 0;
+    if (_p1 > 0) _phaseRatios = _phases.map(function(a){ return a / _p1; });
+  } catch(e){}
+  var _nPhases = _phaseRatios.length;
+
   // ── Bar chart: 4 columns — Scenario | Your Plan | Bar | Safe Amount ──
   var bHtml = '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:150px 80px 1fr 100px;gap:8px;padding:0 2px;margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;">'
     + '<span>Scenario</span>'
     + '<span style="color:#f4b86a;">Your Plan</span>'
-    + '<span>Safe extra/yr \u00b7 Phase 1</span>'
+    + '<span>Safe extra/yr \u00b7 by phase</span>'
     + '<span style="text-align:right;">Amount</span></div>';
 
   results.forEach(function(r) {
@@ -1986,6 +2003,12 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
     var belowTag = (!blank && safe > 0 && p1Planned > 0 && safe < p1Planned)
       ? '<div style="font-size:9px;color:#f4b86a;">\u25bc below plan</div>' : '';
     var amtHtml = blank ? '<span style="color:#4f6573;">\u2014</span>' : (fmtKno(safe) + '/yr' + belowTag);
+    // Show the implied Phase 2 / Phase 3 amounts (they scale proportionally to Phase 1)
+    if (!blank && safe > 0 && _nPhases > 1) {
+      amtHtml += '<div style="font-size:9px;color:#9fc1d6;font-weight:600;margin-top:3px;line-height:1.5;">'
+        + _phaseRatios.slice(1, 3).map(function(rt, idx){ return 'P' + (idx+2) + ' ~' + fmtKno(safe * rt); }).join('<br>')
+        + '</div>';
+    }
 
     bHtml += '<div style="display:grid;grid-template-columns:150px 80px 1fr 100px;gap:8px;align-items:start;margin-bottom:8px;">'
       + '<div style="font-size:11px;color:#dceaf5;font-family:monospace;padding-top:2px;">' + r.label + '</div>'
