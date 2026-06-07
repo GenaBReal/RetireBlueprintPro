@@ -1099,6 +1099,42 @@ function loadSampleData() {
   recalc();
 }
 
+// ── HONEST WAIT / FAIL STATES (never auto-loads sample numbers) ──
+// The shell stays visible with its "—" placeholders. We show a clear status
+// + Try Again, and — when a sheet is connected — a link to open the raw
+// connector response so we can SEE whether the engine erred or just stalled.
+function rbpFailState(kind, sheetId, statusEl){
+  var content=document.getElementById('stress-content'); if(content) content.style.display='block';
+  var msg=document.getElementById('loading-msg'); if(msg) msg.style.display='block';
+  var bar=document.getElementById('loading-progress');
+  var pctEl=document.getElementById('loading-pct'); if(pctEl) pctEl.style.display='none';
+  if(!statusEl) statusEl=document.getElementById('loading-status');
+  var det=document.getElementById('loading-detail');
+  var retryBtn='<button onclick="loadData()" style="margin-top:10px;padding:7px 18px;background:#1CC7D0;color:#041E2F;border:none;border-radius:5px;font-weight:800;cursor:pointer;font-family:inherit;">&#8635; Try Again</button>';
+  var rawLink='';
+  if(sheetId){
+    var rawUrl=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId);
+    rawLink=' <a href="'+rawUrl+'" target="_blank" rel="noopener" style="margin-left:6px;padding:7px 14px;background:transparent;color:#8aaabb;border:1px solid #1a3a52;border-radius:5px;font-weight:700;font-family:inherit;text-decoration:none;display:inline-block;">Open raw connector response &#8599;</a>';
+  }
+  if(kind==='timeout'){
+    if(bar){bar.style.width='100%';bar.style.background='#f4b86a';}
+    if(statusEl)statusEl.textContent='\u23F3 Still waiting on your sheet';
+    if(det)det.innerHTML='The engine didn\u2019t answer in time \u2014 so your numbers stay blank rather than guessed. Usually the sheet is mid\u2011recalculation, or the connector hit an error. Click \u201cOpen raw connector response\u201d to see what the sheet sent back.<br>'+retryBtn+rawLink;
+  } else if(kind==='neterror'){
+    if(bar){bar.style.width='100%';bar.style.background='#ff6b6b';}
+    if(statusEl)statusEl.textContent='\u26A0\uFE0F Couldn\u2019t reach your sheet';
+    if(det)det.innerHTML='No connection to the connector. Check your internet, then retry.<br>'+retryBtn+rawLink;
+  } else if(kind==='nosheet'){
+    if(bar){bar.style.display='none';}
+    if(statusEl)statusEl.textContent='\uD83D\uDD17 No sheet connected yet';
+    if(det)det.innerHTML='Connect your Google Sheet on the Setup Guide, then come back \u2014 your real numbers will fill in here.<br>'+retryBtn;
+  } else { // preview
+    if(bar){bar.style.display='none';}
+    if(statusEl)statusEl.textContent='\uD83D\uDC41 Preview \u2014 no live sheet here';
+    if(det)det.innerHTML='This preview can\u2019t reach a Google Sheet, so the shell stays empty (no sample numbers). On your live site it fills with your real plan.<br><button onclick="loadSampleData()" style="margin-top:10px;padding:6px 14px;background:transparent;color:#8aaabb;border:1px solid #1a3a52;border-radius:5px;font-weight:700;cursor:pointer;font-family:inherit;">Show sample layout</button>';
+  }
+}
+
 // ── LOAD DATA ─────────────────────────────────────────────────
 function loadData() {
   // Reset UI
@@ -1115,10 +1151,8 @@ function loadData() {
   var host=window.location.hostname||'';
   var isPreview=(window.location.protocol==='file:'||host===''||host==='localhost'||host.indexOf('claude.ai')>=0);
 
-  if(!sheetId||isPreview){
-    setTimeout(loadSampleData,600);
-    return;
-  }
+  if(!sheetId){ rbpFailState('nosheet', sheetId, statusEl); return; }
+  if(isPreview){ rbpFailState('preview', sheetId, statusEl); return; }
 
   // Progress animation
   var pct=0,msgIdx=0;
@@ -1132,7 +1166,7 @@ function loadData() {
   },400);
 
   var cb='rbpStress_'+Date.now(),done=false;
-  var t=setTimeout(function(){if(!done){done=true;clearInterval(prog);loadSampleData();}},90000);
+  var t=setTimeout(function(){if(!done){done=true;clearInterval(prog);rbpFailState('timeout', sheetId, statusEl);}},90000);
 
   window[cb]=function(d){
     if(done)return;done=true;clearTimeout(t);clearInterval(prog);delete window[cb];
@@ -1160,14 +1194,7 @@ function loadData() {
   var s=document.createElement('script'); s.crossOrigin='anonymous';
   s.setAttribute('data-rbp-stress','true');
   s.src=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now()+'&r='+Math.random().toString(36).slice(2);
-  s.onerror=function(){if(!done){done=true;clearTimeout(t);clearInterval(prog);
-    var isGH=window.location.hostname.indexOf('github.io')>=0;
-    if(isGH){
-      if(statusEl)statusEl.textContent='⚠️ Connection failed';
-      var det=document.getElementById('loading-detail');
-      if(det)det.innerHTML='Could not reach your sheet. <button onclick="loadData()" style="margin-top:8px;padding:6px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-family:inherit;">Try Again</button> <button onclick="loadSampleData()" style="padding:6px 12px;background:transparent;color:#8aaabb;border:1px solid #1a3a52;border-radius:4px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:4px;">Use Sample</button>';
-    } else { loadSampleData(); }
-  }};
+  s.onerror=function(){if(!done){done=true;clearTimeout(t);clearInterval(prog);rbpFailState('neterror', sheetId, statusEl);}};
   document.head.appendChild(s);
 }
 
