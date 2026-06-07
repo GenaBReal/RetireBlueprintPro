@@ -116,6 +116,38 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 .alert-teal{background:#f5f9fa;border-left:3px solid #1CC7D0;color:#004a52;}
 
 @media(max-width:600px){.page{padding:16px 12px 60px;}.settings-grid{grid-template-columns:1fr 1fr;}}
+
+  /* ── Access Ladder redesign (card layout) ── */
+  .rl-yr{display:grid;grid-template-columns:104px 1fr;background:#072a3e;border:1px solid rgba(255,255,255,.10);border-radius:14px;overflow:hidden;margin-bottom:12px}
+  .rl-rail{background:#041E2F;padding:16px 14px;display:flex;flex-direction:column;justify-content:center;border-right:2px solid rgba(28,199,208,.4)}
+  .rl-rail .rl-y{font-size:27px;font-weight:700;color:#fff;line-height:1}
+  .rl-rail .rl-ages{font-size:12px;color:#9fc0d0;margin-top:7px;line-height:1.5}
+  .rl-bd{padding:14px 18px}
+  .rl-kpi{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+  .rl-kpi .rl-big{font-size:19px;font-weight:700;color:#fff;white-space:nowrap}
+  .rl-kpi .rl-big b{color:#1CC7D0}
+  .rl-pips{display:flex;gap:5px}
+  .rl-pip{width:24px;height:8px;border-radius:3px;background:rgba(255,255,255,.14)}
+  .rl-pip.on{background:#1CC7D0}
+  .rl-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .rl-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;font-size:13px;font-weight:600;border:1px solid transparent}
+  .rl-chip .rl-ic{width:9px;height:9px;border-radius:50%;flex:none}
+  .rl-chip.open{background:rgba(28,199,208,.14);color:#bfeef2;border-color:rgba(28,199,208,.4)}
+  .rl-chip.open .rl-ic{background:#1CC7D0}
+  .rl-chip.pre{background:rgba(244,184,106,.14);color:#f7d3a4;border-color:rgba(244,184,106,.4)}
+  .rl-chip.pre .rl-ic{background:#f4b86a}
+  .rl-chip.rp{background:rgba(93,202,165,.14);color:#aee6cf;border-color:rgba(93,202,165,.4)}
+  .rl-chip.rp .rl-ic{background:#5DCAA5}
+  .rl-chip.rg{background:rgba(185,164,240,.16);color:#d8ccf7;border-color:rgba(185,164,240,.45)}
+  .rl-chip.rg .rl-ic{background:#b9a4f0}
+  .rl-chip.hsa{background:rgba(242,156,166,.14);color:#f6c4ca;border-color:rgba(242,156,166,.4)}
+  .rl-chip.hsa .rl-ic{background:#f29ca6}
+  .rl-chip.lock{background:rgba(90,115,131,.18);color:#9db4c1;border-color:rgba(90,115,131,.45)}
+  .rl-chip.lock .rl-ic{background:#5a7383}
+  .rl-chip .rl-sub{font-weight:400;opacity:.82;font-size:12px}
+  .rl-new{margin-top:12px;display:inline-flex;align-items:center;gap:8px;background:rgba(28,199,208,.12);border:1px solid rgba(28,199,208,.4);color:#1CC7D0;padding:6px 12px;border-radius:9px;font-size:13px;font-weight:600}
+  .rl-mile{display:flex;align-items:center;gap:11px;background:rgba(244,184,106,.10);border:1px solid rgba(244,184,106,.45);border-left:5px solid #f4b86a;border-radius:10px;padding:12px 16px;margin:12px 0;color:#f7d3a4;font-size:14px;font-weight:600}
+  @media(max-width:560px){.rl-yr{grid-template-columns:74px 1fr}.rl-rail{padding:12px 9px}.rl-rail .rl-y{font-size:21px}.rl-kpi .rl-big{font-size:15px}.rl-bd{padding:12px 12px}}
 </style>
 <style id="rbp-mobile-fix">
 .rbp-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
@@ -236,10 +268,10 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
       <div class="legend">
         <div class="legend-item"><div class="legend-dot" style="background:#1CC7D0;"></div> Taxable Brokerage (no restrictions)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#f4b86a;"></div> Pre-Tax 401k/IRA (age 59½+ or Rule of 55)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#4CAF50;"></div> Roth Principal (5yr wait after conversion)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ce93d8;"></div> Roth Growth (fully unlocked at 59½)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ef9a9a;"></div> HSA (tax-free medical after 65)</div>
-        <div class="legend-item" style="opacity:0.5;"><div class="legend-dot" style="background:#888;"></div> 🔒 Locked (penalty applies)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5;"></div> Roth Principal (contributions always open)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#b9a4f0;"></div> Roth Growth (fully unlocked at 59½)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f29ca6;"></div> HSA (tax-free medical after 65)</div>
+        <div class="legend-item" style="opacity:0.5;"><div class="legend-dot" style="background:#5a7383;"></div> 🔒 Locked (penalty applies)</div>
       </div>
 
       <div class="ladder-wrap">
@@ -363,6 +395,27 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
+// Fallback: if the shared rbp-connector.js didn't load (blocked in a preview,
+// cached 404, etc.), define a local RBP.load so the page works instead of
+// throwing "RBP is not defined". On the live site the shared connector wins.
+if (typeof window.RBP === 'undefined' || !window.RBP || typeof window.RBP.load !== 'function') {
+  window.RBP = window.RBP || {};
+  window.RBP.load = function(onOk, onErr){
+    var sheetId = localStorage.getItem('rbp_sheet_id');
+    var host = window.location.hostname || '';
+    var isPreview = (window.location.protocol==='file:' || host==='' || host==='localhost' || host.indexOf('claude.ai')>=0);
+    if (!sheetId || isPreview) { if(onErr) onErr('no sheet / preview'); return; }
+    var cb = 'rbpRoth_' + Date.now(), done = false;
+    var t = setTimeout(function(){ if(!done){ done=true; try{delete window[cb];}catch(e){} if(onErr) onErr('timeout'); } }, 90000);
+    window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); try{delete window[cb];}catch(e){}
+      if(d && d.error){ if(onErr) onErr(d.error); return; } if(onOk) onOk(d); };
+    var s = document.createElement('script'); s.crossOrigin='anonymous';
+    s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2);
+    s.onerror = function(){ if(!done){ done=true; clearTimeout(t); try{delete window[cb];}catch(e){} if(onErr) onErr('network'); } };
+    document.head.appendChild(s);
+  };
+}
+
 function fmt(n){
   if(!n&&n!==0)return '—';
   if(Math.abs(n)>=1000000)return '$'+(n/1000000).toFixed(1)+'M';
@@ -393,133 +446,129 @@ function buildLadder() {
   var ladder = document.getElementById('access-ladder');
   ladder.innerHTML = '';
 
-  // Build year range: retirement year to max 85 of younger person
   var retireYear = curYear + (Math.min(p1Ret - p1Age, p2Ret - p2Age));
   var endYear = curYear + (85 - youngestAge);
 
-  // Track which Roth conversions have passed their 5-year window
   var conversionYears = [];
-  for (var cy = firstConv; cy <= curYear + 20; cy++) {
-    conversionYears.push(cy);
+  for (var cy = firstConv; cy <= curYear + 20; cy++) conversionYears.push(cy);
+
+  var p1First = (p1Name.split(' ')[0] || 'P1');
+  var p2First = (p2Name.split(' ')[0] || 'P2');
+
+  function rlChip(cls, label, sub){
+    return '<span class="rl-chip ' + cls + '"><i class="rl-ic"></i>' + label +
+           (sub ? ' <span class="rl-sub">' + sub + '</span>' : '') + '</span>';
   }
+  var rlNewMap = { tax:'Taxable', pre:'Pre\u2011Tax 401k/IRA', rp:'Roth Principal',
+                   conv:'Roth Conversions', rg:'Roth Growth is now fully tax\u2011free', hsa:'HSA' };
+
+  var prevOpen = {};
 
   for (var yr = retireYear; yr <= endYear; yr += 1) {
     var p1AgeNow = p1Age + (yr - curYear);
     var p2AgeNow = p2Age + (yr - curYear);
 
-    // Determine what's accessible this year
-    var row = document.createElement('div');
-    row.className = 'ladder-row';
+    // ── Access logic (unchanged from the original ladder) ──
+    var sTaxOpen = taxable > 0;
 
-    // Age label
-    var ageDiv = document.createElement('div');
-    ageDiv.className = 'ladder-age';
-    ageDiv.innerHTML = yr + '<br><span style="font-size:9px;font-weight:400;color:#6a8a9a;">' +
-      (p1Name.split(' ')[0]||'P1') + ':' + p1AgeNow + ' ' +
-      (p2Name.split(' ')[0]||'P2') + ':' + p2AgeNow + '</span>';
-    row.appendChild(ageDiv);
-
-    var barsDiv = document.createElement('div');
-    barsDiv.className = 'ladder-bars';
-
-    // Taxable brokerage - always open
-    if (taxable > 0) {
-      barsDiv.innerHTML += '<div class="bucket bucket-taxable">💼 Taxable Brokerage <span class="tag tag-green" style="font-size:9px;">Open</span></div>';
-    }
-
-    // Pre-tax 401k: age 59.5+, or Rule of 55 if retired at 55+
     var p1CanPreTax = p1AgeNow >= 59.5 || (p1Ret >= 55 && p1AgeNow >= p1Ret);
     var p2CanPreTax = p2AgeNow >= 59.5 || (p2Ret >= 55 && p2AgeNow >= p2Ret);
-    if (pretax > 0) {
-      if (p1CanPreTax || p2CanPreTax) {
-        var who = (p1CanPreTax && p2CanPreTax) ? 'Both' : (p1CanPreTax ? p1Name.split(' ')[0] : p2Name.split(' ')[0]);
-        barsDiv.innerHTML += '<div class="bucket bucket-pretax">🏦 Pre-Tax 401k/IRA <span style="font-size:9px;opacity:0.8;">(' + who + ')</span> <span class="tag tag-green" style="font-size:9px;">Open</span></div>';
-      } else {
-        var p1YrsLeft = Math.max(0, Math.ceil(59.5 - p1AgeNow));
-        var p2YrsLeft = Math.max(0, Math.ceil(59.5 - p2AgeNow));
-        var minYrs = Math.min(p1YrsLeft, p2YrsLeft);
-        barsDiv.innerHTML += '<div class="bucket bucket-pretax bucket-lock">🔒 Pre-Tax 401k/IRA <span style="font-size:9px;">' + minYrs + 'yr until 59½</span></div>';
-      }
-    }
+    var prePresent = pretax > 0;
+    var sPreOpen = prePresent && (p1CanPreTax || p2CanPreTax);
+    var preSub;
+    if (!prePresent) preSub = 'none in plan';
+    else if (sPreOpen) preSub = (p1CanPreTax && p2CanPreTax) ? 'both' : (p1CanPreTax ? p1First : p2First);
+    else { var minYrs = Math.min(Math.max(0,Math.ceil(59.5-p1AgeNow)), Math.max(0,Math.ceil(59.5-p2AgeNow))); preSub = minYrs + ' yr to 59\u00bd'; }
 
-    // Roth conversion principal: locked 5 years from conversion date
-    var openConversions = conversionYears.filter(function(cy){ return yr - cy >= 5; });
-    var lockedConversions = conversionYears.filter(function(cy){ return yr - cy >= 0 && yr - cy < 5; });
+    var rothPresent = rothBal > 0;
+    var sRpOpen = rothPresent;
+    var rpSub = rothPresent ? 'contributions' : 'none in plan';
 
-    if (openConversions.length > 0 || rothBal > 0) {
-      var rothNote = rothBal > 0 ? 'Original contributions always open · ' : '';
-      barsDiv.innerHTML += '<div class="bucket bucket-roth-principal">🟢 Roth Principal <span style="font-size:9px;opacity:0.8;">' + rothNote + openConversions.length + ' conversion yr(s) open</span> <span class="tag tag-green" style="font-size:9px;">Open</span></div>';
-    }
-    if (lockedConversions.length > 0) {
-      barsDiv.innerHTML += '<div class="bucket bucket-roth-principal bucket-lock">🔒 Roth Conversions <span style="font-size:9px;">' + lockedConversions.length + ' batch(es) in 5yr window</span></div>';
-    }
+    var openConversions = conversionYears.filter(function(c){ return yr - c >= 5; });
+    var lockedConversions = conversionYears.filter(function(c){ return yr - c >= 0 && yr - c < 5; });
+    var sConvOpen = openConversions.length > 0;
+    var convSub;
+    if (sConvOpen) convSub = openConversions.length + ' yr matured';
+    else if (lockedConversions.length > 0) convSub = lockedConversions.length + ' batch' + (lockedConversions.length>1?'es':'') + ' in 5\u2011yr window';
+    else convSub = 'not started';
 
-    // Roth growth: fully open at 59.5 AND account 5+ years old
     var p1RothGrowthOpen = p1AgeNow >= 59.5 && (yr - (firstConv - 1)) >= 5;
     var p2RothGrowthOpen = p2AgeNow >= 59.5 && (yr - (firstConv - 1)) >= 5;
-    if (p1RothGrowthOpen || p2RothGrowthOpen) {
-      barsDiv.innerHTML += '<div class="bucket bucket-roth-growth">✨ Roth Growth (tax-free) <span class="tag tag-green" style="font-size:9px;">Fully Open</span></div>';
-    } else {
-      var p1GrowthYrs = Math.max(Math.ceil(59.5 - p1AgeNow), Math.max(0, 5 - (yr - firstConv + 1)));
-      var p2GrowthYrs = Math.max(Math.ceil(59.5 - p2AgeNow), Math.max(0, 5 - (yr - firstConv + 1)));
-      var minGrowthYrs = Math.min(p1GrowthYrs, p2GrowthYrs);
-      if (minGrowthYrs > 0) {
-        barsDiv.innerHTML += '<div class="bucket bucket-roth-growth bucket-lock">🔒 Roth Growth <span style="font-size:9px;">' + minGrowthYrs + 'yr to fully open</span></div>';
-      }
+    var sRgOpen = rothPresent && (p1RothGrowthOpen || p2RothGrowthOpen);
+    var rgSub;
+    if (!rothPresent) rgSub = 'none in plan';
+    else if (sRgOpen) rgSub = 'tax\u2011free';
+    else { var p1GY = Math.max(Math.ceil(59.5-p1AgeNow), Math.max(0,5-(yr-firstConv+1)));
+           var p2GY = Math.max(Math.ceil(59.5-p2AgeNow), Math.max(0,5-(yr-firstConv+1)));
+           rgSub = Math.max(0, Math.min(p1GY,p2GY)) + ' yr to open'; }
+
+    var hsaFull = p1AgeNow >= 65 || p2AgeNow >= 65;
+    var sHsaOpen = true;
+    var hsaSub = hsaFull ? 'full' : 'medical only';
+
+    // ── 6 sources → chips + open count ──
+    var sources = [
+      { key:'tax',  cls:'open', label:'Taxable',           open:sTaxOpen,  sub:(sTaxOpen?'':'none in plan') },
+      { key:'pre',  cls:'pre',  label:'Pre\u2011Tax 401k/IRA', open:sPreOpen,  sub:preSub },
+      { key:'rp',   cls:'rp',   label:'Roth Principal',     open:sRpOpen,   sub:rpSub },
+      { key:'conv', cls:'rp',   label:'Roth Conversions',   open:sConvOpen, sub:convSub },
+      { key:'rg',   cls:'rg',   label:'Roth Growth',        open:sRgOpen,   sub:rgSub },
+      { key:'hsa',  cls:'hsa',  label:'HSA',                open:sHsaOpen,  sub:hsaSub }
+    ];
+    var chipsHtml = '', openCount = 0, openSet = {};
+    sources.forEach(function(sc){
+      if (sc.open) { openCount++; openSet[sc.key] = true; chipsHtml += rlChip(sc.cls, sc.label, sc.sub); }
+      else chipsHtml += rlChip('lock', sc.label, sc.sub);
+    });
+
+    // ── "New this year" (skip the very first card, where everything is "new") ──
+    var newLabels = [];
+    if (yr !== retireYear) {
+      Object.keys(openSet).forEach(function(k){ if (!prevOpen[k]) newLabels.push(rlNewMap[k]); });
     }
+    prevOpen = openSet;
 
-    // HSA: tax-free medical withdrawals always, penalty-free non-medical at 65
-    var p1HsaMedFree = true; // always open for medical
-    var p1HsaFull = p1AgeNow >= 65;
-    var p2HsaFull = p2AgeNow >= 65;
-    if (p1HsaFull || p2HsaFull) {
-      barsDiv.innerHTML += '<div class="bucket bucket-hsa">🏥 HSA (medical + non-medical) <span class="tag tag-green" style="font-size:9px;">Fully Open</span></div>';
-    } else {
-      barsDiv.innerHTML += '<div class="bucket bucket-hsa">🏥 HSA (medical only) <span class="tag tag-blue" style="font-size:9px;">Medical Only</span></div>';
-    }
+    var pips = '';
+    for (var pi = 0; pi < 6; pi++) pips += '<i class="rl-pip' + (pi < openCount ? ' on' : '') + '"></i>';
 
-    // RMD milestone
-    var p1RmdAge = (curYear - p1Age) >= 1960 ? 75 : 73; // SECURE 2.0
-    var p2RmdAge = (curYear - p2Age) >= 1960 ? 75 : 73;
-    var p1Rmd = p1AgeNow >= p1RmdAge;
-    var p2Rmd = p2AgeNow >= p2RmdAge;
-    if (p1Rmd || p2Rmd) {
-      var rmdWho = (p1Rmd && p2Rmd) ? 'Both' : (p1Rmd ? p1Name.split(' ')[0] : p2Name.split(' ')[0]);
-      barsDiv.innerHTML += '<div style="background:#fff;border-left:3px solid #6a8a9a;border-radius:5px;padding:4px 9px;font-size:10px;font-weight:700;color:#2a4050;white-space:nowrap;">⚠️ RMDs Required (' + rmdWho + ')</div>';
-    }
+    var card = document.createElement('div');
+    card.className = 'rl-yr';
+    card.innerHTML =
+      '<div class="rl-rail"><div class="rl-y">' + yr + '</div>' +
+        '<div class="rl-ages">' + p1First + ' ' + p1AgeNow + '<br>' + p2First + ' ' + p2AgeNow + '</div></div>' +
+      '<div class="rl-bd">' +
+        '<div class="rl-kpi"><div class="rl-big"><b>' + openCount + '</b> of 6 sources open</div>' +
+          '<div class="rl-pips">' + pips + '</div></div>' +
+        '<div class="rl-chips">' + chipsHtml + '</div>' +
+        (newLabels.length ? '<div class="rl-new">\u2726 New this year \u2014 ' + newLabels.join(' \u00b7 ') + '</div>' : '') +
+      '</div>';
+    ladder.appendChild(card);
 
-    row.appendChild(barsDiv);
-    ladder.appendChild(row);
-
-    // Add milestone markers at key ages
+    // ── Milestone bands (unchanged triggers) ──
     var milestones = [];
-    if (p1AgeNow === 55 && p1Ret <= 55) milestones.push('📍 ' + p1Name.split(' ')[0] + ' hits Rule of 55 — pre-tax 401k open penalty-free');
-    if (p2AgeNow === 55 && p2Ret <= 55) milestones.push('📍 ' + p2Name.split(' ')[0] + ' hits Rule of 55 — pre-tax 401k open penalty-free');
-    if (p1AgeNow === 59) milestones.push('🎯 ' + p1Name.split(' ')[0] + ' approaching 59½ — all accounts open soon');
-    if (p2AgeNow === 59) milestones.push('🎯 ' + p2Name.split(' ')[0] + ' approaching 59½ — all accounts open soon');
-    if (p1AgeNow === 62) milestones.push('📋 ' + p1Name.split(' ')[0] + ' Social Security eligible (earliest claiming age)');
-    if (p2AgeNow === 62) milestones.push('📋 ' + p2Name.split(' ')[0] + ' Social Security eligible (earliest claiming age)');
-    if (p1AgeNow === 65) milestones.push('🏥 ' + p1Name.split(' ')[0] + ' Medicare eligible — healthcare bridge ends');
-    if (p2AgeNow === 65) milestones.push('🏥 ' + p2Name.split(' ')[0] + ' Medicare eligible — healthcare bridge ends');
-    if (p1AgeNow === 67) milestones.push('💰 ' + p1Name.split(' ')[0] + ' Full Retirement Age (FRA) for Social Security');
-    if (p2AgeNow === 67) milestones.push('💰 ' + p2Name.split(' ')[0] + ' Full Retirement Age (FRA) for Social Security');
-    if (p1AgeNow === 70) milestones.push('⬆️ ' + p1Name.split(' ')[0] + ' SS max delay benefit — no more increases after 70');
-    if (p2AgeNow === 70) milestones.push('⬆️ ' + p2Name.split(' ')[0] + ' SS max delay benefit — no more increases after 70');
-    if (p1AgeNow === ((curYear - p1Age) >= 1960 ? 75 : 73)) milestones.push('⚠️ ' + p1Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
-    if (p2AgeNow === ((curYear - p2Age) >= 1960 ? 75 : 73)) milestones.push('⚠️ ' + p2Name.split(' ')[0] + ' RMDs begin — pre-tax withdrawals now mandatory');
-
-    milestones.forEach(function(m) {
+    if (p1AgeNow === 55 && p1Ret <= 55) milestones.push('\ud83d\udccd ' + p1First + ' hits Rule of 55 \u2014 pre\u2011tax 401k open penalty\u2011free');
+    if (p2AgeNow === 55 && p2Ret <= 55) milestones.push('\ud83d\udccd ' + p2First + ' hits Rule of 55 \u2014 pre\u2011tax 401k open penalty\u2011free');
+    if (p1AgeNow === 59) milestones.push('\ud83c\udfaf ' + p1First + ' approaching 59\u00bd \u2014 all accounts open soon');
+    if (p2AgeNow === 59) milestones.push('\ud83c\udfaf ' + p2First + ' approaching 59\u00bd \u2014 all accounts open soon');
+    if (p1AgeNow === 62) milestones.push('\ud83d\udccb ' + p1First + ' Social Security eligible (earliest claiming age)');
+    if (p2AgeNow === 62) milestones.push('\ud83d\udccb ' + p2First + ' Social Security eligible (earliest claiming age)');
+    if (p1AgeNow === 65) milestones.push('\ud83c\udfe5 ' + p1First + ' Medicare eligible \u2014 healthcare bridge ends');
+    if (p2AgeNow === 65) milestones.push('\ud83c\udfe5 ' + p2First + ' Medicare eligible \u2014 healthcare bridge ends');
+    if (p1AgeNow === 67) milestones.push('\ud83d\udcb0 ' + p1First + ' Full Retirement Age (FRA) for Social Security');
+    if (p2AgeNow === 67) milestones.push('\ud83d\udcb0 ' + p2First + ' Full Retirement Age (FRA) for Social Security');
+    if (p1AgeNow === 70) milestones.push('\u2b06\ufe0f ' + p1First + ' SS max delay benefit \u2014 no more increases after 70');
+    if (p2AgeNow === 70) milestones.push('\u2b06\ufe0f ' + p2First + ' SS max delay benefit \u2014 no more increases after 70');
+    if (p1AgeNow === ((curYear - p1Age) >= 1960 ? 75 : 73)) milestones.push('\u26a0\ufe0f ' + p1First + ' RMDs begin \u2014 pre\u2011tax withdrawals now mandatory');
+    if (p2AgeNow === ((curYear - p2Age) >= 1960 ? 75 : 73)) milestones.push('\u26a0\ufe0f ' + p2First + ' RMDs begin \u2014 pre\u2011tax withdrawals now mandatory');
+    milestones.forEach(function(m){
       var mDiv = document.createElement('div');
-      mDiv.className = 'milestone';
-      mDiv.textContent = m;
+      mDiv.className = 'rl-mile';
+      mDiv.innerHTML = '<span>' + m + '</span>';
       ladder.appendChild(mDiv);
     });
   }
 
-  // Build conversion planner
   buildConversionPlanner(p1Age, p2Age, p1Ret, p2Ret, firstConv, curYear, p1Name, p2Name);
-
-  // Build strategy table
   buildStrategyTable(p1Age, p2Age, p1Ret, p2Ret, taxable, rothBal, pretax, p1Name, p2Name, curYear);
 }
 
