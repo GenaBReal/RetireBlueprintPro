@@ -1034,6 +1034,22 @@ function populate(d){
   }
   var longestYrs = longestP.projectedDeathYear - meta.planYear;
 
+  // ── Cap every projection series at the second death year (for a single, the sole person's year) ──
+  // The connector extends balances well past death to keep headroom, but the dashboard should never
+  // show a 100+-year-old's balance. Trimming the shared proj arrays here makes every chart and tile
+  // below stop at the longest-lived partner's projected death — no per-chart patching needed.
+  (function(){
+    var capYr = single ? p1dy : Math.max(p1dy, p2dy);
+    if (!capYr || !proj.years || !proj.years.length) return;
+    var n = 0;
+    while (n < proj.years.length && proj.years[n] <= capYr) n++;
+    if (n > 0 && n < proj.years.length) {
+      ['years','income','withdrawals','endLiquid','preTax','roth','taxable','hsa',
+       'federalTaxes','taxableIncome','stateIncome','acctWithdrawals','totalRMD','byYear']
+        .forEach(function(k){ if (Array.isArray(proj[k])) proj[k] = proj[k].slice(0, n); });
+    }
+  })();
+
   // HERO
   var pct = leg.achievedPct||0;   // legacy achievement (kept for the Legacy card, shown separately)
 
