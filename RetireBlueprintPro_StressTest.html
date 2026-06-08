@@ -1764,7 +1764,10 @@ function runMonteCarlo() {
   var p2DeathAge = Math.min(p2.deathAge || 90, 110);
   var p1DeathYear = p1.age > 0 ? curYear + (p1DeathAge - p1.age) : curYear + 30;
   var p2DeathYear = p2.age > 0 ? curYear + (p2DeathAge - p2.age) : curYear + 30;
-  var endYear = Math.max(p1DeathYear, p2DeathYear);
+  // Singles-ready: with no real second partner, stop at the sole person's death year
+  // (don't let the empty p2's default 30-year horizon stretch the sim past their death).
+  var mcSingle = !(p2 && p2.name && String(p2.name).trim());
+  var endYear = mcSingle ? p1DeathYear : Math.max(p1DeathYear, p2DeathYear);
   var yrs = Math.min(endYear - curYear + 1, 100); // never more than 100 steps, never less than plan length
   yrs = Math.max(yrs, 20); // minimum 20 years
 
