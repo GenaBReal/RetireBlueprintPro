@@ -576,10 +576,25 @@ if (typeof window.RBP === 'undefined' || !window.RBP || typeof window.RBP.load !
     document.head.appendChild(s);
   };
 }
+/* ── Instant-paint cache (stale-while-revalidate) ──────────────────────────
+   Paints from the last read (held briefly in this tab) the moment the page
+   opens, then re-reads in the background and repaints with fresh data, so
+   navigating feels instant instead of waiting on a cold sheet each time. */
+var RBP_CACHE_TTL = 90000;
+function rbpCacheKey(){ try { return 'rbp_pd_' + (localStorage.getItem('rbp_sheet_id') || ''); } catch(e){ return ''; } }
+function rbpCacheGet(){ try { var r = sessionStorage.getItem(rbpCacheKey()); if(!r) return null; var o = JSON.parse(r); if(!o || (Date.now()-o.ts) > RBP_CACHE_TTL) return null; return o.d; } catch(e){ return null; } }
+function rbpCachePut(d){ try { if (d && !d.error) sessionStorage.setItem(rbpCacheKey(), JSON.stringify({ ts: Date.now(), d: d })); } catch(e){} }
+function rbpCacheClear(){ try { sessionStorage.removeItem(rbpCacheKey()); } catch(e){} }
+RBP.loadCached = function(onOk, onErr){
+  var cached = rbpCacheGet();
+  if (cached) { try { onOk(cached); } catch(e){} }
+  RBP.load(function(d){ rbpCachePut(d); try { onOk(d); } catch(e){} },
+           function(msg){ if (!cached && onErr) onErr(msg); });
+};
 function fmt(n){if(!n&&n!==0)return'--';if(Math.abs(n)>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString();}
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function loadData(){
-  RBP.load(function(d){
+  RBP.loadCached(function(d){
     try{
       var p=d.people,port=d.portfolio,sp=d.spending,leg=d.legacy,tax=d.tax,meta=d.meta;
       var p1=p.craig||p.person1||{},p2=p.gena||p.person2||{};

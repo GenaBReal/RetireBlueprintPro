@@ -656,6 +656,24 @@ if (!window.RBP || typeof window.RBP.load !== 'function') {
   };
 }
 
+/* ── Instant-paint cache (stale-while-revalidate) ──────────────────────────
+   Paints the page from the last read (held briefly in this browser tab) the
+   moment it opens, then quietly re-reads in the background and repaints with
+   fresh data — so navigating between pages feels instant instead of waiting on
+   a cold sheet every time. The cache is per-sheet, lives only in this tab, and
+   self-expires fast, so customers never see meaningfully stale numbers. */
+var RBP_CACHE_TTL = 90000; // ms — a cached snapshot older than this is ignored
+function rbpCacheKey(){ try { return 'rbp_pd_' + (localStorage.getItem('rbp_sheet_id') || ''); } catch(e){ return ''; } }
+function rbpCacheGet(){ try { var r = sessionStorage.getItem(rbpCacheKey()); if(!r) return null; var o = JSON.parse(r); if(!o || (Date.now()-o.ts) > RBP_CACHE_TTL) return null; return o.d; } catch(e){ return null; } }
+function rbpCachePut(d){ try { if (d && !d.error) sessionStorage.setItem(rbpCacheKey(), JSON.stringify({ ts: Date.now(), d: d })); } catch(e){} }
+function rbpCacheClear(){ try { sessionStorage.removeItem(rbpCacheKey()); } catch(e){} }
+RBP.loadCached = function(onOk, onErr){
+  var cached = rbpCacheGet();
+  if (cached) { try { onOk(cached); } catch(e){} }                       // instant paint from the recent snapshot
+  RBP.load(function(d){ rbpCachePut(d); try { onOk(d); } catch(e){} },    // then refresh + repaint with live data
+           function(msg){ if (!cached && onErr) onErr(msg); });           // only surface an error if we had nothing to show
+};
+
 // MFJ federal brackets — built from the shared tax config (rbp-tax-config.js)
 var _RBP_BRC = ['var(--br1)','var(--br2)','var(--br3)','var(--br4)','var(--br5)','var(--br6)','var(--br7)'];
 var BRACKETS = (window.RBP_TAX ? window.RBP_TAX.mfjBrackets : []).map(function(b,i){
@@ -944,7 +962,7 @@ document.getElementById('status-msg').textContent = '⚠️ Error displaying dat
 }
 
 function loadData() {
-  RBP.load(function(data){ populate(data); }, function(){
+  RBP.loadCached(function(data){ populate(data); }, function(){
     populate({});
     document.getElementById('status-msg').textContent='⚠️ Could not load your sheet — check your connection and refresh. Some values shown are estimates.';
   });
