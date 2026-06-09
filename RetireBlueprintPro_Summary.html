@@ -710,10 +710,21 @@ function showSampleBanner() {
   rp.parentNode.insertBefore(b, rp);
 }
 
+/* ── Instant-paint cache (stale-while-revalidate) ──────────────────────────
+   Paints from the last read (held briefly in this tab) the moment the page
+   opens, then re-reads in the background and repaints with fresh data. */
+var RBP_CACHE_TTL = 90000;
+function rbpCacheKey(){ try { return 'rbp_pd_' + (localStorage.getItem('rbp_sheet_id') || ''); } catch(e){ return ''; } }
+function rbpCacheGet(){ try { var r = sessionStorage.getItem(rbpCacheKey()); if(!r) return null; var o = JSON.parse(r); if(!o || (Date.now()-o.ts) > RBP_CACHE_TTL) return null; return o.d; } catch(e){ return null; } }
+function rbpCachePut(d){ try { if (d && !d.error) sessionStorage.setItem(rbpCacheKey(), JSON.stringify({ ts: Date.now(), d: d })); } catch(e){} }
+function rbpCacheClear(){ try { sessionStorage.removeItem(rbpCacheKey()); } catch(e){} }
+
 function loadReport(attempt) {
   attempt = attempt || 1;
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId) { try { populateReport(SAMPLE_SUMMARY); showSampleBanner(); } catch(e){ document.getElementById('loading').textContent = '⚠️ Demo failed to load: '+e.message; } return; }
+
+  if (attempt === 1) { var _c = rbpCacheGet(); if (_c) { try { populateReport(_c); } catch(e){} } } // instant paint from recent snapshot
 
   var loadEl = document.getElementById('loading');
   loadEl.innerHTML = 'Loading your retirement summary' + (attempt > 1 ? ' (attempt '+attempt+' of 3)' : '') + '...<br><small style="color:#aaa;">This may take 15-30 seconds on first load</small>';
@@ -740,7 +751,7 @@ function loadReport(attempt) {
     done = true;
     clearTimeout(t);
     delete window[cb];
-    try { populateReport(d); }
+    try { rbpCachePut(d); populateReport(d); }
     catch(e) {
 loadEl.innerHTML = '⚠️ Error loading data: '+e.message+'<br><button onclick="loadReport(1)" style="margin-top:10px;padding:8px 16px;background:#1CC7D0;color:#041E2F;border:none;border-radius:4px;font-weight:700;cursor:pointer;">Try Again</button>';
     }

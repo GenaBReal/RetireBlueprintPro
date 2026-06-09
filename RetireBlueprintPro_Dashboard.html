@@ -1672,9 +1672,24 @@ function drawCharts(d,p1,p2,p1n,p2n,longestN,longestP,otherP,otherN,meta){
 }
 
 // ── LOAD FROM SHEET VIA APPS SCRIPT ────────────────────────────
+/* ── Instant-paint cache (stale-while-revalidate) ──────────────────────────
+   Paints from the last read (held briefly in this tab) the moment the page
+   opens, then re-reads in the background and repaints with fresh data. */
+var RBP_CACHE_TTL = 90000;
+function rbpCacheKey(){ try { return 'rbp_pd_' + (localStorage.getItem('rbp_sheet_id') || ''); } catch(e){ return ''; } }
+function rbpCacheGet(){ try { var r = sessionStorage.getItem(rbpCacheKey()); if(!r) return null; var o = JSON.parse(r); if(!o || (Date.now()-o.ts) > RBP_CACHE_TTL) return null; return o.d; } catch(e){ return null; } }
+function rbpCachePut(d){ try { if (d && !d.error) sessionStorage.setItem(rbpCacheKey(), JSON.stringify({ ts: Date.now(), d: d })); } catch(e){} }
+function rbpCacheClear(){ try { sessionStorage.removeItem(rbpCacheKey()); } catch(e){} }
+RBP.loadCached = function(onOk, onErr){
+  var cached = rbpCacheGet();
+  if (cached) { try { onOk(cached); } catch(e){} }
+  RBP.load(function(d){ rbpCachePut(d); try { onOk(d); } catch(e){} },
+           function(msg){ if (!cached && onErr) onErr(msg); });
+};
+
 function loadData(){
   $s('loading-sub').textContent = 'Connecting to your Google Sheet…';
-  RBP.load(function(data){
+  RBP.loadCached(function(data){
     $s('loading-overlay').style.display = 'none';
     try { populate(data); window.__DASH_DATA = data; initYearSelector(data); }
     catch(e){
