@@ -1317,7 +1317,7 @@ function populate(d){
   // ── PLAN MILESTONES & LIFETIME NUMBERS ───────────────────────────────
   (function(){
     var yrs = proj.years||[], el = proj.endLiquid||[], wd = proj.withdrawals||[],
-        fed = proj.federalTaxes||[], st = proj.stateIncome||[], rmd = proj.totalRMD||[],
+        fed = proj.federalTaxes||[], st = proj.stateIncome||[], cg = proj.capGainsTax||[], rmd = proj.totalRMD||[],
         inc = proj.income||[];
     var deathYr = longestP.projectedDeathYear || (yrs.length? yrs[yrs.length-1] : 0);
 
@@ -1338,9 +1338,9 @@ function populate(d){
     else { set('ms-rmd', '—'); set('ms-rmd-note', 'no pre-tax RMDs projected'); }
 
     // Lifetime taxes (federal + state, within lifetime)
-    var ltax=0; for(var i=0;i<fed.length;i++){ if(yrs[i]<=deathYr) ltax += (fed[i]||0)+(st[i]||0); }
+    var ltax=0; for(var i=0;i<fed.length;i++){ if(yrs[i]<=deathYr) ltax += (fed[i]||0)+(st[i]||0)+(cg[i]||0); }
     set('ms-ltaxes', fmt(ltax));
-    set('ms-ltaxes-note', (tax && tax.rothConversionSavings>0)? ('Roth plan saves ~'+fmt(tax.rothConversionSavings)) : 'federal + state, full plan');
+    set('ms-ltaxes-note', (tax && tax.rothConversionSavings>0)? ('Roth plan saves ~'+fmt(tax.rothConversionSavings)) : 'federal + state + capital gains, full plan');
 
     // Plan low point (lowest end-of-year liquid before death, excluding $0 after depletion)
     var low=Infinity, lowYr=0;
