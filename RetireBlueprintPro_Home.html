@@ -273,7 +273,7 @@ window.addEventListener('storage', function(e) {
 
 
   <div class="header-stats">
-      <div class="hstat"><div class="hstat-lbl">Legacy Funded</div><div class="hstat-val orange" id="k-confidence">—</div></div>
+      <div class="hstat"><div class="hstat-lbl">Plan Confidence</div><div class="hstat-val orange" id="k-confidence">—</div></div>
 </div></div>
 <div class="nav">
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" class="active">Home</a>
@@ -317,8 +317,8 @@ window.addEventListener('storage', function(e) {
   
   <div class="kpi-strip">
     <div class="kpi o">
-      <div class="kpi-lbl">Legacy Funded</div>
-      <div class="kpi-val" id="kpi-confidence">98%</div>
+      <div class="kpi-lbl">Plan Confidence</div>
+      <div class="kpi-val" id="kpi-confidence">—</div>
       <div class="kpi-sub" id="kpi-confidence-sub">Very Strong</div>
     </div>
     <div class="kpi t">
@@ -367,7 +367,7 @@ window.addEventListener('storage', function(e) {
     </div>
     <div style="flex-shrink:0;margin-left:24px;text-align:center;">
       <div style="font-size:28px;font-weight:900;color:#1CC7D0;" id="home-conf-big">—</div>
-      <div style="font-size:10px;color:#8aaabb;text-transform:uppercase;letter-spacing:1px;">Legacy Funded</div>
+      <div style="font-size:10px;color:#8aaabb;text-transform:uppercase;letter-spacing:1px;">Plan Confidence</div>
     </div>
   </div>
 
@@ -606,7 +606,7 @@ function loadData(){
       set('m-cola',      fmtPct(tax.ssCola||0.025));
 
       // KPI subs — confidence label
-      var pct = leg.achievedPct||0;
+      var pct = (d.health && typeof d.health.confidencePct==='number') ? d.health.confidencePct : (leg.achievedPct||0);
       set('kpi-confidence', Math.round(pct)+'%');
       set('k-confidence',   Math.round(pct)+'%');
       set('home-conf-big',  Math.round(pct)+'%');
