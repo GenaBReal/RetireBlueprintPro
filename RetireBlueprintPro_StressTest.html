@@ -258,6 +258,11 @@ window.addEventListener('storage', function(e) {
     <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
   </div>
 
+  <!-- One-at-a-time explainer (Crash Test + Sweep both write to the live sheet) -->
+  <div style="margin:0 0 16px;font-size:11px;line-height:1.6;color:#37474f;background:#fff7ec;border-left:3px solid #f4b86a;border-radius:6px;padding:9px 12px;">
+    <b>One test at a time.</b> The <b>Crash Test</b> (▶ Run New Test) and the <b>Scenario Sweep</b> both run on your live Google Sheet, so they take turns &mdash; if you start one while another is still running, it waits a few seconds for its turn instead of running alongside it. Kick them off one at a time. The <b>Monte Carlo</b> further down runs entirely on your own computer, so it&rsquo;s independent and never has to wait.
+  </div>
+
   <!-- SCENARIO TABS -->
   <div style="font-size:11px;color:#566576;margin-bottom:8px;font-weight:600;">
     Pick a preset or dial in your own downturn with the sliders, then press <b>▶ Run New Test</b>.
