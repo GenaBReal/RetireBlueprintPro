@@ -1463,18 +1463,18 @@ function scriptUrl(action) {
 
 // ── ACCOUNTS DATA ────────────────────────────────────────────
 var accountsData = [
-  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, contrib:0, match:0, status:'Use for Withdrawals', dash:'No'},
-  {inc:'Yes', name:'Roth',                owner:'', type:'Roth (Tax Free)',          bal:0, ret:8.0, status:'Use for Withdrawals', dash:'No'},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0, ret:7.0, contrib:0, match:0, status:'Use for Withdrawals', dash:'No'},
-  {inc:'Yes', name:'401k / 403b',         owner:'',  type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:''},
-  {inc:'Yes', name:'Roth',                owner:'',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'', dash:''},
-  {inc:'Yes', name:'Brokerage (Taxable)', owner:'',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'', dash:''},
-  {inc:'Yes', name:'HSA (Health Savings)',owner:'', type:'HSA (Triple Tax Advantage)',bal:0,  ret:6.0, status:'', dash:''},
-  {inc:'No',  name:'High-Yield Savings',  owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
-  {inc:'No',  name:'Inheritance Fund',    owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
-  {inc:'No',  name:'Emergency Fund',      owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
-  {inc:'No',  name:'529 College Plan',    owner:'', type:'529 Education (Tax Free)', bal:0,      ret:3.0, status:'',            dash:''},
-  {inc:'No',  name:'Crypto Wallet',       owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:''},
+  {inc:'Yes', name:'401k / 403b',         owner:'', type:'Pretax (Deferred)',       bal:0, ret:7.0, contrib:0, match:0, status:'Use for Withdrawals', dash:'Yes'},
+  {inc:'Yes', name:'Roth',                owner:'', type:'Roth (Tax Free)',          bal:0, ret:8.0, status:'Use for Withdrawals', dash:'Yes'},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'', type:'Taxable (Liquid)',         bal:0, ret:7.0, contrib:0, match:0, status:'Use for Withdrawals', dash:'Yes'},
+  {inc:'Yes', name:'401k / 403b',         owner:'',  type:'Pretax (Deferred)',       bal:0, ret:7.0, status:'', dash:'Yes'},
+  {inc:'Yes', name:'Roth',                owner:'',  type:'Roth (Tax Free)',          bal:0,      ret:6.0, status:'', dash:'Yes'},
+  {inc:'Yes', name:'Brokerage (Taxable)', owner:'',  type:'Taxable (Liquid)',         bal:0,      ret:6.0, status:'', dash:'Yes'},
+  {inc:'Yes', name:'HSA (Health Savings)',owner:'', type:'HSA (Triple Tax Advantage)',bal:0,  ret:6.0, status:'', dash:'Yes'},
+  {inc:'Yes', name:'High-Yield Savings',  owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:'Yes'},
+  {inc:'Yes', name:'Inheritance Fund',    owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:'Yes'},
+  {inc:'Yes', name:'Emergency Fund',      owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:'Yes'},
+  {inc:'Yes', name:'529 College Plan',    owner:'', type:'529 Education (Tax Free)', bal:0,      ret:3.0, status:'',            dash:'Yes'},
+  {inc:'Yes', name:'Crypto Wallet',       owner:'', type:'Taxable (Liquid)',         bal:0,      ret:3.0, status:'',            dash:'Yes'},
 ];
 
 var ownerOptions = ['Partner 1','Partner 2','Joint'];
@@ -2374,6 +2374,9 @@ function toggleSection(hdr) {
 
 // ── DIRTY TRACKING ───────────────────────────────────────────
 var isDirty = false;
+// True only after a successful read populated the form. Saving before this
+// is true would overwrite the sheet with blank defaults — so saveAll refuses.
+var rbpDataLoaded = false;
 function markDirty() {
   isDirty = true;
   document.getElementById('save-btn').disabled = false;
@@ -2697,7 +2700,7 @@ var incEl  = document.getElementById('d-inc-'+i);
         }
       }
       return {
-        inc:          a.showInCalc || 'No',
+        inc:          a.showInCalc || 'Yes',
         name:         a.name || '',
         owner:        _owner,
         type:         a.type || '',
@@ -2709,7 +2712,7 @@ var incEl  = document.getElementById('d-inc-'+i);
         contribEnd:   toISO(a.contribEnd),    // M = Contrib End Date
         withdrawStart:toISO(a.withdrawStart), // N = Withdrawal Start Date
         status:       a.status || 'Use for Withdrawals',
-        dash:         a.showOnDashboard || 'No',
+        dash:         a.showOnDashboard || 'Yes',
         basis:        a.costBasis || 0
       };
     });
@@ -2844,6 +2847,7 @@ var incEl  = document.getElementById('d-inc-'+i);
   }
 
   isDirty = false;
+  rbpDataLoaded = true; // read succeeded and form is populated — saving is now safe
   var saveBtn = document.getElementById('save-btn');
   if (saveBtn) saveBtn.disabled = false;
   checkShowWelcome(d);
@@ -2962,6 +2966,11 @@ function saveAll() {
     setStatus('No sheet connected — complete Setup first.', 'error');
     return;
   }
+  if (!rbpDataLoaded) {
+    setStatus('⚠️ Your plan hasn’t finished loading from your sheet yet. Please refresh and wait until your numbers appear before saving — this protects your sheet from being overwritten with blanks.', 'error');
+    showToast('Not saved — your data hasn’t loaded yet. Refresh and wait for your numbers.', 'error');
+    return;
+  }
   document.getElementById('save-btn').disabled = true;
   setStatus('Saving...', '');
 
@@ -2990,7 +2999,7 @@ function saveAll() {
 
   function collectRothPlan() {
     var plan = [];
-    for (var yr=2026; yr<=2045; yr++) {
+    for (var yr=2026; yr<=2075; yr++) {
       var p1el = document.getElementById('roth-p1-'+yr);
       var p2el = document.getElementById('roth-p2-'+yr);
       plan.push({
@@ -3185,7 +3194,7 @@ function buildPayload() {
     },
     rothPlan: (function() {
       var plan = [];
-      for (var yr = 2026; yr <= 2045; yr++) {
+      for (var yr = 2026; yr <= 2075; yr++) {
         var p1el = document.getElementById('roth-p1-'+yr);
         var p2el = document.getElementById('roth-p2-'+yr);
         var note = document.getElementById('roth-note-'+yr);
