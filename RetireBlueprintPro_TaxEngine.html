@@ -610,6 +610,52 @@ window.addEventListener('storage', function(e) {
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
+/* ── Built-in fallback loader ──────────────────────────────────────────────
+   The shared connector (rbp-connector.js) normally defines window.RBP. If that
+   external file ever fails to load (network hiccup, cache, Pages propagation),
+   this self-contained version keeps the page working so a customer never sees a
+   "RBP is not defined" script error. It only activates when RBP is missing —
+   when the shared connector loads normally, that one is used instead. */
+if (!window.RBP || typeof window.RBP.load !== 'function') {
+  window.RBP = window.RBP || {};
+  RBP.SCRIPT_URL = RBP.SCRIPT_URL || SCRIPT_URL;
+  RBP.getSheetId = RBP.getSheetId || function () {
+    try { return localStorage.getItem('rbp_sheet_id') || ''; } catch (e) { return ''; }
+  };
+  RBP.load = function (onOk, onErr) {
+    var sheetId = RBP.getSheetId();
+    if (!sheetId) { if (onErr) onErr(); return; }
+    var attempts = 0, MAX_ATTEMPTS = 2, TIMEOUT_MS = 60000;
+    function attempt() {
+      attempts++;
+      var cb = 'rbpTaxCb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+      var s = document.createElement('script');
+      var done = false;
+      var timer = setTimeout(function () { finish(false); }, TIMEOUT_MS);
+      function cleanup() {
+        clearTimeout(timer);
+        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+        if (s && s.parentNode) s.parentNode.removeChild(s);
+      }
+      function finish(ok, data) {
+        if (done) return; done = true;
+        cleanup();
+        if (ok) { if (onOk) onOk(data); }
+        else if (attempts < MAX_ATTEMPTS) { attempt(); }
+        else { if (onErr) onErr(); }
+      }
+      window[cb] = function (resp) {
+        if (resp && !resp.error) finish(true, resp); else finish(false);
+      };
+      s.onerror = function () { finish(false); };
+      s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) +
+              '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2);
+      (document.body || document.documentElement).appendChild(s);
+    }
+    attempt();
+  };
+}
+
 // MFJ federal brackets — built from the shared tax config (rbp-tax-config.js)
 var _RBP_BRC = ['var(--br1)','var(--br2)','var(--br3)','var(--br4)','var(--br5)','var(--br6)','var(--br7)'];
 var BRACKETS = (window.RBP_TAX ? window.RBP_TAX.mfjBrackets : []).map(function(b,i){
