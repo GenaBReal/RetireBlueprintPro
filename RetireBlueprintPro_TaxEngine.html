@@ -294,7 +294,7 @@ window.addEventListener('storage', function(e) {
   <div class="header-right">
       <div class="hs"><div class="hs-lbl">Filing Status</div><div class="hs-val" id="hdr-filing">MFJ 2026</div></div>
       <div class="hs"><div class="hs-lbl">Effective Rate</div><div class="hs-val orange" id="hdr-eff">—</div></div>
-      <div class="hs"><div class="hs-lbl">State Rate</div><div class="hs-val" id="hdr-state">7.5%</div></div>
+      <div class="hs"><div class="hs-lbl">State Rate</div><div class="hs-val" id="hdr-state">—</div></div>
       <div class="hs"><div class="hs-lbl">Roth Window</div><div class="hs-val" id="hdr-window">PRIME</div></div>
     </div>
 </div>
@@ -338,22 +338,22 @@ window.addEventListener('storage', function(e) {
   <div class="roth-grid">
     <div class="roth-kpi">
       <div class="roth-kpi-lbl">Analysis Year</div>
-      <div class="roth-kpi-val" id="r-year">2030</div>
+      <div class="roth-kpi-val" id="r-year">—</div>
       <div class="roth-kpi-sub">Chosen in Inputs tab</div>
     </div>
     <div class="roth-kpi">
       <div class="roth-kpi-lbl">Optimal Conversion</div>
-      <div class="roth-kpi-val" id="r-optimal">$85,091</div>
+      <div class="roth-kpi-val" id="r-optimal">—</div>
       <div class="roth-kpi-sub">Sweet spot this year</div>
     </div>
     <div class="roth-kpi">
       <div class="roth-kpi-lbl">Marginal Tax Now</div>
-      <div class="roth-kpi-val" id="r-cost">$10,211</div>
+      <div class="roth-kpi-val" id="r-cost">—</div>
       <div class="roth-kpi-sub">Cost to convert today</div>
     </div>
     <div class="roth-kpi">
       <div class="roth-kpi-lbl">Lifetime Tax Savings</div>
-      <div class="roth-kpi-val" id="r-savings">$10,211</div>
+      <div class="roth-kpi-val" id="r-savings">—</div>
       <div class="roth-kpi-sub">vs. waiting for RMDs</div>
     </div>
   </div>
@@ -380,14 +380,14 @@ window.addEventListener('storage', function(e) {
     </div>
     <div class="card-body">
       <div class="info-row"><span class="info-lbl">Effective Federal Rate<span class="tooltip-icon" data-tip="The percentage of your taxable income that goes to federal taxes in year 1. Different from your marginal (bracket) rate — this is the actual average rate across all your income.">?</span></span><span class="info-val teal" id="t-eff">—</span></div>
-      <div class="info-row"><span class="info-lbl">State Tax Rate</span><span class="info-val" id="t-state">7.5%</span></div>
+      <div class="info-row"><span class="info-lbl">State Tax Rate</span><span class="info-val" id="t-state">—</span></div>
       <div class="info-row"><span class="info-lbl">Standard Deduction<span class="tooltip-icon" data-tip="The amount the IRS lets you subtract from your income before calculating taxes. In 2025, it's $30,000 for married filing jointly (inflation-adjusted annually). This amount increases slightly each year with inflation.">?</span></span><span class="info-val" id="t-ded">—</span></div>
-      <div class="info-row"><span class="info-lbl">2026 Gross Income</span><span class="info-val orange" id="t-income">$144,523</span></div>
-      <div class="info-row"><span class="info-lbl">Taxable Income</span><span class="info-val" id="t-taxable">$114,523</span></div>
-      <div class="info-row"><span class="info-lbl">Est. Federal Tax</span><span class="info-val" id="t-fedtax">$17,900</span></div>
-      <div class="info-row"><span class="info-lbl">Est. State Tax</span><span class="info-val" id="t-statetax">$8,589</span></div>
+      <div class="info-row"><span class="info-lbl">2026 Gross Income</span><span class="info-val orange" id="t-income">—</span></div>
+      <div class="info-row"><span class="info-lbl">Taxable Income</span><span class="info-val" id="t-taxable">—</span></div>
+      <div class="info-row"><span class="info-lbl">Est. Federal Tax</span><span class="info-val" id="t-fedtax">—</span></div>
+      <div class="info-row"><span class="info-lbl">Est. State Tax</span><span class="info-val" id="t-statetax">—</span></div>
       <div class="info-row"><span class="info-lbl">Headroom to 22% Bracket</span><span class="info-val teal" id="t-headroom">—</span></div>
-      <div class="info-row"><span class="info-lbl">Target Bracket</span><span class="info-val teal" id="t-bracket">12%</span></div>
+      <div class="info-row"><span class="info-lbl">Target Bracket</span><span class="info-val teal" id="t-bracket">—</span></div>
       <div class="info-row"><span class="info-lbl">SS COLA</span><span class="info-val" id="t-cola">2.5%/yr</span></div>
       <div class="info-row"><span class="info-lbl">Healthcare Inflation<span class="tooltip-icon" data-tip="Medical costs typically rise faster than general inflation. Your plan projects healthcare costs growing at this rate each year.">?</span></span><span class="info-val orange" id="t-hc">5.3%/yr</span></div>
     </div>
@@ -500,7 +500,7 @@ window.addEventListener('storage', function(e) {
     <div class="card-body">
       <div class="explainer teal" style="margin-bottom:12px;">
         <div class="explainer-title">✅ Your Brokerage Gets Preferential Treatment</div>
-        <div class="explainer-body">Long-term capital gains (assets held 1+ year) and qualified dividends are NOT taxed as ordinary income. For MFJ filers at your income level, you qualify for the <strong><span id="cg-rate-inline1">15%</span> capital gains rate</strong> — not your ordinary-income rate. Your taxable brokerage account is drawn down early in the plan (<span id="cg-deplete1">depleted ~2031</span>) precisely to capture these lower rates while your income is still in a favorable bracket.</div>
+        <div class="explainer-body">Long-term capital gains (assets held 1+ year) and qualified dividends are NOT taxed as ordinary income. For MFJ filers at your income level, you qualify for the <strong><span id="cg-rate-inline1">preferential</span> capital gains rate</strong> — not your ordinary-income rate. Your taxable brokerage account is drawn down early in the plan (<span id="cg-deplete1">drawn down over the plan</span>) precisely to capture these lower rates while your income is still in a favorable bracket.</div>
       </div>
       <table class="irmaa-table">
         <thead>
@@ -515,9 +515,9 @@ window.addEventListener('storage', function(e) {
       <div style="margin-top:12px;background:var(--light);border-radius:6px;padding:12px;">
         <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Your 2026 Capital Gains Position</div>
         <div style="display:flex;gap:16px;flex-wrap:wrap;">
-          <div><span style="font-size:10px;color:var(--muted);">Taxable Income:</span> <strong style="color:var(--navy);" id="cg-taxable">$114,523</strong></div>
-          <div><span style="font-size:10px;color:var(--muted);">Headroom to 15%:</span> <strong style="color:var(--teal);" id="cg-headroom">15% rate — above the $98,900 0% ceiling</strong></div>
-          <div><span style="font-size:10px;color:var(--muted);">Your LTCG Rate:</span> <strong style="color:var(--teal);" id="cg-rate">15%</strong></div>
+          <div><span style="font-size:10px;color:var(--muted);">Taxable Income:</span> <strong style="color:var(--navy);" id="cg-taxable">—</strong></div>
+          <div><span style="font-size:10px;color:var(--muted);">Headroom to 15%:</span> <strong style="color:var(--teal);" id="cg-headroom">—</strong></div>
+          <div><span style="font-size:10px;color:var(--muted);">Your LTCG Rate:</span> <strong style="color:var(--teal);" id="cg-rate">—</strong></div>
         </div>
       </div>
     </div>
@@ -539,11 +539,11 @@ window.addEventListener('storage', function(e) {
       <div class="section-lbl" style="margin-top:4px;">Tax Strategy Summary</div>
       <div class="explainer navy" style="margin-bottom:8px;">
         <div class="explainer-title">📊 Sequence of Withdrawal Strategy <span class="strat-badge strat-on">Active</span></div>
-        <div class="explainer-body">Your plan draws accounts in tax-optimal order: <strong>Taxable brokerage first</strong> (captures <span id="cg-rate-inline2">15%</span> LTCG rate, <span id="cg-deplete2">depleted ~2031</span>), then <strong>Pre-Tax accounts</strong> (ordinary income, manages RMD exposure), Roth converted amounts last (tax-free, grows longest). This sequencing is calculated automatically by the Master engine.</div>
+        <div class="explainer-body">Your plan draws accounts in tax-optimal order: <strong>Taxable brokerage first</strong> (captures <span id="cg-rate-inline2">preferential</span> LTCG rate, <span id="cg-deplete2">drawn down over the plan</span>), then <strong>Pre-Tax accounts</strong> (ordinary income, manages RMD exposure), Roth converted amounts last (tax-free, grows longest). This sequencing is calculated automatically by the Master engine.</div>
       </div>
       <div class="explainer teal" style="margin-bottom:8px;">
-        <div class="explainer-title">🔄 Social Security Tax Torpedo <span class="strat-badge strat-watch">Monitor 2033+</span></div>
-        <div class="explainer-body">When <span id="tax-p2-ss-note">your partner's</span> Social Security begins, combined SS income will be significant. Up to <strong>85% of SS benefits</strong> can become taxable income when combined income exceeds $44,000 (MFJ). Your plan accounts for this in the Master engine's income calculations. Watch effective rates in 2033-2040.</div>
+        <div class="explainer-title">🔄 Social Security Tax Torpedo <span class="strat-badge strat-watch" id="ss-torpedo-badge">Monitor SS years</span></div>
+        <div class="explainer-body">When <span id="tax-p2-ss-note">your partner's</span> Social Security begins, combined SS income will be significant. Up to <strong>85% of SS benefits</strong> can become taxable income when combined income exceeds $44,000 (MFJ). Your plan accounts for this in the Master engine's income calculations. Watch effective rates <span id="ss-torpedo-years">once both benefits are active</span>.</div>
       </div>
       <div class="explainer orange">
         <div class="explainer-title">⏰ RMD Planning Window<span class="tooltip-icon" data-tip="The years between now and age 73 are your window to do Roth conversions at potentially lower tax rates. After 73, Required Minimum Distributions force taxable withdrawals whether you need the money or not.">?</span> <span class="strat-badge strat-prime">Prime Now</span></div>
@@ -647,6 +647,21 @@ function renderBrackets(taxableIncome) {
   var maxShow = 250000;
   var html = '';
 
+  // BRACKETS is built from the shared tax-config script. If that script hasn't
+  // loaded yet (slow or blocked network), rebuild it now if possible, otherwise
+  // bail gracefully — never throw on an empty BRACKETS array.
+  if (!BRACKETS.length && window.RBP_TAX && window.RBP_TAX.mfjBrackets) {
+    BRACKETS = window.RBP_TAX.mfjBrackets.map(function(b,i){
+      return {label:Math.round(b.rate*100)+'%', rate:b.rate,
+              min:(i?window.RBP_TAX.mfjBrackets[i-1].max:0), max:b.max, color:_RBP_BRC[i]};
+    });
+  }
+  if (!BRACKETS.length) {
+    var _bc0=document.getElementById('brackets-container');
+    if(_bc0) _bc0.innerHTML='<div style="padding:16px;color:#8aaabb;font-size:12px;">Loading tax brackets…</div>';
+    return;
+  }
+
   BRACKETS.forEach(function(br, i) {
     var fillPct = Math.min(100, Math.round((Math.min(br.max,maxShow)/maxShow)*100));
     var incomePct = Math.min(100, Math.round((Math.min(income,maxShow)/maxShow)*100));
@@ -672,7 +687,7 @@ function renderBrackets(taxableIncome) {
     totalFed += Math.max(0, Math.min(taxableAmt, BRACKETS[_fb].max) - BRACKETS[_fb].min) * BRACKETS[_fb].rate;
   }
   var effRate  = income > 0 ? totalFed / income : 0;
-  var headroom = Math.max(0, BRACKETS[1].max - income); // headroom to the 22% bracket
+  var headroom = (BRACKETS[1] ? Math.max(0, BRACKETS[1].max - income) : 0); // headroom to the 22% bracket
 
   html += '<div style="margin-top:14px;padding:12px;background:var(--light);border-radius:6px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">' +
     '<div><div style="font-size:8px;color:var(--muted);text-transform:uppercase;">Taxable Income</div><div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:3px;">'+fmt(income)+'</div></div>' +
@@ -831,6 +846,28 @@ function populate(data) {
 
   // Update partner-specific SS note
   set('tax-p2-ss-note', _p2n + '\'s');
+
+  // SS Tax Torpedo window — dynamic from the partners' Social Security start years
+  // (no hardcoded year). Uses SS start date if set, else estimates from full-retirement age.
+  (function(){
+    var py = meta.planYear || new Date().getFullYear();
+    function ssYr(p){
+      if(!p) return 0;
+      if(p.ssStartDate){ var m=String(p.ssStartDate).split('/'); if(m.length===3){ var y=parseInt(m[2]); if(y>2000) return y; } }
+      if(p.ssFra && p.age) return py + (p.ssFra - p.age);
+      return 0;
+    }
+    var y1=ssYr(_p1), y2=ssYr(_p2);
+    var start = Math.max(y1, y2);
+    if(!start) start = (y1 || y2 || 0);
+    if(start>0){
+      set('ss-torpedo-badge', 'Monitor '+start+'+');
+      set('ss-torpedo-years', 'in the years from '+start+' onward (roughly '+start+'–'+(start+7)+')');
+    } else {
+      set('ss-torpedo-badge', 'Monitor SS years');
+      set('ss-torpedo-years', 'once both Social Security benefits are active');
+    }
+  })();
 
   // RMD age depends on birth year (SECURE 2.0): born 1951–1959 → 73, born 1960 or later → 75
   var curYr = new Date().getFullYear();
