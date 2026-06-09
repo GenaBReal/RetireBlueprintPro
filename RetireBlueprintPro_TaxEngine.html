@@ -500,24 +500,24 @@ window.addEventListener('storage', function(e) {
     <div class="card-body">
       <div class="explainer teal" style="margin-bottom:12px;">
         <div class="explainer-title">✅ Your Brokerage Gets Preferential Treatment</div>
-        <div class="explainer-body">Long-term capital gains (assets held 1+ year) and qualified dividends are NOT taxed as ordinary income. For MFJ filers at your income level, you qualify for the <strong>15% capital gains rate</strong> — not 22% or 24%. Your taxable brokerage account is drawn down early in the plan (depleted ~2031) precisely to capture these lower rates while your income is still in a favorable bracket.</div>
+        <div class="explainer-body">Long-term capital gains (assets held 1+ year) and qualified dividends are NOT taxed as ordinary income. For MFJ filers at your income level, you qualify for the <strong><span id="cg-rate-inline1">15%</span> capital gains rate</strong> — not your ordinary-income rate. Your taxable brokerage account is drawn down early in the plan (<span id="cg-deplete1">depleted ~2031</span>) precisely to capture these lower rates while your income is still in a favorable bracket.</div>
       </div>
       <table class="irmaa-table">
         <thead>
           <tr><th>Bracket</th><th>MFJ Taxable Income Threshold</th><th>LTCG Rate</th></tr>
         </thead>
         <tbody>
-          <tr><td>$1</td><td>Up to $98,900</td><td style="color:var(--green);font-weight:700;">0%</td></tr>
-          <tr class="current"><td>$2</td><td>$98,901 – $613,700</td><td style="font-weight:600;">15%</td></tr>
-          <tr><td>$3</td><td>Over $613,700</td><td style="color:#A03030;font-weight:600;">20%</td></tr>
+          <tr id="cg-row-0"><td>$1</td><td>Up to $98,900</td><td style="color:var(--green);font-weight:700;">0%</td></tr>
+          <tr id="cg-row-15"><td>$2</td><td>$98,901 – $613,700</td><td style="font-weight:600;">15%</td></tr>
+          <tr id="cg-row-20"><td>$3</td><td>Over $613,700</td><td style="color:#A03030;font-weight:600;">20%</td></tr>
         </tbody>
       </table>
       <div style="margin-top:12px;background:var(--light);border-radius:6px;padding:12px;">
         <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Your 2026 Capital Gains Position</div>
         <div style="display:flex;gap:16px;flex-wrap:wrap;">
           <div><span style="font-size:10px;color:var(--muted);">Taxable Income:</span> <strong style="color:var(--navy);" id="cg-taxable">$114,523</strong></div>
-          <div><span style="font-size:10px;color:var(--muted);">Headroom to 15%:</span> <strong style="color:var(--teal);">15% rate — above the $98,900 0% ceiling</strong></div>
-          <div><span style="font-size:10px;color:var(--muted);">Your LTCG Rate:</span> <strong style="color:var(--teal);">15%</strong></div>
+          <div><span style="font-size:10px;color:var(--muted);">Headroom to 15%:</span> <strong style="color:var(--teal);" id="cg-headroom">15% rate — above the $98,900 0% ceiling</strong></div>
+          <div><span style="font-size:10px;color:var(--muted);">Your LTCG Rate:</span> <strong style="color:var(--teal);" id="cg-rate">15%</strong></div>
         </div>
       </div>
     </div>
@@ -539,7 +539,7 @@ window.addEventListener('storage', function(e) {
       <div class="section-lbl" style="margin-top:4px;">Tax Strategy Summary</div>
       <div class="explainer navy" style="margin-bottom:8px;">
         <div class="explainer-title">📊 Sequence of Withdrawal Strategy <span class="strat-badge strat-on">Active</span></div>
-        <div class="explainer-body">Your plan draws accounts in tax-optimal order: <strong>Taxable brokerage first</strong> (captures 15% LTCG rate, depleted ~2031), then <strong>Pre-Tax accounts</strong> (ordinary income, manages RMD exposure), Roth converted amounts last (tax-free, grows longest). This sequencing is calculated automatically by the Master engine.</div>
+        <div class="explainer-body">Your plan draws accounts in tax-optimal order: <strong>Taxable brokerage first</strong> (captures <span id="cg-rate-inline2">15%</span> LTCG rate, <span id="cg-deplete2">depleted ~2031</span>), then <strong>Pre-Tax accounts</strong> (ordinary income, manages RMD exposure), Roth converted amounts last (tax-free, grows longest). This sequencing is calculated automatically by the Master engine.</div>
       </div>
       <div class="explainer teal" style="margin-bottom:8px;">
         <div class="explainer-title">🔄 Social Security Tax Torpedo <span class="strat-badge strat-watch">Monitor 2033+</span></div>
@@ -788,6 +788,43 @@ function populate(data) {
   set('t-taxable', taxable1 > 0 ? fmt(taxable1) : '—');
   set('t-fedtax',  fedTax1 > 0 ? fmt(fedTax1) : '—');
   set('t-statetax',stateTax1 > 0 ? fmt(stateTax1) : '—');
+
+  // ── Capital Gains position (dynamic, from the customer's actual numbers) ──
+  // 2026 MFJ LTCG thresholds: 0% up to $98,900; 15% up to $613,700; 20% above.
+  (function(){
+    var ltcg0=98900, ltcg15=613700;
+    var ltcgRate = taxable1<=0 ? null : (taxable1<=ltcg0 ? 0 : (taxable1<=ltcg15 ? 15 : 20));
+    set('cg-taxable', taxable1>0 ? fmt(taxable1) : '—');
+    if (ltcgRate!==null) {
+      set('cg-rate', ltcgRate+'%');
+      set('cg-headroom', ltcgRate===0
+        ? ('$'+Math.round(ltcg0-taxable1).toLocaleString()+' of headroom before the 15% rate begins')
+        : ltcgRate===15
+          ? ('15% rate — above the '+fmt(ltcg0)+' 0% ceiling')
+          : ('20% rate — above the '+fmt(ltcg15)+' threshold'));
+      ['cg-row-0','cg-row-15','cg-row-20'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('current'); });
+      var act = ltcgRate===0?'cg-row-0':(ltcgRate===15?'cg-row-15':'cg-row-20');
+      var ae=document.getElementById(act); if(ae) ae.classList.add('current');
+      set('cg-rate-inline1', ltcgRate+'%');
+      set('cg-rate-inline2', ltcgRate+'%');
+    } else {
+      // No income entered yet — don't assert any bracket
+      set('cg-rate', '—'); set('cg-headroom', 'Enter your income to see your rate');
+      set('cg-rate-inline1', 'preferential'); set('cg-rate-inline2', 'preferential');
+      ['cg-row-0','cg-row-15','cg-row-20'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('current'); });
+    }
+    // Depletion year of the taxable brokerage bucket (first year it reaches 0 after being funded)
+    var deplYr=null, wasFunded=false;
+    if (proj && proj.taxable && proj.taxable.length) {
+      for (var di=0; di<proj.taxable.length; di++){
+        if ((proj.taxable[di]||0) > 0) wasFunded=true;
+        else if (wasFunded){ deplYr = proj.years ? proj.years[di] : null; break; }
+      }
+    }
+    var deplTxt = deplYr ? ('depleted ~'+deplYr) : 'drawn down over the plan';
+    set('cg-deplete1', deplTxt);
+    set('cg-deplete2', deplTxt);
+  })();
   set('t-cola',    pct(tax.ssCola||0.025)+'/yr');
   set('t-hc',      pct(tax.healthcareInflation||0.053)+'/yr');
   set('t-bracket', roth.bracket||'12%');
