@@ -556,6 +556,26 @@ window.addEventListener('storage', function(e) {
 
 <script>
 var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
+// Fallback: if the shared rbp-connector.js didn't load (blocked in a preview,
+// cached 404, etc.), define a local RBP.load so the page works instead of
+// throwing "RBP is not defined". On the live site the shared connector wins.
+if (typeof window.RBP === 'undefined' || !window.RBP || typeof window.RBP.load !== 'function') {
+  window.RBP = window.RBP || {};
+  window.RBP.load = function(onOk, onErr){
+    var sheetId = localStorage.getItem('rbp_sheet_id');
+    var host = window.location.hostname || '';
+    var isPreview = (window.location.protocol==='file:' || host==='' || host==='localhost' || host.indexOf('claude.ai')>=0);
+    if (!sheetId || isPreview) { if(onErr) onErr('no sheet / preview'); return; }
+    var cb = 'rbpHome_' + Date.now(), done = false;
+    var t = setTimeout(function(){ if(!done){ done=true; try{delete window[cb];}catch(e){} if(onErr) onErr('timeout'); } }, 90000);
+    window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); try{delete window[cb];}catch(e){}
+      if(d && d.error){ if(onErr) onErr(d.error); return; } if(onOk) onOk(d); };
+    var s = document.createElement('script'); s.crossOrigin='anonymous';
+    s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2);
+    s.onerror = function(){ if(!done){ done=true; clearTimeout(t); try{delete window[cb];}catch(e){} if(onErr) onErr('network'); } };
+    document.head.appendChild(s);
+  };
+}
 function fmt(n){if(!n&&n!==0)return'--';if(Math.abs(n)>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString();}
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function loadData(){
