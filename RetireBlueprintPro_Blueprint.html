@@ -67,6 +67,16 @@ table.tbl tr:last-child td{ border-bottom:none; }
 .connect h2{ color:var(--navy); margin:0 0 10px; }
 .connect p{ color:var(--muted); font-size:14px; line-height:1.6; }
 
+.findings{ list-style:none; margin:0; padding:0; }
+.findings li{ position:relative; padding:9px 0 9px 28px; border-bottom:1px dotted #e2e7ec; font-size:13.5px; line-height:1.55; color:#33414f; }
+.findings li:last-child{ border-bottom:none; }
+.findings li:before{ content:'\2713'; position:absolute; left:2px; top:9px; color:var(--teal); font-weight:800; }
+.findings b{ color:var(--navy); }
+#chart{ margin-top:4px; }
+.tbl.compact th, .tbl.compact td{ padding:4px 8px; font-size:12px; }
+.tbl tr.mark td{ background:#fff7ec; }
+.tbl tr.endrow td{ font-weight:700; background:#f3f9fa; }
+
 /* ---- print ---- */
 @media print{
   @page{ margin:14mm; }
@@ -108,6 +118,13 @@ table.tbl tr:last-child td{ border-bottom:none; }
       <div class="htext"><h2 id="hero-head">Plan Confidence</h2><p id="hero-sub"></p></div>
     </div>
 
+    <div class="sec"><h3>Key Findings</h3><ul class="findings" id="findings"></ul></div>
+
+    <div class="sec"><h3>Portfolio Outlook</h3>
+      <div class="lead">Projected year-end investable balance through your plan horizon.</div>
+      <div id="chart"></div>
+    </div>
+
     <div class="sec"><h3>Your Household</h3><div id="household"></div></div>
 
     <div class="sec"><h3>Your Portfolio</h3><div id="portfolio"></div></div>
@@ -115,7 +132,7 @@ table.tbl tr:last-child td{ border-bottom:none; }
     <div class="sec"><h3>Your Spending Plan</h3><div id="spending"></div></div>
 
     <div class="sec pagebreak"><h3>The Year-by-Year Projection</h3>
-      <div class="lead">Selected milestone years. Ending portfolio is the projected liquid balance at year-end.</div>
+      <div class="lead">Year-by-year through your plan horizon. Ending portfolio is the projected year-end investable balance.</div>
       <div id="projection"></div>
     </div>
 
@@ -190,6 +207,35 @@ function setFresh(){
 }
 
 /* ---- populate ---- */
+function buildPortfolioChart(rows, firstDeathYear, depletionYear, endYear){
+  if(!rows || rows.length<2) return '';
+  var W=720,H=250,padL=64,padR=18,padT=16,padB=30, n=rows.length;
+  var vals=rows.map(function(o){ return Number(o.r.endLiquid)||0; });
+  var maxV=Math.max.apply(null,vals), minV=Math.min.apply(null,vals);
+  if(minV>0) minV=0; if(maxV<=minV) maxV=minV+1;
+  function sx(i){ return padL + (n===1?0:i*(W-padL-padR)/(n-1)); }
+  function sy(v){ return padT + (1-(v-minV)/(maxV-minV))*(H-padT-padB); }
+  var base=sy(Math.max(minV,0));
+  var line='', area='M'+sx(0).toFixed(1)+','+base.toFixed(1);
+  rows.forEach(function(o,i){ var x=sx(i).toFixed(1), y=sy(vals[i]).toFixed(1); line+=(i===0?'M':'L')+x+','+y+' '; area+=' L'+x+','+y; });
+  area+=' L'+sx(n-1).toFixed(1)+','+base.toFixed(1)+' Z';
+  function moneyShort(v){ v=Number(v); var a=Math.abs(v); if(a>=1e6) return '$'+(v/1e6).toFixed(a>=1e7?0:1)+'M'; if(a>=1e3) return '$'+Math.round(v/1e3)+'K'; return '$'+Math.round(v); }
+  var ticks=[maxV, (maxV+(minV<0?minV:0))/2, (minV<0?minV:0)], grid='', ylab='';
+  ticks.forEach(function(t){ var y=sy(t).toFixed(1); grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="#eef1f5"/>'; ylab+='<text x="'+(padL-8)+'" y="'+(Number(y)+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="#7a8794">'+moneyShort(t)+'</text>'; });
+  var xlab='';
+  function xtick(yr,i){ var x=sx(i).toFixed(1); xlab+='<text x="'+x+'" y="'+(H-10)+'" text-anchor="middle" font-size="10" fill="#7a8794">'+yr+'</text>'; }
+  xtick(rows[0].yr,0); xtick(rows[n-1].yr,n-1);
+  var markers='', leg='';
+  function vline(yr,col){ for(var k=0;k<n;k++){ if(rows[k].yr===Number(yr)){ var x=sx(k).toFixed(1); markers+='<line x1="'+x+'" y1="'+padT+'" x2="'+x+'" y2="'+(H-padB)+'" stroke="'+col+'" stroke-dasharray="3,3"/>'; return true; } } return false; }
+  if(firstDeathYear && firstDeathYear!==endYear && vline(firstDeathYear,'#caa24a')) leg+='<tspan fill="#b07a2a"> \u25C6 survivor begins</tspan>';
+  if(depletionYear && vline(depletionYear,'#c0603a')) leg+='<tspan fill="#c0603a"> \u25C6 funds depleted</tspan>';
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">';
+  svg+=grid+'<path d="'+area+'" fill="rgba(28,199,208,0.16)"/><path d="'+line+'" fill="none" stroke="#1CC7D0" stroke-width="2"/>'+markers+ylab+xlab;
+  if(leg) svg+='<text x="'+padL+'" y="12" font-size="10">'+leg+'</text>';
+  svg+='</svg>';
+  return svg;
+}
+
 function populate(d){
   if(!d || d.error){ showConnect(d && d.error ? 'We could not read your plan' : null, d && d.error ? esc(d.error) : null); return; }
   document.getElementById('connect').style.display='none';
@@ -262,38 +308,58 @@ function populate(d){
   spr+='</div>';
   document.getElementById('spending').innerHTML = spr;
 
-  /* projection (milestone years) */
+  /* projection — annual, capped at projected death(s) */
   var by = (proj.byYear||[]);
   var cg = (proj.capGainsTax||[]);
-  if(by.length){
-    var lastIdx = by.length-1;
-    var picks=[];
-    for(var i=0;i<by.length;i++){
-      var yr = Number(by[i].year);
-      if(i===0 || i===lastIdx || (yr % 5 === 0)) picks.push(i);
-      else if(health.depletionYear && Number(health.depletionYear)===yr) picks.push(i);
-    }
-    picks = picks.filter(function(v,i,arr){ return arr.indexOf(v)===i; }).sort(function(a,b){return a-b;});
-    var ageOf=function(p,yr){ if(!p||p.age===undefined||p.age===null) return null; return Number(p.age)+(yr-planYear); };
-    var th='<table class="tbl"><thead><tr><th>Year</th><th class="r">Age'+(hasName(p2)?'s':'')+'</th><th class="r">Income / need</th><th class="r">Taxes</th><th class="r">Healthcare</th><th class="r">Ending portfolio</th></tr></thead><tbody>';
-    picks.forEach(function(i){
-      var r=by[i]; var yr=Number(r.year);
-      var a1=ageOf(p1,yr), a2=ageOf(p2,yr);
-      var ages = (a1!==null?a1:'\u2014') + (hasName(p2)&&a2!==null?(' / '+a2):'');
-      var taxes = (Number(r.federalTaxes)||0) + (Number(r.stateTax)||0) + (Number(cg[i])||0);
-      var need = (r.totalNeed!==undefined && r.totalNeed!==null) ? r.totalNeed : r.totalGross;
-      th+='<tr><td><b>'+esc(yr)+'</b></td><td class="r">'+ages+'</td><td class="r">'+money(need)+'</td><td class="r">'+money(taxes)+'</td><td class="r">'+money(r.healthcare)+'</td><td class="r">'+money(r.endLiquid)+'</td></tr>';
+  var ageOf=function(p,yr){ if(!p||p.age===undefined||p.age===null||isNaN(p.age)) return null; return Number(p.age)+(yr-planYear); };
+  function deathYearOf(p){ if(hasName(p)&&p.age!=null&&!isNaN(p.age)&&p.deathAge!=null&&!isNaN(p.deathAge)) return planYear+(Number(p.deathAge)-Number(p.age)); return null; }
+  var dy1=deathYearOf(p1), dy2=deathYearOf(p2), deathYears=[];
+  if(dy1!=null) deathYears.push(dy1); if(dy2!=null) deathYears.push(dy2);
+  var endYear = deathYears.length ? Math.max.apply(null,deathYears) : (by.length?Number(by[by.length-1].year):null);
+  var firstDeathYear = (deathYears.length===2 && dy1!==dy2) ? Math.min(dy1,dy2) : null;
+  window.__endYear = endYear;
+
+  var rows=[];
+  for(var i=0;i<by.length;i++){ var yr=Number(by[i].year); if(endYear==null || yr<=endYear){ rows.push({i:i, yr:yr, r:by[i]}); } }
+
+  if(rows.length){
+    var th='<table class="tbl compact"><thead><tr><th>Year</th><th class="r">Age'+(hasName(p2)?'s':'')+'</th><th class="r">Income / need</th><th class="r">Taxes</th><th class="r">Healthcare</th><th class="r">Ending portfolio</th></tr></thead><tbody>';
+    rows.forEach(function(o,idx){
+      var r=o.r, yr=o.yr, a1=ageOf(p1,yr), a2=ageOf(p2,yr);
+      var ages=(a1!==null?a1:'\u2014')+(hasName(p2)&&a2!==null?(' / '+a2):'');
+      var taxes=(Number(r.federalTaxes)||0)+(Number(r.stateTax)||0)+(Number(cg[o.i])||0);
+      var need=(r.totalNeed!==undefined&&r.totalNeed!==null)?r.totalNeed:r.totalGross;
+      var cls='', tag='';
+      if(firstDeathYear && yr===firstDeathYear){ cls=' class="mark"'; tag=' <span style="color:#b07a2a;font-size:10px">\u2022 survivor begins</span>'; }
+      if(idx===rows.length-1){ cls=' class="endrow"'; tag=' <span style="color:#5a6675;font-size:10px">\u2022 plan horizon</span>'; }
+      th+='<tr'+cls+'><td><b>'+esc(yr)+'</b>'+tag+'</td><td class="r">'+ages+'</td><td class="r">'+money(need)+'</td><td class="r">'+money(taxes)+'</td><td class="r">'+money(r.healthcare)+'</td><td class="r">'+money(r.endLiquid)+'</td></tr>';
     });
     th+='</tbody></table>';
     document.getElementById('projection').innerHTML=th;
+    document.getElementById('chart').innerHTML = buildPortfolioChart(rows, firstDeathYear, health.depletionYear, endYear);
 
-    /* lifetime taxes for tax section */
-    var lifeTax=0; for(var j=0;j<by.length;j++){ lifeTax += (Number(by[j].federalTaxes)||0)+(Number(by[j].stateTax)||0)+(Number(cg[j])||0); }
+    var lifeTax=0; rows.forEach(function(o){ lifeTax += (Number(o.r.federalTaxes)||0)+(Number(o.r.stateTax)||0)+(Number(cg[o.i])||0); });
     window.__lifeTax = lifeTax;
+    window.__estateEnd = rows[rows.length-1].r.endLiquid;
   } else {
     document.getElementById('projection').innerHTML='<div class="empty">No year-by-year projection found in your plan.</div>';
-    window.__lifeTax = null;
+    document.getElementById('chart').innerHTML='';
+    window.__lifeTax = null; window.__estateEnd = null;
   }
+
+  /* key findings */
+  var F=[];
+  if(conf!==null&&conf!==undefined&&!isNaN(conf)){
+    if(health.fundedForLife) F.push('Your plan is projected to remain <b>funded for life</b> (confidence '+Math.round(conf)+'%).');
+    else if(health.depletionYear) F.push('Under current assumptions, your funds are projected to last through about <b>'+esc(health.depletionYear)+'</b> (confidence '+Math.round(conf)+'%).');
+  }
+  if(port.total) F.push('You have <b>'+money(port.total)+'</b> invested'+((port.accounts&&port.accounts.length)?(' across '+port.accounts.length+' account'+(port.accounts.length>1?'s':'')):'')+'.');
+  if(sp.baseAnnual) F.push('Your plan budgets <b>'+money(sp.baseAnnual)+'</b> of base spending per year'+(sp.safeExtra?(', plus up to '+money(sp.safeExtra)+' when conditions allow'):'')+'.');
+  if(window.__lifeTax!=null) F.push('Projected lifetime taxes of about <b>'+money(window.__lifeTax)+'</b>'+(window.__endYear?(' through '+window.__endYear):'')+'.');
+  if(roth&&roth.optimalAmount&&tax.rothConversionSavings) F.push('Converting about <b>'+money(roth.optimalAmount)+'</b> to Roth per year'+(roth.year?(' beginning '+esc(roth.year)):'')+' could reduce lifetime taxes by roughly <b>'+money(tax.rothConversionSavings)+'</b>.');
+  var estate=(leg.projectedEnding!=null&&leg.projectedEnding!=='')?leg.projectedEnding:window.__estateEnd;
+  if(estate!=null) F.push('Projected estate of about <b>'+money(estate)+'</b> at the end of your plan'+(window.__endYear?(' in '+window.__endYear):'')+'.');
+  document.getElementById('findings').innerHTML = F.length ? F.map(function(x){return '<li>'+x+'</li>';}).join('') : '<li>Connect your full plan to see personalized findings here.</li>';
 
   /* tax */
   var tr='<div class="kv">';
