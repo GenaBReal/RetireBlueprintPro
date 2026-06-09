@@ -193,7 +193,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
     <div class="kpi g">
       <div class="kpi-lbl">Legacy Goal</div>
       <div class="kpi-val" id="kpi-legacy">Met ✓</div>
-      <div class="kpi-sub">$250K target · +$62</div>
+      <div class="kpi-sub" id="kpi-legacy-sub">$250K target · +$62</div>
     </div>
     <div class="kpi t">
       <div class="kpi-lbl">Roth Conv. Savings</div>
@@ -337,7 +337,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 </div>
 
 <script>
-var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 function fmt(n){if(!n&&n!==0)return'--';if(Math.abs(n)>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString();}
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function loadData(){
@@ -360,6 +360,7 @@ function loadData(){
       set('kpi-legacy',leg.achievedPct>=100?'Met ✓':Math.round(leg.achievedPct)+'%');
       set('kpi-roth',fmt(tax.rothConversionSavings));
       set('kpi-runway',runway+' yrs');
+      set('kpi-legacy-sub',fmt(leg.goal)+' target · '+(leg.variance>=0?'+':'')+fmt(leg.variance));
       set('kpi-runway-sub',p2.name+' covered to '+p2.projectedDeathAge);
       set('m-names',craig.name+' '+craig.age+' · '+gena.name+' '+gena.age);
       set('m-year',meta.planYear);
