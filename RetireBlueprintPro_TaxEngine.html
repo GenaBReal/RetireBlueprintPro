@@ -413,7 +413,7 @@ window.addEventListener('storage', function(e) {
 
     <div class="explainer navy">
       <div class="explainer-title">💡 How Progressive Taxes Work</div>
-      <div class="explainer-body">Think of the US tax system like filling buckets. Your income fills the 10% bucket first, then overflows into the 12% bucket, then the 22% bucket. <strong>Only the income in each bucket is taxed at that rate</strong> — not your entire income. If you earn $114,523 taxable income, you don't pay 22% on all of it. You pay 10% on the first $24,800, 12% on the next $76,000, and 22% only on the small amount above that.</div>
+      <div class="explainer-body">Think of the US tax system like filling buckets. Your income fills the 10% bucket first, then overflows into the 12% bucket, then the 22% bucket. <strong>Only the income in each bucket is taxed at that rate</strong> — not your entire income. If you earn $120,000 taxable income, you don't pay 22% on all of it. You pay 10% on the first $24,800, 12% on the next $76,000, and 22% only on the small amount above that.</div>
     </div>
     <div class="explainer teal">
       <div class="explainer-title">💡 The Gross-Up Principle</div>
@@ -643,7 +643,7 @@ function pct(n)  { return n?(n>1?(n).toFixed(1):(n*100).toFixed(1))+'%':'--'; }
 function set(id,v){ var el=document.getElementById(id);if(el)el.textContent=v; }
 
 function renderBrackets(taxableIncome) {
-  var income = taxableIncome || 114523;
+  var income = taxableIncome || 100000;
   var maxShow = 250000;
   var html = '';
 
@@ -885,8 +885,8 @@ function populate(data) {
     renderBrackets(taxable1);
   } else {
     var bc = document.getElementById('brackets-container');
-    if (bc) bc.innerHTML = '<div style="padding:20px;text-align:center;color:#8aaabb;font-size:12px;">Connect your Google Sheet to see your personalized bracket position.<br><br><span style="font-size:10px;">Using sample income of $114,523 for illustration:</span></div>';
-    renderBrackets(114523); // Show sample
+    if (bc) bc.innerHTML = '<div style="padding:20px;text-align:center;color:#8aaabb;font-size:12px;">Connect your Google Sheet to see your personalized bracket position.<br><br><span style="font-size:10px;">Using sample income of $100,000 for illustration:</span></div>';
+    renderBrackets(100000); // Show sample (neutral example, not real customer data)
   }
   renderTimeline(proj, tax);
     document.getElementById('status-msg').textContent = '✅ Tax data loaded — ' + (data.meta&&data.meta.generated||'May 2026');
