@@ -242,8 +242,11 @@ function populate(d){
   var bp=document.getElementById('blueprint'); bp.style.display='block';
 
   var ppl = d.people || {};
-  var p1 = ppl.p1 || {}, p2 = ppl.p2 || {};
+  var _pk = Object.keys(ppl);
+  var p1 = ppl[_pk[0]] || ppl.craig || ppl.person1 || ppl.p1 || {};
+  var p2 = ppl[_pk[1]] || ppl.gena  || ppl.person2 || ppl.p2 || {};
   var gl  = d.global || {};
+  var meta = d.meta || {};
   var port= d.portfolio || {};
   var sp  = d.spending || {};
   var leg = d.legacy || {};
@@ -251,7 +254,7 @@ function populate(d){
   var roth= d.roth || {};
   var proj= d.projections || {};
   var health = d.health || {};
-  var planYear = Number(gl.planYear) || (new Date()).getFullYear();
+  var planYear = Number(meta.planYear) || Number(gl.planYear) || (new Date()).getFullYear();
 
   function hasName(p){ return p && p.name && String(p.name).trim()!==''; }
   var names=[]; if(hasName(p1)) names.push(String(p1.name).trim()); if(hasName(p2)) names.push(String(p2.name).trim());
@@ -312,9 +315,14 @@ function populate(d){
   var by = (proj.byYear||[]);
   var cg = (proj.capGainsTax||[]);
   var ageOf=function(p,yr){ if(!p||p.age===undefined||p.age===null||isNaN(p.age)) return null; return Number(p.age)+(yr-planYear); };
-  function deathYearOf(p){ if(hasName(p)&&p.age!=null&&!isNaN(p.age)&&p.deathAge!=null&&!isNaN(p.deathAge)) return planYear+(Number(p.deathAge)-Number(p.age)); return null; }
+  function deathYearOf(p){
+    if(!hasName(p)) return 0;
+    var y = Number(p.projectedDeathYear)||0;                 // connector value: currentYear + (deathAge - age)
+    if(!y && Number(p.age)>0 && Number(p.deathAge)>0) y = planYear + (Number(p.deathAge)-Number(p.age)); // fallback
+    return y>0 ? y : 0;
+  }
   var dy1=deathYearOf(p1), dy2=deathYearOf(p2), deathYears=[];
-  if(dy1!=null) deathYears.push(dy1); if(dy2!=null) deathYears.push(dy2);
+  if(dy1>0) deathYears.push(dy1); if(dy2>0) deathYears.push(dy2);
   var endYear = deathYears.length ? Math.max.apply(null,deathYears) : (by.length?Number(by[by.length-1].year):null);
   var firstDeathYear = (deathYears.length===2 && dy1!==dy2) ? Math.min(dy1,dy2) : null;
   window.__endYear = endYear;
@@ -356,7 +364,7 @@ function populate(d){
   if(port.total) F.push('You have <b>'+money(port.total)+'</b> invested'+((port.accounts&&port.accounts.length)?(' across '+port.accounts.length+' account'+(port.accounts.length>1?'s':'')):'')+'.');
   if(sp.baseAnnual) F.push('Your plan budgets <b>'+money(sp.baseAnnual)+'</b> of base spending per year'+(sp.safeExtra?(', plus up to '+money(sp.safeExtra)+' when conditions allow'):'')+'.');
   if(window.__lifeTax!=null) F.push('Projected lifetime taxes of about <b>'+money(window.__lifeTax)+'</b>'+(window.__endYear?(' through '+window.__endYear):'')+'.');
-  if(roth&&roth.optimalAmount&&tax.rothConversionSavings) F.push('Converting about <b>'+money(roth.optimalAmount)+'</b> to Roth per year'+(roth.year?(' beginning '+esc(roth.year)):'')+' could reduce lifetime taxes by roughly <b>'+money(tax.rothConversionSavings)+'</b>.');
+  if(roth&&roth.optimalAmount&&tax.rothConversionSavings) F.push('Converting about <b>'+money(roth.optimalAmount)+'</b> to Roth per year'+((Number(roth.year)>0)?(' during the prime window (now\u2013'+(Number(roth.year)+5)+')'):'')+' could reduce lifetime taxes by roughly <b>'+money(tax.rothConversionSavings)+'</b>.');
   var estate=(leg.projectedEnding!=null&&leg.projectedEnding!=='')?leg.projectedEnding:window.__estateEnd;
   if(estate!=null) F.push('Projected estate of about <b>'+money(estate)+'</b> at the end of your plan'+(window.__endYear?(' in '+window.__endYear):'')+'.');
   document.getElementById('findings').innerHTML = F.length ? F.map(function(x){return '<li>'+x+'</li>';}).join('') : '<li>Connect your full plan to see personalized findings here.</li>';
@@ -374,8 +382,8 @@ function populate(d){
   var rr;
   if(roth && (roth.optimalAmount || roth.year)){
     rr='<div class="kv">';
-    if(roth.optimalAmount) rr+='<div class="row"><span class="k">Suggested annual conversion</span><span class="v">'+money(roth.optimalAmount)+'</span></div>';
-    if(roth.year) rr+='<div class="row"><span class="k">Best window begins</span><span class="v">'+esc(txt(roth.year))+'</span></div>';
+    if(roth.optimalAmount) rr+='<div class="row"><span class="k">Optimal annual conversion <span style="color:#9aa6b2;font-weight:400">(to fill bracket)</span></span><span class="v">'+money(roth.optimalAmount)+'</span></div>';
+    if(Number(roth.year)>0) rr+='<div class="row"><span class="k">Prime conversion window</span><span class="v">Now – '+(Number(roth.year)+5)+'</span></div>';
     if(tax.rothConversionSavings) rr+='<div class="row"><span class="k">Estimated lifetime tax savings</span><span class="v">'+money(tax.rothConversionSavings)+'</span></div>';
     rr+='</div>';
     rr+='<div class="note" style="margin-top:12px">Converting traditional savings to Roth in lower-income years can reduce lifetime taxes and required withdrawals later. Run the Roth Ladder page in the app to fine-tune the amount and timing for your situation.</div>';
