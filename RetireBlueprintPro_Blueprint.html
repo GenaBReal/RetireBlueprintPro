@@ -647,6 +647,9 @@ function populate(d){
   if(longDeath>0) snap+=stat('Longevity Coverage','to age '+txt(longP.deathAge), longN+' \u00b7 '+longDeath);
   var inc1=(inc.length?inc[0]:null); if(inc1==null&&rows.length) inc1=rows[0].r.totalGross;
   snap+=stat('Household Income, Yr 1', money(inc1), 'first plan year');
+  var _r0s=rows.length?rows[0].r:null;
+  var _floor1=_r0s?((Number(_r0s.baseLiving)||0)+(Number(_r0s.healthcare)||0)+(Number(_r0s.debt)||0)):null;
+  if(_floor1){ snap+=stat('Must-Pay Spending, Yr 1', money(_floor1), 'base + healthcare + debt'); }
   snap+=stat('Effective Tax Rate', pctSmart(tax.effectiveRate), (tax.stateRate?('state '+pctSmart(tax.stateRate)):''));
   snap+=stat('Projected Legacy', money(leg.projectedEnding!=null?leg.projectedEnding:estateEnd), (endYear?('at '+endYear):''));
   snap+=stat('First Portfolio Draw', firstDrawYr?String(firstDrawYr):'Never', firstDrawYr?'income covers the rest until then':'guaranteed income covers life');
