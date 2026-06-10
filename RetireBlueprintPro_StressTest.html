@@ -2226,6 +2226,10 @@ function rbpRealSweep() {
   }
 
   function finish() {
+    try {
+      var _swP={ ts:Date.now(), goal:legGoal, p1Amt:p1Amt, realCount:realCount, rows:results.map(function(r){ return { label:r.label, drag:r._drag, yr1:r._yr1, safe:r.safe, belowYear:r.fullDepl||null, real:!!r._real }; }) };
+      esJsonp({ action:'saveSweep', enc:'b64', data:btoa(unescape(encodeURIComponent(JSON.stringify(_swP)))) }, function(){}, function(){});
+    } catch(e){}
     if (progEl) progEl.style.display = 'none';
     if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Sweep All Scenarios'; }
     reRender();

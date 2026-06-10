@@ -201,6 +201,13 @@ thead{ display:table-header-group; }
       <div class="sec"><h3>Longevity &amp; Survivor Plan</h3><div id="intel"></div></div>
     </div>
 
+    <!-- PAGE: Safe Spending Sweep -->
+    <div class="page">
+      <div class="sec"><h3>Safe Spending at Every Crash Level</h3>
+        <div class="lead">If the market dropped sharply in your first retirement year, how much discretionary spending could you safely add and still hit your legacy goal? This runs your live engine across every crash level &mdash; the deeper the drop, the less room there is.</div>
+        <div id="sweep"></div>
+      </div>
+    </div>
     <!-- PAGE: Market Stress Test -->
     <div class="page">
       <div class="sec"><h3>Market Stress Test &mdash; Crash Scenarios</h3>
@@ -489,6 +496,46 @@ function renderSmile(d){
     var rp=prow('Go-go years',sp.phase1Start,sp.phase1End,sp.phase1Extra)+prow('Slow-go years',sp.phase2Start,sp.phase2End,sp.phase2Extra)+prow('No-go years',sp.phase3Start,sp.phase3End,sp.phase3Extra);
     h+= rp ? ('<table class="tbl" style="margin-top:12px"><thead><tr><th>Phase</th><th>Years</th><th class="r">Extra / year</th></tr></thead><tbody>'+rp+'</tbody></table>') : '<div class="empty" style="margin-top:10px">No spending phases are set &mdash; your plan uses a level spending amount throughout.</div>';
   }
+  el.innerHTML=h;
+}
+function rbpLoadSweep(){
+  var el=document.getElementById('sweep'); if(!el) return;
+  var sheetId=(window.RBP.getSheetId?window.RBP.getSheetId():'');
+  var host=location.hostname||''; var isPreview=location.protocol==='file:'||host==='localhost'||host==='127.0.0.1'||/claude\.ai$/.test(host);
+  if(isPreview||!sheetId||sheetId==='1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA'){ el.innerHTML='<div class="empty">Connect your plan to load your crash-level sweep.</div>'; return; }
+  el.innerHTML='<div class="lead">Loading your crash-level sweep\u2026</div>';
+  var cb='rbpSweep_'+Date.now(), done=false;
+  var timer=setTimeout(function(){ if(!done){ done=true; try{delete window[cb];}catch(e){} renderSweep(null,'timeout'); } }, 60000);
+  window[cb]=function(resp){ if(done) return; done=true; clearTimeout(timer); try{delete window[cb];}catch(e){} renderSweep(resp&&resp.sweep?resp.sweep:null, (resp&&resp.ok)?null:'error'); };
+  var s=document.createElement('script'); s.crossOrigin='anonymous';
+  s.src=SCRIPT_URL+'?authuser=0&action=loadSweep&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now();
+  s.onerror=function(){ if(!done){ done=true; clearTimeout(timer); try{delete window[cb];}catch(e){} renderSweep(null,'network'); } };
+  document.head.appendChild(s);
+}
+function renderSweep(sweep, err){
+  var el=document.getElementById('sweep'); if(!el) return;
+  if(err){ el.innerHTML='<div class="empty">Your scenario sweep couldn\u2019t be loaded right now. Run <b>Sweep All Scenarios</b> on the Stress Test page and it\u2019ll appear here automatically.</div>'; return; }
+  if(!sweep || !sweep.rows || !sweep.rows.length){ el.innerHTML='<div class="empty">No scenario sweep saved yet. On the Stress Test page, press <b>Sweep All Scenarios</b> \u2014 it runs your plan through every crash level and saves the result here automatically.</div>'; return; }
+  var cur=Number(sweep.p1Amt)||0;
+  function hist(yr1){ var d=Math.round((Number(yr1)||0)*100);
+    if(d>=0) return '';
+    if(d===-50) return '\u2248 worst of 2008 / 1929-scale';
+    if(d===-40) return '\u2248 2008 financial crisis';
+    if(d===-30) return 'deep bear market';
+    if(d===-20) return '\u2248 dot-com / 1973\u201374';
+    if(d===-10) return 'mild correction';
+    return ''; }
+  var h='<table class="tbl"><thead><tr><th>Year-1 market</th><th class="r">Safe extra / yr</th><th>Notes</th></tr></thead><tbody>';
+  sweep.rows.forEach(function(r){
+    var lbl=esc((r.label||'').replace(/\s+/g,' ').trim());
+    var safeV=Number(r.safe);
+    var safeCell=(r.safe==null)?'\u2014':(safeV<=0?'<span style="color:#b0392a;font-weight:700;">None</span>':money(safeV));
+    var note=hist(r.yr1);
+    if(!note && safeV>0 && cur>0){ note=(safeV>=cur)?'covers your current extra':'tighter than current extra'; }
+    h+='<tr><td>'+lbl+'</td><td class="r">'+safeCell+'</td><td style="color:#5a6675;font-size:12px;">'+esc(note)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  h+='<div class="note" style="margin-top:10px">Each row asks: <b>if the market dropped this much in your first retirement year, what\u2019s the most discretionary spending you could add on top of your must-pay floor and still finish at or above your legacy goal?</b> Computed on your live engine \u2014 taxes, RMDs, and Social Security timing all reflected. The deeper the crash, the less is safe; <b>None</b> means even current spending can\u2019t be sustained at that level.'+(cur>0?(' Your plan\u2019s current discretionary extra is about <b>'+money(cur)+'/yr</b>.'):'')+'</div>';
   el.innerHTML=h;
 }
 function rbpLoadStress(){
@@ -875,6 +922,7 @@ function showConnect(h, p){
   var cached=rbpCacheGet(); if(cached){ populate(cached); }
   window.RBP.load(function(d){ rbpCachePut(d); populate(d); }, function(msg){ if(!cached){ if(msg==='no-sheet') showConnect(); else showConnect('We could not reach your plan','There was a problem loading your live numbers ('+esc(msg||'unknown')+'). Please check your connection and try again from your dashboard.'); } });
   rbpLoadStress();
+  rbpLoadSweep();
 })();
 </script>
 </body>
