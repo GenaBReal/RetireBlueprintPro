@@ -469,15 +469,15 @@ function renderMonteCarlo(d){
   s+=stat('Probability of Success', mc.successPct+'%', 'futures that meet your legacy goal');
   s+=stat('Always Covers Essentials', mc.neverRanOutPct+'%', 'never short on must-pay costs');
   s+=stat('Median Ending', moneyShort(mc.median), 'half of futures end above this');
-  s+=stat('Average Ending', moneyShort(mc.average), 'tracks your main projection');
+  s+=stat('Chance You Leave a Legacy', (100-mc.depletedFullPct)+'%', 'futures that end with money left');
   s+=stat('Downside (10th pct)', moneyShort(mc.p10), '1-in-10 rough markets');
   s+=stat('Upside (90th pct)', moneyShort(mc.p90), '1-in-10 strong markets');
   statsEl.innerHTML=s;
   if(fanEl) fanEl.innerHTML=buildMCFanChart(mc.yearlyBals, mc.years, mc.legacyGoal);
   var eqPct=Math.round(mc.equityFraction*100);
   if(methEl) methEl.innerHTML =
-    '<div class="note"><b>What this is based on.</b> '+mc.runs.toLocaleString()+' randomized market futures applied to <i>your</i> actual year-by-year withdrawal plan, run only through your plan horizon. Returns are centered on your portfolio\u2019s blended expected return of <b>'+(Math.round(mc.mu*1000)/10)+'%</b> with volatility of <b>'+(Math.round(mc.sigma*1000)/10)+'%</b> (scaled to its ~'+eqPct+'% equity exposure), using a fat-tailed model with a volatility-drag correction so the average tracks your main projection. Dynamic spending guardrails trim discretionary extras by '+Math.round(mc.flex*100)+'% in strained markets (industry-standard Guyton-Klinger).</div>'+
-    '<div class="note" style="margin-top:10px"><b>What it means.</b> The <b>average</b> should land near your Dashboard projection &mdash; confirmation it\u2019s using your real portfolio. The <b>median</b> and success rate come in lower on purpose: that gap is real-market volatility (sequence-of-returns risk) a smooth projection can\u2019t show. Plan around the <b>median</b> and the <b>success rate</b> &mdash; half of all futures are worse than the average. Each time this report is generated the simulation is re-run, so these figures may move a point or two.</div>';
+    '<div class="note"><b>What this is based on.</b> '+mc.runs.toLocaleString()+' randomized market futures applied to <i>your</i> actual year-by-year withdrawal plan, run only through your plan horizon. Returns are centered on your portfolio\u2019s blended expected return of <b>'+(Math.round(mc.mu*1000)/10)+'%</b> with volatility of <b>'+(Math.round(mc.sigma*1000)/10)+'%</b> (scaled to its ~'+eqPct+'% equity exposure), using a fat-tailed model with a volatility-drag correction so the median tracks your expected return. Dynamic spending guardrails trim discretionary extras by '+Math.round(mc.flex*100)+'% in strained markets (industry-standard Guyton-Klinger).</div>'+
+    '<div class="note" style="margin-top:10px"><b>What it means.</b> Plan around the <b>median</b> and the <b>success rate</b>, not the average &mdash; on a range this skewed, a handful of strong-market futures pull the mean far above the typical outcome. The <b>median</b> is the middle result and the <b>success rate</b> is the share of futures that still meet your legacy goal; both come in below a smooth projection on purpose, because that gap is real-market volatility (sequence-of-returns risk) a single straight line can\u2019t show. Each time this report is generated the simulation is re-run, so these figures may move a point or two.</div>';
 }
 function renderSmile(d){
   var el=document.getElementById('smile'); if(!el) return;
