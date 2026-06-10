@@ -296,12 +296,14 @@ window.addEventListener('storage', function(e) {
 <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Summary.html" class="active">Summary</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Blueprint.html">Blueprint</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
 <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
   <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide to connect your sheet.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master Sheet</a>
 </div>
 <div style="display:flex;align-items:center;justify-content:flex-end;padding:10px 20px;background:#041E2F;border-bottom:1px solid #1a3a52;">
-  <button class="btn" onclick="window.print()" style="background:#1CC7D0;color:#041E2F;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.3px;">🖨️ Print / Save PDF</button>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Blueprint.html" style="background:#1CC7D0;color:#041E2F;border:none;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.3px;text-decoration:none;display:inline-block;">📄 Download Full Blueprint (PDF)</a>
+  <button class="btn" onclick="window.print()" style="background:transparent;color:#1CC7D0;border:1px solid #1CC7D0;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.3px;margin-left:10px;">🖨️ Print this summary</button>
 </div>
 
 </div>
