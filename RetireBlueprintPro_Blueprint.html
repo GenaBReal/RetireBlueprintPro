@@ -66,6 +66,13 @@ thead{ display:table-header-group; }
 .kv .row{ display:flex; justify-content:space-between; border-bottom:1px dotted #e2e7ec; padding:5px 0; font-size:13px; }
 .kv .row .k{ color:var(--muted); }
 .kv .row .v{ font-weight:700; color:var(--navy); }
+.people-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.pcard{ border:1px solid #e3e8ee; border-radius:8px; padding:14px 16px; background:#fff; break-inside:avoid; }
+.pcard .pname{ font-size:15px; font-weight:800; color:var(--navy); margin:0 0 9px; border-bottom:2px solid var(--teal); padding-bottom:6px; }
+.pcard .prow{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:5px 0; border-bottom:1px dotted #eef1f5; font-size:12px; }
+.pcard .prow:last-child{ border-bottom:none; }
+.pcard .pk{ color:var(--muted); }
+.pcard .pv{ font-weight:700; color:var(--ink); text-align:right; white-space:nowrap; }
 
 .findings{ list-style:none; margin:0; padding:0; }
 .findings li{ position:relative; padding:9px 0 9px 28px; border-bottom:1px dotted #e2e7ec; font-size:13.5px; line-height:1.55; color:#33414f; }
@@ -90,6 +97,7 @@ thead{ display:table-header-group; }
 
 @media (max-width:640px){
   .stats{ grid-template-columns:1fr 1fr; }
+  .people-grid{ grid-template-columns:1fr; }
   .grid2{ grid-template-columns:1fr; }
   .sec,.hero,.cover,.foot{ padding-left:18px; padding-right:18px; }
   .hero{ flex-direction:column; text-align:center; }
@@ -503,19 +511,26 @@ function renderStress(tests, err){
   if(!tests || !tests.length){ el.innerHTML='<div class="empty">No saved crash tests yet. On the Stress Test page, design a crash (for example a \u221230% drop in your first retirement year), press Run, and it saves automatically &mdash; then it appears here with your real engine results.</div>'; return; }
   var goal=(window.__stressGoal!=null)?window.__stressGoal:0;
   var h='<table class="tbl"><thead><tr><th>Scenario</th><th class="r">Ending balance</th><th class="r">vs legacy goal</th><th class="r">Safe extra / yr</th><th>Result</th></tr></thead><tbody>';
-  var any=false;
+  var any=false, idx=0;
   tests.forEach(function(t){
-    if(!t||!t.result) return; any=true;
+    if(!t||!t.result) return; any=true; idx++;
     var p=t.params||{}, r=t.result||{};
     var lbl='Saved crash test';
-    if(p.eDrag){ lbl='\u2212'+Math.abs(Math.round(p.eDrag))+'% downturn'+(p.eDur>1?(' \u00d7 '+p.eDur+' yrs'):'')+(p.eStart?(' from '+p.eStart):''); }
+    if(p.eDrag){ lbl='\u2212'+Math.abs(Math.round(p.eDrag))+'% downturn'+((p.eDur&&p.eDur>0)?(' \u00d7 '+p.eDur+' yr'+(p.eDur>1?'s':'')):'')+(p.eStart?(' from '+p.eStart):''); }
     if(p.lDrag){ lbl+=' + later \u2212'+Math.abs(Math.round(p.lDrag))+'%'+(p.lStart?(' ('+p.lStart+')'):''); }
+    lbl='#'+idx+'\u2002'+lbl;
     var g=r.legacyGoal||goal;
-    var pctGoal=(g>0)?(Math.round((r.ending||0)/g*100)+'% of goal'):'\u2014';
-    var res=(r.belowYear)?('First below goal in '+r.belowYear):'Holds your goal \u2713';
-    h+='<tr><td>'+esc(lbl)+'</td><td class="r">'+money(r.ending)+'</td><td class="r">'+pctGoal+'</td><td class="r">'+money(r.safeExtra)+'</td><td>'+esc(res)+'</td></tr>';
+    var endV=Number(r.ending)||0;
+    var depleted=(r.depletes===true)||(endV<=0);
+    var heldGoal=(r.held===true)||(!r.belowYear && !depleted);
+    var pctGoal=depleted?'0% of goal':((g>0)?(Math.round(endV/g*100)+'% of goal'):'\u2014');
+    var safeCell=depleted?'<span style="color:#b0392a;font-weight:700;">None</span>':money(r.safeExtra);
+    var res=depleted?'Plan runs out':(r.belowYear?('Below goal by '+r.belowYear):'Holds your goal \u2713');
+    var resCol=depleted?'#b0392a':(r.belowYear?'#a8761e':'#1f7a4d');
+    h+='<tr><td>'+esc(lbl)+'</td><td class="r">'+money(endV)+'</td><td class="r">'+pctGoal+'</td><td class="r">'+safeCell+'</td><td style="color:'+resCol+';font-weight:600;">'+esc(res)+'</td></tr>';
   });
   h+='</tbody></table>';
+  h+='<div class="note" style="margin-top:10px">Ending balance and \u201cruns out\u201d reflect your plan at its <b>current</b> planned spending in each scenario. <b>Safe extra / yr</b> is the most discretionary spending you could add on top of your must-pay floor and still finish at or above your legacy goal \u2014 it reads <b>None</b> when a crash is severe enough that the plan can\u2019t sustain even current spending. Each row is one saved run; re-run the sweep on the Stress Test page to refresh them.</div>';
   el.innerHTML = any ? h : '<div class="empty">No completed crash-test results are saved yet.</div>';
 }
 
@@ -633,19 +648,21 @@ function populate(d){
   })();
 
   /* =================== PAGE 2: household + income =================== */
-  function personRows(p){
+  function personCard(p){
     if(!hasName(p)) return '';
-    var r='';
-    r+='<tr><td><b>'+esc(p.name)+'</b></td><td class="r">Current age</td><td class="r">'+txt(p.age)+'</td></tr>';
-    if(p.deathAge) r+='<tr><td></td><td class="r">Planning through age</td><td class="r">'+txt(p.deathAge)+(p.projectedDeathYear?(' ('+p.projectedDeathYear+')'):'')+'</td></tr>';
-    if(p.salary) r+='<tr><td></td><td class="r">Employment income</td><td class="r">'+money(p.salary)+(p.salaryEnd?(' to '+esc(p.salaryEnd)):'')+'</td></tr>';
-    if(p.ssMonthly) r+='<tr><td></td><td class="r">Social Security</td><td class="r">'+money(p.ssMonthly)+'/mo'+(p.ssStartDate?(' from '+esc(p.ssStartDate)):'')+'</td></tr>';
-    if(p.pension) r+='<tr><td></td><td class="r">Pension</td><td class="r">'+money(p.pension)+(p.pensionStart?(' from '+esc(p.pensionStart)):'')+'</td></tr>';
-    if(p.otherIncome) r+='<tr><td></td><td class="r">Other income</td><td class="r">'+money(p.otherIncome)+'</td></tr>';
-    return r;
+    var rows='';
+    function prow(k,v){ rows+='<div class="prow"><span class="pk">'+k+'</span><span class="pv">'+v+'</span></div>'; }
+    if(p.age!=null&&p.age!=='') prow('Current age', txt(p.age));
+    if(p.deathAge) prow('Planning through age', txt(p.deathAge)+(p.projectedDeathYear?(' ('+p.projectedDeathYear+')'):''));
+    if(p.salary) prow('Employment income', money(p.salary)+(p.salaryEnd?(' to '+esc(p.salaryEnd)):''));
+    if(p.ssMonthly) prow('Social Security', money(p.ssMonthly)+'/mo'+(p.ssStartDate?(' from '+esc(p.ssStartDate)):''));
+    if(p.pension) prow('Pension', money(p.pension)+(p.pensionStart?(' from '+esc(p.pensionStart)):''));
+    if(p.otherIncome) prow('Other income', money(p.otherIncome));
+    return '<div class="pcard"><div class="pname">'+esc(p.name)+'</div>'+rows+'</div>';
   }
-  var hh=personRows(p1)+personRows(p2);
-  document.getElementById('household').innerHTML = hh? ('<table class="tbl"><tbody>'+hh+'</tbody></table>') : '<div class="empty">No household details found in your plan.</div>';
+  var nCards=(hasName(p1)?1:0)+(hasName(p2)?1:0);
+  var pcards=personCard(p1)+personCard(p2);
+  document.getElementById('household').innerHTML = pcards? ('<div class="people-grid"'+(nCards<2?' style="grid-template-columns:1fr"':'')+'>'+pcards+'</div>') : '<div class="empty">No household details found in your plan.</div>';
 
   var ir='<div class="grid2">';
   ir+='<div class="kv">';
