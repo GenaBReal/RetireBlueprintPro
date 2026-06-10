@@ -41,15 +41,15 @@ body{ font-family:'Segoe UI',system-ui,sans-serif; background:#f0f2f5; color:var
 
 .page{ }
 .sec{ padding:20px 40px; border-bottom:1px solid #eef1f5; break-inside:avoid; }
-.sec h3{ margin:0 0 12px; font-size:13px; text-transform:uppercase; letter-spacing:1.2px; color:var(--navy); border-left:4px solid var(--gold); padding-left:10px; }
+.sec h3{ margin:0 0 13px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:var(--navy); border-bottom:2px solid var(--teal); padding:0 0 6px; }
 .sec h3 .secnote{ float:right; font-size:10px; letter-spacing:.4px; color:#9aa6b2; text-transform:none; font-weight:400; }
 .sec .lead{ color:var(--muted); font-size:13px; margin:-4px 0 12px; }
 
 .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.stat{ border:1px solid #e7ebf0; border-radius:8px; padding:12px 14px; background:#fcfdfe; }
-.stat .lbl{ font-size:10px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); }
-.stat .val{ font-size:21px; font-weight:800; color:var(--navy); margin-top:3px; line-height:1.1; }
-.stat .sub{ font-size:11px; color:#7a8794; margin-top:3px; }
+.stat{ border:none; border-left:3px solid var(--teal); border-radius:6px; padding:11px 14px; background:#f8f9fa; }
+.stat .lbl{ font-size:9px; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); font-weight:600; }
+.stat .val{ font-size:20px; font-weight:800; color:var(--ink); margin-top:3px; line-height:1.1; }
+.stat .sub{ font-size:10px; color:#7a8794; margin-top:3px; }
 
 .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px 26px; }
 
@@ -78,6 +78,8 @@ thead{ display:table-header-group; }
 .legend i{ display:inline-block; width:12px; height:3px; vertical-align:middle; margin-right:5px; border-radius:2px; }
 
 .note{ background:#f7f9fb; border:1px solid #e7ebf0; border-radius:6px; padding:12px 14px; font-size:12.5px; color:#42505f; line-height:1.55; }
+.narrative{ font-size:13px; line-height:1.85; color:#33414f; background:#f8f9fa; border-left:4px solid var(--teal); padding:16px 20px; border-radius:0 8px 8px 0; }
+.narrative strong, .narrative b{ color:var(--navy); }
 .foot{ padding:20px 40px 26px; background:#fafbfc; color:var(--muted); font-size:11.5px; line-height:1.6; }
 .foot .brand{ color:var(--navy); font-weight:700; }
 .empty{ color:#9aa6b2; font-style:italic; font-size:13px; }
@@ -135,6 +137,7 @@ thead{ display:table-header-group; }
         <div class="ring" id="hero-ring"><div class="num" id="hero-num">&mdash;</div><div class="lab">Plan Confidence</div></div>
         <div class="htext"><h2 id="hero-head">Plan Confidence</h2><p id="hero-sub"></p></div>
       </div>
+      <div class="sec"><h3>Executive Summary</h3><div class="narrative" id="exec-narrative">Preparing your summary&hellip;</div></div>
       <div class="sec"><h3>Plan Snapshot</h3><div class="stats" id="snapshot"></div></div>
       <div class="sec"><h3>Key Findings</h3><ul class="findings" id="findings"></ul></div>
     </div>
@@ -598,6 +601,37 @@ function populate(d){
   if(estate!=null) F.push('Projected estate of about <b>'+money(estate)+'</b> at the end of your plan'+(endYear?(' in '+endYear):'')+'.');
   document.getElementById('findings').innerHTML = F.length? F.map(function(x){return '<li>'+x+'</li>';}).join('') : '<li>Connect your full plan to see personalized findings here.</li>';
 
+  /* ====== executive narrative (Summary-style story; plan-confidence and legacy kept distinct) ====== */
+  (function(){
+    var elN=document.getElementById('exec-narrative'); if(!elN) return;
+    var goalMet=(Math.round(leg.achievedPct||0)>=100)||((leg.variance!=null)&&(Number(leg.variance)>=-Math.max(1,(Number(leg.goal)||0)*0.005)));
+    var nm1=hasName(p1)?String(p1.name).trim():'', nm2=hasName(p2)?String(p2.name).trim():'';
+    var who=single?(nm1||nm2||'You'):(nm1+' and '+nm2);
+    var verb=single?'has':'have', tverb=single?'is':'are';
+    var confR=(conf!=null&&!isNaN(conf))?Math.round(conf):null;
+    var s='';
+    s+='<strong>'+esc(who)+'</strong> '+verb+' a retirement plan ';
+    if(confR!=null){ s+='with <strong>'+confR+'% confidence</strong> \u2014 '+(health.fundedForLife?('projected to stay funded for '+(single?'life':'the longer-living partner\u2019s full lifetime')):(health.depletionYear?('projected to last through about <strong>'+esc(health.depletionYear)+'</strong>'):'based on the projection that follows'))+'. '; }
+    else { s+='summarized below. '; }
+    if(port.total){ var span=rows.length?rows.length:((endYear&&endYear>planYear)?(endYear-planYear+1):0);
+      s+=(single?'A':'A combined')+' portfolio of <strong>'+money(port.total)+'</strong>'+(span>0?(', running across a <strong>'+span+'-year projection</strong>,'):',')+' is ';
+      if(single){ s+=(health.fundedForLife?'projected to fully cover ':'projected to cover ')+'<strong>'+esc(longN)+' through age '+txt(longP.deathAge)+(longDeath>0?(' ('+longDeath+')'):'')+'</strong>. '; }
+      else { s+=(health.fundedForLife?'projected to fully cover ':'projected to support ')+'<strong>'+esc(nm1)+' through age '+txt(p1.deathAge)+(dy1>0?(' ('+dy1+')'):'')+'</strong> and <strong>'+esc(nm2)+' through age '+txt(p2.deathAge)+(dy2>0?(' ('+dy2+')'):'')+'</strong>. '; }
+    }
+    var r0=rows.length?rows[0].r:null; var ss1=r0?((Number(r0.cSS)||0)+(Number(r0.gSS)||0)):0;
+    if(ss1>0&&sp.baseAnnual){ s+='Social Security provides about <strong>'+money(ss1)+'/year</strong>, covering roughly <strong>'+Math.round(ss1/sp.baseAnnual*100)+'%</strong> of base living expenses before any portfolio withdrawal. '; }
+    s+='<br><br>';
+    if(Number(leg.goal)>0){ s+='<strong>'+esc(who)+'</strong> '+tverb+' tracking toward a <strong>$'+Math.round(Number(leg.goal)/1000)+'K legacy goal</strong> \u2014 '+(goalMet?'currently <strong>on track to meet it</strong>':('currently <strong>'+Math.round(leg.achievedPct||0)+'% funded</strong>'))+((leg.projectedEnding!=null&&leg.projectedEnding!=='')?(', with a projected estate of <strong>'+money(leg.projectedEnding)+'</strong>'+(endYear?(' at '+endYear):'')):'')+'. '; }
+    var effR=pctSmart(tax.effectiveRate); if(effR&&effR!=='\u2014'){ s+='The effective federal tax rate is <strong>'+effR+'</strong>. '; }
+    if(roth&&roth.optimalAmount&&tax.rothConversionSavings){ s+='Converting about <strong>'+money(roth.optimalAmount)+'/year</strong> to Roth'+((Number(roth.year)>0)?(' during the prime window (now\u2013'+(Number(roth.year)+5)+')'):'')+' could save an estimated <strong>'+money(tax.rothConversionSavings)+'</strong> in lifetime taxes. '; }
+    s+='<br><br>';
+    if(confR==null){ s+='<strong>Bottom line:</strong> The detailed projections that follow show the full picture of this plan.'; }
+    else if(confR>=85&&goalMet){ s+='\u2705 <strong>Bottom line:</strong> This plan is resilient \u2014 projected to fund a full retirement and hold the legacy goal. '+esc(who)+' can plan with confidence.'; }
+    else if(confR>=65){ s+='\u26a0\ufe0f <strong>Bottom line:</strong> The plan is largely on track and may benefit from small adjustments \u2014 modest spending changes, a timing shift, or added Roth conversions during the prime window.'; }
+    else { s+='\u26d4 <strong>Bottom line:</strong> The plan needs attention. Adjusting spending, retirement timing, or allocation can improve the long-term outlook.'; }
+    elN.innerHTML=s;
+  })();
+
   /* =================== PAGE 2: household + income =================== */
   function personRows(p){
     if(!hasName(p)) return '';
@@ -765,14 +799,20 @@ function populate(d){
   } else rr='<div class="empty">No Roth conversion opportunity was identified for your current plan. You can still model conversions on the Roth Ladder page.</div>';
   document.getElementById('roth').innerHTML=rr;
 
+  /* legacy — tolerance-aware: a rounding-level miss (e.g. $1) is "met", not a shortfall */
+  var lgoal=Number(leg.goal)||0;
+  var lvar=(leg.variance!=null&&leg.variance!=='')?Number(leg.variance):((leg.projectedEnding!=null&&lgoal)?(Number(leg.projectedEnding)-lgoal):null);
+  var lpct=(leg.achievedPct!=null&&leg.achievedPct!=='')?Number(leg.achievedPct):((lgoal>0&&leg.projectedEnding!=null)?Math.round(Number(leg.projectedEnding)/lgoal*100):null);
+  var goalMet=(lpct!=null&&Math.round(lpct)>=100)||(lvar!=null&&lvar>=-Math.max(1,lgoal*0.005));
   var lr='<div class="grid2"><div class="kv">';
   if(leg.projectedEnding!=null) lr+='<div class="row"><span class="k">Projected ending estate</span><span class="v">'+money(leg.projectedEnding)+'</span></div>';
-  if(leg.goal!=null&&leg.goal!=='') lr+='<div class="row"><span class="k">Legacy goal</span><span class="v">'+money(leg.goal)+'</span></div>';
-  if(leg.variance!=null&&leg.variance!=='') lr+='<div class="row"><span class="k">Variance to goal</span><span class="v">'+money(leg.variance)+'</span></div>';
+  if(lgoal) lr+='<div class="row"><span class="k">Legacy goal</span><span class="v">'+money(lgoal)+'</span></div>';
+  if(lvar!=null){ var vtxt=goalMet?((lvar>=1)?('+'+money(lvar)+' over goal'):'On goal'):((lvar<0)?('\u2212'+money(Math.abs(lvar))):money(lvar)); lr+='<div class="row"><span class="k">Variance to goal</span><span class="v">'+vtxt+'</span></div>'; }
   lr+='</div><div class="kv">';
-  if(leg.achievedPct!=null&&leg.achievedPct!=='') lr+='<div class="row"><span class="k">Goal achieved</span><span class="v">'+pctSmart(leg.achievedPct)+'</span></div>';
+  if(lpct!=null) lr+='<div class="row"><span class="k">Goal achieved</span><span class="v">'+(goalMet?'Met \u2713':pctSmart(lpct))+'</span></div>';
   if(leg.safetyFloor!=null&&leg.safetyFloor!=='') lr+='<div class="row"><span class="k">Safety floor</span><span class="v">'+money(leg.safetyFloor)+'</span></div>';
-  if(leg.status) lr+='<div class="row"><span class="k">Status</span><span class="v">'+esc(txt(leg.status))+'</span></div>';
+  var lstatus=goalMet?'Meets your legacy goal \u2713':(leg.status?esc(txt(leg.status)):'\u2014');
+  lr+='<div class="row"><span class="k">Status</span><span class="v">'+lstatus+'</span></div>';
   lr+='</div></div>';
   document.getElementById('legacy').innerHTML=lr;
 
