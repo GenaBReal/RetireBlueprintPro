@@ -165,6 +165,7 @@ thead{ display:table-header-group; }
     <div class="page">
       <div class="sec"><h3>Spending &amp; Expense Engine</h3><div id="spending"></div></div>
       <div class="sec"><h3>Debts &amp; Equity</h3><div id="debts"></div></div>
+      <div class="sec"><h3>Spending Smile (Go-Go / Slow-Go / No-Go)</h3><div id="smile"></div></div>
       <div class="sec"><h3>Portfolio Outlook</h3>
         <div class="lead">Projected year-end investable balance through your plan horizon.</div>
         <div class="chartwrap" id="chart"></div>
@@ -189,6 +190,30 @@ thead{ display:table-header-group; }
       <div class="sec"><h3>Longevity &amp; Survivor Plan</h3><div id="intel"></div></div>
     </div>
 
+    <!-- PAGE: Market Stress Test -->
+    <div class="page">
+      <div class="sec"><h3>Market Stress Test &mdash; Crash Scenarios</h3>
+        <div class="lead">Your real plan run through market crashes on the live engine &mdash; full taxes, RMDs, and Social Security timing reflected. These are the scenarios saved from the Stress Test page.</div>
+        <div id="stress"></div>
+      </div>
+      <div class="sec"><h3>What the Crash Test Means</h3>
+        <div class="note">A crash early in retirement is one of a plan&rsquo;s biggest risks: you&rsquo;re forced to sell investments while prices are down, and those shares never recover. Each scenario reveals which lever bends first &mdash; your <b>spending</b> (the plan trims discretionary extras to protect itself) or your <b>legacy goal</b> (the damage lands there instead). Holding your legacy goal through a steep, multi-year crash is real, built-in resilience. &ldquo;Safe extra / yr&rdquo; is the most discretionary spending you could add on top of your must-pay floor and still finish at or above your legacy goal in that scenario.</div>
+      </div>
+    </div>
+
+    <!-- PAGE: Monte Carlo -->
+    <div class="page">
+      <div class="sec"><h3>Monte Carlo Simulation</h3>
+        <div class="lead">1,000 randomized market futures run against your real year-by-year withdrawal plan &mdash; a true probability of success rather than a single smooth line.</div>
+        <div class="stats" id="mc-stats"></div>
+      </div>
+      <div class="sec"><h3>Range of Outcomes Over Time</h3>
+        <div class="lead">The shaded band is the middle 80% of simulated futures (10th to 90th percentile); the line is the median; the dashed line is your legacy goal.</div>
+        <div class="chartwrap" id="mc-fan"></div>
+      </div>
+      <div class="sec"><h3>Method &amp; How to Read It</h3><div id="mc-method"></div></div>
+    </div>
+
     <!-- PAGE 7 -->
     <div class="page">
       <div class="sec"><h3>Your Tax Picture</h3><div id="tax"></div></div>
@@ -196,6 +221,18 @@ thead{ display:table-header-group; }
       <div class="sec"><h3>Legacy Engine</h3><div id="legacy"></div></div>
       <div class="sec"><h3>Resilience &amp; Crash-Testing</h3><div class="note" id="resilience"></div></div>
       <div class="sec"><h3>Assumptions &amp; Methodology</h3><div id="assumptions"></div></div>
+      <div class="sec"><h3>Glossary</h3>
+        <div style="font-size:12.5px;color:#42505f;line-height:1.6">
+          <p style="margin:4px 0"><b>Probability of success</b> &mdash; the share of simulated futures that finish at or above your legacy goal.</p>
+          <p style="margin:4px 0"><b>Median outcome</b> &mdash; the middle result: half of futures end higher, half lower. A more realistic planning number than the average.</p>
+          <p style="margin:4px 0"><b>Sequence-of-returns risk</b> &mdash; the danger of poor returns early in retirement while you&rsquo;re withdrawing; the same returns do far more damage early than late.</p>
+          <p style="margin:4px 0"><b>Guardrails (Guyton-Klinger)</b> &mdash; an industry-standard rule that trims discretionary spending when markets strain the portfolio, then restores it when they recover.</p>
+          <p style="margin:4px 0"><b>Safe extra spend</b> &mdash; the most discretionary spending you could add on top of must-pay costs and still hit your legacy goal in a given scenario.</p>
+          <p style="margin:4px 0"><b>Must-pay floor</b> &mdash; base living costs plus healthcare and debt payments; the spending that can&rsquo;t be cut in a downturn.</p>
+          <p style="margin:4px 0"><b>RMD</b> &mdash; Required Minimum Distribution: the IRS-mandated withdrawal from pre-tax accounts that begins at age 73.</p>
+          <p style="margin:4px 0"><b>Spending smile</b> &mdash; the common pattern of higher spending early (go-go), tapering in the middle (slow-go), and lower later apart from healthcare (no-go).</p>
+        </div>
+      </div>
       <div class="foot" id="foot"></div>
     </div>
 
@@ -300,6 +337,183 @@ function buildMixChart(rows){
   var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">'+grid+paths+ylab+xlab+'</svg>';
   var lg='<div class="legend">'+present.map(function(s){ return '<span><i style="background:'+s.color+'"></i>'+s.label+'</span>'; }).join('')+'</div>';
   return svg+lg;
+}
+
+/* ============================================================
+   STRESS-TEST & MONTE CARLO ENGINE  (ported from the Stress Test
+   page so the Blueprint's numbers match the app exactly).
+   Monte Carlo is computed here on your real plan; crash scenarios
+   are your real saved engine results. No estimates.
+   ============================================================ */
+var MC_HISTORICAL=[43.6,-8.4,-24.9,-43.3,-8.2,53.9,-2.3,52.6,-1.4,-10.1,23.7,18.8,34.2,25.1,-2.8,-12.5,37.6,13.1,19.0,-14.9,31.4,43.8,-2.5,15.4,22.2,-13.0,-9.8,35.5,-0.4,20.7,22.7,4.5,13.1,22.5,-4.4,-2.5,9.5,24.8,-13.8,-24.3,37.1,23.8,-7.2,6.5,18.2,32.4,-4.9,21.4,22.5,6.3,32.2,28.7,21.0,-9.1,-11.9,-22.1,28.7,10.9,4.9,15.8,5.5,-37.0,26.5,15.1,2.1,16.0,32.4,13.7,1.4,12.0,21.8,-4.4,31.5,18.4,28.9,26.8,-19.4,-12.4,-25.2];
+function rbpPortfolioStats(port){
+  var R_BOND=0.04,R_EQUITY=0.09,VOL_FIXED=0.06,VOL_EQUITY=0.18,wRet=0.07;
+  if(port&&port.accounts&&port.accounts.length){ var tb=0,rb=0; port.accounts.forEach(function(a){ var bal=(a.balance>0)?a.balance:0, r=(a.expectedReturn>0)?a.expectedReturn/100:0; if(bal>0&&r>0){tb+=bal;rb+=bal*r;} }); if(tb>0) wRet=rb/tb; }
+  var eqFrac=Math.max(0,Math.min(1,(wRet-R_BOND)/(R_EQUITY-R_BOND)));
+  var sigma=VOL_FIXED+(VOL_EQUITY-VOL_FIXED)*eqFrac; sigma=Math.max(0.05,Math.min(0.19,sigma));
+  return {meanReturn:wRet,equityFraction:eqFrac,sigma:sigma};
+}
+function mcEssentialFloor(d){
+  var sp=(d&&d.spending)||{}, proj=(d&&d.projections)||{}, by=null;
+  if(proj.byYear&&proj.byYear.length){ var cy=new Date().getFullYear(); for(var k=0;k<proj.byYear.length;k++){ if(proj.byYear[k]&&proj.byYear[k].year===cy){by=proj.byYear[k];break;} } if(!by) by=proj.byYear[0]; }
+  if(by){ var living=+by.baseLiving||0,h=+by.healthcare||0,dbt=+by.debt||0,floor=(+by.totalNeed)||(living+h+dbt); return {living:living,healthcare:h,debt:dbt,floor:floor}; }
+  var fb=sp.baseAnnual||0; return {living:fb,healthcare:0,debt:0,floor:fb};
+}
+function mcRandReturn(model,mu,sigma){
+  var u1=Math.random(),u2=Math.random(); var z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+  if(model==='historical'){ return MC_HISTORICAL[Math.floor(Math.random()*MC_HISTORICAL.length)]/100; }
+  else if(model==='fat'){ var driftFat=0.5*sigma*sigma; var base=(mu+driftFat)+sigma*z; if(Math.random()<0.03){ base+=(Math.random()<0.5?-1:1)*sigma*(1+Math.random()*2); } return Math.max(-0.60,Math.min(0.80,base)); }
+  else { var drift=0.5*sigma*sigma; return (mu+drift)+sigma*z; }
+}
+function mcPercentile(a,p){ if(!a||!a.length) return 0; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.floor(p/100*(s.length-1)); return s[i]; }
+function rbpRunMonteCarlo(d,opts){
+  opts=opts||{}; var nRuns=opts.runs||1000, model=opts.model||'fat', flexPct=(opts.flex!=null?opts.flex:0.10), fixedYr1=(opts.fixedYr1!=null?opts.fixedYr1:null);
+  if(!d) return null;
+  var port=d.portfolio||{}, sp=d.spending||{}, gl=d.global||{}, leg=d.legacy||{}, proj=d.projections||{};
+  var totalPF=port.total||0; if(totalPF<=0) return null;
+  var useSheetWithdrawals=(proj.withdrawals&&proj.withdrawals.length>5&&proj.endLiquid&&proj.endLiquid.length>5);
+  var pk=Object.keys(d.people||{}); var p1=(d.people&&d.people[pk[0]])||{}, p2=(d.people&&d.people[pk[1]])||{};
+  var floorNow=mcEssentialFloor(d).floor;
+  var chosenExtraNow=(proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))?(+proj.byYear[0].chosenExtra):0;
+  var baseSpend=floorNow+chosenExtraNow;
+  var legacyGoal=leg.goal||0;
+  var inflation=(gl.inflation||0.03), colaRate=(gl.ssCola||0.025);
+  var ssYear1=((p1.ssYear1||0)+(p2.ssYear1||0)); var pension=(((p1.pension||0)+(p2.pension||0))*12);
+  var curYear=new Date().getFullYear();
+  var GK_TRIGGER=1.20, initialWR=0.04;
+  if(useSheetWithdrawals){ for(var gi=0;gi<proj.withdrawals.length;gi++){ var w=+proj.withdrawals[gi]||0, b=(proj.endLiquid&&+proj.endLiquid[gi])?+proj.endLiquid[gi]:0; if(w>0&&b>0){ initialWR=w/b; break; } } }
+  else if(totalPF>0){ initialWR=Math.max(0,baseSpend-(ssYear1+pension))/totalPF; }
+  initialWR=Math.max(0.02,Math.min(0.10,initialWR));
+  var p1DeathAge=Math.min(p1.deathAge||90,110), p2DeathAge=Math.min(p2.deathAge||90,110);
+  var p1DeathYear=p1.age>0?curYear+(p1DeathAge-p1.age):curYear+30, p2DeathYear=p2.age>0?curYear+(p2DeathAge-p2.age):curYear+30;
+  var mcSingle=!(p2&&p2.name&&String(p2.name).trim());
+  var endY=mcSingle?p1DeathYear:Math.max(p1DeathYear,p2DeathYear);
+  var yrs=Math.min(endY-curYear+1,100); yrs=Math.max(yrs,20);
+  var mcYears=[]; var origYears=(proj.years&&proj.years.length)?proj.years:null;
+  for(var y0=0;y0<yrs;y0++){ mcYears.push(origYears&&y0<origYears.length?origYears[y0]:curYear+y0); }
+  var ps=rbpPortfolioStats(port); var mu=ps.meanReturn, sigma=ps.sigma;
+  var allEnd=[], depleteYears=[], yearlyBals=[]; for(var yy=0;yy<yrs;yy++) yearlyBals.push([]);
+  for(var run=0;run<nRuns;run++){
+    var bal=totalPF, balNX=totalPF, depleted=false;
+    for(var i=0;i<yrs;i++){
+      if(yearlyBals[i]) yearlyBals[i].push(Math.round(bal));
+      if(i===0) continue;
+      var withdrawal;
+      if(useSheetWithdrawals && i<proj.withdrawals.length){ withdrawal=Math.max(0,(proj.withdrawals[i]||0)); }
+      else { var guaranteed=ssYear1*Math.pow(1+colaRate,i)+pension; var spend=baseSpend*Math.pow(1+inflation,i); withdrawal=Math.max(0,spend-guaranteed); }
+      if(flexPct>0 && bal>0 && (withdrawal/bal)>initialWR*GK_TRIGGER){ withdrawal*=(1-flexPct); }
+      var withdrawalNX;
+      if(useSheetWithdrawals && i<proj.withdrawals.length){ var cx=(proj.byYear[i]&&(+proj.byYear[i].chosenExtra))?(+proj.byYear[i].chosenExtra):0; withdrawalNX=Math.max(0,(proj.withdrawals[i]||0)-cx); }
+      else { var gNX=ssYear1*Math.pow(1+colaRate,i)+pension; var sNX=floorNow*Math.pow(1+inflation,i); withdrawalNX=Math.max(0,sNX-gNX); }
+      var ret=(i===1&&fixedYr1!==null)?fixedYr1:mcRandReturn(model,mu,sigma);
+      var half=Math.sqrt(1+ret);
+      bal=bal*half; bal=Math.max(0,bal-withdrawal); bal=Math.max(0,bal*half);
+      balNX=balNX*half; balNX=Math.max(0,balNX-withdrawalNX); balNX=Math.max(0,balNX*half);
+      if(balNX<=0 && !depleted){ depleted=true; depleteYears.push(mcYears[i]||(curYear+i)); }
+    }
+    allEnd.push(Math.round(bal));
+  }
+  var succeedGoal=allEnd.filter(function(b){return b>=legacyGoal;}).length;
+  var survivePos=allEnd.filter(function(b){return b>0&&b<legacyGoal;}).length;
+  var depletedFull=allEnd.filter(function(b){return b<=0;}).length;
+  var depletedFloor=depleteYears.length;
+  var avg=allEnd.reduce(function(s,v){return s+v;},0)/(allEnd.length||1);
+  return { runs:nRuns, model:model, mu:mu, sigma:sigma, equityFraction:ps.equityFraction, flex:flexPct,
+    years:mcYears, yrs:yrs, legacyGoal:legacyGoal, floor:floorNow,
+    successPct:Math.round(succeedGoal/nRuns*100), survivePct:Math.round(survivePos/nRuns*100),
+    neverRanOutPct:Math.round((nRuns-depletedFloor)/nRuns*100), depletedFloorPct:Math.round(depletedFloor/nRuns*100),
+    depletedFullPct:Math.round(depletedFull/nRuns*100),
+    median:mcPercentile(allEnd,50), average:Math.round(avg),
+    p10:mcPercentile(allEnd,10), p90:mcPercentile(allEnd,90), yearlyBals:yearlyBals };
+}
+function buildMCFanChart(yearlyBals, years, legacyGoal){
+  if(!yearlyBals||yearlyBals.length<2) return '';
+  var n=yearlyBals.length, W=720,H=240,padL=64,padR=18,padT=16,padB=30;
+  var p10=[],p50=[],p90=[]; for(var i=0;i<n;i++){ var a=yearlyBals[i]||[]; p10.push(mcPercentile(a,10)); p50.push(mcPercentile(a,50)); p90.push(mcPercentile(a,90)); }
+  var maxV=Math.max.apply(null,p90.concat([legacyGoal||0])); if(maxV<=0) maxV=1;
+  function sx(i){ return padL+(n===1?0:i*(W-padL-padR)/(n-1)); }
+  function sy(v){ return padT+(1-v/maxV)*(H-padT-padB); }
+  var grid='',ylab=''; [maxV,maxV/2,0].forEach(function(t){ var y=sy(t).toFixed(1); grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="#eef1f5"/>'; ylab+='<text x="'+(padL-8)+'" y="'+(Number(y)+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="#7a8794">'+moneyShort(t)+'</text>'; });
+  var band='M'; for(var a1=0;a1<n;a1++){ band+=(a1===0?'':'L')+sx(a1).toFixed(1)+','+sy(p90[a1]).toFixed(1)+' '; } for(var a2=n-1;a2>=0;a2--){ band+='L'+sx(a2).toFixed(1)+','+sy(p10[a2]).toFixed(1)+' '; } band+='Z';
+  var med=''; for(var m=0;m<n;m++){ med+=(m===0?'M':'L')+sx(m).toFixed(1)+','+sy(p50[m]).toFixed(1)+' '; }
+  var goalLine=''; if(legacyGoal>0){ var gy=sy(legacyGoal).toFixed(1); goalLine='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="#f4b86a" stroke-dasharray="6,4" stroke-width="1.5"/>'; }
+  var xlab=''; function xt(i){ var x=sx(i).toFixed(1); xlab+='<text x="'+x+'" y="'+(H-10)+'" text-anchor="middle" font-size="10" fill="#7a8794">'+years[i]+'</text>'; } xt(0); xt(n-1);
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">'+grid+'<path d="'+band+'" fill="rgba(28,199,208,0.14)" stroke="none"/>'+goalLine+'<path d="'+med+'" fill="none" stroke="#1CC7D0" stroke-width="2"/>'+ylab+xlab+'</svg>';
+  var lg='<div class="legend"><span><i style="background:rgba(28,199,208,0.4)"></i>10th\u201390th percentile</span><span><i style="background:#1CC7D0"></i>Median outcome</span>'+(legacyGoal>0?'<span><i style="background:#f4b86a"></i>Legacy goal</span>':'')+'</div>';
+  return svg+lg;
+}
+function renderMonteCarlo(d){
+  var statsEl=document.getElementById('mc-stats'), fanEl=document.getElementById('mc-fan'), methEl=document.getElementById('mc-method');
+  if(!statsEl) return;
+  var mc=rbpRunMonteCarlo(d,{runs:1000,model:'fat',flex:0.10});
+  if(!mc){ statsEl.innerHTML='<div class="empty">A Monte Carlo simulation needs your portfolio balances and projection. Connect your full plan to see it here.</div>'; if(fanEl) fanEl.innerHTML=''; if(methEl) methEl.innerHTML=''; return; }
+  var s='';
+  s+=stat('Probability of Success', mc.successPct+'%', 'futures that meet your legacy goal');
+  s+=stat('Always Covers Essentials', mc.neverRanOutPct+'%', 'never short on must-pay costs');
+  s+=stat('Median Ending', moneyShort(mc.median), 'half of futures end above this');
+  s+=stat('Average Ending', moneyShort(mc.average), 'tracks your main projection');
+  s+=stat('Downside (10th pct)', moneyShort(mc.p10), '1-in-10 rough markets');
+  s+=stat('Upside (90th pct)', moneyShort(mc.p90), '1-in-10 strong markets');
+  statsEl.innerHTML=s;
+  if(fanEl) fanEl.innerHTML=buildMCFanChart(mc.yearlyBals, mc.years, mc.legacyGoal);
+  var eqPct=Math.round(mc.equityFraction*100);
+  if(methEl) methEl.innerHTML =
+    '<div class="note"><b>What this is based on.</b> '+mc.runs.toLocaleString()+' randomized market futures applied to <i>your</i> actual year-by-year withdrawal plan, run only through your plan horizon. Returns are centered on your portfolio\u2019s blended expected return of <b>'+(Math.round(mc.mu*1000)/10)+'%</b> with volatility of <b>'+(Math.round(mc.sigma*1000)/10)+'%</b> (scaled to its ~'+eqPct+'% equity exposure), using a fat-tailed model with a volatility-drag correction so the average tracks your main projection. Dynamic spending guardrails trim discretionary extras by '+Math.round(mc.flex*100)+'% in strained markets (industry-standard Guyton-Klinger).</div>'+
+    '<div class="note" style="margin-top:10px"><b>What it means.</b> The <b>average</b> should land near your Dashboard projection &mdash; confirmation it\u2019s using your real portfolio. The <b>median</b> and success rate come in lower on purpose: that gap is real-market volatility (sequence-of-returns risk) a smooth projection can\u2019t show. Plan around the <b>median</b> and the <b>success rate</b> &mdash; half of all futures are worse than the average. Each time this report is generated the simulation is re-run, so these figures may move a point or two.</div>';
+}
+function renderSmile(d){
+  var el=document.getElementById('smile'); if(!el) return;
+  var sp=(d&&d.spending)||{}, proj=(d&&d.projections)||{}, by=arr(proj.byYear);
+  var exArr=by.map(function(y){ return (y&&+y.chosenExtra)||0; });
+  var phases=[], i=0;
+  while(i<exArr.length){ if(exArr[i]>0){ var amt=exArr[i], stt=i; while(i<exArr.length && Math.abs(exArr[i]-amt)<1) i++; phases.push({amt:amt, startYr:by[stt]?by[stt].year:null, endYr:by[i-1]?by[i-1].year:null}); } else i++; }
+  var labels=['Go-go years','Slow-go years','No-go years'];
+  var h='<div class="note">The retirement &ldquo;spending smile&rdquo;: most people spend more early in retirement (travel and activity &mdash; the go-go years), taper through the middle (slow-go), and spend less later apart from healthcare (no-go). Your plan models this as discretionary <b>extra</b> spending layered on top of your must-pay base + debt floor.</div>';
+  if(phases.length){
+    h+='<table class="tbl" style="margin-top:12px"><thead><tr><th>Phase</th><th>Years</th><th class="r">Extra / year</th></tr></thead><tbody>';
+    phases.forEach(function(p,idx){ h+='<tr><td>'+(labels[idx]||('Phase '+(idx+1)))+'</td><td>'+txt(p.startYr)+(p.endYr?(' \u2013 '+p.endYr):'')+'</td><td class="r">'+money(p.amt)+'</td></tr>'; });
+    h+='</tbody></table><div class="lead" style="margin-top:8px">Extra spending is discretionary and sits on top of your base + debt floor; in down markets the plan can trim it to protect your legacy goal.</div>';
+  } else {
+    function prow(lbl,a,b,x){ if(!a&&!b&&!x) return ''; return '<tr><td>'+lbl+'</td><td>'+(a||'\u2014')+(b?(' \u2013 '+b):'')+'</td><td class="r">'+(x?money(x):'\u2014')+'</td></tr>'; }
+    var rp=prow('Go-go years',sp.phase1Start,sp.phase1End,sp.phase1Extra)+prow('Slow-go years',sp.phase2Start,sp.phase2End,sp.phase2Extra)+prow('No-go years',sp.phase3Start,sp.phase3End,sp.phase3Extra);
+    h+= rp ? ('<table class="tbl" style="margin-top:12px"><thead><tr><th>Phase</th><th>Years</th><th class="r">Extra / year</th></tr></thead><tbody>'+rp+'</tbody></table>') : '<div class="empty" style="margin-top:10px">No spending phases are set &mdash; your plan uses a level spending amount throughout.</div>';
+  }
+  el.innerHTML=h;
+}
+function rbpLoadStress(){
+  var el=document.getElementById('stress'); if(!el) return;
+  var sheetId=(window.RBP.getSheetId?window.RBP.getSheetId():'');
+  var host=location.hostname||''; var isPreview=location.protocol==='file:'||host==='localhost'||host==='127.0.0.1'||/claude\.ai$/.test(host);
+  if(isPreview||!sheetId||sheetId==='1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA'){ el.innerHTML='<div class="empty">Connect your plan to load your saved crash-test scenarios.</div>'; return; }
+  el.innerHTML='<div class="lead">Loading your saved crash tests\u2026</div>';
+  var cb='rbpStress_'+Date.now(), done=false;
+  var timer=setTimeout(function(){ if(!done){ done=true; try{delete window[cb];}catch(e){} renderStress(null,'timeout'); } }, 60000);
+  window[cb]=function(resp){ if(done) return; done=true; clearTimeout(timer); try{delete window[cb];}catch(e){} renderStress(resp&&resp.tests?resp.tests:[], (resp&&resp.ok)?null:'error'); };
+  var s=document.createElement('script'); s.crossOrigin='anonymous';
+  s.src=SCRIPT_URL+'?authuser=0&action=loadStressTests&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now();
+  s.onerror=function(){ if(!done){ done=true; clearTimeout(timer); try{delete window[cb];}catch(e){} renderStress(null,'network'); } };
+  document.head.appendChild(s);
+}
+function renderStress(tests, err){
+  var el=document.getElementById('stress'); if(!el) return;
+  if(err){ el.innerHTML='<div class="empty">Your saved crash tests couldn\u2019t be loaded right now. Run and save a few on the Stress Test page and they\u2019ll appear here automatically.</div>'; return; }
+  if(!tests || !tests.length){ el.innerHTML='<div class="empty">No saved crash tests yet. On the Stress Test page, design a crash (for example a \u221230% drop in your first retirement year), press Run, and it saves automatically &mdash; then it appears here with your real engine results.</div>'; return; }
+  var goal=(window.__stressGoal!=null)?window.__stressGoal:0;
+  var h='<table class="tbl"><thead><tr><th>Scenario</th><th class="r">Ending balance</th><th class="r">vs legacy goal</th><th class="r">Safe extra / yr</th><th>Result</th></tr></thead><tbody>';
+  var any=false;
+  tests.forEach(function(t){
+    if(!t||!t.result) return; any=true;
+    var p=t.params||{}, r=t.result||{};
+    var lbl='Saved crash test';
+    if(p.eDrag){ lbl='\u2212'+Math.abs(Math.round(p.eDrag))+'% downturn'+(p.eDur>1?(' \u00d7 '+p.eDur+' yrs'):'')+(p.eStart?(' from '+p.eStart):''); }
+    if(p.lDrag){ lbl+=' + later \u2212'+Math.abs(Math.round(p.lDrag))+'%'+(p.lStart?(' ('+p.lStart+')'):''); }
+    var g=r.legacyGoal||goal;
+    var pctGoal=(g>0)?(Math.round((r.ending||0)/g*100)+'% of goal'):'\u2014';
+    var res=(r.belowYear)?('First below goal in '+r.belowYear):'Holds your goal \u2713';
+    h+='<tr><td>'+esc(lbl)+'</td><td class="r">'+money(r.ending)+'</td><td class="r">'+pctGoal+'</td><td class="r">'+money(r.safeExtra)+'</td><td>'+esc(res)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  el.innerHTML = any ? h : '<div class="empty">No completed crash-test results are saved yet.</div>';
 }
 
 function stat(lbl,val,sub){ return '<div class="stat"><div class="lbl">'+esc(lbl)+'</div><div class="val">'+val+'</div>'+(sub?('<div class="sub">'+sub+'</div>'):'')+'</div>'; }
@@ -581,6 +795,9 @@ function populate(d){
     '<div style="margin-top:6px">This blueprint is an educational projection based on the assumptions above and is not financial advice. For decisions, consider consulting a licensed professional.</div>'+
     '<div style="margin-top:6px">Generated '+fmtDate(new Date())+' \u00b7 <span class="brand">RetireBlueprint Pro</span></div>';
 
+  window.__stressGoal=(leg&&leg.goal!=null)?leg.goal:0;
+  renderSmile(d);
+  renderMonteCarlo(d);
   setFresh();
 }
 
@@ -600,6 +817,7 @@ function showConnect(h, p){
   if(isPreview||!sheetId||sheetId==='1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA'){ showConnect(); return; }
   var cached=rbpCacheGet(); if(cached){ populate(cached); }
   window.RBP.load(function(d){ rbpCachePut(d); populate(d); }, function(msg){ if(!cached){ if(msg==='no-sheet') showConnect(); else showConnect('We could not reach your plan','There was a problem loading your live numbers ('+esc(msg||'unknown')+'). Please check your connection and try again from your dashboard.'); } });
+  rbpLoadStress();
 })();
 </script>
 </body>
