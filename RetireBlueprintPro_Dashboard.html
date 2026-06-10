@@ -60,7 +60,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .at-lbl{font-size:8px;color:#f4b86a;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
 .at-val{font-size:22px;font-weight:800;color:#fff;margin-top:3px;line-height:1;}
 .at-sub{font-size:8px;color:#8a9ab0;margin-top:3px;}
-.kpi-grid{display:grid;grid-template-columns:200px repeat(5,1fr);gap:8px;margin-bottom:10px;align-items:start;}
+.kpi-grid{display:grid;grid-template-columns:200px repeat(5,1fr);gap:8px;margin-bottom:10px;align-items:stretch;}
 .plan-health{background:#041E2F;border-radius:6px;padding:12px 14px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;}
 .ph-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#f4b86a;text-transform:uppercase;margin-bottom:4px;}
 .ph-score{font-size:50px;font-weight:800;color:#fff;line-height:1;}
@@ -361,7 +361,7 @@ window.addEventListener('storage', function(e) {
       </div>
       <div class="ph-zone">You are in the <span id="ph-zone">SAFE ZONE</span></div>
       <div style="font-size:10px;line-height:1.45;margin-top:8px;opacity:0.78;">
-        100% means your savings are projected to last for the rest of your life (for the longer-living spouse). Below 100% shows how far your money reaches — e.g. 80% means it covers about 80% of your retirement years before running out. This measures whether the money <em>lasts</em>, which is separate from your legacy goal.
+        100% means your money is projected to last your whole retirement (for the longer-living spouse). Below 100% is the share of retirement years covered before it runs out — a measure of whether the money <em>lasts</em>, separate from your legacy goal.
       </div>
     </div>
   </div>
