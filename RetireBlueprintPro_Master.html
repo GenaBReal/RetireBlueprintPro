@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Projection — RetireBlueprint Pro</title>
+<script src="rbp-engine.js"></script>
+<style>
+  :root{
+    --navy:#051628; --navy1:#041E2F; --n2:#0A3145; --teal:#1CC7D0; --gold:#f4b86a;
+    --ink:#0c2230; --paper:#eef3f7; --line:#cdd9e2; --line2:#e3ebf1;
+    --p1:#60828C; --p2:#B07BBF;            /* overwritten from the customer's dropdown */
+    --hdr:#0A3145; --grp-income:#13496a; --grp-spend:#5a3d12; --grp-tax:#5c1f2a;
+    --grp-flow:#114b43; --grp-bal:#1c3a52; --grp-meta:#23303b;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);}
+  /* ── top chrome ── */
+  .nav{background:var(--navy);display:flex;align-items:center;gap:2px;padding:0 8px;overflow-x:auto;border-bottom:2px solid var(--teal);}
+  .nav a{font-size:9px;color:var(--teal);text-decoration:none;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:11px 12px;white-space:nowrap;}
+  .nav a.active{color:var(--gold);border-bottom:2px solid var(--gold);}
+  .topbar{background:linear-gradient(180deg,var(--navy1),var(--navy));color:#fff;padding:14px 18px 16px;}
+  .topbar h1{margin:0;font-size:17px;font-weight:800;letter-spacing:.3px;}
+  .topbar h1 .accent{color:var(--teal);}
+  .sub{font-size:11px;color:#9fc1d6;margin-top:3px;}
+  .who{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;font-size:11px;}
+  .who .chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:4px 11px;}
+  .who .dot{width:10px;height:10px;border-radius:3px;}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:9.5px;color:#8aa3b5;margin-top:9px;text-transform:uppercase;letter-spacing:.6px;}
+  .legend b{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:4px;}
+  /* ── status / loader ── */
+  #status{padding:40px 18px;font-size:13px;color:#3a5a72;}
+  #status .big{font-size:15px;font-weight:800;color:var(--navy1);margin-bottom:6px;}
+  #status a{color:var(--teal);font-weight:700;}
+  .bar{height:5px;background:var(--line2);border-radius:4px;overflow:hidden;max-width:340px;margin-top:12px;}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .3s;}
+  /* ── the grid ── */
+  .gridwrap{overflow:auto;max-height:calc(100vh - 150px);border-top:1px solid var(--line);position:relative;background:#fff;}
+  table.master{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums;font-size:11px;white-space:nowrap;}
+  table.master th,table.master td{border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:4px 9px;text-align:right;}
+  /* group header row */
+  tr.groups th{position:sticky;top:0;z-index:6;color:#fff;font-size:9px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+    text-align:center;padding:5px 9px;border-bottom:2px solid rgba(255,255,255,.25);}
+  /* label header row */
+  tr.labels th{position:sticky;top:24px;z-index:6;background:var(--hdr);color:#cfe3ef;font-size:9.5px;font-weight:700;
+    text-align:right;border-bottom:2px solid var(--teal);box-shadow:0 2px 4px rgba(0,0,0,.12);}
+  /* sticky first columns (year + ages) */
+  th.frz,td.frz{position:sticky;left:0;z-index:5;}
+  td.frz{background:#f4f8fb;font-weight:800;color:var(--navy1);box-shadow:2px 0 4px rgba(0,0,0,.06);}
+  tr.groups th.frz,tr.labels th.frz{z-index:8;}
+  td.yr{text-align:center;}
+  td.age{color:#5b7689;font-weight:600;}
+  tbody tr:nth-child(even) td{background:#f7fafc;}
+  tbody tr:nth-child(even) td.frz{background:#eef4f8;}
+  tbody tr:hover td{background:#eaf6f8;}
+  tbody tr:hover td.frz{background:#e2f0f4;}
+  td.z{color:#b8c4cd;}            /* zero values, muted */
+  td.tot{font-weight:800;color:var(--navy1);background:#eef4f8 !important;}
+  td.neg{color:#c0392b;}
+  /* per-partner account column tint (set inline via --own) */
+  th.own{color:#fff !important;}
+  .foot{padding:10px 18px;font-size:10.5px;color:#5b7689;background:var(--paper);border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<div class="nav" id="nav"></div>
+
+<div class="topbar">
+  <h1>Master <span class="accent">Projection</span></h1>
+  <div class="sub" id="sub">Every Master column, year by year — computed live by your plan's engine.</div>
+  <div class="who" id="who"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="status">
+  <div class="big">Loading your plan…</div>
+  Reading your inputs and running the projection.
+  <div class="bar"><i id="barfill"></i></div>
+</div>
+
+<div class="gridwrap" id="gridwrap" style="display:none;">
+  <table class="master" id="tbl"></table>
+</div>
+<div class="foot" id="foot" style="display:none;"></div>
+
+<script>
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
+var THEME={ 'Steel Blue':'#60828C','Slate Teal':'#456A73','Muted Mauve':'#B07BBF','Frost Plum':'#8D6B92' };
+var PAGES=[['Home','RetireBlueprintPro_Home.html'],['Dashboard','RetireBlueprintPro_Dashboard.html'],
+  ['Inputs','RetireBlueprintPro_Inputs.html'],['Blueprint','RetireBlueprintPro_Blueprint.html'],
+  ['Master','RetireBlueprintPro_Master.html'],['Stress Test','RetireBlueprintPro_StressTest.html'],
+  ['Roth Ladder','RetireBlueprintPro_RothLadder.html'],['Tax Engine','RetireBlueprintPro_TaxEngine.html'],
+  ['Methodology','RetireBlueprintPro_Methodology.html']];
+(function(){var n=document.getElementById('nav');PAGES.forEach(function(p){var a=document.createElement('a');
+  a.href=p[1];a.textContent=p[0];if(p[0]==='Master')a.className='active';n.appendChild(a);});})();
+
+/* ── COLUMN MODEL: index → {label, group, fmt} in Master sheet order ─────────
+   fmt: '$' currency · 'n' plain integer · '%' percent · 'acct' per-account (label/own filled at render) */
+var GROUPS={ id:'--grp-meta', inc:'--grp-income', con:'--grp-income', spend:'--grp-spend',
+             flow:'--grp-flow', tax:'--grp-tax', wd:'--grp-flow', bal:'--grp-bal', tot:'--grp-bal' };
+var COLS=[
+  {i:0,l:'Year',g:'id',f:'yr'},{i:2,l:'Craig Age',g:'id',f:'age'},{i:3,l:'Gena Age',g:'id',f:'age'},
+  {i:4,l:'Craig Salary',g:'inc',f:'$'},{i:5,l:'Craig SS',g:'inc',f:'$'},{i:6,l:'Craig Proj SS',g:'inc',f:'$'},
+  {i:7,l:'Craig Pension',g:'inc',f:'$'},{i:8,l:'Craig Other',g:'inc',f:'$'},
+  {i:9,l:'Gena Salary',g:'inc',f:'$'},{i:10,l:'Gena SS',g:'inc',f:'$'},{i:11,l:'Gena Proj SS',g:'inc',f:'$'},
+  {i:12,l:'Gena Pension',g:'inc',f:'$'},{i:13,l:'Gena Other',g:'inc',f:'$'},{i:14,l:'Total Gross Income',g:'inc',f:'$',tot:1},
+  {i:15,l:'Craig Contrib',g:'con',f:'$'},{i:16,l:'Craig Match',g:'con',f:'$'},{i:17,l:'Gena Contrib',g:'con',f:'$'},
+  {i:18,l:'Gena Match',g:'con',f:'$'},{i:19,l:'Total Contrib',g:'con',f:'$',tot:1},{i:20,l:'Std Deduction',g:'con',f:'$'},
+  {i:21,l:'Base Living',g:'spend',f:'$'},{i:23,l:'Living (infl-adj)',g:'spend',f:'$'},
+  {i:24,l:'Healthcare Base',g:'spend',f:'$'},{i:26,l:'Healthcare (infl-adj)',g:'spend',f:'$'},
+  {i:27,l:'Debt',g:'spend',f:'$'},{i:28,l:'Total Need',g:'spend',f:'$',tot:1},
+  {i:29,l:'Income Gap',g:'flow',f:'$'},{i:30,l:'Surplus',g:'flow',f:'$'},{i:31,l:'Chosen Extra',g:'flow',f:'$'},
+  {i:32,l:'Funding Required',g:'flow',f:'$',tot:1},
+  {i:33,l:'Craig RMD',g:'flow',f:'$'},{i:34,l:'Gena RMD',g:'flow',f:'$'},{i:35,l:'Total RMD',g:'flow',f:'$',tot:1},
+  {i:36,l:'Craig Conv',g:'flow',f:'$'},{i:37,l:'Gena Conv',g:'flow',f:'$'},{i:38,l:'Total Conv',g:'flow',f:'$',tot:1},
+  {i:39,l:'Total Taxable',g:'tax',f:'$'},{i:40,l:'Federal Tax',g:'tax',f:'$'},{i:41,l:'State Tax',g:'tax',f:'$'},
+  {i:42,l:'Cap Gains Tax',g:'tax',f:'$'},{i:43,l:'Total Taxes',g:'tax',f:'$',tot:1},
+  /* per-account withdrawals (slots 0-11 → master 46-57) injected at render as group 'wd' */
+  {i:58,l:'Monthly W/D',g:'wd',f:'$'},
+  /* per-account ending balances (slots 0-11 → master 59-70) injected at render as group 'bal' */
+  {i:71,l:'Start Total',g:'tot',f:'$',tot:1},{i:72,l:'Pre-Tax Total',g:'tot',f:'$'},{i:73,l:'Roth Total',g:'tot',f:'$'},
+  {i:74,l:'Taxable Total',g:'tot',f:'$'},{i:75,l:'Cost Basis',g:'tot',f:'$'},{i:76,l:'HSA Total',g:'tot',f:'$'},
+  {i:78,l:'Post-W/D Total',g:'tot',f:'$'},{i:79,l:'Mid-Year Total',g:'tot',f:'$'},{i:80,l:'Growth',g:'tot',f:'$'},
+  {i:81,l:'Ending Liquid',g:'tot',f:'$',tot:1}
+];
+var GROUP_LABEL={id:'Plan',inc:'Income',con:'Contributions',spend:'Spending Need',flow:'Cash Flow',tax:'Taxes',wd:'Withdrawals',bal:'Ending Balances',tot:'Portfolio Totals'};
+
+function money(v){ v=Math.round(v||0); var neg=v<0; v=Math.abs(v);
+  return (neg?'-$':'$')+v.toLocaleString('en-US'); }
+
+function ownerColorFor(name, p1n, p2n){
+  var n=String(name||'').toLowerCase();
+  if(p1n && n.indexOf(p1n)>=0) return 'var(--p1)';
+  if(p2n && n.indexOf(p2n)>=0) return 'var(--p2)';
+  return null;
+}
+
+function shortType(t){
+  t=String(t||''); var base=t.split('(')[0].trim();          // "Pretax (Deferred)" → "Pretax"
+  if(/529/.test(t)) return '529'; if(/hsa/i.test(base)) return 'HSA';
+  return base || 'Acct';
+}
+function acctShown(sl){ return sl && sl.name && sl.included!==false; }
+
+function buildColumns(slots, p1n, p2n){
+  // expand per-account columns into the COLS list, in sheet position
+  var out=[], i;
+  for(i=0;i<COLS.length;i++){
+    out.push(COLS[i]);
+    if(COLS[i].i===43){ // after Total Taxes → withdrawals block (master 46..57)
+      for(var s=0;s<12;s++){ var sl=slots[s]||{}; if(!acctShown(sl)) continue;
+        out.push({i:46+s, l:sl.name+' '+shortType(sl.type)+' W/D', g:'wd', f:'$', own:ownerColorFor(sl.owner||sl.name,p1n,p2n)}); }
+    }
+    if(COLS[i].i===58){ // after Monthly W/D → ending-balance block (master 59..70)
+      for(var s2=0;s2<12;s2++){ var sl2=slots[s2]||{}; if(!acctShown(sl2)) continue;
+        out.push({i:59+s2, l:sl2.name+' '+shortType(sl2.type)+' End', g:'bal', f:'$', own:ownerColorFor(sl2.owner||sl2.name,p1n,p2n)}); }
+    }
+  }
+  return out;
+}
+
+function render(rows, cols){
+  var tbl=document.getElementById('tbl');
+  // group header row (merged spans)
+  var gtr='<tr class="groups">'; var prev=null,span=0,buf='';
+  function flush(){ if(span){ var v=getComputedStyle(document.documentElement).getPropertyValue(GROUPS[prev])||'#23303b';
+    var frz = (prev==='id')?' frz':''; buf+='<th class="g'+frz+'" colspan="'+span+'" style="background:'+v+'">'+GROUP_LABEL[prev]+'</th>'; } }
+  cols.forEach(function(c){ if(c.g!==prev){ flush(); prev=c.g; span=0; } span++; });
+  flush(); gtr+=buf+'</tr>';
+  // label header row
+  var ltr='<tr class="labels">';
+  cols.forEach(function(c){
+    var cls=[]; var style='';
+    if(c.i===0||c.i===2||c.i===3) cls.push('frz');
+    if(c.own){ cls.push('own'); style=' style="background:'+c.own+'"'; }
+    ltr+='<th class="'+cls.join(' ')+'"'+style+'>'+c.l+'</th>';
+  });
+  ltr+='</tr>';
+  // body
+  var b='';
+  rows.forEach(function(r){
+    b+='<tr>';
+    cols.forEach(function(c){
+      var raw=r.master[c.i]; var cls=[]; var txt;
+      if(c.f==='yr'){ cls.push('frz','yr'); txt=raw; }
+      else if(c.f==='age'){ cls.push('frz','age'); txt=Math.round(raw); }
+      else { var v=Math.round(raw||0); txt=money(v);
+        if(v===0) cls.push('z'); if(v<0) cls.push('neg'); if(c.tot) cls.push('tot'); }
+      b+='<td class="'+cls.join(' ')+'">'+txt+'</td>';
+    });
+    b+='</tr>';
+  });
+  tbl.innerHTML=gtr+ltr+'<tbody>'+b+'</tbody>';
+  document.getElementById('status').style.display='none';
+  document.getElementById('gridwrap').style.display='block';
+  var ft=document.getElementById('foot'); ft.style.display='block';
+  ft.innerHTML='Showing all '+cols.length+' columns × '+rows.length+' years. Computed live from your inputs by the same engine your whole plan runs on — no separate spreadsheet to fall out of sync. Figures round to the dollar.';
+}
+
+function applyThemeAndHeader(d){
+  var pk=Object.keys(d.people||{}); var p1=d.people[pk[0]]||{}, p2=d.people[pk[1]]||{};
+  var c1=THEME[p1.theme]||'#60828C', c2=THEME[p2.theme]||'#B07BBF';
+  document.documentElement.style.setProperty('--p1',c1);
+  document.documentElement.style.setProperty('--p2',c2);
+  var who=document.getElementById('who');
+  who.innerHTML='<span class="chip"><span class="dot" style="background:'+c1+'"></span>'+(p1.name||'Partner 1')+'</span>'
+    +'<span class="chip"><span class="dot" style="background:'+c2+'"></span>'+(p2.name||'Partner 2')+'</span>';
+  document.getElementById('legend').innerHTML=
+    '<span><b style="background:'+c1+'"></b>'+(p1.name||'Partner 1')+' accounts</span>'
+    +'<span><b style="background:'+c2+'"></b>'+(p2.name||'Partner 2')+' accounts</span>'
+    +'<span><b style="background:#114b43"></b>Income &amp; flow</span>'
+    +'<span><b style="background:#5c1f2a"></b>Taxes</span>'
+    +'<span><b style="background:#1c3a52"></b>Balances</span>';
+  return {p1:p1,p2:p2};
+}
+
+function go(d){
+  var who=applyThemeAndHeader(d);
+  var I; try{ I=RBP.buildI(d); }catch(e){ fail('Could not read your inputs ('+e+').'); return; }
+  if(!I){ fail('Inputs did not load.'); return; }
+  // project at the committed plan (the saved safe-extra smile) so columns match the sheet
+  var w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
+  var yOf=function(x){return x?new Date(x).getFullYear():null;};
+  var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
+  var ext=I.committedExtra||0;
+  var rows=RBP.project(I,{extraOverride:function(yr){
+    var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2;
+    return ph<0?0:ext*w[ph]/avg; }});
+  var p1n=String(who.p1.name||'').toLowerCase(), p2n=String(who.p2.name||'').toLowerCase();
+  var slots=(d.portfolio&&d.portfolio.slots)||[];
+  var cols=buildColumns(slots, p1n, p2n);
+  document.getElementById('sub').textContent='All '+cols.length+' columns · '+rows.length+' years ('+rows[0].master[0]+'–'+rows[rows.length-1].master[0]+') · live from your engine';
+  render(rows, cols);
+}
+
+function fail(msg){ document.getElementById('status').innerHTML='<div class="big">Couldn\u2019t load the projection</div>'+msg; }
+
+/* ── load the customer's inputs once (same read the rest of the app uses) ── */
+function load(){
+  var sheetId=localStorage.getItem('rbp_sheet_id');
+  var host=window.location.hostname||'';
+  var preview=(window.location.protocol==='file:'||host===''||host==='localhost'||host.indexOf('claude.ai')>=0);
+  if(!sheetId){ fail('No sheet connected yet. Open the <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a> to link your Google Sheet.'); return; }
+  if(preview){ fail('Open this from your live site to load your sheet.'); return; }
+  var pct=0,bf=document.getElementById('barfill');
+  var t=setInterval(function(){ pct=Math.min(92,pct+3); if(bf)bf.style.width=pct+'%'; },120);
+  var cb='rbpMaster_'+Date.now(),done=false;
+  var to=setTimeout(function(){ if(!done){done=true;clearInterval(t);fail('The load timed out — please refresh.');} },90000);
+  window[cb]=function(d){ if(done)return; done=true; clearTimeout(to); clearInterval(t); if(bf)bf.style.width='100%'; delete window[cb];
+    setTimeout(function(){ try{ go(d); }catch(e){ fail(String(e&&e.message||e)); } }, 60); };
+  var s=document.createElement('script'); s.crossOrigin='anonymous';
+  s.src=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now();
+  s.onerror=function(){ if(!done){done=true;clearTimeout(to);clearInterval(t);fail('Could not reach your sheet.');} };
+  document.head.appendChild(s);
+}
+window.addEventListener('DOMContentLoaded', load);
+</script>
+</body>
+</html>
