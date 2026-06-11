@@ -1399,11 +1399,14 @@ function runNewTest(){
 function rbpHonestResult(resp){
   var planEnd=(typeof rbpPlanEndYear==='function')?rbpPlanEndYear():null;
   var ss=(resp.series||[]).filter(function(p){return !planEnd || p.year<=planEnd;});
-  var sEnd = ss.length ? ss[ss.length-1].bal : (resp.ending||0);
-  var minB = ss.length ? Math.min.apply(null, ss.map(function(p){return p.bal;})) : sEnd;
-  var dep = minB<=0;
-  var below = resp.belowYear || null;
-  return { safeExtra:(dep?0:Math.round(resp.safeExtra||0)), ending:Math.round(sEnd), surplus:resp.surplus, legacyGoal:Math.round(resp.legacyGoal||0), belowYear:below, depletes:dep, held:(!dep && !below) };
+  var legEnd=Math.round(resp.ending||0);                 // B129 - the ending that counts toward your legacy goal
+  var goal=Math.round(resp.legacyGoal||0);
+  var safeB=Math.round((resp.safeExtraBase!=null?resp.safeExtraBase:resp.safeExtra)||0); // B119 - your sheet's own solver
+  var minB = ss.length ? Math.min.apply(null, ss.map(function(p){return p.bal;})) : legEnd;
+  var dep = ss.length ? (minB<=0) : false;               // true depletion: money actually runs out during life
+  var zeroYr=null; if(dep){ for(var zi=0;zi<ss.length;zi++){ if(ss[zi].bal<=0){ zeroYr=ss[zi].year; break; } } }
+  var holds = !dep && (legEnd >= goal - Math.max(1, goal*0.005));
+  return { safeExtra:(holds?safeB:0), ending:legEnd, surplus:resp.surplus, legacyGoal:goal, belowYear:(dep?zeroYr:null), depletes:dep, held:holds };
 }
 
 function rbpRenderRealResult(resp, yr1, yrs, inf){

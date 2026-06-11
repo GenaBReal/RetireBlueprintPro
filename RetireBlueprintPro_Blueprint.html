@@ -487,8 +487,8 @@ function renderMonteCarlo(d){
   var mc=rbpRunMonteCarlo(d,{runs:1000,model:'fat',flex:0.10});
   if(!mc){ statsEl.innerHTML='<div class="empty">A Monte Carlo simulation needs your portfolio balances and projection. Connect your full plan to see it here.</div>'; if(fanEl) fanEl.innerHTML=''; if(methEl) methEl.innerHTML=''; return; }
   var s='';
-  s+=stat('Probability of Success', mc.successPct+'%', 'futures that meet your legacy goal');
   s+=stat('Always Covers Essentials', mc.neverRanOutPct+'%', 'never short on must-pay costs');
+  s+=stat('Probability of Success', mc.successPct+'%', 'futures that meet your legacy goal');
   s+=stat('Median Ending', moneyShort(mc.median), 'half of futures end above this');
   s+=stat('Chance You Leave a Legacy', (100-mc.depletedFullPct)+'%', 'futures that end with money left');
   s+=stat('Downside (10th pct)', moneyShort(mc.p10), '1-in-10 rough markets');
@@ -589,16 +589,15 @@ function renderStress(tests, err){
     lbl='#'+idx+'\u2002'+lbl;
     var g=r.legacyGoal||goal;
     var endV=Number(r.ending)||0;
-    var depleted=(r.depletes===true)||(endV<=0);
-    var heldGoal=(r.held===true)||(!r.belowYear && !depleted);
-    var pctGoal=depleted?'0% of goal':((g>0)?(Math.round(endV/g*100)+'% of goal'):'\u2014');
-    var safeCell=depleted?'<span style="color:#b0392a;font-weight:700;">None</span>':money(r.safeExtra);
-    var res=depleted?'Plan runs out':(r.belowYear?('Below goal by '+r.belowYear):'Holds your goal \u2713');
-    var resCol=depleted?'#b0392a':(r.belowYear?'#a8761e':'#1f7a4d');
+    var depleted=(r.depletes===true);
+    var pctGoal=(g>0)?(Math.round(endV/g*100)+'% of goal'):'—';
+    var safeCell=(r.held===true)?money(r.safeExtra):'<span style="color:#b0392a;font-weight:700;">None</span>';
+    var res=depleted?('Plan runs out'+(r.belowYear?(' '+r.belowYear):'')):((r.held===true)?'Holds your goal ✓':'Below legacy goal');
+    var resCol=depleted?'#b0392a':((r.held===true)?'#1f7a4d':'#a8761e');
     h+='<tr><td>'+esc(lbl)+'</td><td class="r">'+money(endV)+'</td><td class="r">'+pctGoal+'</td><td class="r">'+safeCell+'</td><td style="color:'+resCol+';font-weight:600;">'+esc(res)+'</td></tr>';
   });
   h+='</tbody></table>';
-  h+='<div class="note" style="margin-top:10px">Ending balance and \u201cruns out\u201d reflect your plan at its <b>current</b> planned spending in each scenario. <b>Safe extra / yr</b> is the most discretionary spending you could add on top of your must-pay floor and still finish at or above your legacy goal \u2014 it reads <b>None</b> when a crash is severe enough that the plan can\u2019t sustain even current spending. Each row is one saved run; re-run the sweep on the Stress Test page to refresh them.</div>';
+  h+='<div class="note" style="margin-top:10px"><b>Ending balance</b> is the portfolio that counts toward your <b>legacy goal</b> under each crash, read straight from your engine — your solver holds it on target by adjusting how much extra you can spend. <b>Safe extra / yr</b> is the safe discretionary spend your solver allows for that crash; it reads <b>None</b> when no extra is safe, and the result reads <b>Plan runs out</b> only if the money would actually be exhausted during your lifetime. Each row is one saved run; re-run it on the Stress Test page to refresh.</div>';
   el.innerHTML = any ? h : '<div class="empty">No completed crash-test results are saved yet.</div>';
 }
 
