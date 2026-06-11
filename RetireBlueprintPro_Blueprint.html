@@ -10,7 +10,12 @@
 html,body{ margin:0; padding:0; }
 body{ font-family:'Segoe UI',system-ui,sans-serif; background:#f0f2f5; color:var(--ink); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 
-.toolbar{ position:fixed; top:0; left:0; right:0; height:54px; background:var(--navy); display:flex; align-items:center; justify-content:space-between; padding:0 16px; z-index:200; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+.toolbar{ height:54px; background:var(--navy); display:flex; align-items:center; justify-content:space-between; padding:0 16px; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+.nav{ background:#0A3145; border-bottom:1px solid #1a3a52; display:flex; overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; -ms-overflow-style:none; }
+.nav::-webkit-scrollbar{ display:none; }
+.nav a{ font-size:9px; color:#1CC7D0; text-decoration:none; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; padding:10px 14px; border-right:1px solid #1a3a52; display:flex; align-items:center; white-space:nowrap; transition:background 0.15s; }
+.nav a:hover{ background:#1a3a52; }
+.nav a.active{ color:#f4b86a; border-bottom:2px solid #f4b86a; }
 .toolbar .tb-left{ display:flex; align-items:center; gap:12px; }
 .toolbar img{ height:34px; width:auto; display:block; }
 .toolbar .tb-title{ color:var(--teal); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
@@ -20,9 +25,9 @@ body{ font-family:'Segoe UI',system-ui,sans-serif; background:#f0f2f5; color:var
 .btn-ghost{ background:transparent; color:var(--teal); border:1px solid var(--teal); }
 .fresh{ color:#9fb3c4; font-size:11px; white-space:nowrap; }
 .fresh a{ color:var(--teal); text-decoration:none; font-weight:600; }
-.tip{ position:fixed; top:54px; left:0; right:0; background:#eef6f7; border-bottom:1px solid #d6e6e8; color:#36606a; font-size:12px; padding:7px 16px; z-index:190; text-align:center; }
+.tip{ background:#eef6f7; border-bottom:1px solid #d6e6e8; color:#36606a; font-size:12px; padding:7px 16px; text-align:center; }
 
-.canvas{ padding:96px 16px 60px; display:flex; justify-content:center; }
+.canvas{ padding:24px 16px 60px; display:flex; justify-content:center; }
 .blueprint{ width:100%; max-width:820px; background:#fff; box-shadow:0 6px 30px rgba(4,30,47,.14); border-radius:6px; overflow:hidden; }
 
 .cover{ background:linear-gradient(160deg,var(--navy2),var(--navy)); border-bottom:4px solid var(--gold); color:#fff; padding:34px 40px 30px; text-align:center; }
@@ -106,7 +111,7 @@ thead{ display:table-header-group; }
 @media print{
   @page{ margin:13mm; }
   body{ background:#fff; }
-  .toolbar,.tip{ display:none !important; }
+  .toolbar,.tip,.nav{ display:none !important; }
   .canvas{ padding:0; }
   .blueprint{ box-shadow:none; border-radius:0; max-width:none; width:100%; }
   .page{ break-before:page; }
@@ -123,10 +128,26 @@ thead{ display:table-header-group; }
     <span class="tb-title">Retirement Blueprint</span>
   </div>
   <div class="tb-right">
-    <a class="btn btn-ghost" href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html" style="text-decoration:none">&larr; Dashboard</a>
     <span class="fresh" id="fresh"></span>
     <button class="btn" id="printBtn" onclick="window.print()">Download / Print My Blueprint</button>
   </div>
+</div>
+<div class="nav">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Blueprint.html" class="active">Blueprint</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What\'s New</a>
+  <a href="#" onclick="window.print();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">&#10515; Save PDF</a>
+  <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first.');return false;" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">&#128202; Master Sheet</a>
 </div>
 <div class="tip" id="tip">Tip: when the print dialog opens, choose <b>Save as PDF</b> as the destination to keep or share a copy.</div>
 
@@ -186,7 +207,7 @@ thead{ display:table-header-group; }
     <!-- PAGE 5 -->
     <div class="page">
       <div class="sec"><h3>The Year-by-Year Projection</h3>
-        <div class="lead">Annual cash flow through your plan horizon. "Base + debt" is core living costs plus debt payments; ending portfolio is the projected year-end investable balance.</div>
+        <div class="lead">Annual cash flow through your plan horizon. "Base + debt" is core living costs plus debt payments; ending portfolio is the projected year-end investable balance. "Draw vs 4%" shows each year\u2019s portfolio withdrawal \u2014 your must-pay floor plus the discretionary extra your plan takes \u2014 as a percent of that year\u2019s starting balance, next to the classic 4% safe-withdrawal guideline (green at or below 4%, amber above).</div>
         <div id="projection"></div>
       </div>
     </div>
@@ -785,17 +806,23 @@ function populate(d){
 
   /* =================== PAGE 5: year-by-year (with Base+Debt) =================== */
   if(rows.length){
-    var th='<table class="tbl compact"><thead><tr><th>Year</th><th class="r">Age'+(single?'':'s')+'</th><th class="r">Base + debt</th><th class="r">Healthcare</th><th class="r">Taxes</th><th class="r">Total need</th><th class="r">Ending portfolio</th></tr></thead><tbody>';
+    var th='<table class="tbl compact"><thead><tr><th>Year</th><th class="r">Age'+(single?'':'s')+'</th><th class="r">Base + debt</th><th class="r">Healthcare</th><th class="r">Taxes</th><th class="r">Total need</th><th class="r">Draw vs 4%</th><th class="r">Ending portfolio</th></tr></thead><tbody>';
     rows.forEach(function(o,idx){
       var r=o.r, yr=o.yr, a1=ageOf(p1,yr), a2=ageOf(p2,yr);
       var ages=(a1!==null?a1:'\u2014')+((!single)&&a2!==null?(' / '+a2):'');
       var bd=(Number(r.baseLiving)||0)+(Number(r.debt)||0);
       var taxes=(Number(r.federalTaxes)||0)+(Number(r.stateTax)||0)+(Number(cg[o.i])||0);
       var need=(r.totalNeed!=null)?r.totalNeed:r.totalGross;
+      var draw=(wd && wd[o.i]!=null)?Math.max(0,Number(wd[o.i])||0):0;
+      var startBal=(idx===0)?(Number(port.total)||0):(Number(rows[idx-1].r.endLiquid)||0);
+      var wr=(startBal>0)?(draw/startBal):null;
+      var wrCell;
+      if(wr==null){ wrCell='\u2014'; }
+      else { var wrTxt=(wr*100).toFixed(1)+'%'; var wrCol=(wr<=0.04)?'#0e7a6b':((wr<=0.06)?'#b07a2a':'#b0392a'); var wrMk=(wr<=0.04)?' \u2713':''; wrCell='<span style="color:'+wrCol+';font-weight:700">'+wrTxt+wrMk+'</span>'; }
       var cls='', tag='';
       if(firstDeathYear && yr===firstDeathYear){ cls=' class="mark"'; tag=' <span style="color:#b07a2a;font-size:10px">\u2022 survivor begins</span>'; }
       if(idx===rows.length-1){ cls=' class="endrow"'; tag=' <span style="color:#5a6675;font-size:10px">\u2022 plan horizon</span>'; }
-      th+='<tr'+cls+'><td><b>'+esc(yr)+'</b>'+tag+'</td><td class="r">'+ages+'</td><td class="r">'+money(bd)+'</td><td class="r">'+money(r.healthcare)+'</td><td class="r">'+money(taxes)+'</td><td class="r">'+money(need)+'</td><td class="r">'+money(r.endLiquid)+'</td></tr>';
+      th+='<tr'+cls+'><td><b>'+esc(yr)+'</b>'+tag+'</td><td class="r">'+ages+'</td><td class="r">'+money(bd)+'</td><td class="r">'+money(r.healthcare)+'</td><td class="r">'+money(taxes)+'</td><td class="r">'+money(need)+'</td><td class="r">'+wrCell+'</td><td class="r">'+money(r.endLiquid)+'</td></tr>';
     });
     th+='</tbody></table>';
     document.getElementById('projection').innerHTML=th;
