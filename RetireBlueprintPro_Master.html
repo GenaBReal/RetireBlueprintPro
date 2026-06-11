@@ -60,6 +60,8 @@
   /* per-partner account column tint (set inline via --own) */
   th.own{color:#fff !important;}
   .foot{padding:10px 18px;font-size:10.5px;color:#5b7689;background:var(--paper);border-top:1px solid var(--line);}
+  .foot .caveat{margin-top:7px;padding-top:7px;border-top:1px dashed var(--line);font-size:10px;color:#7c93a4;line-height:1.5;max-width:880px;}
+  .foot .caveat b{color:#3a5a72;font-weight:700;}
 </style>
 </head>
 <body>
@@ -195,7 +197,8 @@ function render(rows, cols){
   document.getElementById('status').style.display='none';
   document.getElementById('gridwrap').style.display='block';
   var ft=document.getElementById('foot'); ft.style.display='block';
-  ft.innerHTML='Showing all '+cols.length+' columns × '+rows.length+' years. Computed live from your inputs by the same engine your whole plan runs on — no separate spreadsheet to fall out of sync. Figures round to the dollar.';
+  ft.innerHTML='Showing all '+cols.length+' columns × '+rows.length+' years. Computed live from your inputs by the same engine your whole plan runs on — no separate spreadsheet to fall out of sync. Figures round to the dollar.'
+    +'<div class="caveat"><b>About these numbers:</b> Every figure here is calculated fresh in your browser and checked line-by-line against your Google Sheet. Almost all of them match to the exact dollar. On long-range running balances you may occasionally see a difference of a few dollars — that\u2019s normal rounding between two calculators compounding over decades, not an error. Your Google Sheet stays the official record.</div>';
 }
 
 function applyThemeAndHeader(d){
