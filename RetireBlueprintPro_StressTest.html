@@ -8,6 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Interactive Stress Tester</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="rbp-engine.js"></script>
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:8px 20px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
 .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
@@ -1181,6 +1182,8 @@ function loadData() {
     if(statusEl)statusEl.textContent='✅ Plan loaded!';
     setTimeout(function(){
       planData=d;
+      // One-time: turn the loaded inputs into the engine's input I (single source of truth).
+      try { window.RBP_I = (window.RBP && RBP.buildI) ? RBP.buildI(d) : null; } catch(e){ window.RBP_I = null; }
       document.getElementById('loading-msg').style.display='none';
       document.getElementById('stress-content').style.display='block';
       var sn=document.getElementById('sample-notice');if(sn)sn.style.display='none';
@@ -1229,6 +1232,33 @@ function esJsonp(params, onResult, onError) {
   s.src = SCRIPT_URL + qs;
   s.onerror=function(){ if(!done){ done=true; clearTimeout(t); cleanup(); if(onError) onError('Could not reach your sheet.'); } };
   document.head.appendChild(s);
+}
+
+// Local engine path — same signature as esJsonp, but the crash math runs instantly
+// client-side off the single-source engine (no connector round-trip, no $500 rounding).
+function rbpRunStressLocal(params, onResult, onError) {
+  try {
+    var I = window.RBP_I;
+    if (!window.RBP || !I) { if(onError) onError('Engine not loaded yet — refresh and retry.'); return; }
+    // The page passes inflation as a whole percent (e.g. 3.0); the engine wants a decimal.
+    // Match the connector's /100 convention; undefined leaves the saved plan inflation intact.
+    var inflDec = isFinite(parseFloat(params.infl)) ? (parseFloat(params.infl) / 100) : undefined;
+    // Drags arrive as whole points (e.g. 17 for −10%); the engine wants decimals (0.17),
+    // the same /100 the connector applied via setPct on B15/B19.
+    var dec = function(v){ return (isFinite(parseFloat(v)) ? parseFloat(v) : 0) / 100; };
+    var r;
+    if (params.action === 'runSweepOne') {
+      r = RBP.runStress(I, { drag: dec(params.drag), start: params.startYr,
+        dur: Math.max(1, params.dur || 1), inflation: inflDec, plannedExtra: I.committedExtra });
+    } else { // runStressTest (single test)
+      r = RBP.runStress(I, { drag: dec(params.eDrag), start: params.eStart, dur: Math.max(1, params.eDur || 1),
+        inflation: inflDec, lateDrag: dec(params.lDrag), lateStart: params.lStart, lateDur: params.lDur,
+        plannedExtra: I.committedExtra });
+    }
+    var resp = { ok: true, series: r.series, ending: r.ending, legacyGoal: Math.round(I.legacyB8 || 0),
+      safeExtra: r.safeExtra, safeExtraBase: r.safeExtraBase, belowYear: r.crossover, surplus: 0 };
+    setTimeout(function(){ if(onResult) onResult(resp); }, 0); // keep the async contract
+  } catch (e) { if(onError) onError(String((e && e.message) || e)); }
 }
 
 // Base-plan numbers for comparison (from the already-loaded planData)
@@ -1371,7 +1401,7 @@ function runNewTest(){
   var params={ action:'runStressTest', eType:'bear', eStart:startYr, eDur:(drag!==0?Math.max(1,yrs):0), eDrag:drag, lType:'bear', lStart:lStart, lDur:lDur, lDrag:lDrag, infl:inf };
   if(btn){btn.disabled=true;btn.textContent='Running… (~20–30 sec)';btn.style.opacity='0.7';btn.style.cursor='wait';}
   if(st){st.style.display='block';st.innerHTML='<span style="color:#e09a3e;">⏳ Running your real engine — thousands of calculations. This takes ~20–30 seconds…</span>';}
-  esJsonp(params, function(resp){
+  rbpRunStressLocal(params, function(resp){
     if(btn){btn.disabled=false;btn.textContent='▶ Run New Test';btn.style.opacity='1';btn.style.cursor='pointer';}
     if(!resp || !resp.ok){ if(st){st.innerHTML='<span style="color:#ff6b6b;">⚠️ '+((resp&&resp.error)?('Engine error: '+resp.error):'The test did not complete. Please try again.')+'</span>';} return; }
     if(!resp.series || !resp.series.length){
@@ -2204,7 +2234,7 @@ function rbpRealSweep() {
     if (progBar) progBar.style.width = Math.round(i / results.length * 100) + '%';
     if (runBtn)  runBtn.textContent = 'Running\u2026 ' + (i + 1) + ' of ' + toRun;
 
-    esJsonp({ action:'runSweepOne', idx:i, startYr:startYr, infl:inf }, function(resp) {
+    rbpRunStressLocal({ action:'runSweepOne', idx:i, drag:results[i]._drag, dur:Math.max(1,results[i]._dur||1), startYr:startYr, infl:inf }, function(resp) {
       if (resp && resp.ok) {
         if (resp.safeExtra != null) results[i].safe = +resp.safeExtra;
         results[i].fullDepl = resp.belowYear || null;
