@@ -98,7 +98,7 @@
   <div class="sub" id="sub">Every Master column, year by year — computed live by your plan's engine.</div>
   <div class="who" id="who"></div>
   <div class="legend" id="legend"></div>
-  <button id="xlsBtn" onclick="exportExcel()" aria-label="Download the full 82-column plan as an Excel file">Download to Excel (.xlsx)</button>
+  <button id="xlsBtn" onclick="exportExcel()" aria-label="Download the columns shown in the grid as an Excel file">Download to Excel (.xlsx)</button>
 </div>
 
 <div id="status">
@@ -195,7 +195,7 @@ function buildColumns(slots, p1n, p2n, p1nm, p2nm){
   return out;
 }
 
-function render(rows, cols){
+function render(rows, cols, meta){
   var tbl=document.getElementById('tbl');
   // group header row (merged spans)
   var gtr='<tr class="groups">'; var prev=null,span=0,buf='';
@@ -232,7 +232,10 @@ function render(rows, cols){
   document.getElementById('status').style.display='none';
   document.getElementById('gridwrap').style.display='block';
   var ft=document.getElementById('foot'); ft.style.display='block';
-  ft.innerHTML='Showing all '+cols.length+' columns × '+rows.length+' years. Computed live from your inputs by the same engine your whole plan runs on — no separate spreadsheet to fall out of sync. Figures round to the dollar.'
+  var _hid=(meta&&meta.hidden)||0;
+  ft.innerHTML='Showing '+cols.length+' of 82 columns × '+rows.length+' years. The grid shows your plan\u2019s core columns plus a Withdrawal and an Ending column for each account you\u2019ve included'
+    +(_hid>0 ? ' — '+_hid+(_hid===1?' account is':' accounts are')+' set to <b>Include = No</b> on the Inputs tab and hidden here. Set '+(_hid===1?'it':'them')+' to <b>Include = Yes</b> on Inputs to show '+(_hid===1?'its':'their')+' columns.' : '. To hide an account from the grid, set <b>Include = No</b> on the Inputs tab.')
+    +' Computed live from your inputs; figures round to the dollar.'
     +'<div class="caveat"><b>About these numbers:</b> All 82 columns behind your plan are calculated fresh in your browser and checked line-by-line against your Google Sheet — and match it to the exact dollar on almost every one. On long-range running balances you may occasionally see a difference of a few dollars — that\u2019s normal rounding between two calculators compounding over decades, not an error. Your Google Sheet stays the official record.</div>';
 }
 
@@ -270,8 +273,9 @@ function go(d){
   var p1n=String(who.p1.name||'').toLowerCase(), p2n=String(who.p2.name||'').toLowerCase();
   var slots=(d.portfolio&&d.portfolio.slots)||[];
   var cols=buildColumns(slots, p1n, p2n, (who.p1.name||'Partner 1'), (who.p2.name||'Partner 2'));
-  document.getElementById('sub').textContent='All '+cols.length+' columns · '+rows.length+' years ('+rows[0].master[0]+'–'+rows[rows.length-1].master[0]+') · live from your engine';
-  render(rows, cols);
+  var _shownAccts=slots.filter(acctShown).length, _namedAccts=slots.filter(function(s){return s&&s.name;}).length, _hiddenAccts=Math.max(0,_namedAccts-_shownAccts);
+  document.getElementById('sub').textContent='Showing '+cols.length+' of 82 columns · '+rows.length+' years ('+rows[0].master[0]+'–'+rows[rows.length-1].master[0]+')';
+  render(rows, cols, {hidden:_hiddenAccts});
   window._rbpX={rows:rows, cols:cols, name:(who.p1&&who.p1.name)||'Plan'};
   var _xb=document.getElementById('xlsBtn'); if(_xb) _xb.style.display='inline-flex';
 }
@@ -279,7 +283,7 @@ function go(d){
 function fail(msg){ document.getElementById('status').innerHTML='<div class="big">Couldn\u2019t load the projection</div>'+msg; }
 
 /* ── load the customer's inputs once (same read the rest of the app uses) ── */
-/* Download the full 82-column plan as a real .xlsx (values, matching the grid) */
+/* Download the columns currently shown in the grid as a real .xlsx (values, matching the grid) */
 function exportExcel(){
   var X=window.XLSX;
   if(!X){ alert('The Excel tool is still loading \u2014 give it a second and try again.'); return; }
