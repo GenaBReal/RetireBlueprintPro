@@ -17,9 +17,11 @@
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);}
   /* ── top chrome ── */
-  .nav{background:var(--navy);display:flex;align-items:center;gap:2px;padding:0 8px;overflow-x:auto;border-bottom:2px solid var(--teal);}
-  .nav a{font-size:9px;color:var(--teal);text-decoration:none;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:11px 12px;white-space:nowrap;}
-  .nav a.active{color:var(--gold);border-bottom:2px solid var(--gold);}
+  .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
+  .nav::-webkit-scrollbar{display:none;}
+  .nav a{font-size:9px;color:#1CC7D0;text-decoration:none;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:10px 14px;border-right:1px solid #1a3a52;display:flex;align-items:center;white-space:nowrap;transition:background 0.15s;}
+  .nav a:hover{background:#1a3a52;}
+  .nav a.active{color:#f4b86a;border-bottom:2px solid #f4b86a;}
   .topbar{background:linear-gradient(180deg,var(--navy1),var(--navy));color:#fff;padding:14px 18px 16px;}
   .topbar h1{margin:0;font-size:17px;font-weight:800;letter-spacing:.3px;}
   .topbar h1 .accent{color:var(--teal);}
@@ -73,7 +75,24 @@
 </head>
 <body>
 
-<div class="nav" id="nav"></div>
+<div class="nav">
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html">Home</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Dashboard.html">Dashboard</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Inputs.html">Inputs</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_AnnualCheckIn.html">Annual Check-In</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_TaxEngine.html">Tax Engine</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html">Setup Guide</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Medicare.html">Healthcare</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_LTC.html">LTC</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_StressTest.html">Stress Test</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html">Demo</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Blueprint.html">Blueprint</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Methodology.html">Methodology</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
+</div>
 
 <div class="topbar">
   <h1>Master <span class="accent">Projection</span></h1>
@@ -97,13 +116,6 @@
 <script>
 var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 var THEME={ 'Steel Blue':'#60828C','Slate Teal':'#456A73','Muted Mauve':'#B07BBF','Frost Plum':'#8D6B92' };
-var PAGES=[['Home','RetireBlueprintPro_Home.html'],['Dashboard','RetireBlueprintPro_Dashboard.html'],
-  ['Inputs','RetireBlueprintPro_Inputs.html'],['Blueprint','RetireBlueprintPro_Blueprint.html'],
-  ['Master','RetireBlueprintPro_Master.html'],['Stress Test','RetireBlueprintPro_StressTest.html'],
-  ['Roth Ladder','RetireBlueprintPro_RothLadder.html'],['Tax Engine','RetireBlueprintPro_TaxEngine.html'],
-  ['Methodology','RetireBlueprintPro_Methodology.html']];
-(function(){var n=document.getElementById('nav');PAGES.forEach(function(p){var a=document.createElement('a');
-  a.href=p[1];a.textContent=p[0];if(p[0]==='Master')a.className='active';n.appendChild(a);});})();
 
 /* ── COLUMN MODEL: index → {label, group, fmt} in Master sheet order ─────────
    fmt: '$' currency · 'n' plain integer · '%' percent · 'acct' per-account (label/own filled at render) */

@@ -68,10 +68,8 @@ table.tbl td.r, table.tbl th.r{ text-align:right; }
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Blueprint.html">Blueprint</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Methodology.html" class="active">Methodology</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
-  <div class="nav-right">
-    <a href="#" onclick="location.reload();return false;">&#x27F3; Refresh</a>
-    <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide.'); return false;">&#128202; Master Sheet</a>
-  </div>
+  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
 </div>
 
 <div class="wrap">
