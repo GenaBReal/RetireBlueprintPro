@@ -410,11 +410,122 @@ function rbpBuildI(R, D) {
   };
 }
 
+/* ============================================================
+   MONTE CARLO  —  industry-standard retirement simulation.
+
+   Unseeded: every trial draws fresh, like real life. In each of N trials it
+   models, year by year:
+     • a fresh random market return (sequence-of-returns risk) via a fat-tail,
+       historical-bootstrap, or normal model, each with a volatility-drag
+       (geometric) correction so compounding is honest;
+     • a fresh random INFLATION path — spending growth and Social Security COLA
+       share the same annual inflation shock (COLA tracks CPI), so realized
+       inflation runs hot or cold across trials instead of a fixed rate;
+     • Guyton-Klinger spending guardrails.
+   Baseline withdrawals come from your real sheet projection so the MEDIAN trial
+   tracks your plan; the random inflation path floats them above/below.
+   Returns success/percentile stats + per-year balance bands.
+   ============================================================ */
+var MC_HISTORICAL=[43.6,-8.4,-24.9,-43.3,-8.2,53.9,-2.3,52.6,-1.4,-10.1,23.7,18.8,34.2,25.1,-2.8,-12.5,37.6,13.1,19.0,-14.9,31.4,43.8,-2.5,15.4,22.2,-13.0,-9.8,35.5,-0.4,20.7,22.7,4.5,13.1,22.5,-4.4,-2.5,9.5,24.8,-13.8,-24.3,37.1,23.8,-7.2,6.5,18.2,32.4,-4.9,21.4,22.5,6.3,32.2,28.7,21.0,-9.1,-11.9,-22.1,28.7,10.9,4.9,15.8,5.5,-37.0,26.5,15.1,2.1,16.0,32.4,13.7,1.4,12.0,21.8,-4.4,31.5,18.4,28.9,26.8,-19.4,-12.4,-25.2];
+function mcNormal(){ var u1=Math.random(),u2=Math.random(); if(u1<1e-12)u1=1e-12; return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2); }
+function mcPortfolioStats(port){
+  var R_BOND=0.04,R_EQUITY=0.09,VOL_FIXED=0.06,VOL_EQUITY=0.18,wRet=0.07;
+  if(port&&port.accounts&&port.accounts.length){ var tb=0,rb=0; port.accounts.forEach(function(a){ var bal=(a.balance>0)?a.balance:0, r=(a.expectedReturn>0)?a.expectedReturn/100:0; if(bal>0&&r>0){tb+=bal;rb+=bal*r;} }); if(tb>0) wRet=rb/tb; }
+  var eqFrac=Math.max(0,Math.min(1,(wRet-R_BOND)/(R_EQUITY-R_BOND)));
+  var sigma=VOL_FIXED+(VOL_EQUITY-VOL_FIXED)*eqFrac; sigma=Math.max(0.05,Math.min(0.19,sigma));
+  return {meanReturn:wRet,equityFraction:eqFrac,sigma:sigma};
+}
+function mcEssentialFloor(d){
+  var sp=(d&&d.spending)||{}, proj=(d&&d.projections)||{}, by=null;
+  if(proj.byYear&&proj.byYear.length){ var cy=new Date().getFullYear(); for(var k=0;k<proj.byYear.length;k++){ if(proj.byYear[k]&&proj.byYear[k].year===cy){by=proj.byYear[k];break;} } if(!by) by=proj.byYear[0]; }
+  if(by){ var living=+by.baseLiving||0,h=+by.healthcare||0,dbt=+by.debt||0,floor=(+by.totalNeed)||(living+h+dbt); return {living:living,healthcare:h,debt:dbt,floor:floor}; }
+  var fb=sp.baseAnnual||0; return {living:fb,healthcare:0,debt:0,floor:fb};
+}
+function mcRandReturn(model,mu,sigma,z){
+  if(model==='historical'){ return MC_HISTORICAL[Math.floor(Math.random()*MC_HISTORICAL.length)]/100; }
+  else if(model==='fat'){ var driftFat=0.5*sigma*sigma; var base=(mu+driftFat)+sigma*z; if(Math.random()<0.03){ base+=(Math.random()<0.5?-1:1)*sigma*(1+Math.random()*2); } return Math.max(-0.60,Math.min(0.80,base)); }
+  else { var drift=0.5*sigma*sigma; return (mu+drift)+sigma*z; }
+}
+function mcPercentile(a,p){ if(!a||!a.length) return 0; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.floor(p/100*(s.length-1)); return s[i]; }
+function rbpRunMonteCarlo(d,opts){
+  opts=opts||{};
+  var nRuns=opts.runs||5000, model=opts.model||'fat',
+      flexPct=(opts.flex!=null?opts.flex:0.10),
+      fixedYr1=(opts.fixedYr1!=null?opts.fixedYr1:null),
+      inflSigma=(opts.inflSigma!=null?opts.inflSigma:0.015);  // annual inflation volatility (CPI ~1.5%/yr)
+  if(!d) return null;
+  var port=d.portfolio||{}, sp=d.spending||{}, gl=d.global||{}, leg=d.legacy||{}, proj=d.projections||{};
+  var totalPF=port.total||0; if(totalPF<=0) return null;
+  var useSheetWithdrawals=(proj.withdrawals&&proj.withdrawals.length>5&&proj.endLiquid&&proj.endLiquid.length>5);
+  var pk=Object.keys(d.people||{}); var p1=(d.people&&d.people[pk[0]])||{}, p2=(d.people&&d.people[pk[1]])||{};
+  var floorNow=mcEssentialFloor(d).floor;
+  var chosenExtraNow=(proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))?(+proj.byYear[0].chosenExtra):0;
+  var baseSpend=floorNow+chosenExtraNow;
+  var legacyGoal=leg.goal||0;
+  var inflMean=(gl.inflation||0.03), colaMean=(gl.ssCola||0.025);
+  var ssYear1=((p1.ssYear1||0)+(p2.ssYear1||0)); var pension=(((p1.pension||0)+(p2.pension||0))*12);
+  var curYear=new Date().getFullYear();
+  var GK_TRIGGER=1.20, initialWR=0.04;
+  if(useSheetWithdrawals){ for(var gi=0;gi<proj.withdrawals.length;gi++){ var w=+proj.withdrawals[gi]||0, b=(proj.endLiquid&&+proj.endLiquid[gi])?+proj.endLiquid[gi]:0; if(w>0&&b>0){ initialWR=w/b; break; } } }
+  else if(totalPF>0){ initialWR=Math.max(0,baseSpend-(ssYear1+pension))/totalPF; }
+  initialWR=Math.max(0.02,Math.min(0.10,initialWR));
+  var p1DeathAge=Math.min(p1.deathAge||90,110), p2DeathAge=Math.min(p2.deathAge||90,110);
+  var p1DeathYear=p1.age>0?curYear+(p1DeathAge-p1.age):curYear+30, p2DeathYear=p2.age>0?curYear+(p2DeathAge-p2.age):curYear+30;
+  var mcSingle=!(p2&&p2.name&&String(p2.name).trim());
+  var endY=mcSingle?p1DeathYear:Math.max(p1DeathYear,p2DeathYear);
+  var yrs=Math.min(endY-curYear+1,100); yrs=Math.max(yrs,20);
+  var mcYears=[]; var origYears=(proj.years&&proj.years.length)?proj.years:null;
+  for(var y0=0;y0<yrs;y0++){ mcYears.push(origYears&&y0<origYears.length?origYears[y0]:curYear+y0); }
+  var ps=mcPortfolioStats(port); var mu=ps.meanReturn, sigma=ps.sigma;
+  var allEnd=[], depleteYears=[], yearlyBals=[]; for(var yy=0;yy<yrs;yy++) yearlyBals.push([]);
+  for(var run=0;run<nRuns;run++){
+    var bal=totalPF, balNX=totalPF, depleted=false;
+    var randCumInfl=1, ssCum=1, detCumInfl=1;   // realized vs deterministic inflation paths
+    for(var i=0;i<yrs;i++){
+      if(yearlyBals[i]) yearlyBals[i].push(Math.round(bal));
+      if(i===0) continue;
+      // ── one inflation shock per year, shared by spending growth and SS COLA ──
+      var zi=mcNormal();
+      var inflYr=Math.max(-0.02,Math.min(0.12, inflMean + inflSigma*zi));
+      var colaYr=Math.max(-0.02,Math.min(0.12, colaMean + inflSigma*zi));
+      randCumInfl*=(1+inflYr); ssCum*=(1+colaYr); detCumInfl*=(1+inflMean);
+      var inflFactor=randCumInfl/detCumInfl;   // 1.0 on average; floats with realized inflation
+      var withdrawal;
+      if(useSheetWithdrawals && i<proj.withdrawals.length){ withdrawal=Math.max(0,(proj.withdrawals[i]||0))*inflFactor; }
+      else { var guaranteed=ssYear1*ssCum+pension; var spend=baseSpend*randCumInfl; withdrawal=Math.max(0,spend-guaranteed); }
+      if(flexPct>0 && bal>0 && (withdrawal/bal)>initialWR*GK_TRIGGER){ withdrawal*=(1-flexPct); }
+      var withdrawalNX;
+      if(useSheetWithdrawals && i<proj.withdrawals.length){ var cx=(proj.byYear[i]&&(+proj.byYear[i].chosenExtra))?(+proj.byYear[i].chosenExtra):0; withdrawalNX=Math.max(0,(proj.withdrawals[i]||0)-cx)*inflFactor; }
+      else { var gNX=ssYear1*ssCum+pension; var sNX=floorNow*randCumInfl; withdrawalNX=Math.max(0,sNX-gNX); }
+      var z=mcNormal();
+      var ret=(i===1&&fixedYr1!==null)?fixedYr1:mcRandReturn(model,mu,sigma,z);
+      var half=Math.sqrt(Math.max(0,1+ret));
+      bal=bal*half; bal=Math.max(0,bal-withdrawal); bal=Math.max(0,bal*half);
+      balNX=balNX*half; balNX=Math.max(0,balNX-withdrawalNX); balNX=Math.max(0,balNX*half);
+      if(balNX<=0 && !depleted){ depleted=true; depleteYears.push(mcYears[i]||(curYear+i)); }
+    }
+    allEnd.push(Math.round(bal));
+  }
+  var succeedGoal=allEnd.filter(function(b){return b>=legacyGoal;}).length;
+  var survivePos=allEnd.filter(function(b){return b>0&&b<legacyGoal;}).length;
+  var depletedFull=allEnd.filter(function(b){return b<=0;}).length;
+  var depletedFloor=depleteYears.length;
+  var avg=allEnd.reduce(function(s,v){return s+v;},0)/(allEnd.length||1);
+  return { runs:nRuns, model:model, mu:mu, sigma:sigma, equityFraction:ps.equityFraction, flex:flexPct,
+    inflMean:inflMean, inflSigma:inflSigma,
+    years:mcYears, yrs:yrs, legacyGoal:legacyGoal, floor:floorNow,
+    successPct:Math.round(succeedGoal/nRuns*100), survivePct:Math.round(survivePos/nRuns*100),
+    neverRanOutPct:Math.round((nRuns-depletedFloor)/nRuns*100), depletedFloorPct:Math.round(depletedFloor/nRuns*100),
+    depletedFullPct:Math.round(depletedFull/nRuns*100),
+    median:mcPercentile(allEnd,50), average:Math.round(avg),
+    p10:mcPercentile(allEnd,10), p90:mcPercentile(allEnd,90), yearlyBals:yearlyBals };
+}
+
 /* ── UMD: browser global `RBP` + CommonJS for node validation ───────────────
    Extends an existing window.RBP (e.g. a page's connector loader RBP.load/
    loadCached) rather than replacing it, so engine + loader coexist in any order. */
 (function (root) {
-  var api = { project: rbpProject, solveSafeExtra: rbpSolveSafeExtra, runStress: rbpRunStress, buildI: rbpBuildI };
+  var api = { project: rbpProject, solveSafeExtra: rbpSolveSafeExtra, runStress: rbpRunStress, buildI: rbpBuildI, runMonteCarlo: rbpRunMonteCarlo };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (root.RBP && typeof root.RBP === 'object') { for (var k in api) root.RBP[k] = api[k]; }
   else root.RBP = api;

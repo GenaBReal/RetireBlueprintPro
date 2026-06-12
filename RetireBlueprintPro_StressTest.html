@@ -617,9 +617,9 @@ window.addEventListener('storage', function(e) {
           <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Simulations</div>
           <select id="mc-runs" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="500">500 (fast)</option>
-            <option value="1000" selected>1,000 (standard)</option>
+            <option value="1000">1,000 (quick)</option>
             <option value="2000">2,000 (thorough)</option>
-            <option value="5000">5,000 (maximum)</option>
+            <option value="5000" selected>5,000 (industry standard)</option>
           </select>
         </div>
         <div>
@@ -1786,6 +1786,7 @@ function runMonteCarlo() {
   var legacyGoal= leg.goal || 0;
   var inflation = (gl.inflation || 0.03);
   var colaRate  = (gl.ssCola || 0.025);
+  var inflSigma = 0.015;   // annual inflation volatility (CPI ~1.5%/yr) — industry-standard variable inflation
   var ssYear1   = (p1.ssYear1 || 0) + (p2.ssYear1 || 0);
   var pension   = ((p1.pension || 0) + (p2.pension || 0)) * 12;
   var curYear   = new Date().getFullYear();
@@ -1870,21 +1871,31 @@ function runMonteCarlo() {
       var peakBalNX = balNX;
       var depleteAt = null;
       var depletedFull = false, depleteAtFull = null;
+      var randCumInfl = 1, ssCum = 1, detCumInfl = 1;   // realized vs deterministic inflation paths
 
       for (var i = 0; i < yrs; i++) {
         if (yearlyBals[i]) yearlyBals[i].push(Math.round(bal));
 
         if (i === 0) continue; // Year 0 = starting balance, no withdrawal yet
 
+        // ── industry-standard: a fresh random inflation path each year; spending growth
+        //    and SS COLA share the same annual CPI shock (instead of a fixed rate). ──
+        var _iu1 = Math.random(); if (_iu1 < 1e-12) _iu1 = 1e-12;
+        var _iz = Math.sqrt(-2 * Math.log(_iu1)) * Math.cos(2 * Math.PI * Math.random());
+        var _inflYr = Math.max(-0.02, Math.min(0.12, inflation + inflSigma * _iz));
+        var _colaYr = Math.max(-0.02, Math.min(0.12, colaRate  + inflSigma * _iz));
+        randCumInfl *= (1 + _inflYr); ssCum *= (1 + _colaYr); detCumInfl *= (1 + inflation);
+        var inflFactor = randCumInfl / detCumInfl;   // 1.0 on average; floats with realized inflation
+
         // ── Full plan: spend EXACTLY your chosen plan. Your Final Gross Withdrawal already
         // reflects your Master's Chosen Extra Spend; we never add the solver's suggested max. ──
         var withdrawal;
         if (useSheetWithdrawals && i < proj.withdrawals.length) {
-          withdrawal = Math.max(0, (proj.withdrawals[i] || 0));
+          withdrawal = Math.max(0, (proj.withdrawals[i] || 0)) * inflFactor;
         } else {
           // Fallback: simplified math, spending your chosen amount (floor + chosen extra)
-          var guaranteed = ssYear1 * Math.pow(1 + colaRate, i) + pension;
-          var spend = baseSpend * Math.pow(1 + inflation, i);
+          var guaranteed = ssYear1 * ssCum + pension;
+          var spend = baseSpend * randCumInfl;
           withdrawal = Math.max(0, spend - guaranteed);
         }
         // Guyton-Klinger capital-preservation guardrail: if THIS path's current
@@ -1898,10 +1909,10 @@ function runMonteCarlo() {
         var withdrawalNX;
         if (useSheetWithdrawals && i < proj.withdrawals.length) {
           var chosenX_i = (proj.byYear[i] && (+proj.byYear[i].chosenExtra)) ? (+proj.byYear[i].chosenExtra) : 0;
-          withdrawalNX = Math.max(0, (proj.withdrawals[i] || 0) - chosenX_i);
+          withdrawalNX = Math.max(0, (proj.withdrawals[i] || 0) - chosenX_i) * inflFactor;
         } else {
-          var guaranteedNX = ssYear1 * Math.pow(1 + colaRate, i) + pension;
-          var spendNX = floorNow * Math.pow(1 + inflation, i);
+          var guaranteedNX = ssYear1 * ssCum + pension;
+          var spendNX = floorNow * randCumInfl;
           withdrawalNX = Math.max(0, spendNX - guaranteedNX);
         }
         // ── Floor-only path: NO guardrail trim — the floor is must-pay expenses
@@ -2343,6 +2354,19 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
   var p50 = mcPercentile(endings, 50);
   var p75 = mcPercentile(endings, 75);
   var p90 = mcPercentile(endings, 90);
+
+  // ── persist this exact run so the Blueprint report shows the SAME numbers ──
+  try {
+    var _bP10=[], _bP50=[], _bP90=[];
+    for (var _bi=0; _bi<yearlyBals.length; _bi++){ var _ba=yearlyBals[_bi]||[]; _bP10.push(mcPercentile(_ba,10)); _bP50.push(mcPercentile(_ba,50)); _bP90.push(mcPercentile(_ba,90)); }
+    var _mcSave = { ranAt:Date.now(), runs:nRuns, model:model, inflSigma:0.015, mu:mu, sigma:sigma,
+      legacyGoal:legacyGoal, successPct:successPct, survivePct:survivePct,
+      mustPaySafePct:mpSafePct, depletedFullPct:fullFailPct,
+      median:p50, p10:p10, p25:p25, p75:p75, p90:p90,
+      startYear:(mcYears[0]||curYear), endYear:(mcYears[yrs-1]||(curYear+yrs-1)),
+      years:mcYears, bandP10:_bP10, bandP50:_bP50, bandP90:_bP90 };
+    esJsonp({ action:'saveMonteCarlo', enc:'b64', data: btoa(unescape(encodeURIComponent(JSON.stringify(_mcSave)))) }, function(){}, function(){});
+  } catch(_e){}
 
   var startYear = mcYears[0] || curYear;
   var endYearLabel = mcYears[yrs-1] || (curYear + yrs - 1);
