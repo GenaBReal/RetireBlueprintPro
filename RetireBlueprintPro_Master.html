@@ -8,9 +8,9 @@
 <style>
   :root{
     --navy:#051628; --navy1:#041E2F; --n2:#0A3145; --teal:#1CC7D0; --gold:#f4b86a;
-    --ink:#0c2230; --paper:#eef3f7; --line:#cdd9e2; --line2:#e3ebf1;
+    --ink:#0c2230; --paper:#eef3f7; --line:#cdd9e2; --line2:#e3ebf1; --grid:#d3dde6;
     --p1:#60828C; --p2:#B07BBF;            /* overwritten from the customer's dropdown */
-    --p1-soft:#eef1f3; --p2-soft:#f3eef4; --tot-soft:#fdf3e4; --spend-soft:#e3f6f8;  /* light owner/total/spend tints, recomputed on load */
+    --p1-soft:#eef1f3; --p2-soft:#f3eef4; --tot-soft:#fdf4e7; --spend-soft:#dbf6f7;  /* light owner/total/spend tints, recomputed on load */
     --hdr:#0A3145; --grp-income:#13496a; --grp-spend:#5a3d12; --grp-tax:#5c1f2a;
     --grp-flow:#114b43; --grp-bal:#1c3a52; --grp-meta:#23303b;
   }
@@ -40,7 +40,7 @@
   /* ── the grid ── */
   .gridwrap{overflow:auto;max-height:calc(100vh - 150px);border-top:1px solid var(--line);position:relative;background:#fff;}
   table.master{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums;font-size:11px;white-space:nowrap;}
-  table.master th,table.master td{border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:4px 9px;text-align:right;}
+  table.master th,table.master td{border-right:1px solid var(--grid);border-bottom:1px solid var(--grid);padding:4px 9px;text-align:right;}
   /* group header row */
   tr.groups th{position:sticky;top:0;z-index:6;color:#fff;font-size:9px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
     text-align:center;padding:5px 9px;border-bottom:2px solid rgba(255,255,255,.25);height:24px;}
@@ -53,10 +53,9 @@
   tr.groups th.frz,tr.labels th.frz{z-index:8;}
   td.yr{text-align:center;}
   td.age{color:#5b7689;font-weight:600;}
-  tbody tr:nth-child(even) td{background:#f7fafc;}
-  tbody tr:nth-child(even) td.frz{background:#eef4f8;}
-  tbody tr:hover td{background:#eaf6f8;}
-  tbody tr:hover td.frz{background:#e2f0f4;}
+  /* no zebra striping — spreadsheet-style uniform rows; crisp gridlines carry the eye across */
+  tbody tr:hover td{background:#eaf6f8 !important;}
+  tbody tr:hover td.frz{background:#e2f0f4 !important;}
   td.z{color:#b8c4cd;}            /* zero values, muted */
   td.tot{font-weight:800;color:var(--navy1);background:var(--tot-soft) !important;}
   td.cp1{background:var(--p1-soft)!important;} td.cp2{background:var(--p2-soft)!important;} td.csp{background:var(--spend-soft)!important;}
@@ -150,7 +149,7 @@ var GROUP_LABEL={id:'Lifetime Plan',inc:'Guaranteed Income \u2014 The Have',con:
 function money(v){ v=Math.round(v||0); var neg=v<0; v=Math.abs(v);
   return (neg?'-$':'$')+v.toLocaleString('en-US'); }
 function softTint(hex){ hex=String(hex||'').replace('#',''); if(hex.length!==6) return '#eef1f3';
-  var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16),k=0.14;
+  var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16),k=0.16;
   function m(c){ return Math.round(c*k+255*(1-k)); }
   return 'rgb('+m(r)+','+m(g)+','+m(b)+')'; }
 
