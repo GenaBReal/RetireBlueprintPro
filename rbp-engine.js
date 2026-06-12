@@ -410,9 +410,12 @@ function rbpBuildI(R, D) {
   };
 }
 
-/* ── UMD: browser global `RBP` + CommonJS for node validation ───────────────*/
+/* ── UMD: browser global `RBP` + CommonJS for node validation ───────────────
+   Extends an existing window.RBP (e.g. a page's connector loader RBP.load/
+   loadCached) rather than replacing it, so engine + loader coexist in any order. */
 (function (root) {
   var api = { project: rbpProject, solveSafeExtra: rbpSolveSafeExtra, runStress: rbpRunStress, buildI: rbpBuildI };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  root.RBP = api;
+  if (root.RBP && typeof root.RBP === 'object') { for (var k in api) root.RBP[k] = api[k]; }
+  else root.RBP = api;
 })(typeof self !== 'undefined' ? self : this);
