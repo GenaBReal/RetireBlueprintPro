@@ -8,6 +8,94 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Inputs</title>
 <script src="https://genabreal.github.io/RetireBlueprintPro/rbp-tax-config.js"></script>
+<script src="https://genabreal.github.io/RetireBlueprintPro/rbp-engine.js"></script>
+<script>
+/* ── ENGINE ADAPTER ───────────────────────────────────────────────
+   Rebuilds d.projections from the one formula (rbp-engine.js), in the EXACT shape the
+   connector returns, so every Dashboard card and chart reads the engine instead of the
+   connector's read of the sheet's computed cells. If the engine isn't present or anything
+   fails, this returns quietly and the connector's own projections are used unchanged. */
+function rbpApplyEngine(d){
+  if (!d || typeof RBP==='undefined' || !RBP.buildI || !RBP.project) return;
+  var I = RBP.buildI(d); if (!I) return;
+  // committed-plan smile (the saved safe-extra) — same basis the sheet's plan line uses
+  var w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
+  var yOf=function(x){ return x?new Date(x).getFullYear():null; };
+  var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
+  var ext=I.committedExtra||0;
+  var rows=RBP.project(I,{extraOverride:function(yr){
+    var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2;
+    return ph<0?0:ext*w[ph]/avg; }});
+  if(!rows || !rows.length) return;
+
+  function R(v){ return Math.round(Number(v)||0); }
+  var P={years:[],income:[],withdrawals:[],endLiquid:[],preTax:[],roth:[],taxable:[],hsa:[],
+         federalTaxes:[],taxableIncome:[],stateIncome:[],capGainsTax:[],acctWithdrawals:[],totalRMD:[],byYear:[]};
+  rows.forEach(function(r){
+    var m=r.master; function N(i){ return R(m[i]); }
+    var acctW=[]; for(var k=46;k<=57;k++) acctW.push(N(k));
+    var acctEnd=[]; for(var k2=59;k2<=70;k2++) acctEnd.push(N(k2));
+    P.years.push(N(0));
+    P.income.push(N(14));
+    P.withdrawals.push(R(m[44]-m[45]));         // Display_AH − Reinvested_RMDs = net outflow
+    P.endLiquid.push(N(81));
+    P.federalTaxes.push(N(40));
+    P.taxableIncome.push(N(39));
+    P.stateIncome.push(N(41));
+    P.capGainsTax.push(N(42));
+    P.totalRMD.push(N(35));
+    P.acctWithdrawals.push(acctW.slice());
+    P.preTax.push(N(72)); P.roth.push(N(73)); P.taxable.push(N(74)); P.hsa.push(N(76));
+    P.byYear.push({
+      year:N(0), craigAge:N(2), genaAge:N(3),
+      gSal:N(4), gSS:N(5), gProjSS:N(6), gPen:N(7), gOth:N(8),
+      cSal:N(9), cSS:N(10), cProjSS:N(11), cPen:N(12), cOth:N(13),
+      totalGross:N(14),
+      craigContrib:N(15), craigMatch:N(16), genaContrib:N(17), genaMatch:N(18), totalContrib:N(19),
+      stdDed:N(20), baseLiving:N(23), healthcare:N(26), debt:N(27), totalNeed:N(28),
+      gap:N(29), surplus:N(30), chosenExtra:N(31), fundingRequired:N(32),
+      rmdC:N(33), rmdG:N(34), totalRMD:N(35),
+      convC:N(36), convG:N(37), totalConv:N(38),
+      totalTaxable:N(39), federalTaxes:N(40), stateTax:N(41), totalTaxes:N(43),
+      acctW:acctW.slice(), monthlyWithdraw:N(58), acctEnd:acctEnd,
+      preTaxTotal:N(72), rothTotal:N(73), taxableTotal:N(74), hsaTotal:N(76),
+      endLiquid:N(81)
+    });
+  });
+
+  // ── extend to 100 years from plan start (flat growth, no income/withdrawals) ──
+  if(P.years.length){
+    var firstYr=P.years[0], lastYr=P.years[P.years.length-1], targetEnd=firstYr+99, baseReturn=0.07;
+    try{ var accs=(d.portfolio&&d.portfolio.accounts)||[], rs=0,rc=0;
+      accs.forEach(function(a){ if((a.expectedReturn||0)>0){ rs+=a.expectedReturn/100; rc++; } });
+      if(rc>0) baseReturn=rs/rc; }catch(e){}
+    var lb=P.endLiquid[P.endLiquid.length-1]||0, lp=P.preTax[P.preTax.length-1]||0,
+        lr=P.roth[P.roth.length-1]||0, lt=P.taxable[P.taxable.length-1]||0, lh=P.hsa[P.hsa.length-1]||0;
+    for(var ey=lastYr+1; ey<=targetEnd; ey++){
+      lb=Math.round(Math.max(0,lb*(1+baseReturn))); lp=Math.round(Math.max(0,lp*(1+baseReturn)));
+      lr=Math.round(Math.max(0,lr*(1+baseReturn))); lt=Math.round(Math.max(0,lt*(1+baseReturn)));
+      lh=Math.round(Math.max(0,lh*(1+baseReturn)));
+      P.years.push(ey); P.income.push(0); P.withdrawals.push(0); P.endLiquid.push(lb);
+      P.federalTaxes.push(0); P.taxableIncome.push(0); P.stateIncome.push(0); P.capGainsTax.push(0);
+      P.preTax.push(lp); P.roth.push(lr); P.taxable.push(lt); P.hsa.push(lh);
+      P.acctWithdrawals.push([0,0,0,0,0,0,0,0,0,0,0,0]); P.totalRMD.push(0);
+      P.byYear.push({ year:ey, craigAge:0, genaAge:0,
+        gSal:0,gSS:0,gProjSS:0,gPen:0,gOth:0, cSal:0,cSS:0,cProjSS:0,cPen:0,cOth:0,
+        totalGross:0, craigContrib:0,craigMatch:0,genaContrib:0,genaMatch:0,totalContrib:0,
+        stdDed:0, baseLiving:0, healthcare:0, debt:0, totalNeed:0,
+        gap:0, surplus:0, chosenExtra:0, fundingRequired:0,
+        rmdC:0, rmdG:0, totalRMD:0, convC:0, convG:0, totalConv:0,
+        totalTaxable:0, federalTaxes:0, stateTax:0, totalTaxes:0,
+        acctW:[0,0,0,0,0,0,0,0,0,0,0,0], monthlyWithdraw:0, acctEnd:[0,0,0,0,0,0,0,0,0,0,0,0],
+        preTaxTotal:lp, rothTotal:lr, taxableTotal:lt, hsaTotal:lh, endLiquid:lb });
+    }
+  }
+
+  d.projections = P;
+  // legacy ending = liquid at the last LIVE year (before the flat extension)
+  try { d.legacy = d.legacy || {}; d.legacy.projectedEnding = Math.round(rows[rows.length-1].master[81]); } catch(e){}
+}
+</script>
 <style>.header{background:#051628;border-bottom:3px solid #f4b86a;padding:0 20px;display:flex;align-items:stretch;justify-content:flex-start;overflow:hidden;min-height:76px;}
 .header img{height:60px;width:auto;flex-shrink:0;display:block;}
 .nav{background:#0A3145 !important;border-bottom:1px solid #1a3a52;display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;}
@@ -2499,6 +2587,16 @@ var EXPENSE_DEFAULTS = {58:'Verizon Wireless',59:'PG&E (Electric/Gas)',60:'Garba
 
 function populateFromData(d) {
   if (!d) return;
+  // ── single-source: rebuild the projection with the shared engine so the Roth Conversion
+  //    Solver and tax estimates use the exact same numbers as every other page. Built on a copy
+  //    so the sheet-sourced Safe Spend KPIs (spending/legacy) are left untouched. ──
+  try {
+    if (typeof rbpApplyEngine === 'function' && window.RBP && window.RBP.buildI) {
+      var _engD = JSON.parse(JSON.stringify(d));
+      rbpApplyEngine(_engD);
+      if (_engD && _engD.projections) d.projections = _engD.projections;
+    }
+  } catch(_e){}
   var gl = d.global || {};
   var tax = d.tax || {};
   var p = d.people || {};
