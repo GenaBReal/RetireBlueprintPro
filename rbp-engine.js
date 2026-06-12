@@ -36,10 +36,10 @@ function rbpProject(I, opts) {
   const nameL = s => String(s||'').toLowerCase().trim();
   const n1 = nameL(I.name1), n2 = nameL(I.name2);
   const owner = A.map(a => {
-    const nm = nameL(a.name);
-    if (n1 && nm.includes(n1)) return 1;
-    if (n2 && nm.includes(n2)) return 2;
-    return 0;
+    const ow = nameL(a.owner);          // Owner column (C): partner name or "Joint"
+    if (n1 && ow.includes(n1)) return 1;  // → partner 1 (Craig)
+    if (n2 && ow.includes(n2)) return 2;  // → partner 2 (Gena)
+    return 0;                              // Joint / blank → unattributed (matches Sheet)
   });
   const incYes = A.map(a => nameL(a.statusA) === 'yes');
   const rate = A.map(a => (a.rate||0));                 // already decimal
@@ -404,7 +404,7 @@ function rbpBuildI(R, D) {
     crashType:'', crashStart:0, crashDur:0, crashDrag:0, lateCrashType:'', lateStart:0, lateDur:0, lateDrag:0,
     committedExtra:sp.safeExtra,   // the saved plan's safe extra — the red line's spend
     accounts:(R.portfolio.accounts||[]).map(function(a){ return {
-      statusA:a.showInCalc, statusG:a.status, type:a.type, name:a.name, start:a.balance,
+      statusA:a.showInCalc, statusG:a.status, type:a.type, name:a.name, owner:a.owner, start:a.balance,
       rate:(a.expectedReturn||0)/100, basis:a.costBasis, contrib:a.contrib||0, match:a.match||0,
       cStart:D(a.contribStart), cEnd:D(a.contribEnd), wStart:D(a.withdrawStart) }; })
   };
