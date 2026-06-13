@@ -3739,6 +3739,10 @@ function fmt(n) {
 }
 
 function calcGrowth(p) {
+  // Guard: if this partner's growth-calculator block isn't on the page, do nothing.
+  // Prevents a TypeError on c2-results.style when the block is absent (e.g. single-person plans).
+  var growthBox = document.getElementById('c'+p+'-results');
+  if (!growthBox) return;
   var bal     = getNum('c'+p+'-balance');
   var contrib = getNum('c'+p+'-contrib');
   var match   = getNum('c'+p+'-match');
