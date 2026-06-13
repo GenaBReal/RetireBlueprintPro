@@ -386,7 +386,7 @@ window.addEventListener('storage', function(e) {
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Changelog.html">What's New</a>
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
-  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
+  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 
 
@@ -398,12 +398,12 @@ window.addEventListener('storage', function(e) {
   <div class="cmd-item"><div class="cmd-lbl">Runway</div><div class="cmd-val" id="val-runway">—</div></div>
   <div class="cmd-item"><div class="cmd-lbl">Inflation</div><div class="cmd-val" id="val-inflation">—</div></div>
   <div class="cmd-item"><div class="cmd-lbl">SS COLA</div><div class="cmd-val" id="val-ss-cola">—</div></div>
-  <a href="https://retireblueprintpro.com/RetireBlueprintPro_StressTest.html" style="display:inline-block;background:#1CC7D0;color:#041E2F;font-size:11px;font-weight:800;padding:7px 16px;border-radius:6px;text-decoration:none;letter-spacing:0.3px;">⚡ View All Scenarios →</a>
+  <a href="https://retireblueprintpro.com/RetireBlueprintPro_StressTest.html" style="display:inline-block;background:#1CC7D0;color:#041E2F;font-size:11px;font-weight:800;padding:7px 16px;border-radius:6px;text-decoration:none;letter-spacing:0.3px;">View All Scenarios →</a>
 </div>
 
 <!-- ── YEAR SELECTOR: drives every year-specific card on the dashboard ── -->
 <div id="year-selector-bar" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#0B2239;border-radius:8px;padding:10px 16px;margin-bottom:12px;color:#fff;">
-  <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#f4b86a;">📅 Viewing Year</span>
+  <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#f4b86a;">Viewing Year</span>
   <button id="yr-prev" style="background:#1CC7D0;color:#041E2F;border:none;border-radius:6px;width:30px;height:30px;font-size:16px;font-weight:800;cursor:pointer;line-height:1;">◀</button>
   <select id="yr-select" style="background:#fff;color:#0B2239;border:none;border-radius:6px;padding:6px 10px;font-size:15px;font-weight:800;cursor:pointer;min-width:90px;text-align:center;"></select>
   <button id="yr-next" style="background:#1CC7D0;color:#041E2F;border:none;border-radius:6px;width:30px;height:30px;font-size:16px;font-weight:800;cursor:pointer;line-height:1;">▶</button>
@@ -417,7 +417,7 @@ window.addEventListener('storage', function(e) {
 
 <div id="dashboard-tip-panel" style="background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:10px;border:1px solid #80deea;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
   <div style="display:flex;gap:12px;align-items:flex-start;flex:1;">
-    <div style="font-size:20px;flex-shrink:0;">💡</div>
+    <div style="flex-shrink:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.2 1 2.5h6c0-1.3.2-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></span></div>
     <div>
       <div id="rbp-understanding-banner" style="position:relative;font-size:12px;font-weight:800;color:#006064;margin-bottom:5px;">Understanding Your Dashboard<button onclick="document.getElementById('rbp-understanding-banner').style.display='none';localStorage.setItem('rbp_dash_help_seen','1');" style="position:absolute;top:6px;right:8px;background:none;border:none;cursor:pointer;font-size:14px;color:#00838f;opacity:0.6;">✕</button></div>
       <div style="font-size:11px;color:#00838f;line-height:1.7;">
@@ -436,7 +436,7 @@ window.addEventListener('storage', function(e) {
 
 <div class="kpi-grid">
   <div class="plan-health">
-    <div class="ph-label">🛡 Plan Health Score</div>
+    <div class="ph-label"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/></svg></span>Plan Health Score</div>
     <div>
       <div class="ph-score" id="kpi-health">—</div>
       <div class="ph-sub">Retirement Confidence Score</div>
@@ -690,13 +690,13 @@ window.addEventListener('storage', function(e) {
 <div id="fire-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:14px 18px;margin-bottom:10px;border:1px solid rgba(28,199,208,0.25);display:none;">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
     <div>
-      <div style="font-size:11px;font-weight:800;color:#ff9f43;text-transform:uppercase;letter-spacing:1px;">
-        🔥 FIRE Intelligence
+      <div style="font-size:11px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></svg></span>FIRE Intelligence
         <span class="tooltip-icon" data-tip="FIRE = Financial Independence, Retire Early — a movement built on saving aggressively and retiring on your own timeline. Even traditional retirees benefit from these metrics. See Setup Guide for a full FIRE explainer.">?</span>
       </div>
       <div style="font-size:9px;color:#8aaabb;margin-top:2px;">Financial Independence metrics for your plan</div>
     </div>
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html#fire" style="font-size:9px;color:#ff9f43;text-decoration:none;white-space:nowrap;">What is FIRE? →</a>
+    <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html#fire" style="font-size:9px;color:#1CC7D0;text-decoration:none;white-space:nowrap;">What is FIRE? →</a>
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #1CC7D0;">
@@ -720,11 +720,11 @@ window.addEventListener('storage', function(e) {
       <div style="font-size:18px;font-weight:800;color:#1CC7D0;" id="fire-type">—</div>
       <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="fire-type-note">—</div>
     </div>
-    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #9b59b6;">
+    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #f4b86a;">
       <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Coast FIRE Number
         <span class="tooltip-icon" data-tip="The portfolio size at which you could stop ALL contributions and let compound growth alone carry you to your target retirement portfolio. If you're past this — you've Coasted!">?</span>
       </div>
-      <div style="font-size:18px;font-weight:800;color:#c39bd3;" id="fire-coast">—</div>
+      <div style="font-size:18px;font-weight:800;color:#f4b86a;" id="fire-coast">—</div>
       <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="fire-coast-note">—</div>
     </div>
   </div>
@@ -733,7 +733,7 @@ window.addEventListener('storage', function(e) {
 <div id="home-equity-panel" style="background:#fff;border-top:3px solid #f4b86a;border-bottom:1px solid #e8eaed;padding:12px 16px;margin:0 -14px 16px;display:none;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
     <div style="font-size:11px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:1px;">
-      🏠 <span id="dash-home-name">Home Equity</span> · <span style="color:#5F6368;">Mortgage</span>
+      <span id="dash-home-name">Home Equity</span> · <span style="color:#5F6368;">Mortgage</span>
     </div>
     <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" style="font-size:10px;color:#1CC7D0;text-decoration:none;">Update in Inputs →</a>
   </div>
@@ -747,8 +747,8 @@ window.addEventListener('storage', function(e) {
       <div style="font-size:18px;font-weight:800;color:#C62828;" id="dash-home-mort-now">—</div>
     </div>
     <div style="text-align:center;">
-      <div style="font-size:9px;color:#1565C0;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Current Net Equity</div>
-      <div style="font-size:18px;font-weight:800;color:#1565C0;" id="dash-home-equity-now">—</div>
+      <div style="font-size:9px;color:#1CC7D0;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Current Net Equity</div>
+      <div style="font-size:18px;font-weight:800;color:#1CC7D0;" id="dash-home-equity-now">—</div>
     </div>
     <div style="text-align:center;">
       <div style="font-size:9px;color:#5F6368;text-transform:uppercase;font-weight:700;margin-bottom:4px;" id="dash-home-proj-lbl">At Payoff</div>
@@ -768,32 +768,32 @@ window.addEventListener('storage', function(e) {
   </div>
 </div>
 
-<div id="stress-panel" style="background:linear-gradient(135deg,#1a0a0a,#2a1010);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,107,107,0.2);">
-  <div style="font-size:13px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+<div id="stress-panel" style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(28,199,208,0.25);">
+  <div style="font-size:13px;font-weight:700;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
     Stress Test — Sequence of Returns Risk
-    <span class="tooltip-icon" data-tip="BASE: Your plan as projected. DOWN 20%: Portfolio drops 20% in Year 1 (mild bear market — tests sequence of returns risk). DOWN 30%: Severe crash like 2008 or COVID 2020. HIGH INFLATION: 5% inflation instead of 3% — expenses grow faster. ✅ = legacy goal met · ⚠️ = below goal · ⛔ = depleted. To improve results: increase Roth %, delay SS, or reduce Phase 1 spending." style="border-color:#ff6b6b;color:#ff6b6b;">?</span>
+    <span class="tooltip-icon" data-tip="BASE: Your plan as projected. DOWN 20%: Portfolio drops 20% in Year 1 (mild bear market — tests sequence of returns risk). DOWN 30%: Severe crash like 2008 or COVID 2020. HIGH INFLATION: 5% inflation instead of 3% — expenses grow faster. ✅ = legacy goal met · ⚠️ = below goal · ⛔ = depleted. To improve results: increase Roth %, delay SS, or reduce Phase 1 spending." style="border-color:#1CC7D0;color:#1CC7D0;">?</span>
   </div>
   <div style="font-size:10px;color:#f4b86a;margin-bottom:10px;">
-    💡 <strong>Try this:</strong> Change your Phase 1 spending or SS start date in Inputs, save, then refresh to see how it affects these numbers.
+    <strong>Try this:</strong> Change your Phase 1 spending or SS start date in Inputs, save, then refresh to see how it affects these numbers.
     The goal: keep all 4 scenarios showing ✅.
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(28,199,208,0.2);">
       <div class="solver-kpi-lbl">Base Scenario</div>
       <div class="solver-kpi-val" id="stress-base" style="color:#1CC7D0;">—</div>
       <div class="solver-kpi-sub">Normal market returns</div>
     </div>
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(28,199,208,0.2);">
       <div class="solver-kpi-lbl">Year 1 Down 20%</div>
       <div class="solver-kpi-val" id="stress-20">—</div>
       <div class="solver-kpi-sub">Mild bear market</div>
     </div>
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(28,199,208,0.2);">
       <div class="solver-kpi-lbl">Year 1 Down 30%</div>
       <div class="solver-kpi-val" id="stress-30">—</div>
       <div class="solver-kpi-sub">Severe bear market</div>
     </div>
-    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(255,107,107,0.2);">
+    <div class="solver-kpi" style="background:rgba(255,255,255,0.08);padding:16px;border:1px solid rgba(28,199,208,0.2);">
       <div class="solver-kpi-lbl">High Inflation (5%)</div>
       <div class="solver-kpi-val" id="stress-inf">—</div>
       <div class="solver-kpi-sub">vs base 3% inflation</div>
@@ -823,7 +823,7 @@ window.addEventListener('storage', function(e) {
 
   <div style="grid-column:4;grid-row:1/3;">
     <div class="intel">
-      <div class="intel-title">🧠 At-a-Glance Intelligence</div>
+      <div class="intel-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="16 8 10.5 10.5 8 16 13.5 13.5 16 8"/></svg></span>Plan Intelligence</div>
       <div class="intel-row"><span class="ir-lbl">Sequence Risk</span><span class="b-go">Low</span></div>
       <div class="intel-row"><span class="ir-lbl" id="intel-lon-lbl">Longevity Coverage</span><span class="b-go">Covered</span></div>
       <div class="intel-row"><span class="ir-lbl">Healthcare Inflation</span><span class="b-watch" id="intel-hc">—</span></div>
@@ -873,7 +873,7 @@ window.addEventListener('storage', function(e) {
 <div id="completion-panel" style="background:#0A3145;border-radius:12px;padding:28px;margin-bottom:16px;border:2px solid rgba(28,199,208,0.3);">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
     <div style="font-size:16px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px;">
-      📋 Plan Completion Score
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>Plan Completion Score
       <span class="tooltip-icon" data-tip="Shows which sections of your plan are complete. Green checkmarks = done. White boxes = still needs your input on the Inputs page.">?</span>
     </div>
     <div id="completion-score" style="font-size:48px;font-weight:900;color:#1CC7D0;line-height:1;">—%</div>
@@ -1101,7 +1101,7 @@ function populate(d){
       banner.style.borderLeft = '4px solid #f4b86a';
       banner.style.color = '#f4b86a';
       banner.style.padding = '14px 24px';
-      banner.innerHTML = '👋 &nbsp;<strong>Welcome! Feel free to explore.</strong> &nbsp;Some panels may show placeholders or zeros until you enter your data. When ready, head to <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:bold;text-decoration:underline;">Inputs</a>, fill in your information, and click <strong>Save All Changes</strong> — everything will populate with your real numbers automatically.';
+      banner.innerHTML = '<strong>Welcome.</strong> &nbsp;Some panels may show placeholders or zeros until you enter your data. When ready, head to <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:bold;text-decoration:underline;">Inputs</a>, fill in your information, and click <strong>Save All Changes</strong> — everything will populate with your real numbers automatically.';
     }
     // Continue to render dashboard with blanks/dashes
     // Show welcome modal if first visit
@@ -1566,7 +1566,7 @@ function populateFIRE(d) {
     var fiNoteEl = document.getElementById('fire-fi-note');
     if (fiEl) {
       if (fiYear && fiYear <= planYear) {
-        fiEl.textContent = 'Already FI! 🎉'; fiEl.style.color='#1CC7D0';
+        fiEl.textContent = 'Already FI'; fiEl.style.color='#1CC7D0';
         if(fiNoteEl) fiNoteEl.textContent = 'Portfolio sustains expenses at 4% SWR';
       } else if (fiYear) {
         fiEl.textContent = fiYear;
@@ -1584,7 +1584,7 @@ function populateFIRE(d) {
       if (annualSpend < 30000)       { typeEl.textContent='Lean FIRE';    typeEl.style.color='#1CC7D0'; if(typeNoteEl) typeNoteEl.textContent='Under $30K/yr'; }
       else if (annualSpend < 60000)  { typeEl.textContent='Regular FIRE'; typeEl.style.color='#1CC7D0'; if(typeNoteEl) typeNoteEl.textContent='$30K–$60K/yr'; }
       else if (annualSpend < 100000) { typeEl.textContent='FIRE';         typeEl.style.color='#f4b86a'; if(typeNoteEl) typeNoteEl.textContent='$60K–$100K/yr'; }
-      else                           { typeEl.textContent='Fat FIRE 🥩';  typeEl.style.color='#ff9f43'; if(typeNoteEl) typeNoteEl.textContent='Over $100K/yr'; }
+      else                           { typeEl.textContent='Fat FIRE';  typeEl.style.color='#f4b86a'; if(typeNoteEl) typeNoteEl.textContent='Over $100K/yr'; }
     }
 
     // Coast FIRE
@@ -1930,7 +1930,7 @@ function updateStressTest(d) {
         ? ' — <span style="color:#f4b86a;font-size:12px;">⚠️ Some scenarios fall below legacy goal</span>'
         : ' — <span style="color:#ff6b6b;font-size:12px;">⛔ Plan at risk in worst case</span>';
       header.innerHTML = 'Stress Test — Sequence of Returns Risk' +
-        '<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions." style="border-color:#ff6b6b;color:#ff6b6b;">?</span>' +
+        '<span class="tooltip-icon" data-tip="Shows your ending portfolio under bad market conditions." style="border-color:#1CC7D0;color:#1CC7D0;">?</span>' +
         verdict;
     }
 
