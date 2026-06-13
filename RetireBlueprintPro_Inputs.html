@@ -484,13 +484,13 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Changelog.html">What's New</a>
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
-  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
+  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 </div>
 </div>
 
 <div class="status-bar">
-  <button class="save-btn" id="save-btn" onclick="saveAll()" disabled>💾 Save All Changes</button>
+  <button class="save-btn" id="save-btn" onclick="saveAll()" disabled>Save All Changes</button>
   <span class="status-msg" id="status-msg">Loading your plan data...</span>
 </div>
 
@@ -505,7 +505,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 <div class="page">
 
 <div id="rbp-first-time-banner" style="background:linear-gradient(135deg,#f0fdfe,#e8f9fa);border-radius:10px;padding:14px 18px;margin-bottom:16px;border:1px solid #b2ebf2;display:flex;gap:14px;align-items:flex-start;position:relative;">
-  <div style="font-size:24px;flex-shrink:0;">🚀</div>
+  <div style="flex-shrink:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span></div>
   <div style="flex:1;">
     <div style="font-size:13px;font-weight:800;color:#006064;margin-bottom:4px;">First Time? Fill These 4 Things First</div>
     <div style="font-size:11px;color:#00838f;line-height:1.8;">
@@ -514,10 +514,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       <strong>2. Account Balances</strong> (Section VI: Named Accounts) → Your starting portfolio values<br>
       <strong>3. Social Security amounts</strong> (in each partner section) → Your guaranteed income foundation<br>
       <strong>4. Base Annual Expenses</strong> (Section IV) → What you spend each year<br>
-      <span style="color:#0097a7;">Everything else can be refined later. These 4 unlock your first projection! ✨</span>
+      <span style="color:#0097a7;">Everything else can be refined later. These 4 unlock your first projection! </span>
     
     </div>
-    <div style="font-size:10px;color:#00838f;margin-top:6px;font-style:italic;">Everything else can be refined later. These 4 unlock your first projection! ✨</div>
+    <div style="font-size:10px;color:#00838f;margin-top:6px;font-style:italic;">Everything else can be refined later. These 4 unlock your first projection! </div>
   </div>
   <button onclick="document.getElementById('rbp-first-time-banner').style.display='none';localStorage.setItem('rbp_first_time_seen','1');" 
     style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:#00838f;opacity:0.6;line-height:1;" 
@@ -1181,7 +1181,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         style="background:rgba(28,199,208,.12);border:1px solid rgba(28,199,208,.35);color:#1CC7D0;
                font-size:11px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;
                letter-spacing:.3px;">
-        📥 Import balances from brokerage CSV &nbsp;(optional)
+        Import balances from brokerage CSV &nbsp;(optional)
       </button>
       <span style="font-size:10px;color:#566576;margin-left:10px;">
         Fidelity · Schwab · Vanguard · Empower · any CSV with account name + value
@@ -1398,7 +1398,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       <strong style="color:#1CC7D0;">your rate NOW</strong> (the bracket you fill up to) vs 
       <strong style="color:#f4b86a;">your rate in the FUTURE</strong> (at your RMD age — 73 or 75 by birth year). 
       If your future rate will be <em>higher</em> than today, converting now saves money. 
-      Check your Dashboard for your projected income at your RMD age (73 or 75) to estimate your future rate. <strong style="color:#f4b86a;">💡 This answers: "How much to convert?" — For "When can I access it?" see the <a href="https://retireblueprintpro.com/RetireBlueprintPro_RothLadder.html" style="color:#1CC7D0;">Roth Access Ladder →</a></strong></div>
+      Check your Dashboard for your projected income at your RMD age (73 or 75) to estimate your future rate. <strong style="color:#f4b86a;">This answers: "How much to convert?" — For "When can I access it?" see the <a href="https://retireblueprintpro.com/RetireBlueprintPro_RothLadder.html" style="color:#1CC7D0;">Roth Access Ladder →</a></strong></div>
     <div class="form-grid-4" style="margin-bottom:14px;">
       <div class="field">
         <label>Analysis Year</label>
@@ -1994,7 +1994,7 @@ function calcPensionVsLumpSum(partner) {
 
   panel.style.display = 'block';
   panel.innerHTML =
-    '<div style="font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;margin-bottom:8px;">💰 Pension vs Lump Sum Analysis</div>' +
+    '<div style="font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;margin-bottom:8px;">Pension vs Lump Sum Analysis</div>' +
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;">' +
     '<div style="text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid rgba(28,199,208,0.2);">' +
       '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Pension Total</div>' +
@@ -2012,7 +2012,7 @@ function calcPensionVsLumpSum(partner) {
       '<div style="font-size:9px;color:#8aaabb;">'+(pensionWins?'✅ Pension wins':'⚠️ Take lump sum')+'</div>' +
     '</div>' +
     '</div>' +
-    '<div style="font-size:9px;color:#8aaabb;font-style:italic;">💡 '+(pensionWins ? 'On raw dollars, the pension pays more if you live past age '+Math.round(breakEvenAge)+' — and your expected lifespan is '+lifeAge+'. This ignores investment growth, so if you can reliably out-earn the pension, the lump sum could still win.' : 'On raw dollars, you would need to live to about age '+Math.round(breakEvenAge)+' just to match the lump sum — past your expected lifespan of '+lifeAge+' — so the lump sum likely wins, and investing it could widen the gap.')+'</div>';
+    '<div style="font-size:9px;color:#8aaabb;font-style:italic;">'+(pensionWins ? 'On raw dollars, the pension pays more if you live past age '+Math.round(breakEvenAge)+' — and your expected lifespan is '+lifeAge+'. This ignores investment growth, so if you can reliably out-earn the pension, the lump sum could still win.' : 'On raw dollars, you would need to live to about age '+Math.round(breakEvenAge)+' just to match the lump sum — past your expected lifespan of '+lifeAge+' — so the lump sum likely wins, and investing it could widen the gap.')+'</div>';
 }
 
 function calcHealthcareBridge(partner) {
@@ -2042,7 +2042,7 @@ function calcHealthcareBridge(partner) {
   
   panel.style.display = 'block';
   panel.innerHTML = 
-    '<div style="font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;margin-bottom:8px;">🏥 Healthcare Bridge to Medicare</div>' +
+    '<div style="font-size:9px;font-weight:700;color:#f4b86a;text-transform:uppercase;margin-bottom:8px;">Healthcare Bridge to Medicare</div>' +
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">' +
     '<div style="text-align:center;background:rgba(0,0,0,0.2);border-radius:6px;padding:8px;">' +
       '<div style="font-size:8px;color:#8aaabb;text-transform:uppercase;">Annual Cost</div>' +
@@ -2057,7 +2057,7 @@ function calcHealthcareBridge(partner) {
       '<div style="font-size:16px;font-weight:800;color:#ff6b6b;">$'+Math.round(totalBridgeCost/1000)+'K</div>' +
     '</div>' +
     '</div>' +
-    '<div style="font-size:9px;color:#8aaabb;margin-top:6px;font-style:italic;">💡 This $'+Math.round(totalBridgeCost/1000)+'K healthcare bridge is one of the most overlooked early retirement costs.</div>';
+    '<div style="font-size:9px;color:#8aaabb;margin-top:6px;font-style:italic;">This $'+Math.round(totalBridgeCost/1000)+'K healthcare bridge is one of the most overlooked early retirement costs.</div>';
 }
 
 function calcSSBreakeven(baseId, fraId, ageId) {
@@ -2116,7 +2116,7 @@ function calcSSBreakeven(baseId, fraId, ageId) {
   var be70label = breakeven70vs67 >= 110 ? 'Never breaks even' : 'Breakeven: age ' + breakeven70vs67 + ' (' + breakeven70yr + ')';
 
   panel.innerHTML =
-    '<div style="font-size:10px;font-weight:700;color:#0B2239;text-transform:uppercase;margin-bottom:10px;letter-spacing:0.5px;">📊 Social Security Claiming Strategy</div>' +
+    '<div style="font-size:10px;font-weight:700;color:#0B2239;text-transform:uppercase;margin-bottom:10px;letter-spacing:0.5px;">Social Security Claiming Strategy</div>' +
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;">' +
 
     '<div style="background:#fff3e0;border-radius:8px;padding:12px;text-align:center;border:1px solid #ffcc80;">' +
@@ -2151,7 +2151,7 @@ function calcSSBreakeven(baseId, fraId, ageId) {
 
     '</div>' +
     '<div style="font-size:10px;color:#37474f;margin-top:10px;padding:10px 12px;background:#f5f5f5;border-left:3px solid #0097a7;border-radius:0 6px 6px 0;line-height:1.6;">' +
-      '💡 <strong>Rule of thumb:</strong> If you expect to live past ' +
+      '<strong>Rule of thumb:</strong> If you expect to live past ' +
       (breakeven70vs67 < 110 ? 'age ' + breakeven70vs67 + ' (' + breakeven70yr + ')' : 'age 82') +
       ', delaying to 70 pays off. Claiming at 62 makes sense if you have health concerns or need the income now.' +
     '</div>';
@@ -4165,7 +4165,7 @@ function loadCalcFromStorage() {
 
 <div class="welcome-modal-overlay" id="welcome-modal">
   <div class="welcome-modal">
-    <div style="font-size:48px;">👋</div>
+    <div><span style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span></div>
     <h2>Welcome to RetireBlueprint Pro!</h2>
     <p><strong style="color:#fff;">Feel free to look around!</strong> Some panels may show placeholders or zeros until you enter your data — that's completely normal.</p>
     <p>When you're ready, here's how it works:</p>
@@ -4177,7 +4177,7 @@ function loadCalcFromStorage() {
       </div>
       <div class="step-item">
         <div class="step-num">2</div>
-        <div class="step-text"><strong>Click 💾 Save All Changes</strong><br>
+        <div class="step-text"><strong>Click Save All Changes</strong><br>
           <span>Your data saves directly to your private Google Sheet.</span></div>
       </div>
       <div class="step-item">
@@ -4186,7 +4186,7 @@ function loadCalcFromStorage() {
           <span>See your full lifetime retirement plan come to life with real numbers!</span></div>
       </div>
     </div>
-    <button class="welcome-btn" onclick="dismissWelcome()">Got it — Let's Go! 🚀</button>
+    <button class="welcome-btn" onclick="dismissWelcome()">Got it — Let's Go! </button>
   </div>
 </div>
 
