@@ -151,7 +151,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 .tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(28,199,208,0.2);color:#1CC7D0;font-size:10px;font-weight:700;cursor:help;margin-left:4px;position:relative;flex-shrink:0;}
 .tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:11px;font-weight:400;padding:8px 12px;border-radius:6px;white-space:normal;width:240px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;}
 
-/* ── MOBILE RESPONSIVE ────────────────────────────────── */
+/* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
   .page, .rpt-body { padding: 10px !important; }
   .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3 { 
@@ -180,7 +180,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   .stress-grid { grid-template-columns: 1fr !important; }
 }
 
-/* ── MOBILE NAV & HEADER FIX ──────────────────────────── */
+/* MOBILE NAV & HEADER FIX */
 @media (max-width: 768px) {
   /* Nav bar - scrollable horizontal on mobile */
   .nav-bar, .nav, [class*="nav"] {
@@ -244,7 +244,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 </style>
 <script src="rbp-engine.js"></script>
 <script>
-/* ── ENGINE ADAPTER ───────────────────────────────────────────────
+/* ENGINE ADAPTER 
    Rebuilds d.projections from the one formula (rbp-engine.js), in the EXACT shape the
    connector returns, so every Dashboard card and chart reads the engine instead of the
    connector's read of the sheet's computed cells. If the engine isn't present or anything
@@ -297,7 +297,7 @@ function rbpApplyEngine(d){
     });
   });
 
-  // ── extend to 100 years from plan start (flat growth, no income/withdrawals) ──
+  // extend to 100 years from plan start (flat growth, no income/withdrawals) 
   if(P.years.length){
     var firstYr=P.years[0], lastYr=P.years[P.years.length-1], targetEnd=firstYr+99, baseReturn=0.07;
     try{ var accs=(d.portfolio&&d.portfolio.accounts)||[], rs=0,rc=0;
@@ -331,7 +331,7 @@ function rbpApplyEngine(d){
 }
 </script>
 <script>
-// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+// DYNAMIC PARTNER NAMES 
 function rbpApplyNames(p1, p2) {
   p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
   p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
@@ -402,7 +402,7 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 </div>
 </div>
@@ -489,8 +489,8 @@ window.addEventListener('storage', function(e) {
 
   <div>
     
-    <div class="explainer" style="background:#f0f7ff;border-left-color:#1565C0;margin-bottom:16px;">
-      <div class="explainer-title" style="color:#1565C0;">🌟 New to Tax Planning? Start Here</div>
+    <div class="explainer" style="background:#eef9fb;border-left-color:#1CC7D0;margin-bottom:16px;">
+      <div class="explainer-title">New to tax planning? Start here</div>
       <div class="explainer-body">
         <strong>3 things that matter most in retirement tax planning:</strong><br>
         <strong>1. Your effective rate</strong> (not your bracket) is what you actually pay — often much lower than you think.<br>
@@ -501,22 +501,22 @@ window.addEventListener('storage', function(e) {
     </div>
 
     <div class="explainer navy">
-      <div class="explainer-title">💡 How Progressive Taxes Work</div>
+      <div class="explainer-title">How Progressive Taxes Work</div>
       <div class="explainer-body">Think of the US tax system like filling buckets. Your income fills the 10% bucket first, then overflows into the 12% bucket, then the 22% bucket. <strong>Only the income in each bucket is taxed at that rate</strong> — not your entire income. If you earn $120,000 taxable income, you don't pay 22% on all of it. You pay 10% on the first $24,800, 12% on the next $76,000, and 22% only on the small amount above that.</div>
     </div>
     <div class="explainer teal">
-      <div class="explainer-title">💡 The Gross-Up Principle</div>
+      <div class="explainer-title">The Gross-Up Principle</div>
       <div class="explainer-body">Most retirement plans underestimate withdrawals by ignoring taxes. Your plan works <strong>backward from your actual spending need</strong>. If you need $1,000 to pay bills and owe 12% in taxes, withdrawing $1,000 isn't enough. You need to withdraw <strong>$1,136.36</strong> so that after paying $136.36 in tax, you have exactly $1,000 left. Your lifestyle is never underfunded due to tax drag.</div>
     </div>
   </div>
 
   <div>
     <div class="explainer orange">
-      <div class="explainer-title">💡 The Roth Conversion Opportunity</div>
+      <div class="explainer-title">The Roth Conversion Opportunity</div>
       <div class="explainer-body">Between retirement and your RMD age — 73 if born 1951–1959, 75 if born 1960 or later — (when RMDs begin), your income is temporarily lower. This is your <strong>Roth conversion window</strong>. You can move money from Pre-Tax accounts to Roth at today's lower rate — locking in tax savings before RMDs force withdrawals at a higher rate. Your plan shows <strong id="tax-roth-savings-text">significant projected lifetime savings</strong> from converting now vs. waiting.</div>
     </div>
     <div class="explainer slate">
-      <div class="explainer-title">💡 Long-Term Capital Gains</div>
+      <div class="explainer-title">Long-Term Capital Gains</div>
       <div class="explainer-body">Qualified dividends and long-term capital gains from your taxable brokerage account are taxed at preferential rates — <strong>0%, 15%, or 20%</strong> depending on your income, not ordinary income rates. For MFJ filers, the 0% rate applies up to $98,900 of taxable income in 2026. Your brokerage account benefits from this lower rate on investment gains.</div>
     </div>
   </div>
@@ -563,7 +563,7 @@ window.addEventListener('storage', function(e) {
     </div>
     <div class="card-body">
       <div class="explainer orange" style="margin-bottom:12px;">
-        <div class="explainer-title">⚠️ Watch Your MAGI in Conversion Years</div>
+        <div class="explainer-title">Watch Your MAGI in Conversion Years</div>
         <div class="explainer-body">IRMAA (Income-Related Monthly Adjustment Amount) adds surcharges to Medicare Part B and D premiums when your MAGI exceeds the thresholds below. A large Roth conversion can accidentally push you into a higher IRMAA tier. <span id="tax-irmaa-note">Partner 1 qualifies for Medicare at 65, Partner 2 at 65. Plan conversions carefully around these thresholds.</span></div>
       </div>
       <table class="irmaa-table">
@@ -627,15 +627,15 @@ window.addEventListener('storage', function(e) {
     <div class="card-body" style="padding-top:0;">
       <div class="section-lbl" style="margin-top:4px;">Tax Strategy Summary</div>
       <div class="explainer navy" style="margin-bottom:8px;">
-        <div class="explainer-title">📊 Sequence of Withdrawal Strategy <span class="strat-badge strat-on">Active</span></div>
+        <div class="explainer-title">Sequence of Withdrawal Strategy <span class="strat-badge strat-on">Active</span></div>
         <div class="explainer-body">Your plan draws accounts in tax-optimal order: <strong>Taxable brokerage first</strong> (captures <span id="cg-rate-inline2">preferential</span> LTCG rate, <span id="cg-deplete2">drawn down over the plan</span>), then <strong>Pre-Tax accounts</strong> (ordinary income, manages RMD exposure), Roth converted amounts last (tax-free, grows longest). This sequencing is calculated automatically by the Master engine.</div>
       </div>
       <div class="explainer teal" style="margin-bottom:8px;">
-        <div class="explainer-title">🔄 Social Security Tax Torpedo <span class="strat-badge strat-watch" id="ss-torpedo-badge">Monitor SS years</span></div>
+        <div class="explainer-title">Social Security Tax Torpedo <span class="strat-badge strat-watch" id="ss-torpedo-badge">Monitor SS years</span></div>
         <div class="explainer-body">When <span id="tax-p2-ss-note">your partner's</span> Social Security begins, combined SS income will be significant. Up to <strong>85% of SS benefits</strong> can become taxable income when combined income exceeds $44,000 (MFJ). Your plan accounts for this in the Master engine's income calculations. Watch effective rates <span id="ss-torpedo-years">once both benefits are active</span>.</div>
       </div>
       <div class="explainer orange">
-        <div class="explainer-title">⏰ RMD Planning Window<span class="tooltip-icon" data-tip="The years between now and age 73 are your window to do Roth conversions at potentially lower tax rates. After 73, Required Minimum Distributions force taxable withdrawals whether you need the money or not.">?</span> <span class="strat-badge strat-prime">Prime Now</span></div>
+        <div class="explainer-title">RMD Planning Window<span class="tooltip-icon" data-tip="The years between now and age 73 are your window to do Roth conversions at potentially lower tax rates. After 73, Required Minimum Distributions force taxable withdrawals whether you need the money or not.">?</span> <span class="strat-badge strat-prime">Prime Now</span></div>
         <div class="explainer-body"><span id="tax-rmd-note">Partner 1 RMDs begin at age 75, Partner 2 at 75. The years between now and RMD start are your window to reduce pre-tax balances through Roth conversions. <strong>Every $1 converted now</strong> reduces your future RMD obligation and the associated tax spike.</span></div>
       </div>
     </div>
@@ -699,7 +699,7 @@ window.addEventListener('storage', function(e) {
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
-/* ── Built-in fallback loader ──────────────────────────────────────────────
+/* Built-in fallback loader 
    The shared connector (rbp-connector.js) normally defines window.RBP. If that
    external file ever fails to load (network hiccup, cache, Pages propagation),
    this self-contained version keeps the page working so a customer never sees a
@@ -745,7 +745,7 @@ if (!window.RBP || typeof window.RBP.load !== 'function') {
   };
 }
 
-/* ── Instant-paint cache (stale-while-revalidate) ──────────────────────────
+/* Instant-paint cache (stale-while-revalidate) 
    Paints the page from the last read (held briefly in this browser tab) the
    moment it opens, then quietly re-reads in the background and repaints with
    fresh data — so navigating between pages feels instant instead of waiting on
@@ -957,7 +957,7 @@ function populate(data) {
   set('t-fedtax',  fedTax1 > 0 ? fmt(fedTax1) : '—');
   set('t-statetax',stateTax1 > 0 ? fmt(stateTax1) : '—');
 
-  // ── Capital Gains position (dynamic, from the customer's actual numbers) ──
+  // Capital Gains position (dynamic, from the customer's actual numbers) 
   // 2026 MFJ LTCG thresholds: 0% up to $98,900; 15% up to $613,700; 20% above.
   (function(){
     var ltcg0=98900, ltcg15=613700;
@@ -1064,105 +1064,103 @@ loadData();
 
 <div style="text-align:center;font-size:9px;color:#607080;padding:16px;border-top:1px solid #DDE3E9;margin-top:20px;">
 <div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:20px 24px;margin:16px 0;border:1px solid rgba(28,199,208,0.25);">
-  <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:4px;">📅 Annual Update Guide — Keep Your Plan Current</div>
+  <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:4px;">Annual Update Guide — Keep Your Plan Current</div>
   <div style="font-size:10px;color:#8aaabb;margin-bottom:16px;">These values change each year. Bookmark this page and check each January to keep your plan accurate.</div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏛️ Tax Brackets & Deductions</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Tax Brackets & Deductions</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS Tax Year 2025 Adjustments</a><br>
-        <a href="https://www.irs.gov/pub/irs-drop/rp-24-40.pdf" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS Rev. Proc. — Annual Bracket Updates</a><br>
-        <a href="https://taxfoundation.org/data/all/federal/2026-tax-brackets/" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 Tax Foundation 2025 Brackets (plain English)</a><br>
+        <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026" target="_blank" style="color:#1CC7D0;text-decoration:none;">IRS Tax Year 2025 Adjustments</a><br>
+        <a href="https://www.irs.gov/pub/irs-drop/rp-24-40.pdf" target="_blank" style="color:#1CC7D0;text-decoration:none;">IRS Rev. Proc. — Annual Bracket Updates</a><br>
+        <a href="https://taxfoundation.org/data/all/federal/2026-tax-brackets/" target="_blank" style="color:#1CC7D0;text-decoration:none;">Tax Foundation 2025 Brackets (plain English)</a><br>
         <span style="color:#8aaabb;font-size:10px;">Update in: Tax Engine sheet → Brackets tab</span>
       </div>
     </div>
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏥 IRMAA Thresholds (Medicare)</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">IRMAA Thresholds (Medicare)</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.medicare.gov/your-medicare-costs/part-b-costs" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 Medicare.gov — Official Part B Costs</a><br>
-        <a href="https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 CMS 2025 Part B Premiums & IRMAA</a><br>
-        <a href="https://www.ssa.gov/pubs/EN-05-10536.pdf" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 SSA IRMAA Fact Sheet</a><br>
+        <a href="https://www.medicare.gov/your-medicare-costs/part-b-costs" target="_blank" style="color:#1CC7D0;text-decoration:none;">Medicare.gov — Official Part B Costs</a><br>
+        <a href="https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles" target="_blank" style="color:#1CC7D0;text-decoration:none;">CMS 2025 Part B Premiums & IRMAA</a><br>
+        <a href="https://www.ssa.gov/pubs/EN-05-10536.pdf" target="_blank" style="color:#1CC7D0;text-decoration:none;">SSA IRMAA Fact Sheet</a><br>
         <span style="color:#8aaabb;font-size:10px;">Update in: Tax Engine sheet → IRMAA table</span>
       </div>
     </div>
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">📈 RMD Life Expectancy Tables</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">RMD Life Expectancy Tables</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.irs.gov/publications/p590b" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS Pub 590-B — RMD Calculations</a><br>
-        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/required-minimum-distributions" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 IRS RMD Overview Page</a><br>
-        <a href="https://www.fidelity.com/calculators-tools/required-minimum-distribution" target="_blank" style="color:#1CC7D0;text-decoration:none;">🧮 Fidelity RMD Calculator (verify amounts)</a><br>
+        <a href="https://www.irs.gov/publications/p590b" target="_blank" style="color:#1CC7D0;text-decoration:none;">IRS Pub 590-B — RMD Calculations</a><br>
+        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/required-minimum-distributions" target="_blank" style="color:#1CC7D0;text-decoration:none;">IRS RMD Overview Page</a><br>
+        <a href="https://www.fidelity.com/calculators-tools/required-minimum-distribution" target="_blank" style="color:#1CC7D0;text-decoration:none;">Fidelity RMD Calculator (verify amounts)</a><br>
         <span style="color:#8aaabb;font-size:10px;">RMD tables change rarely — last updated 2022</span>
       </div>
     </div>
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🔐 Social Security</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Social Security</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.ssa.gov/myaccount/" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 ssa.gov/myaccount — Your SS Statement</a><br>
-        <a href="https://www.ssa.gov/OACT/COLA/colasummary.html" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 SSA COLA History & Current Rate</a><br>
-        <a href="https://www.ssa.gov/benefits/retirement/planner/ageincrease.html" target="_blank" style="color:#1CC7D0;text-decoration:none;">📅 Full Retirement Age by Birth Year</a><br>
+        <a href="https://www.ssa.gov/myaccount/" target="_blank" style="color:#1CC7D0;text-decoration:none;">ssa.gov/myaccount — Your SS Statement</a><br>
+        <a href="https://www.ssa.gov/OACT/COLA/colasummary.html" target="_blank" style="color:#1CC7D0;text-decoration:none;">SSA COLA History & Current Rate</a><br>
+        <a href="https://www.ssa.gov/benefits/retirement/planner/ageincrease.html" target="_blank" style="color:#1CC7D0;text-decoration:none;">Full Retirement Age by Birth Year</a><br>
         <span style="color:#8aaabb;font-size:10px;">Update SS COLA rate in Inputs → Plan Settings</span>
       </div>
     </div>
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">💼 401k / IRA Contribution Limits</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">401k / IRA Contribution Limits</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-401k-and-profit-sharing-plan-contribution-limits" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS 401k Contribution Limits</a><br>
-        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-ira-contribution-limits" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 IRS IRA Contribution Limits</a><br>
-        <a href="https://www.irs.gov/retirement-plans/retirement-plans-faqs-regarding-iras" target="_blank" style="color:#1CC7D0;text-decoration:none;">❓ IRS Roth IRA FAQ</a><br>
+        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-401k-and-profit-sharing-plan-contribution-limits" target="_blank" style="color:#1CC7D0;text-decoration:none;">IRS 401k Contribution Limits</a><br>
+        <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-ira-contribution-limits" target="_blank" style="color:#1CC7D0;text-decoration:none;">IRS IRA Contribution Limits</a><br>
+        <a href="https://www.irs.gov/retirement-plans/retirement-plans-faqs-regarding-iras" target="_blank" style="color:#1CC7D0;text-decoration:none;">IRS Roth IRA FAQ</a><br>
         <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Named Accounts → Annual Contrib</span>
       </div>
     </div>
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏥 ACA / Healthcare Costs</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">ACA / Healthcare Costs</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.healthcare.gov/see-plans/" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔵 HealthCare.gov — Browse Plans & Costs</a><br>
-        <a href="https://www.kff.org/health-reform/state-indicator/marketplace-average-benchmark-premiums/" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 KFF Benchmark Premium Data by State</a><br>
-        <a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" style="color:#1CC7D0;text-decoration:none;">📄 HHS Federal Poverty Level Guidelines</a><br>
+        <a href="https://www.healthcare.gov/see-plans/" target="_blank" style="color:#1CC7D0;text-decoration:none;">HealthCare.gov — Browse Plans & Costs</a><br>
+        <a href="https://www.kff.org/health-reform/state-indicator/marketplace-average-benchmark-premiums/" target="_blank" style="color:#1CC7D0;text-decoration:none;">KFF Benchmark Premium Data by State</a><br>
+        <a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" style="color:#1CC7D0;text-decoration:none;">HHS Federal Poverty Level Guidelines</a><br>
         <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Healthcare section</span>
       </div>
     </div>
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">📉 Inflation Rate</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Inflation Rate</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.bls.gov/cpi/" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 BLS Consumer Price Index (CPI) — Official</a><br>
-        <a href="https://fred.stlouisfed.org/series/CPIAUCSL" target="_blank" style="color:#1CC7D0;text-decoration:none;">📈 FRED CPI Chart (St. Louis Fed)</a><br>
-        <a href="https://www.clevelandfed.org/indicators-and-data/inflation-expectations" target="_blank" style="color:#1CC7D0;text-decoration:none;">🔮 Cleveland Fed Inflation Expectations</a><br>
+        <a href="https://www.bls.gov/cpi/" target="_blank" style="color:#1CC7D0;text-decoration:none;">BLS Consumer Price Index (CPI) — Official</a><br>
+        <a href="https://fred.stlouisfed.org/series/CPIAUCSL" target="_blank" style="color:#1CC7D0;text-decoration:none;">FRED CPI Chart (St. Louis Fed)</a><br>
+        <a href="https://www.clevelandfed.org/indicators-and-data/inflation-expectations" target="_blank" style="color:#1CC7D0;text-decoration:none;">Cleveland Fed Inflation Expectations</a><br>
         <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Plan Settings → Inflation Rate</span>
       </div>
     </div>
 
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">🏠 Real Estate Values</div>
+      <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Real Estate Values</div>
       <div style="font-size:11px;color:#c8dae8;line-height:2;">
-        <a href="https://www.zillow.com" target="_blank" style="color:#1CC7D0;text-decoration:none;">🏠 Zillow — Current Home Estimates</a><br>
-        <a href="https://www.redfin.com" target="_blank" style="color:#1CC7D0;text-decoration:none;">🏠 Redfin — Home Values & Market Data</a><br>
-        <a href="https://www.fhfa.gov/hpi" target="_blank" style="color:#1CC7D0;text-decoration:none;">📊 FHFA House Price Index (annual appreciation)</a><br>
+        <a href="https://www.zillow.com" target="_blank" style="color:#1CC7D0;text-decoration:none;">Zillow — Current Home Estimates</a><br>
+        <a href="https://www.redfin.com" target="_blank" style="color:#1CC7D0;text-decoration:none;">Redfin — Home Values & Market Data</a><br>
+        <a href="https://www.fhfa.gov/hpi" target="_blank" style="color:#1CC7D0;text-decoration:none;">FHFA House Price Index (annual appreciation)</a><br>
         <span style="color:#8aaabb;font-size:10px;">Update in: Inputs → Debts & Real Estate</span>
       </div>
     </div>
 
   </div>
 
-  <div style="margin-top:14px;padding:10px 14px;background:#fff;border-radius:6px;border-left:3px solid #f4b86a;font-size:10px;color:#f4b86a;line-height:1.7;">
-    💡 <strong>Annual Check-In Tip:</strong> Each January, spend 30 minutes updating: (1) SS COLA rate, (2) tax brackets if changed,
-    (3) IRMAA thresholds, (4) account balances, (5) home value from Zillow, (6) mortgage balance from your statement.
-    Your whole plan recalculates automatically. This is the whole point of having a live-connected plan!
+  <div style="margin-top:14px;padding:12px 16px;background:#fdf8ee;border-radius:8px;border-left:4px solid #f4b86a;font-size:12px;color:#455A64;line-height:1.7;text-align:left;">
+    <strong style="color:#b9842f;">Annual check-in tip:</strong> Each January, take a few minutes to update six things: SS COLA rate, tax brackets (if they changed), IRMAA thresholds, account balances, home value from Zillow, and mortgage balance from your statement. Your whole plan recalculates automatically.
   </div>
 </div>
 
 <div style="background:#f0f4f8;border-radius:8px;padding:16px 20px;margin:16px 0;border-left:4px solid #1CC7D0;">
-  <div style="font-size:12px;font-weight:700;color:#041E2F;margin-bottom:8px;">💡 How to Use This Page</div>
+  <div style="font-size:12px;font-weight:700;color:#041E2F;margin-bottom:8px;">How to Use This Page</div>
   <div style="font-size:11px;color:#444;line-height:1.7;">
     <strong>Step 1:</strong> Check your effective tax rate — if it's under 15%, you're in great shape for Roth conversions.<br>
-    <strong>Step 2:</strong> Look at the bracket chart — the orange marker shows where your income sits today.<br>
+    <strong>Step 2:</strong> Look at the bracket chart — the gold marker shows where your income sits today.<br>
     <strong>Step 3:</strong> Use the Roth conversion analysis to see how much you can convert without jumping brackets.<br>
     <strong>Step 4:</strong> Check the IRMAA table — make sure planned conversions won't trigger Medicare surcharges.<br>
     <strong>Step 5:</strong> Review the RMD schedule — know when required distributions begin and plan accordingly.
@@ -1175,7 +1173,7 @@ loadData();
 Not financial advice. Not legal advice. For personal planning purposes only. Always consult a licensed financial advisor before making major retirement decisions. © 2026 RetireBlueprint Pro</div>
 
 <script>
-// ── AUTO-REFRESH: reloads data when Inputs saves ──────────────────
+// AUTO-REFRESH: reloads data when Inputs saves 
 (function() {
   var _loadFn = 'loadData';
   var _hiddenAt = 0;
