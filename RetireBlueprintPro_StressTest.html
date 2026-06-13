@@ -239,7 +239,7 @@ window.addEventListener('storage', function(e) {
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Changelog.html">What's New</a>
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
-  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
+  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 
 
@@ -261,13 +261,13 @@ window.addEventListener('storage', function(e) {
     <div style="font-size:20px;">✅</div>
     <div style="flex:1;">
       <div style="font-weight:800;color:#1CC7D0;margin-bottom:2px;">Your Real Plan Loaded — <span id="loaded-names">—</span></div>
-      <div style="font-size:10px;color:#8aaabb;"><span id="loaded-portfolio">—</span> · All stress scenarios use your actual numbers · <button onclick="loadData()" style="background:transparent;border:none;color:#1CC7D0;font-size:10px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0;">🔄 Reload</button></div>
+      <div style="font-size:10px;color:#8aaabb;"><span id="loaded-portfolio">—</span> · All stress scenarios use your actual numbers · <button onclick="loadData()" style="background:transparent;border:none;color:#1CC7D0;font-size:10px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0;">Reload</button></div>
     </div>
     <div style="font-size:10px;color:#8aaabb;text-align:right;">Base ending should match Dashboard ✓</div>
   </div>
 
   <div id="sample-notice">
-    <div style="font-size:20px;color:var(--teal);">🔔</div>
+    <div style="font-size:20px;color:var(--teal);"></div>
     <div style="flex:1;">
       <span style="font-weight:800;color:var(--teal);">Showing Sample Data</span></div>
       <div style="font-size:10px;color:#8aaabb;">Connect your sheet to stress-test YOUR numbers. <a href="https://retireblueprintpro.com/RetireBlueprintPro_Home.html" style="color:#1CC7D0;">Set up →</a></div>
@@ -298,7 +298,7 @@ window.addEventListener('storage', function(e) {
     <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:10px;min-width:280px;">
 
       <div style="display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.06);border-radius:10px;padding:12px 14px;border:1px solid rgba(28,199,208,.18);">
-        <div style="font-size:20px;flex-shrink:0;">📉</div>
+        <div style="font-size:20px;flex-shrink:0;"></div>
         <div>
           <div style="font-size:11px;font-weight:900;color:#fff;margin-bottom:3px;">Pick a Crash Scenario</div>
           <div style="font-size:10.5px;color:#b8dde6;line-height:1.55;">Choose a preset (2008, stagflation, COVID) or dial in your own with the sliders below.</div>
@@ -313,10 +313,10 @@ window.addEventListener('storage', function(e) {
     </div>
   </div>
 <div style="margin:14px 0;padding:12px 16px;background:rgba(244,184,106,.10);border:1px solid rgba(244,184,106,.45);border-radius:8px;font-size:12px;color:#7a4e00;line-height:1.65;">
-    🧪 <strong>This is a safe what-if sandbox.</strong> Everything here is layered on your saved numbers just for testing &mdash; it never changes your real plan. To change your plan for keeps, edit it on the <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" style="color:#0c7b84;font-weight:700;">Inputs page</a> and Save.
+    <strong>This is a safe what-if sandbox.</strong> Everything here is layered on your saved numbers just for testing &mdash; it never changes your real plan. To change your plan for keeps, edit it on the <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" style="color:#0c7b84;font-weight:700;">Inputs page</a> and Save.
   </div>
 <div id="plan-fingerprint">
-    <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔍 Your Plan Fingerprint — Confirm This Is Your Data</div>
+    <div style="font-size:9px;font-weight:800;color:#1CC7D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Your Plan Fingerprint — Confirm This Is Your Data</div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
       <div class="fp-cell"><div class="fp-label">Portfolio</div><div class="fp-val" id="fp-portfolio">—</div><div class="fp-note">Starting</div></div>
       <div class="fp-cell"><div class="fp-label">Legacy Goal</div><div class="fp-val" id="fp-legacy" style="color:#f4b86a;">—</div><div class="fp-note">Target end</div></div>
@@ -333,7 +333,7 @@ window.addEventListener('storage', function(e) {
 
   <!-- Bottom strip: key insight -->
   <div style="margin-top:20px;padding:11px 16px;background:rgba(28,199,208,.07);border:1px solid rgba(28,199,208,.28);border-radius:8px;font-size:11.5px;color:#2c4a57;line-height:1.65;position:relative;">
-    <strong style="color:#0c7b84;">📖 Why Year 1 is the worst timing:</strong>
+    <strong style="color:#0c7b84;">Why Year 1 is the worst timing:</strong>
     A crash early in retirement forces you to sell at the bottom while withdrawing — those shares never recover.
     The same crash in Year 20 barely dents your plan because you had 20 years of growth first.
   </div>
@@ -357,12 +357,12 @@ window.addEventListener('storage', function(e) {
     Pick a preset or dial in your own downturn with the sliders, then press <b>▶ Run New Test</b>.
   </div>
   <div class="scenario-tabs">
-    <button class="tab-btn active" onclick="setScenario('custom')">🎛️ Custom</button>
-    <button class="tab-btn" onclick="setScenario('crash2008')">📉 2008 Crisis</button>
-    <button class="tab-btn" onclick="setScenario('dotcom')">💻 Dot-Com Bust</button>
-    <button class="tab-btn" onclick="setScenario('covid')">🦠 COVID 2020</button>
-    <button class="tab-btn" onclick="setScenario('stagflation')">📈 1970s Stagflation</button>
-    <button class="tab-btn" onclick="setScenario('bestcase')">🚀 Bull Market</button>
+    <button class="tab-btn active" onclick="setScenario('custom')">Custom</button>
+    <button class="tab-btn" onclick="setScenario('crash2008')">2008 Crisis</button>
+    <button class="tab-btn" onclick="setScenario('dotcom')">Dot-Com Bust</button>
+    <button class="tab-btn" onclick="setScenario('covid')">COVID 2020</button>
+    <button class="tab-btn" onclick="setScenario('stagflation')">1970s Stagflation</button>
+    <button class="tab-btn" onclick="setScenario('bestcase')">Bull Market</button>
   </div>
 
   
@@ -371,9 +371,9 @@ window.addEventListener('storage', function(e) {
 
     <!-- SLIDERS -->
     <div class="sliders-panel">
-      <div class="panel-title">🎛️ Scenario Parameters</div>
+      <div class="panel-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>Scenario Parameters</div>
       <div style="margin:4px 0 12px;font-size:10.5px;line-height:1.5;color:#37474f;background:#fff7ec;border-left:3px solid #f4b86a;border-radius:6px;padding:8px 10px;">
-        ▶ Your test starts at your <b>base plan (0% — no crash)</b>. Move the sliders below to model a downturn. The <b>🛡️ −30% Crash</b> card up top is a <b>fixed worst-case reference</b>, not the current setting.
+        ▶ Your test starts at your <b>base plan (0% — no crash)</b>. Move the sliders below to model a downturn. The <b>−30% Crash</b> card up top is a <b>fixed worst-case reference</b>, not the current setting.
       </div>
 
       <div class="slider-group">
@@ -442,7 +442,7 @@ window.addEventListener('storage', function(e) {
     <!-- CRASH IMPACT CHART -->
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line);">
       <div style="font-size:9.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">
-        📉 Return Assumptions — Year by Year
+        Return Assumptions — Year by Year
         <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#92a1b2;font-size:9px;margin-left:8px;">Red bars = crash years · Your plan must survive these</span>
       </div>
       <div style="height:90px;position:relative;">
@@ -465,7 +465,7 @@ window.addEventListener('storage', function(e) {
 @media(max-width:520px){#es-slots{grid-template-columns:1fr !important;}}
 </style>
 <div style="margin-top:4px;" id="stress-kpi-block">
-  <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;">📊 Stress Test Result — at a glance</div>
+  <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;">Stress Test Result — at a glance</div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" id="stress-kpi-grid">
 
     <!-- 1 Base ending -->
@@ -512,10 +512,10 @@ window.addEventListener('storage', function(e) {
     <div id="verdict-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;">—</div>
     <div id="verdict-detail" style="font-size:11.5px;color:#b8dde6;line-height:1.7;"></div>
     <div id="recs-section" style="display:none;margin-top:12px;">
-      <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">💡 Top Actions</div>
+      <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">Top Actions</div>
       <div id="recs-list" style="font-size:11px;color:#e0f0f4;line-height:2.0;"></div>
     </div>
-    <div style="margin-top:12px;font-size:10.5px;color:#7ecfda;line-height:1.6;">Want to change your plan based on what you see here? <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:700;">Edit it in Inputs</a>, Save, then click 🔄 Reload Data above.</div>
+    <div style="margin-top:12px;font-size:10.5px;color:#7ecfda;line-height:1.6;">Want to change your plan based on what you see here? <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" style="color:#1CC7D0;font-weight:700;">Edit it in Inputs</a>, Save, then click Reload Data above.</div>
   </div>
 </div>
 
@@ -536,7 +536,7 @@ window.addEventListener('storage', function(e) {
 <!-- ════ SAVED TESTS (comparison of your real-engine runs) ════ -->
 <div id="saved-tests-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #f4b86a;overflow:hidden;box-shadow:0 6px 22px rgba(4,30,47,.3);">
   <div style="padding:20px 22px 6px;">
-    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">🎯 Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
+    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
     <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">Every time you press <strong style="color:#cfe3ef;">▶ Run New Test</strong> above, that result saves here so you can compare your scenarios side by side — including any with a second, later crash.</div>
   </div>
 
@@ -621,7 +621,7 @@ window.addEventListener('storage', function(e) {
     <!-- Left: title + what it is -->
     <div style="flex:1;min-width:280px;">
       <div style="margin-bottom:8px;"><span style="display:inline-block;background:#f4b86a;color:#041E2F;font-size:9px;font-weight:900;letter-spacing:.8px;padding:2px 9px;border-radius:10px;">TEST 2 · MONTE CARLO</span></div>
-      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px;margin-bottom:10px;">🎲 Monte Carlo Simulation</div>
+      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px;margin-bottom:10px;">Monte Carlo Simulation</div>
       <div style="font-size:13px;color:#b8dde6;line-height:1.75;max-width:520px;">
         The scenarios above each test <strong style="color:#fff;">one specific crash you define.</strong>
         But which sequence of returns would you actually get in retirement?
@@ -681,7 +681,7 @@ window.addEventListener('storage', function(e) {
       <!-- Header -->
       <div style="background:linear-gradient(90deg,#041E2F,#0d2d45);padding:18px 22px;border-bottom:1px solid #1a3a52;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
         <div>
-          <div style="font-size:16px;font-weight:900;color:#ffffff;letter-spacing:-0.3px;">🎲 Monte Carlo Simulation</div>
+          <div style="font-size:16px;font-weight:900;color:#ffffff;letter-spacing:-0.3px;">Monte Carlo Simulation</div>
           
       <!-- MC Explainer -->
       
@@ -752,7 +752,7 @@ window.addEventListener('storage', function(e) {
             <p style="margin:0 0 6px;"><strong style="color:#f4b86a;">Never ran out of money</strong> &mdash; the share of those 1,000 futures where your money lasted your whole life. This is the number most planning tools lead with.</p>
             <p style="margin:0 0 6px;"><strong style="color:#1CC7D0;">Success rate</strong> &mdash; a stricter bar: futures where you not only didn't run out, but finished with your full legacy goal still intact.</p>
             <p style="margin:0 0 6px;"><strong>Median</strong> &mdash; the middle outcome: half the futures did better, half did worse.</p>
-            <p style="margin:0;"><strong style="color:#ff9f43;">P10 / P90</strong> &mdash; your unlucky and lucky edges. P10 is the result only the worst 10% of futures fell below; P90 is the result only the best 10% beat. A wide gap means your outcome rides heavily on market luck.</p>
+            <p style="margin:0;"><strong style="color:#f4b86a;">P10 / P90</strong> &mdash; your unlucky and lucky edges. P10 is the result only the worst 10% of futures fell below; P90 is the result only the best 10% beat. A wide gap means your outcome rides heavily on market luck.</p>
           </div>
         </details>
 
@@ -779,21 +779,21 @@ window.addEventListener('storage', function(e) {
                 <div style="font-size:10px;color:#9fc1d6;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Median Ending Balance</div>
                 <div id="mc-median" style="font-size:18px;font-weight:800;color:#1CC7D0;margin-top:2px;">—</div>
               </div>
-              <div style="font-size:18px;">📊</div>
+              <div style="font-size:18px;"></div>
             </div>
             <div style="background:#061620;border-radius:8px;border:1px solid #1a3a52;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
               <div>
                 <div style="font-size:10px;color:#9fc1d6;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Worst 10% Scenario (P10)</div>
-                <div id="mc-p10" style="font-size:18px;font-weight:800;color:#ff9f43;margin-top:2px;">—</div>
+                <div id="mc-p10" style="font-size:18px;font-weight:800;color:#f4b86a;margin-top:2px;">—</div>
               </div>
-              <div style="font-size:18px;">📉</div>
+              <div style="font-size:18px;"></div>
             </div>
             <div style="background:#061620;border-radius:8px;border:1px solid #1a3a52;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
               <div>
                 <div style="font-size:10px;color:#9fc1d6;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Best 10% Scenario (P90)</div>
                 <div id="mc-p90" style="font-size:18px;font-weight:800;color:#1CC7D0;margin-top:2px;">—</div>
               </div>
-              <div style="font-size:18px;">📈</div>
+              <div style="font-size:18px;"></div>
             </div>
           </div>
 
@@ -1157,7 +1157,7 @@ function recalc() {
   var _scen=document.getElementById('active-scenario-label');
   if(_scen){
     if(yr1===0 && sp===0 && Math.abs(inf-(gi.inflation||0.03)*100)<0.05){ _scen.textContent='✅ Base case (no stress applied)'; _scen.style.color='#1CC7D0'; }
-    else { _scen.textContent='⚡ Scenario set — press ▶ Run New Test for your real result'; _scen.style.color='#f4b86a'; }
+    else { _scen.textContent='Scenario set — press ▶ Run New Test for your real result'; _scen.style.color='#f4b86a'; }
   }
   updateFingerprint(baseRes);
   rbpDrawBars(yr1, yrs, baseRes);
@@ -1476,7 +1476,7 @@ function rbpStressPending(baseRes){
 function runNewTest(){
   var st=document.getElementById('run-status');
   var btn=document.getElementById('run-new-test-btn');
-  if(!planData){ if(st){st.style.display='block';st.innerHTML='<span style="color:#ff6b6b;">Load your plan first (🔄 Reload above).</span>';} return; }
+  if(!planData){ if(st){st.style.display='block';st.innerHTML='<span style="color:#ff6b6b;">Load your plan first (Reload above).</span>';} return; }
   var yr1=parseInt(document.getElementById('sl-yr1').value);
   var yrs=parseInt(document.getElementById('sl-yrs').value);
   var inf=parseFloat(document.getElementById('sl-inf').value);
@@ -1642,7 +1642,7 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
 }
 
 function runEngineStressTest() {
-  if(!planData){ esShowErr('Load your plan first (🔄 Reload above).'); return; }
+  if(!planData){ esShowErr('Load your plan first (Reload above).'); return; }
   var btn=document.getElementById('es-run-btn');
   var warn=document.getElementById('es-warning');
   document.getElementById('es-error').style.display='none';
@@ -1691,7 +1691,7 @@ function esRenderSlots() {
     var enDelta = (base.ending!=null && r.ending!=null) ? (r.ending-base.ending) : null;
     var spColor = spDelta==null?'#9fc1d6':(spDelta<0?'#f4b86a':'#1CC7D0');
     var enColor = enDelta==null?'#9fc1d6':(enDelta<0?'#f4b86a':'#1CC7D0');
-    var belowTxt = r.belowYear ? ('<span style="color:#ff9f43;">Drops below legacy goal in <strong>'+r.belowYear+'</strong></span>')
+    var belowTxt = r.belowYear ? ('<span style="color:#f4b86a;">Drops below legacy goal in <strong>'+r.belowYear+'</strong></span>')
                                : ('<span style="color:#1CC7D0;">Stays at/above legacy goal throughout ✓</span>');
     var pTxt = 'Early: '+(Number(p.eDur)>0&&Number(p.eDrag)>0?(p.eDrag+'% for '+p.eDur+'yr from '+p.eStart):'none');
     if(Number(p.lDur)>0 && Number(p.lDrag)>0) pTxt += ' · Late: '+p.lDrag+'% for '+p.lDur+'yr from '+p.lStart;
@@ -1822,7 +1822,7 @@ function mcRandReturn(model, mu, sigma) {
 
 function runMonteCarlo() {
   if (!planData) {
-    alert('Load your plan data first by clicking 🔄 Reload Data above.');
+    alert('Load your plan data first by clicking Reload Data above.');
     return;
   }
 
@@ -2583,7 +2583,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
     }
   }
   document.getElementById('mc-median').textContent = fmt(p50);
-  document.getElementById('mc-p10').textContent = p10 > 0 ? fmt(p10) : '💀 Depleted';
+  document.getElementById('mc-p10').textContent = p10 > 0 ? fmt(p10) : 'Depleted';
   document.getElementById('mc-p90').textContent = fmt(p90);
 
   // ── Breakdown bars ────────────────────────────────────────
@@ -2629,7 +2629,7 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
 
   // ── Context panel: what does this mean in REAL numbers ────
   var contextHtml = '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.22);border-radius:12px;padding:16px;margin-bottom:16px;">' +
-    '<div style="font-size:10px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">📋 What Your Simulation Actually Ran</div>' +
+    '<div style="font-size:10px;font-weight:700;color:#9fc1d6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">What Your Simulation Actually Ran</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">' +
     contextRow('Simulation period', startYear + ' → ' + endYearLabel + ' (' + yrs + ' years)') +
     contextRow(p1Name + ' lifespan modeled', 'Age ' + p1Age + ' → ' + p1DeathAge + ' (year ' + (curYear + p1DeathAge - p1Age) + ')') +
