@@ -23,13 +23,13 @@
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:'Segoe UI',system-ui,sans-serif; background:#F8F9FA; color:#fff; min-height:100vh; }
 
-  /* ── HEADER ── */
+  /* HEADER */
   
   .demo-title { font-size:14px; font-weight:800; color:var(--teal); text-transform:uppercase; letter-spacing:1px; }
   .demo-badge { background:var(--orange); color:var(--navy); font-size:10px; font-weight:800; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:1px; }
   .buy-btn { background:var(--teal); color:var(--navy); font-weight:800; padding:10px 20px; border-radius:6px; text-decoration:none; font-size:12px; white-space:nowrap; }
 
-  /* ── HERO ── */
+  /* HERO */
   .demo-hero { background:linear-gradient(135deg,#041E2F,#0d2d44); padding:30px 24px; text-align:center; border-bottom:1px solid #1a3a52; }
   .demo-hero h1 { font-size:26px; font-weight:900; margin-bottom:8px; }
   .demo-hero h1 span { color:var(--teal); }
@@ -39,13 +39,13 @@
   .persona-btn:hover { border-color:var(--teal); color:var(--teal); }
   .persona-btn.active { background:var(--teal); border-color:var(--teal); color:var(--navy); }
 
-  /* ── LAYOUT ── */
+  /* LAYOUT */
   .demo-body { max-width:1200px; margin:0 auto; padding:20px; }
   .demo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
   .demo-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
   .demo-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
 
-  /* ── CARDS ── */
+  /* CARDS */
   .card { background:#0A3145; border-radius:10px; padding:16px; border:1px solid #1a3a52; }
   .card-title { font-size:10px; font-weight:800; color:var(--teal); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
   .big-num { font-size:28px; font-weight:900; color:#fff; line-height:1; }
@@ -56,10 +56,10 @@
   .badge-green { background:rgba(76,175,80,0.2); color:#1CC7D0; font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
   .badge-orange { background:rgba(244,184,106,0.2); color:var(--orange); font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
 
-  /* ── CHART AREA ── */
+  /* CHART AREA */
   .chart-area { height:180px; position:relative; }
 
-  /* ── CONTROLS ── */
+  /* CONTROLS */
   .controls { background:#061620; border-radius:10px; padding:16px; margin-bottom:16px; border:2px solid var(--orange); }
   .controls-title { font-size:11px; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
   .ctrl-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
@@ -67,13 +67,13 @@
   .ctrl-item input[type=range] { width:100%; accent-color:var(--teal); }
   .ctrl-val { font-size:14px; font-weight:700; color:var(--teal); margin-top:2px; }
 
-  /* ── FIRE PANEL ── */
+  /* FIRE PANEL */
   .fire-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
   .fire-box { background:rgba(0,0,0,0.3); border-radius:8px; padding:10px; text-align:center; }
   .fire-label { font-size:8px; color:#8aaabb; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
   .fire-val { font-size:18px; font-weight:800; }
 
-  /* ── CTA ── */
+  /* CTA */
   .cta-banner { background:#041E2F; border-radius:12px; padding:28px 24px; text-align:center; margin-top:20px; border-top:3px solid #f4b86a; }
   .cta-banner h2 { font-size:20px; font-weight:900; color:#fff; margin-bottom:8px; }
   .cta-banner p { font-size:12px; color:#8aaabb; margin-bottom:16px; line-height:1.7; }
@@ -81,7 +81,7 @@
   .cta-btn-primary { background:#1CC7D0; color:#041E2F; font-weight:800; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:13px; }
   .cta-btn-secondary { background:transparent; color:#f4b86a; border:2px solid #f4b86a; font-weight:700; padding:12px 22px; border-radius:8px; text-decoration:none; font-size:13px; }
 
-  /* ── FEATURE LIST ── */
+  /* FEATURE LIST */
   .feature-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
   .feature-item { display:flex; align-items:center; gap:8px; font-size:11px; color:#d8eaf5; }
 
@@ -96,7 +96,7 @@
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
-// ── DYNAMIC PARTNER NAMES ─────────────────────────────────
+// DYNAMIC PARTNER NAMES 
 function rbpApplyNames(p1, p2) {
   p1 = p1 || localStorage.getItem('rbp_p1_name') || 'Partner 1';
   p2 = p2 || localStorage.getItem('rbp_p2_name') || 'Partner 2';
@@ -157,11 +157,11 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 <div style="background:#041E2F;border-bottom:3px solid #1CC7D0;padding:10px 24px;display:flex;align-items:center;gap:16px;flex-wrap:nowrap;">
   <div style="flex:1;min-width:0;">
-    <div style="font-size:14px;font-weight:800;color:#fff;">🎬 Live Interactive Demo</div>
+    <div style="font-size:14px;font-weight:800;color:#fff;">Live interactive demo</div>
     <div style="font-size:11px;color:#8aaabb;">Sample data — connect your sheet to see your real numbers</div>
   </div>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Home.html" style="flex-shrink:0;background:#1CC7D0;color:#041E2F;font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Connect My Sheet →</a>
@@ -172,10 +172,10 @@ window.addEventListener('storage', function(e) {
   <h1>See Your Retirement Plan <span>Come to Life</span></h1>
   <p>This is a live interactive demo using sample data. Drag the sliders to see how your plan changes in real-time. Your real plan connects to your own Google Sheet.</p>
   <div class="persona-tabs">
-    <button class="persona-btn active" onclick="loadPersona('traditional')">👔 Traditional Retiree<br><span style="font-size:9px;font-weight:400;">Age 63/55 · SS + 401k</span></button>
-    <button class="persona-btn" onclick="loadPersona('fire')">🔥 Early FIRE Retiree<br><span style="font-size:9px;font-weight:400;">Age 45/42 · Retiring Now</span></button>
-    <button class="persona-btn" onclick="loadPersona('single')">👤 Single Retiree<br><span style="font-size:9px;font-weight:400;">Age 60 · Pension + IRA</span></button>
-    <button class="persona-btn" onclick="loadPersona('fatfire')">🥩 Fat FIRE<br><span style="font-size:9px;font-weight:400;">Age 55/52 · $3M Portfolio</span></button>
+    <button class="persona-btn active" onclick="loadPersona('traditional')">Traditional Retiree<br><span style="font-size:9px;font-weight:400;">Age 63/55 · SS + 401k</span></button>
+    <button class="persona-btn" onclick="loadPersona('fire')">Early FIRE Retiree<br><span style="font-size:9px;font-weight:400;">Age 45/42 · Retiring Now</span></button>
+    <button class="persona-btn" onclick="loadPersona('single')">Single Retiree<br><span style="font-size:9px;font-weight:400;">Age 60 · Pension + IRA</span></button>
+    <button class="persona-btn" onclick="loadPersona('fatfire')">Fat FIRE<br><span style="font-size:9px;font-weight:400;">Age 55/52 · $3M Portfolio</span></button>
   </div>
 </div>
 
@@ -183,7 +183,7 @@ window.addEventListener('storage', function(e) {
 
   <!-- LIVE CONTROLS -->
   <div class="controls">
-    <div class="controls-title">🎛️ Play With It — Drag Sliders to See Your Plan Change Live</div>
+    <div class="controls-title">Adjust the sliders to see your plan change</div>
     <div class="ctrl-grid">
       <div class="ctrl-item">
         <label>Annual Spending ($)</label>
@@ -236,25 +236,25 @@ window.addEventListener('storage', function(e) {
   <!-- CHARTS ROW -->
   <div class="demo-grid">
     <div class="card">
-      <div class="card-title">📊 Portfolio Sustainability</div>
+      <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="10" width="3.2" height="7" rx="0.6"/><rect x="10.4" y="6" width="3.2" height="11" rx="0.6"/><rect x="14.8" y="13" width="3.2" height="4" rx="0.6"/></svg></span>Portfolio Sustainability</div>
       <div class="chart-area"><canvas id="chart-portfolio"></canvas></div>
       <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;" id="chart-portfolio-note">—</div>
     </div>
     <div class="card">
-      <div class="card-title">🪣 Tax Bucket Evolution</div>
+      <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>Tax Bucket Evolution</div>
       <div class="chart-area"><canvas id="chart-buckets"></canvas></div>
       <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;">Pre-Tax heavy → Roth grows via conversions</div>
     </div>
     <div class="card">
-      <div class="card-title">💵 Income Bridge</div>
+      <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1.5" x2="12" y2="22.5"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Income Bridge</div>
       <div class="chart-area"><canvas id="chart-income"></canvas></div>
       <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;" id="chart-income-note">—</div>
     </div>
   </div>
 
   <!-- FIRE PANEL -->
-  <div class="card" style="margin-bottom:16px;border-color:rgba(255,159,67,0.4);">
-    <div class="card-title">🔥 FIRE Intelligence</div>
+  <div class="card" style="margin-bottom:16px;border-color:rgba(28,199,208,0.4);">
+    <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></svg></span>FIRE Intelligence</div>
     <div class="fire-grid">
       <div class="fire-box">
         <div class="fire-label">Safe Withdrawal Rate</div>
@@ -273,15 +273,15 @@ window.addEventListener('storage', function(e) {
       </div>
       <div class="fire-box">
         <div class="fire-label">Coast FIRE Number</div>
-        <div class="fire-val" id="d-coast" style="color:#c39bd3;">—</div>
+        <div class="fire-val" id="d-coast" style="color:var(--orange);">—</div>
         <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-coast-note">—</div>
       </div>
     </div>
   </div>
 
   <!-- STRESS TEST -->
-  <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,#1a0808,#2a1010);border-color:rgba(255,107,107,0.3);">
-    <div class="card-title" style="color:#ff6b6b;">⚡ Stress Test — Sequence of Returns Risk</div>
+  <div class="card" style="margin-bottom:16px;border-color:rgba(28,199,208,0.3);">
+    <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span>Stress Test — Sequence of Returns Risk</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
       <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
         <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">Base Scenario</div>
@@ -308,11 +308,11 @@ window.addEventListener('storage', function(e) {
 
   <!-- CTA -->
   <div class="cta-banner">
-    <h2>Ready to See YOUR Numbers?</h2>
-    <p>This demo uses sample data. Your real plan connects to your own private Google Sheet — your actual accounts, your Social Security, your spending, your legacy goal. Up to 100-year projection, Roth conversion optimizer, stress testing, and a printable PDF summary your financial advisor will actually read.</p>
+    <h2>Ready to see your numbers?</h2>
+    <p>This demo uses sample data. Your real plan connects to your own private Google Sheet — your actual accounts, your Social Security, your spending, your legacy goal. Up to 100-year projection, Roth conversion optimizer, stress testing, and a printable PDF summary your financial advisor will read.</p>
     <div class="cta-btns">
-      <a href="https://www.etsy.com/your-listing-url" target="_blank" class="cta-btn-primary">🛒 Get RetireBlueprint Pro on Etsy</a>
-      <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html" class="cta-btn-secondary">📖 See Full Feature List</a>
+      <a href="https://www.etsy.com/your-listing-url" target="_blank" class="cta-btn-primary">Get RetireBlueprint Pro on Etsy</a>
+      <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_SetupGuide.html" class="cta-btn-secondary">See the full feature list</a>
     </div>
     <div class="feature-list" style="max-width:500px;margin:16px auto 0;">
       <div class="feature-item">✅ Up to 100-year projection</div>
@@ -333,7 +333,7 @@ window.addEventListener('storage', function(e) {
 </div>
 
 <script>
-// ── PERSONAS ──────────────────────────────────────────────────────
+// PERSONAS 
 var PERSONAS = {
   traditional: {
     name:'Alex & Jordan', p1age:63, p2age:55, portfolio:925000,
@@ -397,7 +397,7 @@ function recalc() {
   document.getElementById('ctrl-inflation-val').textContent = (p.inflation*100).toFixed(1)+'%';
   document.getElementById('ctrl-retage-val').textContent = 'Age '+p.retAge;
 
-  // ── PROJECTION ──────────────────────────────────────────────────
+  // PROJECTION 
   var yrs = 50;
   var years = [], portfolioVals = [], preTaxVals = [], rothVals = [], taxableVals = [];
   var bal = p.portfolio;
@@ -445,7 +445,7 @@ function recalc() {
   var endBal = portfolioVals[portfolioVals.length-1];
   var conf = p.legacyGoal > 0 ? Math.min(100, Math.round(endBal/p.legacyGoal*100)) : 100;
 
-  // ── KPIs ──────────────────────────────────────────────────────
+  // KPIs 
   document.getElementById('d-confidence').textContent = conf+'%';
   document.getElementById('d-confidence').style.color = conf>=100?'#1CC7D0':conf>=80?'#f4b86a':'#ff6b6b';
   document.getElementById('d-confidence-sub').textContent = conf>=100?'Legacy goal fully funded':conf+'% of legacy goal funded';
@@ -458,7 +458,7 @@ function recalc() {
   document.getElementById('d-ending').style.color = endBal >= p.legacyGoal ? '#1CC7D0' : '#f4b86a';
   document.getElementById('d-ending-sub').textContent = endBal>=p.legacyGoal ? '✅ Legacy goal met' : '⚠️ '+fmt(p.legacyGoal)+' goal';
 
-  // ── FIRE METRICS ────────────────────────────────────────────────
+  // FIRE METRICS 
   var gap = Math.max(0, p.spend - (p.ss + p.pension*12));
   var swr = p.portfolio > 0 && gap > 0 ? Math.round(gap/p.portfolio*1000)/10 : 0;
   var swrEl = document.getElementById('d-swr');
@@ -471,7 +471,7 @@ function recalc() {
   for (var fi=0;fi<portfolioVals.length;fi++) { if(portfolioVals[fi]>=fiTarget){fiYear=curYear+fi;break;} }
   if (!fiYear && p.portfolio>=fiTarget) fiYear = curYear;
   var fiEl = document.getElementById('d-fi-date');
-  if (fiYear && fiYear<=curYear) { fiEl.textContent='Already FI! 🎉'; fiEl.style.color='#1CC7D0'; document.getElementById('d-fi-note').textContent='You have reached financial independence'; }
+  if (fiYear && fiYear<=curYear) { fiEl.textContent='Already FI'; fiEl.style.color='#1CC7D0'; document.getElementById('d-fi-note').textContent='You have reached financial independence'; }
   else if (fiYear) { fiEl.textContent=fiYear; fiEl.style.color='#f4b86a'; document.getElementById('d-fi-note').textContent=p.label+' · age '+(p.p1age+(fiYear-curYear)); }
   else { fiEl.textContent='—'; fiEl.style.color='#ff6b6b'; document.getElementById('d-fi-note').textContent='Target: '+fmt(fiTarget); }
 
@@ -479,16 +479,16 @@ function recalc() {
   if(p.spend<30000){ftEl.textContent='Lean FIRE';ftEl.style.color='#1CC7D0';document.getElementById('d-fire-type-note').textContent='Under $30K/yr';}
   else if(p.spend<60000){ftEl.textContent='Regular FIRE';ftEl.style.color='#1CC7D0';document.getElementById('d-fire-type-note').textContent='$30K–$60K/yr';}
   else if(p.spend<100000){ftEl.textContent='FIRE';ftEl.style.color='#f4b86a';document.getElementById('d-fire-type-note').textContent='$60K–$100K/yr';}
-  else{ftEl.textContent='Fat FIRE 🥩';ftEl.style.color='#ff9f43';document.getElementById('d-fire-type-note').textContent='Over $100K/yr';}
+  else{ftEl.textContent='Fat FIRE';ftEl.style.color='#ff9f43';document.getElementById('d-fire-type-note').textContent='Over $100K/yr';}
 
   var yrsToRet = Math.max(1, p.retAge - p.p1age + 5);
   var coast = fiTarget > 0 ? Math.round(fiTarget/Math.pow(1+p.ret,yrsToRet)) : 0;
   var coastEl = document.getElementById('d-coast');
   coastEl.textContent = coast>0?fmt(coast):'—';
   if(p.portfolio>=coast&&coast>0){coastEl.style.color='#1CC7D0';document.getElementById('d-coast-note').textContent='✅ Already coasting!';}
-  else{coastEl.style.color='#c39bd3';document.getElementById('d-coast-note').textContent=coast>0?fmt(coast-p.portfolio)+' to coast':'—';}
+  else{coastEl.style.color='#f4b86a';document.getElementById('d-coast-note').textContent=coast>0?fmt(coast-p.portfolio)+' to coast':'—';}
 
-  // ── STRESS TEST ─────────────────────────────────────────────────
+  // STRESS TEST 
   var stressNote = function(val,goal) {
     if(val>=goal&&goal>0) return {txt:'✅ Goal met',col:'#1CC7D0'};
     if(val>0) return {txt:'⚠️ '+fmt(goal-val)+' short',col:'#f4b86a'};
@@ -507,7 +507,7 @@ function recalc() {
     else document.getElementById('d-stress-base-note').textContent = note.txt;
   });
 
-  // ── CHARTS ──────────────────────────────────────────────────────
+  // CHARTS 
   var step = Math.ceil(yrs/10);
   var dispIdx = [], dispYrs = [];
   for(var i=0;i<yrs;i+=step){dispIdx.push(i);dispYrs.push(years[i]);}
@@ -570,11 +570,11 @@ function recalc() {
   document.getElementById('chart-income-note').textContent = yr1gap > 0 ? 'Year 1 gap: '+fmt(yr1gap)+' funded by portfolio' : 'Income covers all expenses ✅';
 }
 
-// ── INIT ────────────────────────────────────────────────────────
+// INIT 
 loadPersona('traditional');
 </script>
 
-<div style="text-align:center;padding:8px 0;"><a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="font-size:11px;color:#6a8a9a;text-decoration:none;">📋 What's New</a></div>
+<div style="text-align:center;padding:8px 0;"><a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html" style="font-size:11px;color:#6a8a9a;text-decoration:none;">What's New</a></div>
 <script>
 /* mobile: wrap tables so wide ones scroll inside their own box instead of pushing the page wide */
 (function(){function w(){document.querySelectorAll('table').forEach(function(t){var p=t.parentElement;if(p&&p.classList&&p.classList.contains('rbp-tscroll'))return;var d=document.createElement('div');d.className='rbp-tscroll';t.parentNode.insertBefore(d,t);d.appendChild(t);});}
