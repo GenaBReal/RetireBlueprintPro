@@ -423,7 +423,7 @@ window.addEventListener('storage', function(e) {
       <div style="font-size:11px;color:#00838f;line-height:1.7;">
         <strong>Plan Confidence</strong> — Whether your plan funds the longer-lived partner for life (without running out). Your legacy goal is tracked separately. ·
         <strong>Safe Spending</strong> — Maximum annual spend while still meeting your legacy goal. ·
-        <strong>Withdrawal Rate</strong> — How much of your portfolio you draw each year vs. the classic 4% rule. ·
+        <strong>Withdrawal Rate</strong> — what you draw from your portfolio in the selected year (the planning-style 4%-rule number lives in the FIRE panel). ·
         <strong>Survivor Runway</strong> — Years the plan covers the longer-lived partner. ·
         Press <strong>Cmd+Shift+R</strong> (Mac) or <strong>Ctrl+Shift+R</strong> (Windows) after saving Inputs to refresh all charts.
       </div>
@@ -494,7 +494,7 @@ window.addEventListener('storage', function(e) {
 
   <div class="kpi-card">
     <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#2E7D5B;"></span>Withdrawal Rate <span class="tooltip-icon" data-tip="The share of your investment portfolio you draw in a typical full-retirement year (portfolio withdrawal ÷ portfolio balance). The classic '4% rule' suggests ~4% is a sustainable starting point. Lower is more conservative; guaranteed income like Social Security and pensions reduces how much you need to pull." style="font-size:9px;">?</span></div>
+      <div class="kc-title"><span class="kc-dot" style="background:#2E7D5B;"></span>Withdrawal Rate <span class="tooltip-icon" data-tip="This is the withdrawal rate for the year selected above — the actual amount pulled from your portfolio that year (including taxes and any extra spending) divided by the balance at the start of that year. It changes as you move through the years. Think of it as 'how hard am I drawing right now.' This is NOT the 4% rule itself — for the classic 4%-rule planning number, see the Safe Withdrawal Rate in the FIRE panel below." style="font-size:9px;">?</span></div>
       <div class="kc-value" id="kpi-wdraw">—</div>
       <div class="kc-sub" id="kpi-wdraw-sub">Portfolio draw · typical retirement year</div>
       <div class="kc-delta-up" id="kpi-wdraw-delta">—</div>
@@ -701,7 +701,7 @@ window.addEventListener('storage', function(e) {
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
     <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #1CC7D0;">
       <div style="font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Safe Withdrawal Rate
-        <span class="tooltip-icon" data-tip="Your planned annual withdrawal from portfolio divided by total portfolio. The 4% rule says this should be at or under 4% for a 30-year retirement. Lower = safer.">?</span>
+        <span class="tooltip-icon" data-tip="The industry-standard 'safe withdrawal rate': your planned annual spending minus guaranteed income (Social Security, pensions), divided by your total portfolio. The 4% rule (Bengen / Trinity Study) says ~4% is a sustainable starting point for a 30-year retirement — taken in year one, then the dollar amount rises with inflation. It's the same idea as FIRE's '25× your expenses' target (1 ÷ 4% = 25). Many early retirees use a more cautious 3.25–3.5%. Lower = safer.">?</span>
       </div>
       <div style="font-size:20px;font-weight:800;" id="fire-swr">—</div>
       <div style="font-size:9px;margin-top:3px;" id="fire-swr-note">—</div>
@@ -1242,44 +1242,12 @@ function populate(d){
   set('kpi-tax-foot', 'State: '+fmtP(tax.stateRate)+' · Deduction: '+fmt(gl.standardDeduction));
   var tb=$s('kpi-tax-bar'); if(tb) tb.style.width=Math.min(100,(tax.effectiveRate<1?tax.effectiveRate*100:tax.effectiveRate)*3)+'%';
 
-  // ── WITHDRAWAL RATE vs the 4% rule ───────────────────────────────────
-  // True portfolio withdrawal rate = portfolio withdrawal ÷ portfolio balance.
-  // We pick the first year the plan actually draws from the portfolio (first
-  // positive withdrawal) — that's the meaningful "retirement" rate to compare
-  // against the 4% rule, since working/SS/pension years may draw little or nothing.
-  (function(){
-    var wd = proj.withdrawals||[], el = proj.endLiquid||[], yrs = proj.years||[];
-    var rateYearIdx = -1;
-    for (var i=0; i<wd.length; i++){ if ((wd[i]||0) > 0){ rateYearIdx = i; break; } }
-    var rate=null, wAmt=0, balUsed=0, rateYr=null;
-    if (rateYearIdx >= 0){
-      wAmt = wd[rateYearIdx];
-      // balance at START of that year = prior year's ending liquid (or this year's ending + withdrawal as fallback)
-      balUsed = (rateYearIdx>0 && el[rateYearIdx-1]>0) ? el[rateYearIdx-1]
-                : ((el[rateYearIdx]||0) + wAmt);
-      rateYr = yrs[rateYearIdx];
-      if (balUsed > 0) rate = wAmt / balUsed;
-    }
-    if (rate !== null && isFinite(rate)){
-      var ratePctNum = rate*100;
-      set('kpi-wdraw', ratePctNum.toFixed(1)+'%');
-      set('kpi-wdraw-sub', 'First draw year ('+rateYr+') · incl. extra spend & taxes');
-      var vs4 = ratePctNum - 4;
-      if (ratePctNum <= 4)
-        set('kpi-wdraw-delta', 'Below the 4% rule by '+Math.abs(vs4).toFixed(1)+' pts — conservative ✓ (rises with inflation later)');
-      else
-        set('kpi-wdraw-delta', 'Above the 4% rule by '+vs4.toFixed(1)+' pts — watch sustainability');
-      // bar: 4% sits at the midpoint; scale so 0%→0, 8%→100
-      var bar=$s('kpi-wdraw-bar'); if(bar){ bar.style.width=Math.max(4,Math.min(100,ratePctNum/8*100))+'%'; bar.style.background = ratePctNum<=4 ? '#2E7D5B' : '#f4b86a'; }
-      set('kpi-wdraw-foot', '4% rule benchmark: '+fmt(Math.round((balUsed*0.04)/100)*100)+'/yr');
-    } else {
-      set('kpi-wdraw', '~0%');
-      set('kpi-wdraw-sub', 'Guaranteed income covers spending');
-      set('kpi-wdraw-delta', 'Not drawing from the portfolio yet ✓');
-      set('kpi-wdraw-foot', 'Well under the 4% rule');
-      var bar0=$s('kpi-wdraw-bar'); if(bar0){ bar0.style.width='4%'; }
-    }
-  })();
+  // ── WITHDRAWAL RATE (top KPI) ────────────────────────────────────────
+  // The top "Withdrawal Rate" KPI is owned entirely by renderYear(), which
+  // paints it for the selected year and repaints on every year change. A
+  // second definition used to live here and was immediately overwritten by
+  // renderYear on load — removed to keep one stable, year-aware definition.
+  // (For the planning-style 4%-rule metric, see the FIRE Safe Withdrawal Rate.)
 
   // ── REQUIRED SPENDING BREAKDOWN (current year) ───────────────────────
   (function(){
