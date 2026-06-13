@@ -56,10 +56,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 .meta-item:first-child{padding-left:0;}
 .meta-item .mi-lbl{font-size:7px;color:#6a8a9a;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;}
 .meta-item .mi-val{font-size:11px;color:var(--white);font-weight:700;letter-spacing:-0.2px;}
-.status-pill{display:flex;align-items:center;gap:7px;background:#fff;
-              border:1px solid rgba(46,112,50,0.35);border-radius:20px;padding:5px 14px;}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;flex-shrink:0;}
-.status-text{font-size:10px;font-weight:700;color:#4ade80;letter-spacing:0.3px;}
+.status-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,0.12);
+              border:1px solid rgba(52,211,153,0.40);border-radius:999px;padding:6px 15px;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 0 4px rgba(52,211,153,0.15);animation:pulse 2s infinite;flex-shrink:0;}
+.status-text{font-size:11px;font-weight:600;color:#d7f5e6;letter-spacing:0.4px;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
 
 /* ── PAGE ── */
@@ -291,7 +291,7 @@ window.addEventListener('storage', function(e) {
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Changelog.html">What's New</a>
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">📊 Master</a>
+  <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 
 
@@ -308,7 +308,7 @@ window.addEventListener('storage', function(e) {
     </div>
     <div class="status-pill">
       <div class="status-dot"></div>
-      <span class="status-text" id="m-status">ON TRACK · Legacy Goal Met</span>
+      <span class="status-text" id="m-status">On track · Legacy goal met</span>
     </div>
   </div>
 </div>
@@ -355,16 +355,16 @@ window.addEventListener('storage', function(e) {
   
   <div style="text-align:center;margin-bottom:16px;">
     <a href="https://genabreal.github.io/RetireBlueprintPro/RetireBlueprintPro_Demo.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f4b86a,#e09320);color:#041E2F;font-size:14px;font-weight:800;padding:14px 30px;border-radius:8px;text-decoration:none;">
-      🎬 Try Interactive Demo — No Sheet Required
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#041E2F" stroke="#041E2F" stroke-linejoin="round"><polygon points="7 5 19 12 7 19 7 5"/></svg> Try the interactive demo (no sheet required)
     </a>
-    <div style="font-size:10px;color:#8aaabb;margin-top:8px;">See real calculations with live sliders · Traditional, FIRE, Single, Fat FIRE personas</div>
+    <div style="font-size:10px;color:#8aaabb;margin-top:8px;">Real calculations with live sliders. Four personas: Traditional, FIRE, Single, and Fat FIRE.</div>
   </div>
 
   
   <div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:18px 24px;margin-bottom:16px;border:1px solid rgba(28,199,208,0.2);display:flex;align-items:center;justify-content:space-between;">
     <div>
-      <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">The retirement plan that is modeled every year — all the way to age 110 — so you never outlive your money. 📊</div>
-      <div style="font-size:11px;color:#8aaabb;line-height:1.6;">Connect your Google Sheet once. Your full lifetime projection updates automatically. Print a professional summary your financial advisor can read in 5 minutes.</div>
+      <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">A retirement plan that's recalculated every year, all the way to age 110, so you don't outlive your money.</div>
+      <div style="font-size:11px;color:#8aaabb;line-height:1.6;">Connect your Google Sheet once and your full lifetime projection updates automatically. Print a clean summary your financial advisor can read in five minutes.</div>
     </div>
     <div style="flex-shrink:0;margin-left:24px;text-align:center;">
       <div style="font-size:28px;font-weight:900;color:#1CC7D0;" id="home-conf-big">—</div>
@@ -375,55 +375,50 @@ window.addEventListener('storage', function(e) {
   
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
     <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #1CC7D0;text-align:center;">
-      <div style="font-size:24px;margin-bottom:6px;">📊</div>
-      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Lifetime Projection — to Age 110</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Master spreadsheet calculates your complete financial picture year by year — all the way to age 110. Perfect for FIRE planners and traditional retirees alike</div>
+      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="10" width="3.2" height="7" rx="0.6"/><rect x="10.4" y="6" width="3.2" height="11" rx="0.6"/><rect x="14.8" y="13" width="3.2" height="4" rx="0.6"/></svg></span></div>
+      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Lifetime projection to age 110</div>
+      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Your Master spreadsheet builds a complete, year-by-year picture of your finances through age 110, whether you're planning early retirement or a traditional one.</div>
     </div>
     <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #f4b86a;text-align:center;">
-      <div style="font-size:24px;margin-bottom:6px;">🔄</div>
+      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 0 1 14.5-6"/><polyline points="18.5 3 18.5 6.5 15 6.5"/><path d="M20.5 12a8.5 8.5 0 0 1-14.5 6"/><polyline points="5.5 21 5.5 17.5 9 17.5"/></svg></span></div>
       <div style="font-size:12px;font-weight:700;color:#f4b86a;margin-bottom:4px;">Roth Conversion Solver</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Automatically finds the optimal conversion amount to minimize lifetime taxes before RMDs hit at 73</div>
+      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Finds the conversion amount that minimizes your lifetime taxes before RMDs begin at 73.</div>
     </div>
     <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #1CC7D0;text-align:center;">
-      <div style="font-size:24px;margin-bottom:6px;">⚡</div>
-      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Stress Test Ready</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">See exactly how a 30% market crash in year one of retirement affects your plan — before it happens</div>
+      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span></div>
+      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Stress test built in</div>
+      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">See how a 30% market crash in your first year of retirement would affect your plan, before it ever happens.</div>
     </div>
     <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #9b59b6;text-align:center;">
-      <div style="font-size:24px;margin-bottom:6px;">📄</div>
-      <div style="font-size:12px;font-weight:700;color:#c39bd3;margin-bottom:4px;">Print-Ready Summary</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Professional PDF report your spouse and financial advisor will actually read and understand</div>
+      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></span></div>
+      <div style="font-size:12px;font-weight:700;color:#c39bd3;margin-bottom:4px;">Print-ready summary</div>
+      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">A clean one-page PDF your spouse and financial advisor can read and understand.</div>
     </div>
   </div>
 
   
   <div id="review-banner" style="display:none;background:linear-gradient(135deg,#2E7D32,#1b5e20);border-radius:10px;padding:14px 20px;margin-bottom:20px;display:none;align-items:center;justify-content:space-between;">
     <div style="display:flex;align-items:center;gap:12px;">
-      <div style="font-size:24px;">⭐</div>
+      <div><svg width="22" height="22" viewBox="0 0 24 24" fill="#f4b86a" stroke="#f4b86a" stroke-linejoin="round"><polygon points="12 3 14.7 9 21 9.5 16 13.8 17.7 20 12 16.4 6.3 20 8 13.8 3 9.5 9.3 9 12 3"/></svg></div>
       <div>
-        <div style="font-size:13px;font-weight:700;color:#fff;">Loving RetireBlueprint Pro?</div>
-        <div style="font-size:10px;color:#a5d6a7;">Your review helps other families find financial peace of mind — it takes 30 seconds!</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">Getting value from RetireBlueprint Pro?</div>
+        <div style="font-size:10px;color:#a5d6a7;">A short review helps other families find the tool. It takes about a minute.</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;flex-shrink:0;">
-      <a href="https://www.etsy.com/your-listing-url" target="_blank" style="background:#fff;color:#2E7D32;font-size:11px;font-weight:700;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Leave a Review ⭐</a>
+      <a href="https://www.etsy.com/your-listing-url" target="_blank" style="background:#fff;color:#2E7D32;font-size:11px;font-weight:700;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Leave a review<svg width="13" height="13" viewBox="0 0 24 24" fill="#2E7D32" stroke="#2E7D32" stroke-linejoin="round" style="vertical-align:-1px;margin-left:5px;"><polygon points="12 3 14.7 9 21 9.5 16 13.8 17.7 20 12 16.4 6.3 20 8 13.8 3 9.5 9.3 9 12 3"/></svg></a>
       <button onclick="document.getElementById('review-banner').style.display='none';localStorage.setItem('rbp_reviewed','1');" style="background:transparent;color:#a5d6a7;border:1px solid #a5d6a7;font-size:10px;padding:8px 12px;border-radius:6px;cursor:pointer;">Not now</button>
     </div>
   </div>
 
   
   <div class="section-lbl">Planning Tools</div>
-<div style="background:linear-gradient(135deg,#1a0a0a,#2d1515);border-radius:10px;padding:14px 20px;margin-bottom:12px;border:1px solid rgba(255,107,107,0.3);display:flex;align-items:flex-start;gap:14px;">
-    <div style="font-size:28px;flex-shrink:0;">🔥</div>
+<div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:14px 20px;margin-bottom:12px;border:1px solid rgba(28,199,208,0.25);display:flex;align-items:flex-start;gap:14px;">
+    <div style="flex-shrink:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></svg></span></div>
     <div>
-      <div style="font-size:13px;font-weight:800;color:#ff9f43;margin-bottom:4px;">What is FIRE? — Financial Independence, Retire Early</div>
-      <div style="font-size:11px;color:#ffcba4;line-height:1.7;">
-        FIRE is a movement built on one idea: <strong>save aggressively, invest wisely, and retire on your own timeline</strong> — not the government's.
-        Whether you want to retire at 45 or just have the <em>option</em> to stop working at 55, RetireBlueprint Pro gives you the
-        exact numbers to make that happen. Your plan shows your <strong>FI Date</strong> (when work becomes optional),
-        your <strong>Safe Withdrawal Rate</strong> (are you taking too much?), your <strong>Coast FIRE number</strong> (when can you stop saving?),
-        and your <strong>FIRE type</strong> — Lean, Regular, or Fat FIRE based on your lifestyle spending.
-        <span style="color:#ff9f43;font-weight:700;">You don't have to be 30 to use this. FIRE is for anyone who wants control over their financial future.</span>
+      <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:4px;">What is FIRE? — Financial Independence, Retire Early</div>
+      <div style="font-size:11px;color:#c9d6de;line-height:1.7;">
+        FIRE — Financial Independence, Retire Early — comes down to one idea: <strong>save steadily, invest sensibly, and retire on a timeline you choose.</strong> RetireBlueprint Pro gives you the numbers behind it: your <strong>FI Date</strong> (when work becomes optional), your <strong>Safe Withdrawal Rate</strong> (whether you're drawing too much), your <strong>Coast FIRE number</strong> (when you can stop saving), and your <strong>FIRE type</strong> — Lean, Regular, or Fat — based on how you plan to spend. <span style="color:#1CC7D0;font-weight:700;">You don't have to be 30 or chasing an extreme budget to use it. This is for anyone who wants more control over when and how they retire.</span>
       </div>
     </div>
   </div>
@@ -461,7 +456,7 @@ window.addEventListener('storage', function(e) {
       <div class="app-card-inner">
         <div><span class="app-tag tag-teal">Annual</span></div>
         <div class="app-title">Annual Check-In</div>
-        <div class="app-desc">Enter your December 31 actual balances each January. Track variance vs projection every year of your plan. Green or red — are you ahead of the plan?</div>
+        <div class="app-desc">Enter your December 31 balances each January, then see how your actual results compare to the projection, year by year.</div>
         <div class="app-footer">
           <span class="app-cta">Open Check-In</span>
           <span class="app-arrow">→</span>
@@ -506,7 +501,7 @@ window.addEventListener('storage', function(e) {
         <div class="app-title">Setup & User Guide</div>
         <div class="app-desc">8-section complete reference. Every input field explained, how the model works, annual check-in process, formula logic, Roth window strategy, and FAQ.</div>
         <div class="app-footer">
-          <span class="app-cta orange">Download Guide</span>
+          <span class="app-cta orange">Open guide</span>
           <span class="app-arrow">→</span>
         </div>
       </div>
@@ -622,7 +617,7 @@ function loadData(){
       set('m-names', single ? (p1.name+' '+p1.age) : (p1.name+' '+p1.age+' · '+p2.name+' '+p2.age));
       set('m-year',meta.planYear);
       set('m-runway',runway+' yrs ('+(coverPerson.name||'')+')');
-      set('m-status',leg.achievedPct>=100?'ON TRACK · Legacy Goal Met':'REVIEW PLAN');
+      set('m-status',leg.achievedPct>=100?'On track · Legacy goal met':'Review plan');
 
       // Phase and Scenario
       var gl = d.global||{};
