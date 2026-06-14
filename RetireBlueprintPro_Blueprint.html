@@ -112,6 +112,8 @@ thead{ display:table-header-group; }
 .connect p{ color:var(--muted); font-size:14px; line-height:1.6; }
 
 @media (max-width:640px){
+  /* keep the whole page inside the screen so nothing drags sideways or bleeds off the right */
+  html,body{ max-width:100% !important; overflow-x:hidden !important; }
   .stats{ grid-template-columns:1fr 1fr; }
   .people-grid{ grid-template-columns:1fr; }
   .grid2{ grid-template-columns:1fr; }
@@ -119,7 +121,10 @@ thead{ display:table-header-group; }
   .hero{ flex-direction:column; text-align:center; }
   .toolbar{ height:auto; flex-wrap:wrap; gap:8px; padding:8px 12px; }
   .toolbar .btn{ font-size:11px; padding:6px 10px; }
-  .rbp-tscroll table.tbl th, .rbp-tscroll table.tbl td{ white-space:nowrap; }
+  /* every data-table section scrolls its own table left/right inside its box, instead of pushing the page wider */
+  #household,#income,#portfolio,#accounts,#spending,#debts,#smile,#projection,#wsrc,#intel,#sweep,#stress,#tax,#roth,#legacy,#assumptions{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  /* keep columns at a readable width so wide tables scroll cleanly rather than crushing together */
+  table.tbl th, table.tbl td{ white-space:nowrap; }
 }
 
 @media print{
