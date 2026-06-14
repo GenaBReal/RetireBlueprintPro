@@ -258,7 +258,24 @@ function render(rows, cols, meta){
     +(_hid>0 ? ' — '+_hid+(_hid===1?' account is':' accounts are')+' set to <b>Include = No</b> on the Inputs tab and hidden here. Set '+(_hid===1?'it':'them')+' to <b>Include = Yes</b> on Inputs to show '+(_hid===1?'its':'their')+' columns.' : '. To hide an account from the grid, set <b>Include = No</b> on the Inputs tab.')
     +' Computed live from your inputs; figures round to the dollar.'
     +'<div class="caveat"><b>About these numbers:</b> All 82 columns behind your plan are calculated fresh in your browser and checked line-by-line against your Google Sheet — and match it to the exact dollar on almost every one. On long-range running balances you may occasionally see a difference of a few dollars — that\u2019s normal rounding between two calculators compounding over decades, not an error. Your Google Sheet stays the official record.</div>';
+  freezeCols();
 }
+
+// Give each frozen column (Year, Craig Age, Gena Age) its own left offset so they
+// sit side by side and stay put on horizontal scroll, instead of stacking at left:0.
+function freezeCols(){
+  var tbl=document.getElementById('tbl'); if(!tbl) return;
+  var lab=tbl.querySelector('tr.labels'); if(!lab) return;
+  var hs=lab.querySelectorAll('th.frz'); if(!hs.length) return;
+  var lefts=[], cum=0, k;
+  for(k=0;k<hs.length;k++){ lefts.push(cum); cum+=hs[k].getBoundingClientRect().width; }
+  tbl.querySelectorAll('tr').forEach(function(tr){
+    var fc=tr.querySelectorAll('.frz'), m;
+    if(fc.length>=hs.length){ for(m=0;m<hs.length;m++) fc[m].style.left=lefts[m]+'px'; }
+    else { for(m=0;m<fc.length;m++) fc[m].style.left='0px'; }  // group-header colspan pins at 0
+  });
+}
+window.addEventListener('resize', function(){ clearTimeout(window._frzT); window._frzT=setTimeout(freezeCols,150); });
 
 function applyThemeAndHeader(d){
   var pk=Object.keys(d.people||{}); var p1=d.people[pk[0]]||{}, p2=d.people[pk[1]]||{};

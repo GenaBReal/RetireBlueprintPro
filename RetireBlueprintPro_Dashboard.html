@@ -1446,7 +1446,18 @@ function populate(d){
 
   // ENGINES
   set('eng-income-hdr', p1n+' & '+p2n+' · Year '+meta.planYear);
-  set('lbl-p1-sal', p1n+' Salary');         set('eng-p1-sal', fmt(p1.salary));
+  // Salary: prorate for the plan year if employment ends partway through (mirrors the SS partial-year handling below)
+  function _salYr(pp, yr){
+    var sal=pp.salary||0; if(!sal) return 0;
+    var e=pp.salaryEnd?new Date(pp.salaryEnd):null, s=pp.salaryStart?new Date(pp.salaryStart):null;
+    if(e && e.getFullYear()<yr) return 0;          // employment ended before this year
+    if(s && s.getFullYear()>yr) return 0;          // employment starts after this year
+    var sm=(s && s.getFullYear()===yr)?s.getMonth():0;
+    var em=(e && e.getFullYear()===yr)?e.getMonth():11;
+    var mo=em-sm+1; if(mo>=12) return sal; if(mo<=0) return 0; return sal*(mo/12);
+  }
+  var _p1sal=_salYr(p1, meta.planYear);
+  set('lbl-p1-sal', p1n+' Salary'+(_p1sal>0 && _p1sal<(p1.salary||0)?' (partial yr)':''));         set('eng-p1-sal', fmt(_p1sal));
   // Show prorated SS for start year (e.g. July start = 6 months), full annual after
   var p1ssDisplay = (p1.ssYear1 && p1.ssYear1 > 0 && p1.ssYear1 < p1.ssAnnual)
     ? p1.ssYear1  // partial year
@@ -1458,7 +1469,8 @@ function populate(d){
   set('eng-p1-ss', fmt(p1ssDisplay));
   set('lbl-p1-pen', p1n+' Pension');        set('eng-p1-pen', fmt((p1.pension||0)*12||p1.pensionAnnual||0));
   set('lbl-p1-other', p1n+' Other');        set('eng-p1-other', fmt(p1.otherIncome));
-  set('lbl-p2-sal', p2n+' Salary');         set('eng-p2-sal', fmt(p2.salary));
+  var _p2sal=_salYr(p2, meta.planYear);
+  set('lbl-p2-sal', p2n+' Salary'+(_p2sal>0 && _p2sal<(p2.salary||0)?' (partial yr)':''));         set('eng-p2-sal', fmt(_p2sal));
   set('eng-income-total', fmt(yr1inc));
 
   set('eng-base-spend', fmt(sp.baseAnnual));
