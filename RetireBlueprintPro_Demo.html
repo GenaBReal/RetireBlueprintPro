@@ -134,6 +134,9 @@ window.addEventListener('storage', function(e) {
   [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid{grid-template-columns:1fr !important;}
   /* let inline flex rows wrap (nav/header use classes, so they're untouched) */
   [style*="display:flex"],[style*="display: flex"],.plan-meta{flex-wrap:wrap !important;}
+  /* demo top bar: title full-width, buttons drop to their own row */
+  .demo-topbar > div:first-child{flex:1 1 100% !important;margin-bottom:6px;}
+  .demo-topbar > a{flex:1 1 auto !important;text-align:center;}
   /* keep fields, media, charts within the viewport */
   input,select,textarea{max-width:100% !important;box-sizing:border-box;}
   img,canvas{max-width:100% !important;}
@@ -173,7 +176,7 @@ window.addEventListener('storage', function(e) {
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
-<div class="demo-hero" style="background:#041E2F;border-bottom:3px solid #1CC7D0;padding:10px 24px;display:flex;align-items:center;gap:16px;flex-wrap:nowrap;">
+<div class="demo-topbar" style="background:#041E2F;border-bottom:3px solid #1CC7D0;padding:10px 24px;display:flex;align-items:center;gap:16px;flex-wrap:nowrap;">
   <div style="flex:1;min-width:0;">
     <div style="font-size:14px;font-weight:800;color:#fff;">Live interactive demo</div>
     <div style="font-size:11px;color:#8aaabb;">Sample data — connect your sheet to see your real numbers</div>

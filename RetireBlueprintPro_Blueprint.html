@@ -75,6 +75,7 @@ table.tbl td.r, table.tbl th.r{ text-align:right; }
 table.tbl tr:last-child td{ border-bottom:none; }
 table.tbl.compact th, table.tbl.compact td{ padding:4px 8px; font-size:11.5px; }
 table.tbl tr.mark td{ background:#fff7ec; }
+.rbp-tscroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%; }
 table.tbl tr.endrow td{ font-weight:700; background:#f3f9fa; }
 thead{ display:table-header-group; }
 
@@ -116,6 +117,9 @@ thead{ display:table-header-group; }
   .grid2{ grid-template-columns:1fr; }
   .sec,.hero,.cover,.foot{ padding-left:18px; padding-right:18px; }
   .hero{ flex-direction:column; text-align:center; }
+  .toolbar{ height:auto; flex-wrap:wrap; gap:8px; padding:8px 12px; }
+  .toolbar .btn{ font-size:11px; padding:6px 10px; }
+  .rbp-tscroll table.tbl th, .rbp-tscroll table.tbl td{ white-space:nowrap; }
 }
 
 @media print{
@@ -1109,6 +1113,35 @@ function showConnect(h, p){
   window.RBP.load(function(d){ try { rbpApplyEngine(d); } catch(e){} rbpCachePut(d); populate(d); }, function(msg){ if(!cached){ if(msg==='no-sheet') showConnect(); else showConnect('We could not reach your plan','There was a problem loading your live numbers ('+esc(msg||'unknown')+'). Please check your connection and try again from your dashboard.'); } });
   rbpLoadStress();
   rbpLoadSweep();
+})();
+</script>
+<script>
+/* Wrap every data table in a horizontal-scroll box so wide tables scroll inside
+   their own area instead of dragging the whole page. Uses a MutationObserver
+   because Blueprint builds its tables after the sheet finishes loading. */
+(function(){
+  function wrap(t){
+    var p=t.parentElement;
+    if(p&&p.classList&&p.classList.contains('rbp-tscroll')) return;
+    var w=document.createElement('div'); w.className='rbp-tscroll';
+    t.parentNode.insertBefore(w,t); w.appendChild(t);
+  }
+  function wrapAll(){ document.querySelectorAll('table.tbl').forEach(wrap); }
+  function watch(){
+    wrapAll();
+    var mo=new MutationObserver(function(muts){
+      for(var i=0;i<muts.length;i++){
+        var nodes=muts[i].addedNodes; if(!nodes) continue;
+        for(var j=0;j<nodes.length;j++){
+          var n=nodes[j]; if(!n||n.nodeType!==1) continue;
+          if(n.tagName==='TABLE'&&n.classList.contains('tbl')) wrap(n);
+          else if(n.querySelectorAll) n.querySelectorAll('table.tbl').forEach(wrap);
+        }
+      }
+    });
+    mo.observe(document.body,{childList:true,subtree:true});
+  }
+  if(document.readyState!=='loading') watch(); else document.addEventListener('DOMContentLoaded', watch);
 })();
 </script>
 </body>
