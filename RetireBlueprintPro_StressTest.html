@@ -226,6 +226,12 @@ window.addEventListener('storage', function(e) {
   /* trim horizontal padding so content fits a phone */
   .card,.section,.section-body,.page,.rpt-body,.explainer{padding-left:12px !important;padding-right:12px !important;}
   /* nav scrolls horizontally rather than overflowing the page */
+  /* scenario sweep: the 4-col bar grid + 6-col depletion table don't fit a phone.
+     Reflow the bars to 2 cols (amount lands on the right, fully visible); let the
+     dense depletion table scroll sideways instead of clipping off-screen. */
+  #sweep-bars > div{grid-template-columns:minmax(0,1fr) auto !important;gap:4px 10px !important;}
+  #sweep-depletion > div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #sweep-depletion [style*="140px 75px"]{min-width:520px;}
   .nav{overflow-x:auto !important;flex-wrap:nowrap !important;}
 }
 </style>
