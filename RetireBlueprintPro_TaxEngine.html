@@ -164,9 +164,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
   .page, .rpt-body { padding: 10px !important; }
-  .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3 { 
+  .grid-3, .grid-2, .grid-2-1, .kpi4, .kpi3, .col2, .col3 { 
     grid-template-columns: 1fr !important; 
   }
+  /* cards with an explicit grid-column span must flow into the single column too */
+  [style*="grid-column"] { grid-column: auto !important; }
   .kpi2 { grid-template-columns: 1fr 1fr !important; }
   .stress-grid { grid-template-columns: 1fr 1fr !important; }
   .nav, .nav-bar { flex-wrap: nowrap; overflow-x: auto; }
