@@ -64,6 +64,7 @@
   tr.groups th.frz,tr.labels th.frz{z-index:8;}
   td.yr{text-align:center;}
   td.age{color:#5b7689;font-weight:600;}
+  .yr-ages{display:none;}
   /* no zebra striping — spreadsheet-style uniform rows; crisp gridlines carry the eye across */
   tbody tr:hover td{background:#eaf6f8 !important;}
   tbody tr:hover td.frz{background:#e2f0f4 !important;}
@@ -91,6 +92,11 @@
     .legend{gap:8px;font-size:9px;}
     #xlsBtn{width:100%;justify-content:center;padding:12px;font-size:13px;margin-top:10px;}
     .gridwrap{max-height:64vh;}
+    /* phone: tuck Craig/Gena ages under the Year so only Year stays frozen and the grid wins back width */
+    table.master th.age,table.master td.age{display:none;}
+    td.yr .yr-num{display:block;font-size:11px;font-weight:800;}
+    .yr-ages{display:block;font-size:8px;font-weight:600;color:#5b7689;line-height:1.25;margin-top:1px;}
+    .yr-ages span{display:block;white-space:nowrap;}
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
@@ -153,8 +159,8 @@ var COLS=[
   {i:12,o:2,base:"\u2019s Pension",g:'inc',f:'$'},{i:13,o:2,base:"\u2019s Other",g:'inc',f:'$'},{i:14,l:'Total Gross Guaranteed Income',g:'inc',f:'$',tot:1},
   {i:15,o:1,base:"\u2019s Contributions",g:'con',f:'$'},{i:16,o:1,base:"\u2019s Employer Match",g:'con',f:'$'},{i:17,o:2,base:"\u2019s Contributions",g:'con',f:'$'},
   {i:18,o:2,base:"\u2019s Employer Match",g:'con',f:'$'},{i:19,l:'Total Household Contributions',g:'con',f:'$',tot:1},{i:20,l:'Standard Deduction',g:'con',f:'$'},
-  {i:21,l:'Base Lifestyle Expenses',g:'spend',f:'$'},{i:23,l:'Living (infl-adj)',g:'spend',f:'$'},
-  {i:24,l:'Healthcare Base',g:'spend',f:'$'},{i:26,l:'Healthcare (infl-adj)',g:'spend',f:'$'},
+  {i:21,l:'Base Lifestyle Expenses',g:'spend',f:'$'},{i:22,l:'Inflation \u00d7',g:'spend',f:'x'},{i:23,l:'Living (infl-adj)',g:'spend',f:'$'},
+  {i:24,l:'Healthcare Base',g:'spend',f:'$'},{i:25,l:'Inflation \u00d7',g:'spend',f:'x'},{i:26,l:'Healthcare (infl-adj)',g:'spend',f:'$'},
   {i:27,l:'Debt',g:'spend',f:'$'},{i:28,l:'Total Need',g:'spend',f:'$',tot:1},
   {i:29,l:'Income Gap',g:'flow',f:'$'},{i:30,l:'Surplus',g:'flow',f:'$'},{i:31,l:'Chosen Extra',g:'flow',f:'$'},
   {i:32,l:'Funding Required',g:'flow',f:'$',tot:1},
@@ -232,19 +238,26 @@ function render(rows, cols, meta){
   cols.forEach(function(c){
     var cls=[]; var style='';
     if(c.i===0||c.i===2||c.i===3) cls.push('frz');
+    if(c.f==='age') cls.push('age');
     if(c.tot) cls.push('toth');
     if(c.own){ cls.push('own'); style=' style="background:'+c.own+'"'; }
     ltr+='<th class="'+cls.join(' ')+'"'+style+'>'+c.l+'</th>';
   });
   ltr+='</tr>';
   // body
+  var ageCols=cols.filter(function(c){ return c.f==='age'; });
   var b='';
   rows.forEach(function(r){
     b+='<tr>';
     cols.forEach(function(c){
       var raw=r.master[c.i]; var cls=[]; var txt;
-      if(c.f==='yr'){ cls.push('frz','yr'); txt=raw; }
+      if(c.f==='yr'){ cls.push('frz','yr');
+        var asub=ageCols.map(function(ac){ var nm=String(ac.l).replace(/\u2019s? Age$/,'').replace(/ Age$/,'').trim(); return '<span>'+(nm.charAt(0)||'')+' '+Math.round(r.master[ac.i])+'</span>'; }).join('');
+        txt='<span class="yr-num">'+raw+'</span><span class="yr-ages">'+asub+'</span>'; }
       else if(c.f==='age'){ cls.push('frz','age'); txt=Math.round(raw); }
+      else if(c.f==='x'){ var xv=(raw===null||raw===undefined||raw==='')?null:(+raw);
+        txt=(xv===null||isNaN(xv))?'' : xv.toLocaleString('en-US',{minimumFractionDigits:3,maximumFractionDigits:3});
+        if(xv===null||isNaN(xv)) cls.push('z'); }
       else { var v=Math.round(raw||0); txt=money(v);
         if(v===0) cls.push('z'); if(v<0) cls.push('neg'); if(c.tot) cls.push('tot'); }
       if(c.bgcls) cls.push(c.bgcls);
