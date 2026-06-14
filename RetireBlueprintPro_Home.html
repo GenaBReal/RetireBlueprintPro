@@ -145,11 +145,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
 /* ── MOBILE RESPONSIVE ────────────────────────────────── */
 @media (max-width: 768px) {
   .page, .rpt-body { padding: 10px !important; }
-  .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3 { 
+  .grid-3, .grid-2, .kpi4, .kpi3, .col2, .col3, .apps-primary, .apps-secondary { 
     grid-template-columns: 1fr !important; 
   }
   .kpi2 { grid-template-columns: 1fr 1fr !important; }
   .stress-grid { grid-template-columns: 1fr 1fr !important; }
+  .kpi-strip, .sheets-grid { grid-template-columns: repeat(2,1fr) !important; }
   .nav, .nav-bar { flex-wrap: nowrap; overflow-x: auto; }
   .nav a, .nav-bar a { font-size: 9px; padding: 8px 10px; white-space: nowrap; }
   .header-right, .header-stats { display: none !important; }
