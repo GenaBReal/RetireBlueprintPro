@@ -448,6 +448,13 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   /* nav scrolls horizontally rather than overflowing the page */
   .nav{overflow-x:auto !important;flex-wrap:nowrap !important;}
 }
+/* Loading overlay — shows while reading the sheet, then hidden by hideLoadingOverlay() */
+.data-loading-overlay{position:fixed;inset:0;z-index:9999;background:#041E2F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;}
+.data-loading-overlay.hidden{display:none;}
+.dl-spinner{width:44px;height:44px;border-radius:50%;border:4px solid rgba(28,199,208,.25);border-top-color:#1CC7D0;animation:dl-spin .8s linear infinite;}
+@keyframes dl-spin{to{transform:rotate(360deg);}}
+.dl-text{color:#fff;font-size:16px;font-weight:700;letter-spacing:.3px;}
+.dl-sub{color:#9fc0d0;font-size:13px;}
 </style>
 </head>
 <body>
@@ -528,7 +535,6 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       <span style="color:#0097a7;">Everything else can be refined later. These 4 unlock your first projection! </span>
     
     </div>
-    <div style="font-size:10px;color:#00838f;margin-top:6px;font-style:italic;">Everything else can be refined later. These 4 unlock your first projection! </div>
   </div>
   <button onclick="document.getElementById('rbp-first-time-banner').style.display='none';localStorage.setItem('rbp_first_time_seen','1');" 
     style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:#00838f;opacity:0.6;line-height:1;" 
