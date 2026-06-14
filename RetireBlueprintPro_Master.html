@@ -67,6 +67,9 @@
   /* no zebra striping — spreadsheet-style uniform rows; crisp gridlines carry the eye across */
   tbody tr:hover td{background:#eaf6f8 !important;}
   tbody tr:hover td.frz{background:#e2f0f4 !important;}
+  /* tap/click a row to lock a highlight that follows across on horizontal scroll (esp. phone) */
+  tbody tr.sel td{background:#cbe9f1 !important;}
+  tbody tr.sel td.frz{background:#b6dfe9 !important;}
   td.z{color:#b8c4cd;}            /* zero values, muted */
   td.tot{font-weight:800;color:var(--navy1);background:var(--tot-soft) !important;}
   td.cp1{background:var(--p1-soft)!important;} td.cp2{background:var(--p2-soft)!important;} td.csp{background:var(--spend-soft)!important;}
@@ -276,6 +279,15 @@ function freezeCols(){
   });
 }
 window.addEventListener('resize', function(){ clearTimeout(window._frzT); window._frzT=setTimeout(freezeCols,150); });
+// Tap/click a row to lock a highlight that follows across columns as you scroll — so you don't lose your place on the phone.
+document.addEventListener('click', function(e){
+  var tr = (e.target && e.target.closest) ? e.target.closest('#tbl tbody tr') : null;
+  if(!tr) return;
+  var on = tr.classList.contains('sel');
+  var tbl = document.getElementById('tbl');
+  if(tbl) tbl.querySelectorAll('tbody tr.sel').forEach(function(r){ r.classList.remove('sel'); });
+  if(!on) tr.classList.add('sel');
+});
 
 function applyThemeAndHeader(d){
   var pk=Object.keys(d.people||{}); var p1=d.people[pk[0]]||{}, p2=d.people[pk[1]]||{};
