@@ -230,8 +230,11 @@ window.addEventListener('storage', function(e) {
      Reflow the bars to 2 cols (amount lands on the right, fully visible); let the
      dense depletion table scroll sideways instead of clipping off-screen. */
   #sweep-bars > div{grid-template-columns:minmax(0,1fr) auto !important;gap:4px 10px !important;}
-  #sweep-depletion > div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  #sweep-depletion [style*="140px 75px"]{min-width:520px;}
+  #sweep-depletion .swp-dep-head{display:none !important;}
+  #sweep-depletion .swp-dep-row{grid-template-columns:1fr !important;gap:3px !important;align-items:stretch !important;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 11px;margin-bottom:9px !important;}
+  #sweep-depletion .swp-dep-row > div{display:flex !important;justify-content:space-between;gap:12px;}
+  #sweep-depletion .swp-dep-row > div::before{content:attr(data-label);color:#7a9aaa;font-weight:600;}
+  #sweep-depletion .swp-dep-row > div:first-child{display:block !important;font-size:12px;font-weight:800;color:#dceaf5 !important;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:5px;margin-bottom:3px;}
   /* Monte Carlo headline boxes were flex:0 0 auto with a min-width, so the long
      explainer line pushed the box wider than the phone and clipped. Let them
      shrink and stack full-width so all the wording wraps on-screen. */
@@ -2210,7 +2213,7 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
 
   var dHtml = '<div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">'
     + '<div style="font-size:11.5px;font-weight:500;color:#dceaf5;margin-bottom:8px;">When does the portfolio deplete at each scenario?</div>'
-    + '<div style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;">'
+    + '<div class="swp-dep-head" style="font-size:10px;color:#9fc1d6;display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;">'
     + '<span>Scenario</span><span>Floor/yr</span><span>Floor only</span><span>At full extra</span><span>Reduce to</span><span>At reduced plan</span></div>';
 
   results.forEach(function(r) {
@@ -2223,13 +2226,13 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
     var safeStr = blank ? dash : (r.safe > 0 ? fmtKno(r.safe)+'/yr' : '$0 \u2014 floor');
     var atReduced = blank ? dash : (r.safe > 0 ? '\u2705 Survives' : String(r.floorDepl || '\u2014'));
     var atReducedCol = (!blank && r.safe > 0) ? '#1CC7D0' : '#f4b86a';
-    dHtml += '<div style="display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;align-items:center;margin-bottom:5px;font-size:11px;">'
+    dHtml += '<div class="swp-dep-row" style="display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;align-items:center;margin-bottom:5px;font-size:11px;">'
       + '<div style="color:#9fc1d6;font-family:monospace;">' + r.label + '</div>'
-      + '<div style="color:#566576;">' + floorStr + '</div>'
-      + '<div style="color:'+lCol+';font-weight:500;">' + floorOnlyCell + '</div>'
-      + '<div style="color:'+fCol+';font-weight:500;">' + fullExtraCell + '</div>'
-      + '<div style="color:#f4b86a;font-weight:700;">' + safeStr + '</div>'
-      + '<div style="color:'+atReducedCol+';font-weight:500;">' + atReduced + '</div>'
+      + '<div data-label="Floor/yr" style="color:#566576;">' + floorStr + '</div>'
+      + '<div data-label="Floor only" style="color:'+lCol+';font-weight:500;">' + floorOnlyCell + '</div>'
+      + '<div data-label="At full extra" style="color:'+fCol+';font-weight:500;">' + fullExtraCell + '</div>'
+      + '<div data-label="Reduce to" style="color:#f4b86a;font-weight:700;">' + safeStr + '</div>'
+      + '<div data-label="At reduced plan" style="color:'+atReducedCol+';font-weight:500;">' + atReduced + '</div>'
       + '</div>';
   });
   dHtml += '<div style="margin-top:10px;font-size:10px;color:#566576;line-height:1.6;">'
