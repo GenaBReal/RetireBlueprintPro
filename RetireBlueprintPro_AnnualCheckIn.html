@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Annual Check-In</title>
-<script src="https://retireblueprintpro.com/rbp-connector.js"></script>
+<script src="rbp-connector.js"></script>
 <script src="https://retireblueprintpro.com/rbp-engine.js"></script>
 <script>
 /* ── ENGINE ADAPTER ───────────────────────────────────────────────
@@ -295,7 +295,8 @@ window.addEventListener('storage', function(e) {
 @media (max-width:640px){
   html,body{min-width:0 !important;max-width:100% !important;overflow-x:hidden !important;}
   /* collapse multi-column grids (inline + class) to a single column */
-  [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid{grid-template-columns:1fr !important;}
+  [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid,.kpi-strip{grid-template-columns:1fr !important;}
+  table{display:block !important;width:100% !important;overflow-x:auto !important;-webkit-overflow-scrolling:touch;}
   /* let inline flex rows wrap (nav/header use classes, so they're untouched) */
   [style*="display:flex"],[style*="display: flex"],.plan-meta{flex-wrap:wrap !important;}
   /* keep fields, media, charts within the viewport */

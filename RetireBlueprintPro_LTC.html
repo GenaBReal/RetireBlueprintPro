@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Long-Term Care Planner</title>
-<script src="https://retireblueprintpro.com/rbp-connector.js"></script>
+<script src="rbp-connector.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
 function rbpApplyNames(p1,p2){
@@ -81,6 +81,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 .strategy-pro::before{content:'✓';position:absolute;left:0;color:#4CAF50;font-weight:700;}
 .strategy-con::before{content:'✗';position:absolute;left:0;color:#ef5350;font-weight:700;}
 @media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr;}.page{padding:16px 12px 60px;}}
+input[type=range],input[type="range"]{touch-action:none;}
 </style>
 <style id="rbp-mobile-fix">
 .rbp-tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}

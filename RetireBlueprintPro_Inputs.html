@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetireBlueprint Pro — Inputs</title>
-<script src="https://retireblueprintpro.com/rbp-tax-config.js"></script>
+<script src="rbp-tax-config.js"></script>
 <script src="https://retireblueprintpro.com/rbp-engine.js"></script>
 <script>
 /* ── ENGINE ADAPTER ───────────────────────────────────────────────
@@ -423,7 +423,8 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 @media (max-width:640px){
   html,body{min-width:0 !important;max-width:100% !important;overflow-x:hidden !important;}
   /* collapse multi-column grids (inline + class) to a single column */
-  [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid{grid-template-columns:1fr !important;}
+  [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid,.form-grid,.form-grid-2,.form-grid-3,.form-grid-4,.solver-grid,.kc-grid,.kc-grid-2{grid-template-columns:1fr !important;}
+  table{display:block !important;width:100% !important;overflow-x:auto !important;-webkit-overflow-scrolling:touch;}
   /* let inline flex rows wrap (nav/header use classes, so they're untouched) */
   [style*="display:flex"],[style*="display: flex"],.plan-meta{flex-wrap:wrap !important;}
   /* keep fields, media, charts within the viewport */
