@@ -232,6 +232,11 @@ window.addEventListener('storage', function(e) {
   #sweep-bars > div{grid-template-columns:minmax(0,1fr) auto !important;gap:4px 10px !important;}
   #sweep-depletion > div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   #sweep-depletion [style*="140px 75px"]{min-width:520px;}
+  /* Monte Carlo headline boxes were flex:0 0 auto with a min-width, so the long
+     explainer line pushed the box wider than the phone and clipped. Let them
+     shrink and stack full-width so all the wording wraps on-screen. */
+  #mc-headline-row{gap:12px !important;}
+  #mc-headline-row > div{flex:1 1 100% !important;min-width:0 !important;box-sizing:border-box !important;}
   .nav{overflow-x:auto !important;flex-wrap:nowrap !important;}
 }
 </style>
@@ -777,7 +782,7 @@ window.addEventListener('storage', function(e) {
         <div id="mc-spend-readout" style="margin-bottom:16px;padding:13px 18px;background:linear-gradient(135deg,#06243a,#0A3145);border:1px solid rgba(28,199,208,.25);border-left:4px solid #f4b86a;border-radius:10px;font-size:12.5px;color:#dceaf5;line-height:1.65;">—</div>
 
         <!-- Big success rate number -->
-        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;align-items:stretch;">
+        <div id="mc-headline-row" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;align-items:stretch;">
 
           <div style="flex:0 0 auto;background:#061620;border-radius:12px;border:2px solid #f4b86a;padding:20px 28px;text-align:center;min-width:180px;">
             <div style="font-size:11px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Won't Run Out of Money</div>
