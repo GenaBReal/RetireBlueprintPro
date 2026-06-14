@@ -333,6 +333,9 @@ window.addEventListener('storage', function(e) {
   html,body{min-width:0 !important;max-width:100% !important;overflow-x:hidden !important;}
   /* collapse multi-column grids (inline + class) to a single column */
   [style*="repeat("],[style*="1fr 1fr"],.main-grid,.mc-stat-row,.mc-bar-row,.partner-grid,.engines-grid,.kpi-grid,.acct-grid{grid-template-columns:1fr !important;}
+  /* viz cards carry explicit grid-column/row placement — reset so they stack full-width */
+  .viz-grid{grid-template-columns:1fr !important;grid-template-rows:auto !important;}
+  .viz-grid > *{grid-column:auto !important;grid-row:auto !important;}
   /* let inline flex rows wrap (nav/header use classes, so they're untouched) */
   [style*="display:flex"],[style*="display: flex"],.plan-meta{flex-wrap:wrap !important;}
   /* keep fields, media, charts within the viewport */
@@ -631,6 +634,7 @@ window.addEventListener('storage', function(e) {
     <div class="eng-body">
       <div class="eng-rows">
         <div class="eng-row"><span class="er-lbl">Base Spend / year</span><span class="er-val"><span id="eng-base-spend">—</span><span class="s-go"></span></span></div>
+        <div class="eng-row"><span class="er-lbl">Debts / year</span><span class="er-val"><span id="eng-debt">—</span><span class="s-go"></span></span></div>
         <div class="eng-row"><span class="er-lbl">Extra Spend Phase 1</span><span class="er-val"><span id="eng-p1-extra">—</span><span class="s-go"></span></span></div>
         <div class="eng-row"><span class="er-lbl">Extra Spend Phase 2</span><span class="er-val"><span id="eng-p2-extra">—</span><span class="s-go"></span></span></div>
         <div class="eng-row"><span class="er-lbl">Extra Spend Phase 3</span><span class="er-val"><span id="eng-p3-extra">—</span><span class="s-go"></span></span></div>
@@ -811,7 +815,7 @@ window.addEventListener('storage', function(e) {
   </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr 195px;grid-template-rows:auto auto;gap:8px;margin-bottom:0;">
+<div class="viz-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr 195px;grid-template-rows:auto auto;gap:8px;margin-bottom:0;">
   <div class="chart-card">
     <div class="chart-title">Portfolio Sustainability</div>
     <div class="chart-sub" id="c1-sub">Total end-of-year liquid assets</div>
@@ -1467,6 +1471,7 @@ function populate(d){
   set('eng-income-total', fmt(yr1inc));
 
   set('eng-base-spend', fmt(sp.baseAnnual));
+  set('eng-debt', fmt((_yrRow && _yrRow.debt) || 0));
   set('eng-p1-extra', fmt(sp.phase1Extra));
   set('eng-p2-extra', fmt(sp.phase2Extra));
   set('eng-p3-extra', fmt(sp.phase3Extra));
