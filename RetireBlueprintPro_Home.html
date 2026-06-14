@@ -165,6 +165,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:v
   .chart-area { height: 140px !important; }
   .roth-grid { grid-template-columns: 1fr 1fr !important; }
   .intel { display: none; } /* Hide intel panel on mobile - too cramped */
+  #fire-explainer { flex-direction: column !important; align-items: center !important; text-align: center !important; }
 }
 @media (max-width: 480px) {
   .kpi4, .kpi3 { grid-template-columns: 1fr 1fr !important; }
@@ -424,7 +425,7 @@ window.addEventListener('storage', function(e) {
 
   
   <div class="section-lbl">Planning Tools</div>
-<div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:14px 20px;margin-bottom:12px;border:1px solid rgba(28,199,208,0.25);display:flex;align-items:flex-start;gap:14px;">
+<div id="fire-explainer" style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:14px 20px;margin-bottom:12px;border:1px solid rgba(28,199,208,0.25);display:flex;align-items:flex-start;gap:14px;">
     <div style="flex-shrink:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></svg></span></div>
     <div>
       <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:4px;">What is FIRE? — Financial Independence, Retire Early</div>
