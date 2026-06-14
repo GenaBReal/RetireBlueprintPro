@@ -1,0 +1,30 @@
+{
+  "name": "RetireBlueprint Pro",
+  "short_name": "Retire Pro",
+  "description": "Your personal retirement planning blueprint \u2014 projections, stress tests, and tax strategy.",
+  "start_url": "/RetireBlueprintPro_Dashboard.html",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#041E2F",
+  "theme_color": "#041E2F",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

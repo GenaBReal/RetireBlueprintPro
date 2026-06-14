@@ -250,7 +250,8 @@ function readAll(ss, inp) {
       contribStart:dt(ar,12),  // L = Contrib Start Date
       contribEnd:dt(ar,13),    // M = Contrib End Date
       withdrawStart:dt(ar,14), // N = Withdrawal Start Date
-      status:str(ar,7), showOnDashboard:str(ar,8)
+      status:str(ar,7), showOnDashboard:str(ar,8),
+      costBasis:num(ar,15) // O = Cost Basis (capital gains)
     });
   }
 
@@ -350,7 +351,7 @@ function readAll(ss, inp) {
   try {
     var masterSheet = ss.getSheetByName('Master');
     if (masterSheet) {
-      var masterData = masterSheet.getRange('A8:CC200').getValues();
+      var masterData = masterSheet.getRange('A8:CD200').getValues();
       masterData.forEach(function(row) {
         // col A = year — handle both plain number and date object
         var yr;
@@ -375,7 +376,7 @@ function readAll(ss, inp) {
         // = var_Funding_Required (spending + taxes - income). Reading row[44] alone counted
         // reinvested RMDs as spent, over-withdrawing in years where RMD exceeds the cash need.
         projections.withdrawals.push(Math.round((Number(row[44])||0) - (Number(row[45])||0)));
-        projections.endLiquid.push(Math.round(Number(row[80])||0));   // BX = End of Year Liquid
+        projections.endLiquid.push(Math.round(Number(row[81])||0));   // BX = End of Year Liquid
         // Federal taxes for effective rate calculation
         var fedTaxes     = Number(row[40])||0;  // AJ = Total Federal Taxes (+5)
         var taxableIncome= Number(row[39])||0;  // AI = Total Taxable Income (+5)
@@ -420,7 +421,7 @@ function readAll(ss, inp) {
         var totalPreTax = Number(row[72])||0;  // BU = total pre-tax
         var totalRoth   = Number(row[73])||0;  // BV = total roth
         var totalTaxable= Number(row[74])||0;  // BW = total taxable/liquid
-        var totalHSA    = Number(row[75])||0;  // BX = total HSA
+        var totalHSA    = Number(row[76])||0;  // BX = total HSA
         // Capture year 1 values for effective rate
         if (!masterYear1Set && yr >= 2020) {
           masterYear1FedTax        = fedTaxes;
@@ -774,20 +775,22 @@ function writeInputs(ss, inp, data) {
           (function(){ var v=parseFloat(a.match);  return (isFinite(v) && v>=0 && v<=200000) ? Math.round(v) : 0; })(),  // K = Employer Match
           '',                                // L = Contrib Start (written separately below)
           '',                                // M = Contrib End (written separately below)
-          ''                                 // N = Withdrawal Start (written separately below)
+          '',                                // N = Withdrawal Start (written separately below)
+          Number(a.basis)||0                 // O = Cost Basis (capital gains)
         ]);
       }
       // Force J and K to number format BEFORE clearing/writing
       // This prevents Sheets from auto-formatting as dates
       inp.getRange('J105:K116').setNumberFormat('0');
+      inp.getRange('O105:O116').setNumberFormat('0');
       SpreadsheetApp.flush();
       // Clear J-N completely before writing to remove any corrupt values
-      inp.getRange('J105:N116').clearContent();
+      inp.getRange('J105:O116').clearContent();
       SpreadsheetApp.flush(); // Ensure clear completes before writing
       // Log what we're about to write to J and K
       Logger.log('Writing accounts J/K: ' + acctData.map(function(r){return r[9]+'/'+r[10];}).join(', '));
       Logger.log('Writing owners: ' + acctData.map(function(r){return r[2];}).join(', '));
-      inp.getRange('A105:N116').setValues(acctData.slice(0,12));
+      inp.getRange('A105:O116').setValues(acctData.slice(0,12));
       // Write contribution dates separately using setD (handles date format correctly)
       var acctRows = [105,106,107,108,109,110,111,112,113,114,115,116];
       for (var ai=0; ai<12; ai++) {
@@ -1059,7 +1062,7 @@ function runStressTest(ss, inp, p) {
     var safeExtraCrashAdj = Math.round(safeExtra); // fallback: base plan value
     var master = ss.getSheetByName('Master');
     if (master) {
-      var md = master.getRange('A8:CC200').getValues();
+      var md = master.getRange('A8:CD200').getValues();
 
       // ── 1. Build series + extract stressed floor withdrawals from same pass ──
       var stressFloorW = [];   // net portfolio draw per year (extras removed)
@@ -1073,7 +1076,7 @@ function runStressTest(ss, inp, p) {
         else { yr = Number(rawYr); if (yr>40000 && yr<100000){ var d=new Date((yr-25569)*86400*1000); yr=d.getFullYear(); } }
         if (!yr || yr<2020 || yr>2200) continue;
 
-        var endLiq = Number(row[80])||0;
+        var endLiq = Number(row[81])||0;
         series.push({ year:yr, bal:Math.round(endLiq) });
         if (belowYear===null && legacyGoal>0 && endLiq < legacyGoal){ belowYear = yr; }
 
@@ -1279,14 +1282,14 @@ function _rbpRunOneSweepScenario(ss, inp, orig, s, inflPct, startYr) {
   var master = ss.getSheetByName('Master');
   var safeAdj = Math.round(safeBase);
   if (master) {
-    var md = master.getRange('A8:CC200').getValues();
+    var md = master.getRange('A8:CD200').getValues();
     var stFW=[], phR=[], p1A=0, ser=[];
     for (var i=0;i<md.length;i++){
       var row=md[i], rawYr=row[0], yr;
       if (rawYr instanceof Date) yr=rawYr.getFullYear();
       else{ yr=Number(rawYr); if(yr>40000&&yr<100000){var dd=new Date((yr-25569)*86400*1000);yr=dd.getFullYear();} }
       if(!yr||yr<2020||yr>2200) continue;
-      var endLiq=Number(row[80])||0;
+      var endLiq=Number(row[81])||0;
       ser.push({year:yr,bal:Math.round(endLiq)});
       if(belowYear===null&&legGoal>0&&endLiq<legGoal) belowYear=yr;
       var gW=(Number(row[44])||0)-(Number(row[45])||0), gCx=Number(row[31])||0;
