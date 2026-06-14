@@ -957,10 +957,20 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
 // IRMAA thresholds (MFJ) + base Part B premium — from the shared tax config (rbp-tax-config.js)
-var IRMAA = (window.RBP_TAX ? window.RBP_TAX.irmaa.tiers : []).map(function(t){
-  return {maxIncome:t.mfjMax, partB:t.partBSurcharge, partD:t.partD, label:t.label};
-});
-var PARTB_BASE = window.RBP_TAX ? window.RBP_TAX.irmaa.partBBase : 202.90;
+// Built-in 2026 IRMAA fallback (MFJ) used if the shared rbp-tax-config.js didn't load,
+// so the calculator works instead of crashing on an empty tier list. Live config wins.
+var IRMAA_FALLBACK = [
+  {maxIncome:218000,   partB:0,      partD:0,     label:'Standard'},
+  {maxIncome:274000,   partB:81.20,  partD:14.50, label:'Tier 1'},
+  {maxIncome:342000,   partB:203.00, partD:37.50, label:'Tier 2'},
+  {maxIncome:410000,   partB:324.70, partD:60.40, label:'Tier 3'},
+  {maxIncome:750000,   partB:446.50, partD:78.60, label:'Tier 4'},
+  {maxIncome:Infinity, partB:487.00, partD:91.00, label:'Tier 5'}
+];
+var IRMAA = (window.RBP_TAX && window.RBP_TAX.irmaa && window.RBP_TAX.irmaa.tiers && window.RBP_TAX.irmaa.tiers.length)
+  ? window.RBP_TAX.irmaa.tiers.map(function(t){ return {maxIncome:t.mfjMax, partB:t.partBSurcharge, partD:t.partD, label:t.label}; })
+  : IRMAA_FALLBACK;
+var PARTB_BASE = (window.RBP_TAX && window.RBP_TAX.irmaa && window.RBP_TAX.irmaa.partBBase) ? window.RBP_TAX.irmaa.partBBase : 202.90;
 
 function fmt(n){if(!n&&n!==0)return '—';if(Math.abs(n)>=1000000)return '$'+(n/1000000).toFixed(1)+'M';if(Math.abs(n)>=1000)return '$'+Math.round(n).toLocaleString();return '$'+n.toFixed(0);}
 function fmtM(n){return '$'+n.toFixed(0)+'/mo';}
@@ -975,10 +985,11 @@ function calc() {
   var p2Death   = parseInt(document.getElementById('p2-death').value)||92;
 
   // Find IRMAA tier
-  var tier = IRMAA[0];
+  var tier = IRMAA[IRMAA.length - 1] || {maxIncome:Infinity, partB:0, partD:0, label:'Standard'};
   for (var i = 0; i < IRMAA.length; i++) {
     if (income <= IRMAA[i].maxIncome) { tier = IRMAA[i]; break; }
   }
+  if (!tier) tier = {maxIncome:Infinity, partB:0, partD:0, label:'Standard'};
 
   var partBPerPerson = PARTB_BASE + tier.partB;
   var partDPerPerson = partD + tier.partD;
