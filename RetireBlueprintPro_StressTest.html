@@ -240,6 +240,10 @@ window.addEventListener('storage', function(e) {
      shrink and stack full-width so all the wording wraps on-screen. */
   #mc-headline-row{gap:12px !important;}
   #mc-headline-row > div{flex:1 1 100% !important;min-width:0 !important;box-sizing:border-box !important;}
+  /* "Your Real Plan Loaded" / sample notices: stack as a single left-aligned column on a phone
+     so the right-aligned "Base ending…" line tucks underneath instead of floating off to the side */
+  #your-data-notice,#sample-notice{flex-direction:column !important;align-items:flex-start !important;text-align:left !important;}
+  #your-data-notice > div,#sample-notice > div{text-align:left !important;width:100% !important;}
   .nav{overflow-x:auto !important;flex-wrap:nowrap !important;}
 }
 </style>
