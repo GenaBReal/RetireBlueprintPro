@@ -47,6 +47,9 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
 .connected-box.show{display:flex;}
 .connected-text{font-size:13px;color:var(--orange);font-weight:700;}
 .connected-id{font-size:11px;color:var(--muted);display:block;margin-top:2px;font-family:monospace;word-break:break-all;}
+.connect-tip{background:rgba(244,184,106,.08);border:1px solid rgba(244,184,106,.4);border-left:4px solid var(--orange);border-radius:8px;padding:14px 16px;margin:0 0 16px;font-size:13px;color:var(--text);line-height:1.85;}
+.connect-tip .tip-head{display:block;font-size:12px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.connect-tip strong{color:var(--white);}
 .success-box{background:var(--n2);border:2px solid var(--teal);border-radius:12px;padding:32px;text-align:center;margin-top:20px;display:none;}
 .success-box.show{display:block;animation:fadeIn .4s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
@@ -129,6 +132,11 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     </div>
     <div class="step-body">
       Go to your new sheet tab. Click the address bar at the top of your browser — it shows the web address. <strong>Select all and copy the whole address</strong> — then paste it below. We'll find your ID automatically!
+    </div>
+
+    <div class="connect-tip">
+      <span class="tip-head">&#9888;&nbsp; Connect YOUR copy — not the original</span>
+      Paste the address of the <strong>copy you made in Step 1</strong>, not the original template you copied it from. Your dashboard simply mirrors whichever sheet you connect here — so if your dashboard numbers ever look off or don't match your sheet, you've most likely connected the wrong copy. Just come back to this page and paste <strong>your own sheet's address</strong> again.
     </div>
 
     <div class="sheet-id-wrap">
