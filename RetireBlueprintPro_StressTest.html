@@ -3159,10 +3159,12 @@ function rcsRender(){
     var phaseLine = r.safe>0
       ? ('Extra by phase \u2014 phase 1 '+rcsK(r.safe)+' \u00b7 phase 2 '+rcsK(r.safe*r2)+' \u00b7 phase 3 '+rcsK(r.safe*r3))
       : 'No room for extra here \u2014 floor only';
-    var extraSeg = wide
-      ? '<div style="width:'+extraPct.toFixed(1)+'%;background:'+s.c+';color:#041E2F;display:flex;align-items:center;justify-content:center;">+'+rcsK(r.safe)+'</div>'
-      : '<div style="width:'+extraPct.toFixed(1)+'%;background:'+s.c+';"></div>';
-    var trailing = wide ? '' : '<span style="font-size:12px;font-weight:700;color:'+(r.safe>0?s.c:'#7a9aaa')+';white-space:nowrap;">'+(r.safe>0?('+'+rcsK(r.safe)):'floor only')+'</span>';
+    var extraSeg = (r.safe>0)
+      ? '<div style="width:'+extraPct.toFixed(1)+'%;background:'+s.c+';color:#041E2F;font-weight:800;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;">+'+rcsK(r.safe)+'</div>'
+      : '';
+    var trailing = (r.safe>0)
+      ? '<span style="font-size:12px;font-weight:800;color:'+s.c+';white-space:nowrap;">+'+rcsK(r.safe)+'</span>'
+      : '<span style="font-size:12px;font-weight:700;color:#7a9aaa;white-space:nowrap;">floor only</span>';
     var active=(window._rcsPick===idx);
     return '<div onclick="rcsPick('+idx+')" style="cursor:pointer;border:1px solid '+(active?'rgba(28,199,208,.55)':'rgba(255,255,255,.08)')+';border-radius:12px;padding:12px 14px;margin-bottom:9px;background:'+(active?'rgba(28,199,208,.06)':'transparent')+';">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;flex-wrap:wrap;">'
@@ -3200,8 +3202,9 @@ function rcsChart(idx){
   var canvas=document.getElementById('rcs-chart'); if(!canvas) return;
   var ttl=document.getElementById('rcs-chart-title'); if(ttl) ttl.textContent='Your money through '+r.name;
   if(window._rcsChartObj) window._rcsChartObj.destroy();
-  var _pe=(typeof rbpPlanEndYear==='function')?rbpPlanEndYear():0;
-  var _bs=(_pe>0)?ctx.baseSeries.filter(function(p){return p.year<=_pe;}):ctx.baseSeries;
+  var _end=0; var _rs=window._rcsResults||[];
+  for(var _i=0;_i<_rs.length;_i++){ var _s=_rs[_i].series; if(_s&&_s.length){ var _y=_s[_s.length-1].year; if(_y>_end) _end=_y; } }
+  var _bs=(_end>0)?ctx.baseSeries.filter(function(p){return p.year<=_end;}):ctx.baseSeries;
   var labels=_bs.map(function(p){return p.year;});
   var baseData=_bs.map(function(p){return p.bal;});
   var sMap={}; r.series.forEach(function(p){ sMap[p.year]=p.bal; });
