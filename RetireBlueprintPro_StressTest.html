@@ -378,20 +378,58 @@ window.addEventListener('storage', function(e) {
 
   <!-- HISTORICAL CRASHES — real bear markets vs safe extra spend -->
   <div id="hist-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #f4b86a;overflow:hidden;padding:20px 22px;">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
-      <div style="min-width:240px;flex:1;">
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">What if a real crash from history happened again?</div>
-        <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;">Runs your actual saved plan through the real year-by-year losses of history's worst bear markets &mdash; as if that exact crash hit at the very start of your retirement &mdash; and shows the most extra you could still safely spend each year and <strong style="color:#dceaf5;">still reach your legacy goal</strong>.</div>
-      </div>
-      <button id="hist-run-btn" onclick="rbpRunHistory()" style="font-size:12px;font-weight:800;padding:9px 18px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.6);color:#f4b86a;cursor:pointer;white-space:nowrap;flex-shrink:0;">&#9654; Run All Historical Crashes</button>
-    </div>
-    <div id="hist-base" style="font-size:11px;color:#9fc1d6;margin-bottom:13px;line-height:1.5;">Your calm-weather safe extra spend is <span id="hist-base-val" style="color:#1CC7D0;font-weight:800;">&mdash;</span>/yr. Each row shows what still holds if that crash hit at the worst possible time.</div>
-    <div id="hist-rows"></div>
-    <div style="font-size:10.5px;color:#6a8a9a;line-height:1.7;margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:11px;">
-      <strong style="color:#9fc1d6;">The exact numbers behind these:</strong> each scenario uses the <strong style="color:#9fc1d6;">actual S&amp;P 500 total returns</strong> (with dividends reinvested) for that period &mdash; 2008 was &minus;37% in a single year; the dot-com bust fell three years running; 1973&ndash;74 dropped &minus;15% then &minus;26% <em>and</em> is modeled with that era's ~9% inflation eating your spending; the Great Depression is the worst on record at roughly &minus;64% over four years. Multi-year crashes apply their real losses in order, with the worst year where it actually landed.<br><br>
-      <strong style="color:#9fc1d6;">Why isn't 2020 here?</strong> The COVID crash fell &minus;34% in five weeks but fully recovered the same year (+18% for 2020). On a yearly basis it wasn't a sustained crash &mdash; and a plan that holds through 2008 shrugs off a fast dip like that.
-    </div>
+  <style>
+    #hist-kpi-grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px;}
+    #hist-kpi-grid .kpi-card{background:#fff;border-top:3px solid #1CC7D0;border-radius:12px;padding:13px 14px 12px;text-align:center;box-shadow:0 6px 24px rgba(4,30,47,.18),0 1px 4px rgba(4,30,47,.12);}
+    #hist-kpi-grid .kpi-card:nth-child(2){border-top-color:#d64545;}
+    #hist-kpi-grid .kpi-card:nth-child(3){border-top-color:#f4b86a;}
+    #hist-kpi-grid .kpi-card:nth-child(5){border-top-color:#f4b86a;}
+    #hist-kpi-grid .kpi-lbl{font-size:8.5px;font-weight:800;color:#5a6b7a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;line-height:1.3;}
+    #hist-kpi-grid .kpi-val{font-size:19px;font-weight:900;line-height:1.1;}
+    #hist-kpi-grid .kpi-sub{font-size:9.5px;color:#5a6b7a;margin-top:5px;font-weight:600;line-height:1.3;}
+    @media(max-width:520px){#hist-kpi-grid{grid-template-columns:1fr !important;}}
+    #hist-pick{width:100%;box-sizing:border-box;background:#06243a;color:#fff;border:1px solid rgba(244,184,106,.55);border-radius:10px;padding:12px 14px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.2px;}
+    #hist-pick:focus{outline:none;border-color:#f4b86a;}
+  </style>
+
+  <div style="margin-bottom:14px;">
+    <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">What if a real crash from history happened again?</div>
+    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;">Pick a real bear market and your saved plan runs through its actual year-by-year losses &mdash; as if that exact crash hit at the very start of your retirement. You get the same full read-out as the Crash Test below.</div>
   </div>
+
+  <div style="font-size:9.5px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Choose a crash from history</div>
+  <select id="hist-pick" onchange="rbpHistFill(this.value)">
+    <option value="gfc2008">2008 Financial Crisis &mdash; 1 year, &minus;37%</option>
+    <option value="dotcom">2000&ndash;2002 Dot-Com Bust &mdash; 3 years, &minus;38%</option>
+    <option value="stag7374">1973&ndash;74 Stagflation &mdash; &minus;37% + ~9% inflation</option>
+    <option value="covid2020">2020 COVID Crash &mdash; &minus;34%, recovered to +18%</option>
+    <option value="rate2022">2022 Rate Shock &mdash; 1 year, &minus;18%</option>
+    <option value="depression">1929&ndash;1932 Great Depression &mdash; &minus;64%, worst on record</option>
+  </select>
+  <div id="hist-caption" style="font-size:11px;color:#8aaabb;margin-top:8px;line-height:1.5;">—</div>
+
+  <div id="hist-base" style="font-size:11px;color:#9fc1d6;margin:14px 0 12px;line-height:1.5;">Your calm-weather safe extra spend is <span id="hist-base-val" style="color:#1CC7D0;font-weight:800;">&mdash;</span>/yr (with no crash). The cards below show how that holds up under the crash you picked.</div>
+
+  <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;">This Crash &mdash; at a glance</div>
+  <div id="hist-kpi-grid">
+    <div class="kpi-card"><div class="kpi-lbl">Base Plan Ending</div><div id="h-base-end" class="kpi-val" style="color:#1CC7D0;">—</div><div class="kpi-sub">no crash</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">With This Crash</div><div id="h-stress-end" class="kpi-val" style="color:#ff6b6b;">—</div><div id="h-stress-conf" class="kpi-sub">—</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">The Hit</div><div id="h-hit" class="kpi-val" style="color:#f4b86a;">—</div><div class="kpi-sub">base − scenario</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">Extra You Can Still Add</div><div id="h-safe" class="kpi-val" style="color:#1CC7D0;">—</div><div id="h-safe-sub" class="kpi-sub">above your floor, this crash</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">Drops Below Legacy</div><div id="h-below" class="kpi-val" style="color:#1CC7D0;">—</div><div class="kpi-sub">year, or holds</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">Your Legacy Target</div><div id="h-legacy" class="kpi-val" style="color:#0B2239;">—</div><div class="kpi-sub">tested against</div></div>
+  </div>
+
+  <div style="margin-top:14px;background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:18px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;">
+    <div id="h-verdict-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;">—</div>
+    <div id="h-verdict-detail" style="font-size:11.5px;color:#b8dde6;line-height:1.7;"></div>
+  </div>
+
+  <div style="font-size:10.5px;color:#6a8a9a;line-height:1.7;margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:11px;">
+    <strong style="color:#9fc1d6;">The exact numbers behind these:</strong> each scenario uses the <strong style="color:#9fc1d6;">actual S&amp;P 500 total returns</strong> (with dividends reinvested) for that period &mdash; 2008 was &minus;37% in a single year; the dot-com bust fell three years running; 1973&ndash;74 dropped &minus;15% then &minus;26% and is modeled with that era's ~9% inflation; the Great Depression is the worst on record at roughly &minus;64% over four years. Multi-year crashes apply their real losses in order.<br><br>
+    <strong style="color:#9fc1d6;">About 2020:</strong> COVID fell &minus;34% in five weeks but fully recovered the same year (+18% for 2020), so on a yearly basis your plan barely notices it. It’s here to show the real lesson — a fast crash that bounces back doesn’t break a retirement; the grinding multi-year bears are what to plan for.
+  </div>
+</div>
 
   <!-- ════════ Test 2 divider (was Test 1) ════════ -->
   <div style="margin:30px 0 16px;display:flex;align-items:center;gap:14px;">
@@ -3034,106 +3072,131 @@ function buildHistChart(endings, legacyGoal) {
 if(document.readyState!=='loading')w();else document.addEventListener('DOMContentLoaded',w);})();
 </script>
 <script>
-// ══ TEST 1 · IF HISTORY REPEATS — real bear markets run through the live local engine ══
+// ══ TEST 1 · IF HISTORY REPEATS — dropdown of real bear markets, identical read-out to the Crash Test ══
 // Each scenario uses the ACTUAL S&P 500 total returns (with dividends) for that period.
-// drag = points below a ~7% baseline year (= 7 − that year's return%), applied for `dur` years.
-// The engine supports two crash phases, so multi-year bears keep their real shape
-// (worst year where it actually landed). 2020 is intentionally excluded: it fell −34% in
-// five weeks but ended +18% for the year, so on an annual basis it isn't a sustained crash.
+// drag = points below a ~7% baseline year (= 7 − that year's return%), applied for `dur` years;
+// the engine's second phase lets multi-year bears keep their real shape (worst year where it landed).
+// Picking a scenario runs it on the instant local engine and fills the SAME 6 KPIs + verdict as Test 2.
 var RBP_HIST = [
-  { key:'gfc2008',    name:'2008 Financial Crisis',     hist:'1 year &middot; \u201237%',
+  { key:'gfc2008',    name:'2008 Financial Crisis',          hist:'one brutal year: the S&P 500 fell \u201237% in 2008',
     phases:[{drag:44,dur:1}], infl:null },
-  { key:'dotcom',     name:'2000\u20132002 Dot-Com Bust', hist:'3 years &middot; \u201238% total',
+  { key:'dotcom',     name:'2000\u20132002 Dot-Com Bust',     hist:'three down years in a row (\u22129%, \u221212%, \u221222%) \u2014 about \u221238% total',
     phases:[{drag:18,dur:2},{drag:29,dur:1}], infl:null },
-  { key:'stag7374',   name:'1973\u201374 Stagflation',    hist:'2 years &middot; \u201237% + ~9% inflation',
+  { key:'stag7374',   name:'1973\u201374 Stagflation',        hist:'\u221215% then \u221226%, with ~9% inflation eating your spending the whole time',
     phases:[{drag:22,dur:1},{drag:33,dur:1}], infl:9 },
-  { key:'rate2022',   name:'2022 Rate Shock',            hist:'1 year &middot; \u201218% &middot; stocks &amp; bonds both fell',
+  { key:'covid2020',  name:'2020 COVID Crash',                hist:'fell \u221234% in five weeks but recovered to +18% by year-end \u2014 a fast crash that bounced back',
+    phases:[{drag:-11,dur:1}], infl:null },
+  { key:'rate2022',   name:'2022 Rate Shock',                 hist:'\u221218% in one year, with stocks and bonds falling together',
     phases:[{drag:25,dur:1}], infl:null },
-  { key:'depression', name:'1929\u20131932 Great Depression', hist:'4 years &middot; ~\u201264% total &middot; worst case on record',
+  { key:'depression', name:'1929\u20131932 Great Depression', hist:'four straight down years, about \u221264% total \u2014 the worst on record',
     phases:[{drag:30,dur:4}], infl:null }
 ];
 
-function rbpHistRowHTML(sc){
-  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;'
-    + 'background:rgba(255,255,255,.04);border:1px solid #163348;border-left:3px solid #f4b86a;'
-    + 'border-radius:10px;padding:11px 14px;margin-bottom:9px;flex-wrap:wrap;">'
-    + '<div style="min-width:200px;flex:1;">'
-    +   '<div style="font-size:13px;font-weight:800;color:#dceaf5;">'+sc.name+'</div>'
-    +   '<div style="font-size:10.5px;color:#8aaabb;margin-top:2px;">'+sc.hist+'</div>'
-    + '</div>'
-    + '<div style="text-align:right;min-width:160px;">'
-    +   '<div style="font-size:8.5px;color:#8aaabb;text-transform:uppercase;letter-spacing:.6px;">Safe extra spend</div>'
-    +   '<div id="hist-val-'+sc.key+'" style="font-size:17px;font-weight:900;color:#9fc1d6;line-height:1.2;">\u2014</div>'
-    +   '<div id="hist-st-'+sc.key+'" style="font-size:10px;color:#7a9aaa;margin-top:1px;">press Run to fill</div>'
-    + '</div>'
-    + '</div>';
-}
+function rbpHistById(key){ for(var i=0;i<RBP_HIST.length;i++){ if(RBP_HIST[i].key===key) return RBP_HIST[i]; } return null; }
 
-function rbpRenderEmptyHist(){
-  var w = document.getElementById('hist-rows');
-  if(!w) return;
-  w.innerHTML = RBP_HIST.map(rbpHistRowHTML).join('');
-}
+function rbpHistFill(key){
+  var sc = rbpHistById(key); if(!sc) return;
+  var $ = function(id){ return document.getElementById(id); };
+  function setVal(id,v,c){ var e=$(id); if(e){ e.textContent=v; if(c) e.style.color=c; } }
+  function setSub(id,t,c){ var e=$(id); if(e){ e.textContent=t; if(c) e.style.color=c; } }
+  function setVerdict(t,d,c){ var vt=$('h-verdict-title'), vd=$('h-verdict-detail');
+    if(vt){ vt.textContent=t; vt.style.color=c||'#fff'; } if(vd) vd.innerHTML=d||''; }
 
-function rbpHistSetRow(key, r){
-  var v = document.getElementById('hist-val-'+key);
-  var s = document.getElementById('hist-st-'+key);
-  if(!v || !s) return;
-  if(r === 'running'){ v.textContent='\u2026'; v.style.color='#9fc1d6'; s.textContent='running\u2026'; s.style.color='#7a9aaa'; return; }
-  if(!r || r.error){ v.textContent='\u2014'; v.style.color='#9fc1d6'; s.innerHTML='<span style="color:#ff6b6b;">couldn\u2019t run \u2014 reload &amp; retry</span>'; return; }
-  if(r.depletes){
-    v.textContent='$0'; v.style.color='#ff6b6b';
-    s.innerHTML='<span style="color:#ff6b6b;">money runs out ~'+(r.belowYear||'')+' \u2014 must trim</span>';
-  } else if(!r.held){
-    v.textContent='$0'; v.style.color='#f4b86a';
-    s.innerHTML='<span style="color:#f4b86a;">dips below your goal '+(r.belowYear||'')+' \u2014 hold or trim</span>';
-  } else {
-    v.textContent=esFmt(r.safeExtra)+'/yr'; v.style.color='#1CC7D0';
-    s.innerHTML='<span style="color:#1CC7D0;">holds your legacy goal \u2713</span>';
-  }
-}
+  var cap = $('hist-caption'); if(cap) cap.innerHTML = '<strong style="color:#cfe3ef;">'+sc.name+'</strong> \u2014 '+sc.hist+'.';
 
-function rbpRunHistory(){
-  var btn = document.getElementById('hist-run-btn');
-  var baseLine = document.getElementById('hist-base');
   if(!planData || !window.RBP_I){
-    if(baseLine) baseLine.innerHTML='<span style="color:#ff6b6b;">Load your plan first (use Reload up top), then run.</span>';
+    setVerdict('Load your plan first', 'Use <b>Reload</b> at the top of the page, then pick a crash again.', '#f4b86a');
     return;
   }
+
+  // running placeholders
+  ['h-base-end','h-stress-end','h-hit','h-safe','h-below','h-legacy'].forEach(function(id){ setVal(id,'\u2026','#9fc1d6'); });
+  setSub('h-stress-conf','running\u2026','#7a9aaa');
+  setVerdict('Running this crash through your plan\u2026','','#fff');
+
   var proj = planData.projections || {};
   var startYr = (proj.years && proj.years.length) ? proj.years[0] : new Date().getFullYear();
   var base = esBaseNumbers() || {};
-  var bv = document.getElementById('hist-base-val');
-  if(bv) bv.textContent = (base.safeExtra!=null ? esFmt(base.safeExtra)+'/yr' : '\u2014');
-  if(btn){ btn.disabled=true; btn.textContent='Running\u2026'; btn.style.opacity='0.7'; btn.style.cursor='wait'; }
-  var i = 0;
-  (function runNext(){
-    if(i >= RBP_HIST.length){
-      if(btn){ btn.disabled=false; btn.innerHTML='\u21bb Re-run Historical Crashes'; btn.style.opacity='1'; btn.style.cursor='pointer'; }
+  var baseEnd = Math.round(base.ending || 0);
+  var legGoal = Math.round(base.legacyGoal || 0);
+  setVal('hist-base-val', (base.safeExtra!=null ? esFmt(base.safeExtra)+'/yr' : '\u2014'));
+
+  var p1 = sc.phases[0], p2 = sc.phases[1] || null;
+  var params = { action:'runStressTest', eType:'bear',
+    eStart:startYr, eDur:p1.dur, eDrag:p1.drag,
+    lType:'bear', lStart:(p2 ? startYr+p1.dur : 0), lDur:(p2 ? p2.dur : 0), lDrag:(p2 ? p2.drag : 0) };
+  if(sc.infl != null) params.infl = sc.infl;
+
+  rbpRunStressLocal(params, function(resp){
+    if(!resp || !resp.ok || !resp.series || !resp.series.length){
+      setVal('h-stress-end','\u2014'); setSub('h-stress-conf','couldn\u2019t run','#ff6b6b');
+      setVerdict('Couldn\u2019t run this scenario','Try Reload at the top of the page, then pick the crash again.','#ff6b6b');
       return;
     }
-    var sc = RBP_HIST[i];
-    var p1 = sc.phases[0], p2 = sc.phases[1] || null;
-    rbpHistSetRow(sc.key, 'running');
-    var params = { action:'runStressTest', eType:'bear',
-      eStart:startYr, eDur:p1.dur, eDrag:p1.drag,
-      lType:'bear', lStart:(p2 ? startYr + p1.dur : 0), lDur:(p2 ? p2.dur : 0), lDrag:(p2 ? p2.drag : 0) };
-    if(sc.infl != null) params.infl = sc.infl;
-    rbpRunStressLocal(params, function(resp){
-      rbpHistSetRow(sc.key, (resp && resp.ok) ? rbpHonestResult(resp) : {error:1});
-      i++; setTimeout(runNext, 140);
-    }, function(){
-      rbpHistSetRow(sc.key, {error:1});
-      i++; setTimeout(runNext, 140);
-    });
-  })();
+    // ── mirror the Crash Test exactly ──
+    var planEnd = (typeof rbpPlanEndYear==='function') ? rbpPlanEndYear() : null;
+    var ss = resp.series.filter(function(p){ return !planEnd || p.year<=planEnd; });
+    var stressEnd = ss.length ? ss[ss.length-1].bal : (resp.ending||0);
+    var minBal = ss.length ? Math.min.apply(null, ss.map(function(p){return p.bal;})) : stressEnd;
+    var zeroYr = null; for(var z=0; z<ss.length; z++){ if(ss[z].bal<=0){ zeroYr=ss[z].year; break; } }
+    var depletes = minBal<=0;
+    var belowYr = resp.belowYear;
+    var safeX = resp.safeExtra;
+    var teal='#1CC7D0', gold='#f4b86a', red='#ff6b6b';
+
+    setVal('h-base-end', esFmt(baseEnd), teal);
+    setVal('h-stress-end', depletes?'$0':esFmt(stressEnd), depletes?red:(stressEnd>=legGoal?teal:gold));
+    setSub('h-stress-conf',
+      depletes ? ('drains ~'+(zeroYr||belowYr||'')) : (belowYr ? ('dips below goal '+belowYr) : 'stays above goal'),
+      depletes?red:(belowYr?gold:teal));
+
+    var hit = baseEnd - (depletes?0:stressEnd);
+    if(hit<0){ setVal('h-hit','+'+esFmt(-hit), teal); }
+    else { setVal('h-hit', (hit>0?'\u2212':'')+esFmt(hit), hit>0?gold:teal); }
+
+    if(depletes){ setVal('h-safe','$0',red); setSub('h-safe-sub','plan depletes \u2014 no extra is safe','#5a6b7a'); }
+    else { setVal('h-safe',(safeX>0?esFmt(safeX):'$0'), safeX>0?teal:gold); setSub('h-safe-sub','above your floor, this crash','#5a6b7a'); }
+
+    if(belowYr){ setVal('h-below',String(belowYr),gold); }
+    else if(depletes){ setVal('h-below',String(zeroYr||'\u2014'),red); }
+    else { setVal('h-below','Holds',teal); }
+
+    setVal('h-legacy', esFmt(legGoal), '#0B2239');
+
+    if(!belowYr && !depletes){
+      setVerdict('\u2705 Holds Through '+sc.name,
+        'Even at your current planned spending, your balance stays at or above your '+esFmt(legGoal)+
+        ' legacy goal the whole way through this crash. Your essentials are covered for life, and safe extra spend holds around '+esFmt(safeX)+'/yr.',
+        '#fff');
+    } else if(depletes){
+      setVerdict('\ud83d\udea8 Drains at Current Spending',
+        '<b>If you don\u2019t adjust:</b> at your current planned spending, this crash drains the portfolio to <b>$0</b> around <b>'+
+        (zeroYr||belowYr||'')+'</b> \u2014 meaning your essentials would no longer be covered after that. No extra spending is safe here; '+
+        'in a real downturn this severe the fix is trimming spending. Most downturns are shorter and shallower than this one.',
+        '#ff6b6b');
+    } else {
+      setVerdict('\u26a0\ufe0f Legacy at Risk at Current Spending',
+        '<b>If you don\u2019t adjust:</b> at your current planned spending, this crash drops you below your '+esFmt(legGoal)+
+        ' legacy goal in <b>'+belowYr+'</b>. Your <b>essentials stay covered for life</b> \u2014 but to ride it out <i>and</i> still leave your '+
+        'full legacy, your safe extra spend needs to ease to about <b>'+(safeX>0?esFmt(safeX):'$0')+'/yr</b>. Trimming discretionary spending is how the plan absorbs the hit.',
+        '#f4b86a');
+    }
+  }, function(){
+    setVal('h-stress-end','\u2014'); setSub('h-stress-conf','couldn\u2019t run','#ff6b6b');
+    setVerdict('Couldn\u2019t run this scenario','Try Reload at the top of the page, then pick the crash again.','#ff6b6b');
+  });
 }
 
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', rbpRenderEmptyHist);
-} else {
-  rbpRenderEmptyHist();
+// Auto-fill the first scenario once the plan finishes loading (no hook into loadData needed).
+function rbpHistAuto(tries){
+  var pick = document.getElementById('hist-pick');
+  if(!pick) return;
+  if(window.RBP_I && planData){ rbpHistFill(pick.value); return; }
+  if(tries>0) setTimeout(function(){ rbpHistAuto(tries-1); }, 600);
 }
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){ rbpHistAuto(25); });
+} else { rbpHistAuto(25); }
 
 </script>
 </body>
