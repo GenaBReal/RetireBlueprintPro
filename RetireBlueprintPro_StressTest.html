@@ -3200,8 +3200,10 @@ function rcsChart(idx){
   var canvas=document.getElementById('rcs-chart'); if(!canvas) return;
   var ttl=document.getElementById('rcs-chart-title'); if(ttl) ttl.textContent='Your money through '+r.name;
   if(window._rcsChartObj) window._rcsChartObj.destroy();
-  var labels=ctx.baseSeries.map(function(p){return p.year;});
-  var baseData=ctx.baseSeries.map(function(p){return p.bal;});
+  var _pe=(typeof rbpPlanEndYear==='function')?rbpPlanEndYear():0;
+  var _bs=(_pe>0)?ctx.baseSeries.filter(function(p){return p.year<=_pe;}):ctx.baseSeries;
+  var labels=_bs.map(function(p){return p.year;});
+  var baseData=_bs.map(function(p){return p.bal;});
   var sMap={}; r.series.forEach(function(p){ sMap[p.year]=p.bal; });
   var crashData=labels.map(function(y){ return (sMap[y]!=null)?sMap[y]:null; });
   var goal=ctx.legGoal;
