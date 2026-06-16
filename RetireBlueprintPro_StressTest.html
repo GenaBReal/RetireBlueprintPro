@@ -319,7 +319,7 @@ window.addEventListener('storage', function(e) {
         What happens to your plan<br><span style="color:#1CC7D0;">when markets crash?</span>
       </div>
       <div style="font-size:13px;color:#b8dde6;line-height:1.8;max-width:480px;">
-        Your Dashboard assumes a smooth 7% every year. Real markets don't work that way &mdash; so this page runs your <strong style="color:#fff;">actual saved plan</strong> through bad markets in <strong style="color:#fff;">four ways:</strong> real crashes from history, a crash you design, every crash level at once, and 1,000 random futures. Nothing here changes your saved plan.
+        Your Dashboard assumes a smooth 7% every year. Real markets don't work that way &mdash; so this page runs your <strong style="color:#fff;">actual saved plan</strong> through bad markets in <strong style="color:#fff;">four ways:</strong> a crash you design, real crashes from history, every crash level at once, and 1,000 random futures. Nothing here changes your saved plan.
       </div>
     </div>
 
@@ -369,72 +369,10 @@ window.addEventListener('storage', function(e) {
 </div>
 
 
-  <!-- ════════ Test 1 divider — IF HISTORY REPEATS (real crashes) ════════ -->
+  <!-- ════════ Test 1 divider — CRASH TEST ════════ -->
   <div style="margin:30px 0 16px;display:flex;align-items:center;gap:14px;">
     <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
-    <div style="background:#1CC7D0;color:#041E2F;font-size:13px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:9px 22px;border-radius:22px;white-space:nowrap;box-shadow:0 4px 16px rgba(28,199,208,.4);">Test 1 &middot; If History Repeats</div>
-    <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
-  </div>
-
-  <!-- HISTORICAL CRASHES — real bear markets vs safe extra spend -->
-  <div id="hist-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #f4b86a;overflow:hidden;padding:20px 22px;">
-  <style>
-    #hist-kpi-grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px;}
-    #hist-kpi-grid .kpi-card{background:#fff;border-top:3px solid #1CC7D0;border-radius:12px;padding:13px 14px 12px;text-align:center;box-shadow:0 6px 24px rgba(4,30,47,.18),0 1px 4px rgba(4,30,47,.12);}
-    #hist-kpi-grid .kpi-card:nth-child(2){border-top-color:#d64545;}
-    #hist-kpi-grid .kpi-card:nth-child(3){border-top-color:#f4b86a;}
-    #hist-kpi-grid .kpi-card:nth-child(5){border-top-color:#f4b86a;}
-    #hist-kpi-grid .kpi-lbl{font-size:8.5px;font-weight:800;color:#5a6b7a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;line-height:1.3;}
-    #hist-kpi-grid .kpi-val{font-size:19px;font-weight:900;line-height:1.1;}
-    #hist-kpi-grid .kpi-sub{font-size:9.5px;color:#5a6b7a;margin-top:5px;font-weight:600;line-height:1.3;}
-    @media(max-width:520px){#hist-kpi-grid{grid-template-columns:1fr !important;}}
-    #hist-pick{width:100%;box-sizing:border-box;background:#06243a;color:#fff;border:1px solid rgba(244,184,106,.55);border-radius:10px;padding:12px 14px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.2px;}
-    #hist-pick:focus{outline:none;border-color:#f4b86a;}
-  </style>
-
-  <div style="margin-bottom:14px;">
-    <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">What if a real crash from history happened again?</div>
-    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;">Pick a real bear market and your saved plan runs through its actual year-by-year losses &mdash; as if that exact crash hit at the very start of your retirement. You get the same full read-out as the Crash Test below.</div>
-  </div>
-
-  <div style="font-size:9.5px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Choose a crash from history</div>
-  <select id="hist-pick" onchange="rbpHistFill(this.value)">
-    <option value="gfc2008">2008 Financial Crisis &mdash; 1 year, &minus;37%</option>
-    <option value="dotcom">2000&ndash;2002 Dot-Com Bust &mdash; 3 years, &minus;38%</option>
-    <option value="stag7374">1973&ndash;74 Stagflation &mdash; &minus;37% + ~9% inflation</option>
-    <option value="covid2020">2020 COVID Crash &mdash; &minus;34%, recovered to +18%</option>
-    <option value="rate2022">2022 Rate Shock &mdash; 1 year, &minus;18%</option>
-    <option value="depression">1929&ndash;1932 Great Depression &mdash; &minus;64%, worst on record</option>
-  </select>
-  <div id="hist-caption" style="font-size:11px;color:#8aaabb;margin-top:8px;line-height:1.5;">—</div>
-
-  <div id="hist-base" style="font-size:11px;color:#9fc1d6;margin:14px 0 12px;line-height:1.5;">Your calm-weather safe extra spend is <span id="hist-base-val" style="color:#1CC7D0;font-weight:800;">&mdash;</span>/yr (with no crash). The cards below show how that holds up under the crash you picked.</div>
-
-  <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;">This Crash &mdash; at a glance</div>
-  <div id="hist-kpi-grid">
-    <div class="kpi-card"><div class="kpi-lbl">Base Plan Ending</div><div id="h-base-end" class="kpi-val" style="color:#1CC7D0;">—</div><div class="kpi-sub">no crash</div></div>
-    <div class="kpi-card"><div class="kpi-lbl">With This Crash</div><div id="h-stress-end" class="kpi-val" style="color:#ff6b6b;">—</div><div id="h-stress-conf" class="kpi-sub">—</div></div>
-    <div class="kpi-card"><div class="kpi-lbl">The Hit</div><div id="h-hit" class="kpi-val" style="color:#f4b86a;">—</div><div class="kpi-sub">base − scenario</div></div>
-    <div class="kpi-card"><div class="kpi-lbl">Extra You Can Still Add</div><div id="h-safe" class="kpi-val" style="color:#1CC7D0;">—</div><div id="h-safe-sub" class="kpi-sub">above your floor, this crash</div></div>
-    <div class="kpi-card"><div class="kpi-lbl">Drops Below Legacy</div><div id="h-below" class="kpi-val" style="color:#1CC7D0;">—</div><div class="kpi-sub">year, or holds</div></div>
-    <div class="kpi-card"><div class="kpi-lbl">Your Legacy Target</div><div id="h-legacy" class="kpi-val" style="color:#0B2239;">—</div><div class="kpi-sub">tested against</div></div>
-  </div>
-
-  <div style="margin-top:14px;background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:18px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;">
-    <div id="h-verdict-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;">—</div>
-    <div id="h-verdict-detail" style="font-size:11.5px;color:#b8dde6;line-height:1.7;"></div>
-  </div>
-
-  <div style="font-size:10.5px;color:#6a8a9a;line-height:1.7;margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:11px;">
-    <strong style="color:#9fc1d6;">The exact numbers behind these:</strong> each scenario uses the <strong style="color:#9fc1d6;">actual S&amp;P 500 total returns</strong> (with dividends reinvested) for that period &mdash; 2008 was &minus;37% in a single year; the dot-com bust fell three years running; 1973&ndash;74 dropped &minus;15% then &minus;26% and is modeled with that era's ~9% inflation; the Great Depression is the worst on record at roughly &minus;64% over four years. Multi-year crashes apply their real losses in order.<br><br>
-    <strong style="color:#9fc1d6;">About 2020:</strong> COVID fell &minus;34% in five weeks but fully recovered the same year (+18% for 2020), so on a yearly basis your plan barely notices it. It’s here to show the real lesson — a fast crash that bounces back doesn’t break a retirement; the grinding multi-year bears are what to plan for.
-  </div>
-</div>
-
-  <!-- ════════ Test 2 divider (was Test 1) ════════ -->
-  <div style="margin:30px 0 16px;display:flex;align-items:center;gap:14px;">
-    <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
-    <div style="background:#1CC7D0;color:#041E2F;font-size:13px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:9px 22px;border-radius:22px;white-space:nowrap;box-shadow:0 4px 16px rgba(28,199,208,.4);">Test 2 &middot; Crash Test</div>
+    <div style="background:#1CC7D0;color:#041E2F;font-size:13px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:9px 22px;border-radius:22px;white-space:nowrap;box-shadow:0 4px 16px rgba(28,199,208,.4);">Test 1 &middot; Crash Test</div>
     <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
   </div>
 
@@ -643,6 +581,103 @@ window.addEventListener('storage', function(e) {
     <div id="es-slots" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
   </div>
 </div>
+
+<!-- ════════ Test 2 divider — REAL CRASHES FROM HISTORY ════════ -->
+  <div style="margin:30px 0 16px;display:flex;align-items:center;gap:14px;">
+    <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
+    <div style="background:#1CC7D0;color:#041E2F;font-size:13px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:9px 22px;border-radius:22px;white-space:nowrap;box-shadow:0 4px 16px rgba(28,199,208,.4);">Test 2 &middot; Real Crashes from History</div>
+    <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
+  </div>
+
+  <!-- HISTORICAL CRASHES — real bear markets vs safe extra spend -->
+  <div id="hist-detail" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #f4b86a;overflow:hidden;padding:20px 22px;">
+  <style>
+    #hist-kpi-grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:12px;}
+    #hist-kpi-grid .kpi-card{background:#fff;border-top:3px solid #1CC7D0;border-radius:12px;padding:13px 14px 12px;text-align:center;box-shadow:0 6px 24px rgba(4,30,47,.18),0 1px 4px rgba(4,30,47,.12);}
+    #hist-kpi-grid .kpi-card:nth-child(2){border-top-color:#d64545;}
+    #hist-kpi-grid .kpi-card:nth-child(3){border-top-color:#f4b86a;}
+    #hist-kpi-grid .kpi-card:nth-child(5){border-top-color:#f4b86a;}
+    #hist-kpi-grid .kpi-lbl{font-size:8.5px;font-weight:800;color:#5a6b7a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;line-height:1.3;}
+    #hist-kpi-grid .kpi-val{font-size:19px;font-weight:900;line-height:1.1;}
+    #hist-kpi-grid .kpi-sub{font-size:9.5px;color:#5a6b7a;margin-top:5px;font-weight:600;line-height:1.3;}
+    @media(max-width:520px){#hist-kpi-grid{grid-template-columns:1fr !important;}}
+    #hist-pick{width:100%;box-sizing:border-box;background:#06243a;color:#fff;border:1px solid rgba(244,184,106,.55);border-radius:10px;padding:12px 14px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.2px;}
+    #hist-pick:focus{outline:none;border-color:#f4b86a;}
+  </style>
+
+  <div style="margin-bottom:14px;">
+    <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">What if a real crash from history happened again?</div>
+    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;">Pick a real bear market and your saved plan runs through its actual year-by-year losses &mdash; as if that exact crash hit at the very start of your retirement. You get the same full read-out as the Crash Test.</div>
+  </div>
+
+  <div style="font-size:9.5px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Choose a crash from history</div>
+  <select id="hist-pick" onchange="rbpHistFill(this.value)">
+    <option value="gfc2008">2008 Financial Crisis &mdash; 1 year, &minus;37%</option>
+    <option value="dotcom">2000&ndash;2002 Dot-Com Bust &mdash; 3 years, &minus;38%</option>
+    <option value="stag7374">1973&ndash;74 Stagflation &mdash; &minus;37% + ~9% inflation</option>
+    <option value="covid2020">2020 COVID Crash &mdash; &minus;34%, recovered to +18%</option>
+    <option value="rate2022">2022 Rate Shock &mdash; 1 year, &minus;18%</option>
+    <option value="depression">1929&ndash;1932 Great Depression &mdash; &minus;64%, worst on record</option>
+  </select>
+  <div id="hist-caption" style="font-size:11px;color:#8aaabb;margin-top:8px;line-height:1.5;">&mdash;</div>
+
+  <div id="hist-base" style="font-size:11px;color:#9fc1d6;margin:14px 0 12px;line-height:1.5;">Your calm-weather safe extra spend is <span id="hist-base-val" style="color:#1CC7D0;font-weight:800;">&mdash;</span>/yr (with no crash). The cards below show how that holds up under the crash you picked.</div>
+
+  <div style="font-size:9px;font-weight:900;color:#7ecfda;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;">This Crash &mdash; at a glance</div>
+  <div id="hist-kpi-grid">
+    <div class="kpi-card"><div class="kpi-lbl">Base Plan Ending</div><div id="h-base-end" class="kpi-val" style="color:#1CC7D0;">&mdash;</div><div class="kpi-sub">no crash</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">With This Crash</div><div id="h-stress-end" class="kpi-val" style="color:#ff6b6b;">&mdash;</div><div id="h-stress-conf" class="kpi-sub">&mdash;</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">The Hit</div><div id="h-hit" class="kpi-val" style="color:#f4b86a;">&mdash;</div><div class="kpi-sub">base &minus; scenario</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">Extra You Can Still Add</div><div id="h-safe" class="kpi-val" style="color:#1CC7D0;">&mdash;</div><div id="h-safe-sub" class="kpi-sub">above your floor, this crash</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">Drops Below Legacy</div><div id="h-below" class="kpi-val" style="color:#1CC7D0;">&mdash;</div><div class="kpi-sub">year, or holds</div></div>
+    <div class="kpi-card"><div class="kpi-lbl">Your Legacy Target</div><div id="h-legacy" class="kpi-val" style="color:#0B2239;">&mdash;</div><div class="kpi-sub">tested against</div></div>
+  </div>
+
+  <div style="margin-top:14px;background:linear-gradient(160deg,#06243a,#0A3145);border-radius:16px;padding:18px 22px;border:1px solid rgba(28,199,208,.25);border-top:3px solid #041E2F;">
+    <div id="h-verdict-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;">&mdash;</div>
+    <div id="h-verdict-detail" style="font-size:11.5px;color:#b8dde6;line-height:1.7;"></div>
+  </div>
+</div>
+
+<div style="height:14px;"></div>
+
+  <div id="hist-section" style="margin-top:18px;">
+  <div id="hsweep-section" style="background:linear-gradient(160deg,#1a1226,#241a33 60%,#2b2040);border-radius:16px;border:1px solid rgba(141,107,146,.35);border-top:4px solid #8D6B92;overflow:hidden;padding:20px 22px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
+      <div>
+        <div style="font-size:15px;font-weight:500;color:#ecdff2;margin-bottom:3px;">Real crashes from history — safe extra spend at each one</div>
+        <div style="font-size:11.5px;color:#cdb8d6;line-height:1.6;">Same read-out as the Scenario Sweep below, but every row is an <b style="color:#fff;">actual bear market</b> — run through your real plan as if it hit in your first retirement year. The bar is the most Phase-1 extra you could safely spend and still clear your legacy goal.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+        <button id="hsweep-real-btn" onclick="rbpHistSweep()" style="font-size:11px;padding:7px 14px;border-radius:8px;background:rgba(141,107,146,.28);border:1px solid rgba(141,107,146,.6);color:#d9c2e3;cursor:pointer;white-space:nowrap;">&#8635; Re-run Real Crashes</button>
+      </div>
+    </div>
+    <div id="hsweep-real-progress" style="display:none;margin-bottom:14px;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:11.5px;color:#ecdff2;">Running your engine — crash <span id="hsweep-prog-n">1</span> of <span id="hsweep-prog-total">6</span>…</span>
+        <span style="font-size:10px;color:#cdb8d6;">rows fill in as each finishes</span>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden;">
+        <div id="hsweep-prog-bar" style="height:100%;background:#8D6B92;border-radius:4px;width:0%;transition:width .4s;"></div>
+      </div>
+    </div>
+    <div id="hsweep-body">
+      <div id="hsweep-placeholder" style="font-size:11.5px;color:#a98fb5;line-height:1.7;padding:6px 2px;">
+        <strong style="color:#ecdff2;">Loading your plan…</strong> the moment your saved numbers are ready, each real crash runs automatically and the rows fill in below.
+      </div>
+      <div id="hsweep-chart-area" style="display:none;">
+        <div id="hsweep-bars"></div>
+        <div id="hsweep-depletion"></div>
+      </div>
+    </div>
+    <div style="font-size:10.5px;color:#a98fb5;line-height:1.7;margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:11px;">
+      <strong style="color:#cdb8d6;">The exact numbers:</strong> each row uses the <strong style="color:#cdb8d6;">actual S&amp;P 500 total returns</strong> for that crash — 2008 was &minus;37% in one year; the dot-com bust fell three years running (about &minus;38%); 1973&ndash;74 dropped &minus;15% then &minus;26% with ~9% inflation; the Great Depression is the worst on record at roughly &minus;64% over four years. Multi-year crashes apply their losses in order.<br><br>
+      <strong style="color:#cdb8d6;">About 2020:</strong> COVID fell &minus;34% in five weeks but recovered to +18% by year-end, so on a yearly basis your plan barely notices it — that's the lesson: a fast crash that bounces back doesn't break a retirement; the grinding multi-year bears are what to plan for.
+    </div>
+  </div>
+</div>
+
+  
 
 <!-- ════════ Test 3 divider (was Test 2) ════════ -->
 <div style="margin:40px 0 16px;display:flex;align-items:center;gap:14px;">
@@ -2206,7 +2241,8 @@ function rbpRenderEmptySweep() {
   _rbpSweepRender(rows, null, 0);   // p1Planned null → YOUR PLAN blank too
 }
 
-function _rbpSweepRender(results, p1Planned, legacyGoal) {
+function _rbpSweepRender(results, p1Planned, legacyGoal, pfx) {
+  var _pfx = pfx || 'sweep';
   var catColor = { great:'#1CC7D0', good:'#7ecfda', ok:'#b8dde6', warn:'#f4b86a', bad:'#ff6b6b' };
   var maxSafe = Math.max.apply(null, results.map(function(r){ return r.safe || 0; }));
   var fmtKno = function(v) { return v >= 1000 ? ('$'+Math.round(v/1000)+'K') : (v>0?('$'+v):'$0'); };
@@ -2308,10 +2344,10 @@ function _rbpSweepRender(results, p1Planned, legacyGoal) {
     +'<strong style="color:#1CC7D0;">At reduced plan</strong> = if you cut to that number, the plan survives.'
     +'</div></div>';
 
-  document.getElementById('sweep-bars').innerHTML = bHtml;
-  document.getElementById('sweep-depletion').innerHTML = dHtml;
-  document.getElementById('sweep-placeholder').style.display = 'none';
-  document.getElementById('sweep-chart-area').style.display = 'block';
+  document.getElementById(_pfx+'-bars').innerHTML = bHtml;
+  document.getElementById(_pfx+'-depletion').innerHTML = dHtml;
+  var _ph=document.getElementById(_pfx+'-placeholder'); if(_ph) _ph.style.display='none';
+  var _ca=document.getElementById(_pfx+'-chart-area'); if(_ca) _ca.style.display='block';
 }
 
 
@@ -3072,11 +3108,9 @@ function buildHistChart(endings, legacyGoal) {
 if(document.readyState!=='loading')w();else document.addEventListener('DOMContentLoaded',w);})();
 </script>
 <script>
-// ══ TEST 1 · IF HISTORY REPEATS — dropdown of real bear markets, identical read-out to the Crash Test ══
-// Each scenario uses the ACTUAL S&P 500 total returns (with dividends) for that period.
-// drag = points below a ~7% baseline year (= 7 − that year's return%), applied for `dur` years;
-// the engine's second phase lets multi-year bears keep their real shape (worst year where it landed).
-// Picking a scenario runs it on the instant local engine and fills the SAME 6 KPIs + verdict as Test 2.
+// ══ TEST 1a · IF HISTORY REPEATS — dropdown of real bear markets, identical read-out to the Crash Test ══
+// Each scenario uses the ACTUAL S&P 500 total returns for that period. drag = 7 − that year's return%,
+// applied for `dur` years; the engine's 2nd phase keeps multi-year bears' real shape.
 var RBP_HIST = [
   { key:'gfc2008',    name:'2008 Financial Crisis',          hist:'one brutal year: the S&P 500 fell \u201237% in 2008',
     phases:[{drag:44,dur:1}], infl:null },
@@ -3109,7 +3143,6 @@ function rbpHistFill(key){
     return;
   }
 
-  // running placeholders
   ['h-base-end','h-stress-end','h-hit','h-safe','h-below','h-legacy'].forEach(function(id){ setVal(id,'\u2026','#9fc1d6'); });
   setSub('h-stress-conf','running\u2026','#7a9aaa');
   setVerdict('Running this crash through your plan\u2026','','#fff');
@@ -3133,7 +3166,6 @@ function rbpHistFill(key){
       setVerdict('Couldn\u2019t run this scenario','Try Reload at the top of the page, then pick the crash again.','#ff6b6b');
       return;
     }
-    // ── mirror the Crash Test exactly ──
     var planEnd = (typeof rbpPlanEndYear==='function') ? rbpPlanEndYear() : null;
     var ss = resp.series.filter(function(p){ return !planEnd || p.year<=planEnd; });
     var stressEnd = ss.length ? ss[ss.length-1].bal : (resp.ending||0);
@@ -3187,16 +3219,99 @@ function rbpHistFill(key){
   });
 }
 
-// Auto-fill the first scenario once the plan finishes loading (no hook into loadData needed).
 function rbpHistAuto(tries){
   var pick = document.getElementById('hist-pick');
   if(!pick) return;
   if(window.RBP_I && planData){ rbpHistFill(pick.value); return; }
   if(tries>0) setTimeout(function(){ rbpHistAuto(tries-1); }, 600);
 }
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', function(){ rbpHistAuto(25); });
-} else { rbpHistAuto(25); }
+if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', function(){ rbpHistAuto(25); }); }
+else { rbpHistAuto(25); }
+
+</script>
+<script>
+// ══ TEST 1 · REAL CRASHES SWEEP — the Scenario Sweep, but each row is an actual bear market ══
+// Reuses the sweep's exact bar + depletion render (_rbpSweepRender with the 'hsweep' target).
+// Each crash runs on your real local engine with its true path: multi-year bears use a 2nd phase,
+// and 1973–74 carries its ~9% inflation. eDrag = 7 − yr1 (points the engine cuts off a ~7% year).
+var HIST_SWEEP = [
+  { label:'2008 Crisis  (-37%)',    cat:'bad',   eDrag:44,  eDur:1, lOff:0, lDrag:0,  lDur:0, infl:2.0 },
+  { label:'Dot-Com Bust (-38%)',    cat:'bad',   eDrag:17,  eDur:2, lOff:2, lDrag:29, lDur:1, infl:2.5 },
+  { label:'Stagflation 73-74',      cat:'bad',   eDrag:22,  eDur:1, lOff:1, lDrag:33, lDur:1, infl:9.0 },
+  { label:'COVID 2020  (+18%)',     cat:'great', eDrag:-11, eDur:1, lOff:0, lDrag:0,  lDur:0, infl:1.5 },
+  { label:'2022 Rate Shock (-18%)', cat:'warn',  eDrag:25,  eDur:1, lOff:0, lDrag:0,  lDur:0, infl:6.0 },
+  { label:'Great Depression -64%',  cat:'bad',   eDrag:30,  eDur:4, lOff:0, lDrag:0,  lDur:0, infl:1.0 }
+];
+
+function _histSweepCtx(){
+  var byYear=(planData&&planData.projections&&planData.projections.byYear)||[];
+  var p1Amt=0; for(var b=0;b<byYear.length;b++){ var c=(byYear[b]&&+byYear[b].chosenExtra)||0; if(c>0){ p1Amt=c; break; } }
+  var base=(typeof esBaseNumbers==='function')?(esBaseNumbers()||{}):{};
+  var legGoal=Math.round(base.legacyGoal||0);
+  var proj=(planData&&planData.projections)||{};
+  var startYr=(proj.years&&proj.years.length)?proj.years[0]:new Date().getFullYear();
+  return { p1Amt:p1Amt, legGoal:legGoal, startYr:startYr };
+}
+
+function rbpHistSweepEmpty(){
+  var rows=HIST_SWEEP.map(function(s){ return {label:s.label,cat:s.cat,safe:null,fullDepl:null,floorDepl:null,safeBase:null}; });
+  try{ _rbpSweepRender(rows, null, 0, 'hsweep'); }catch(e){}
+}
+
+function rbpHistSweep(){
+  if(!planData || !window.RBP_I){
+    var ph=document.getElementById('hsweep-placeholder');
+    if(ph){ ph.style.display='block'; ph.innerHTML='<span style="color:#ff6b6b;">Load your plan first (Reload at the top of the page), then this fills in automatically.</span>'; }
+    return;
+  }
+  var ctx=_histSweepCtx();
+  var results=HIST_SWEEP.map(function(s){ return { label:s.label, cat:s.cat, safe:null, fullDepl:null, floorDepl:null, safeBase:null }; });
+  var btn=document.getElementById('hsweep-real-btn');
+  var progEl=document.getElementById('hsweep-real-progress'),
+      progN=document.getElementById('hsweep-prog-n'),
+      progT=document.getElementById('hsweep-prog-total'),
+      progBar=document.getElementById('hsweep-prog-bar');
+  if(progT) progT.textContent=String(HIST_SWEEP.length);
+  if(progEl) progEl.style.display='block';
+  if(btn){ btn.disabled=true; btn.textContent='Running\u2026'; }
+
+  function render(){
+    _rbpSweepRender(results.map(function(r){ return {label:r.label,cat:r.cat,safe:r.safe,fullDepl:r.fullDepl,floorDepl:r.floorDepl,safeBase:r.safeBase}; }), ctx.p1Amt, ctx.legGoal, 'hsweep');
+  }
+  render();
+
+  function runNext(i){
+    if(i>=HIST_SWEEP.length){ finish(); return; }
+    if(progN) progN.textContent=String(i+1);
+    if(progBar) progBar.style.width=Math.round(i/HIST_SWEEP.length*100)+'%';
+    var s=HIST_SWEEP[i];
+    var p={ action:'runStressTest', eType:'bear', eStart:ctx.startYr, eDur:s.eDur, eDrag:s.eDrag,
+            lType:'bear', lStart:(s.lDrag?ctx.startYr+s.lOff:0), lDur:(s.lDrag?s.lDur:0), lDrag:(s.lDrag||0), infl:s.infl };
+    rbpRunStressLocal(p, function(resp){
+      if(resp && resp.ok){
+        if(resp.safeExtra!=null) results[i].safe=+resp.safeExtra;
+        results[i].fullDepl=resp.belowYear||null;
+        results[i].safeBase=(resp.safeExtraBase!=null)?+resp.safeExtraBase:null;
+      }
+      if(progBar) progBar.style.width=Math.round((i+1)/HIST_SWEEP.length*100)+'%';
+      render(); runNext(i+1);
+    }, function(err){
+      if(progBar) progBar.style.width=Math.round((i+1)/HIST_SWEEP.length*100)+'%';
+      render(); runNext(i+1);
+    });
+  }
+  function finish(){ if(progEl) progEl.style.display='none'; if(btn){ btn.disabled=false; btn.textContent='\u21bb Re-run Real Crashes'; } render(); }
+  runNext(0);
+}
+
+function rbpHistSweepAuto(tries){
+  if(!document.getElementById('hsweep-bars')) return;
+  if(window.RBP_I && planData){ rbpHistSweep(); return; }
+  if(tries===30) rbpHistSweepEmpty();
+  if(tries>0) setTimeout(function(){ rbpHistSweepAuto(tries-1); }, 600);
+}
+if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',function(){ rbpHistSweepAuto(30); }); }
+else { rbpHistSweepAuto(30); }
 
 </script>
 </body>
