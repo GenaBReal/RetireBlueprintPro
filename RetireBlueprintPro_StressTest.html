@@ -563,19 +563,19 @@ window.addEventListener('storage', function(e) {
 
 
 <!-- ════ SAVED TESTS (comparison of your real-engine runs) ════ -->
-<div id="saved-tests-section" style="margin-top:18px;background:linear-gradient(160deg,#041E2F,#0A3145 60%,#0c3a52);border-radius:16px;border:1px solid rgba(28,199,208,.22);border-top:4px solid #f4b86a;overflow:hidden;box-shadow:0 6px 22px rgba(4,30,47,.3);">
+<div id="saved-tests-section" style="margin-top:18px;background:var(--card);border-radius:16px;border:1px solid var(--line);border-top:4px solid #f4b86a;overflow:hidden;box-shadow:var(--sh);">
   <div style="padding:20px 22px 6px;">
-    <div style="font-size:13px;font-weight:900;color:#fff;letter-spacing:.3px;">Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
-    <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;margin-top:6px;max-width:680px;">Every time you press <strong style="color:#cfe3ef;">▶ Run New Test</strong> above, that result saves here so you can compare your scenarios side by side — including any with a second, later crash.</div>
+    <div style="font-size:13px;font-weight:900;color:var(--ink);letter-spacing:.3px;">Saved Tests <span style="font-size:9px;font-weight:800;color:#041E2F;background:#1CC7D0;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;letter-spacing:.5px;">REAL ENGINE</span></div>
+    <div style="font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:6px;max-width:680px;">Every time you press <strong style="color:var(--ink);">▶ Run New Test</strong> above, that result saves here so you can compare your scenarios side by side — including any with a second, later crash.</div>
   </div>
 
   <!-- Saved test slots -->
   <div style="padding:6px 22px 22px;">
-    <div style="font-size:11px;color:#9fc1d6;line-height:1.65;background:rgba(255,255,255,.03);border-radius:9px;padding:12px 14px;margin-bottom:14px;">
-      <strong style="color:#cfe3ef;">What this shows.</strong> A crash early in retirement is one of a plan's biggest risks &mdash; you're forced to sell investments while prices are down. Each test reveals which lever bends first: your <strong style="color:#cfe3ef;">spending</strong> (the plan trims to protect itself) or your <strong style="color:#cfe3ef;">legacy goal</strong> (the damage lands there instead). Holding your legacy goal through a steep, multi-year crash means real resilience is built in.
+    <div style="font-size:11px;color:var(--muted);line-height:1.65;background:#f6fafc;border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin-bottom:14px;">
+      <strong style="color:var(--ink);">What this shows.</strong> A crash early in retirement is one of a plan's biggest risks &mdash; you're forced to sell investments while prices are down. Each test reveals which lever bends first: your <strong style="color:var(--ink);">spending</strong> (the plan trims to protect itself) or your <strong style="color:var(--ink);">legacy goal</strong> (the damage lands there instead). Holding your legacy goal through a steep, multi-year crash means real resilience is built in.
     </div>
-    <div style="font-size:10px;font-weight:800;color:#7ecfda;text-transform:uppercase;letter-spacing:.9px;margin:8px 0 10px;">Saved Tests <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#6a8a9a;">— compared to your base plan · newest fills the next slot, 6th overwrites Test 1</span></div>
-    <div id="es-base-line" style="font-size:11px;color:#9fc1d6;margin-bottom:12px;padding:8px 12px;background:rgba(28,199,208,.07);border-radius:8px;">
+    <div style="font-size:10px;font-weight:800;color:#0c7b84;text-transform:uppercase;letter-spacing:.9px;margin:8px 0 10px;">Saved Tests <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);">— compared to your base plan · newest fills the next slot, 6th overwrites Test 1</span></div>
+    <div id="es-base-line" style="font-size:11px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:rgba(28,199,208,.07);border-radius:8px;">
       <strong style="color:#1CC7D0;">Base plan:</strong> <span id="es-base-vals">load your plan to see base numbers</span>
     </div>
     <div id="es-slots" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
@@ -1762,29 +1762,29 @@ function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
 function esRenderSlots() {
   var wrap=document.getElementById('es-slots');
   if(!wrap) return;
-  if(!_esTests.length){ wrap.innerHTML='<div style="font-size:11px;color:#6a8a9a;padding:10px 0;">No tests yet — press ▶ Run New Test above and your results will save here to compare.</div>'; return; }
+  if(!_esTests.length){ wrap.innerHTML='<div style="font-size:11px;color:#566576;padding:10px 0;">No tests yet — press ▶ Run New Test above and your results will save here to compare.</div>'; return; }
   var base=esBaseNumbers()||{};
   var html='';
   _esTests.forEach(function(t,i){
     var p=t.params, r=t.result;
     var spDelta = (base.safeExtra!=null && r.safeExtra!=null) ? (r.safeExtra-base.safeExtra) : null;
     var enDelta = (base.ending!=null && r.ending!=null) ? (r.ending-base.ending) : null;
-    var spColor = spDelta==null?'#9fc1d6':(spDelta<0?'#f4b86a':'#1CC7D0');
-    var enColor = enDelta==null?'#9fc1d6':(enDelta<0?'#f4b86a':'#1CC7D0');
+    var spColor = spDelta==null?'#566576':(spDelta<0?'#f4b86a':'#1CC7D0');
+    var enColor = enDelta==null?'#566576':(enDelta<0?'#f4b86a':'#1CC7D0');
     var belowTxt = r.belowYear ? ('<span style="color:#f4b86a;">Drops below legacy goal in <strong>'+r.belowYear+'</strong></span>')
                                : ('<span style="color:#1CC7D0;">Stays at/above legacy goal throughout ✓</span>');
     var pTxt = 'Early: '+(Number(p.eDur)>0&&Number(p.eDrag)>0?(p.eDrag+'% for '+p.eDur+'yr from '+p.eStart):'none');
     if(Number(p.lDur)>0 && Number(p.lDrag)>0) pTxt += ' · Late: '+p.lDrag+'% for '+p.lDur+'yr from '+p.lStart;
-    html += '<div style="background:rgba(255,255,255,.04);border:1px solid #163348;border-top:3px solid #f4b86a;border-radius:11px;padding:12px 14px;">'
+    html += '<div style="background:#fff;border:1px solid #e6ebf0;border-top:3px solid #f4b86a;border-radius:11px;padding:12px 14px;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
-      +   '<span style="font-size:10px;font-weight:900;color:#f4b86a;text-transform:uppercase;letter-spacing:.6px;">Test '+(i+1)+'</span>'
-      +   '<span style="font-size:9.5px;color:#6a8a9a;">'+pTxt+'</span>'
+      +   '<span style="font-size:10px;font-weight:900;color:#b3792f;text-transform:uppercase;letter-spacing:.6px;">Test '+(i+1)+'</span>'
+      +   '<span style="font-size:9.5px;color:#566576;">'+pTxt+'</span>'
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">'
-      +   '<div><div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Extra above floor</div>'
+      +   '<div><div style="font-size:9px;color:#566576;text-transform:uppercase;letter-spacing:.5px;">Extra above floor</div>'
       +     '<div style="font-size:15px;font-weight:800;color:'+spColor+';">'+esFmt(r.safeExtra)+'/yr'
       +       (spDelta!=null?' <span style="font-size:10px;font-weight:600;">('+(spDelta>=0?'+':'')+esFmt(spDelta)+')</span>':'')+'</div></div>'
-      +   '<div><div style="font-size:9px;color:#8aaabb;text-transform:uppercase;letter-spacing:.5px;">Ending balance</div>'
+      +   '<div><div style="font-size:9px;color:#566576;text-transform:uppercase;letter-spacing:.5px;">Ending balance</div>'
       +     '<div style="font-size:15px;font-weight:800;color:'+enColor+';">'+esFmt(r.ending)
       +       (enDelta!=null?' <span style="font-size:10px;font-weight:600;">('+(enDelta>=0?'+':'')+esFmt(enDelta)+')</span>':'')+'</div></div>'
       + '</div>'
