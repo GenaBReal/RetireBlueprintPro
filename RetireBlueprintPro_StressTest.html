@@ -846,6 +846,9 @@ window.addEventListener('storage', function(e) {
         <!-- This run's spending — prominent so it's never a mystery what's being spent -->
         <div id="mc-spend-readout" style="margin-bottom:16px;padding:13px 18px;background:linear-gradient(135deg,#06243a,#0A3145);border:1px solid rgba(28,199,208,.25);border-left:4px solid #f4b86a;border-radius:10px;font-size:12.5px;color:#dceaf5;line-height:1.65;">—</div>
 
+        <!-- Planning horizon readout — which end age this run actually simulated through -->
+        <div id="mc-horizon-readout" style="margin-bottom:16px;padding:10px 16px;background:rgba(28,199,208,.07);border:1px solid rgba(28,199,208,.22);border-left:4px solid #1CC7D0;border-radius:9px;font-size:12px;color:#dceaf5;line-height:1.55;"><span id="mc-horizon-text">—</span></div>
+
         <!-- Big success rate number -->
         <div id="mc-headline-row" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;align-items:stretch;">
 
@@ -1970,6 +1973,16 @@ function runMonteCarlo() {
   var endYear = mcSingle ? p1DeathYear : Math.max(p1DeathYear, p2DeathYear);
   var yrs = Math.min(endYear - curYear + 1, 100); // never more than 100 steps, never less than plan length
   yrs = Math.max(yrs, 20); // minimum 20 years
+
+  // Planning-horizon readout: report the actual end age this run simulated through. The driver is
+  // whoever has the later horizon year (a younger survivor can reach 95 later than an older partner
+  // reaches a higher death age), so read the horizon age of that person.
+  var _lastAge = mcSingle ? p1HorizonAge : (p2DeathYear >= p1DeathYear ? p2HorizonAge : p1HorizonAge);
+  var _hzText = endAge95
+    ? 'This run simulated through age ' + _lastAge + ' \u2014 longevity stress test (recommended).'
+    : 'This run simulated through age ' + _lastAge + ' \u2014 your entered death estimate.';
+  var _hzEl = document.getElementById('mc-horizon-text');
+  if (_hzEl) _hzEl.textContent = _hzText;
 
   // Build year labels for charts
   var mcYears = [];
