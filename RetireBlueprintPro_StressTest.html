@@ -376,9 +376,9 @@ window.addEventListener('storage', function(e) {
     <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
   </div>
 
-  <!-- One-at-a-time explainer (Crash Test + Sweep both write to the live sheet) -->
+  <!-- All tests run locally and instantly now; reassurance that the saved plan is never changed -->
   <div style="margin:0 0 16px;font-size:11px;line-height:1.6;color:#37474f;background:#fff7ec;border-left:3px solid #f4b86a;border-radius:6px;padding:9px 12px;">
-    <b>One test at a time.</b> The <b>Crash Test</b> (▶ Run New Test) and the <b>Scenario Sweep</b> both run on your live Google Sheet, so they take turns &mdash; if you start one while another is still running, it waits a few seconds for its turn instead of running alongside it. Kick them off one at a time. The <b>Monte Carlo</b> further down runs entirely on your own computer, so it&rsquo;s independent and never has to wait.
+    <b>Instant, and your plan stays safe.</b> Every test on this page &mdash; the <b>Crash Test</b>, <b>Real Crashes</b>, the <b>Scenario Sweep</b>, and <b>Monte Carlo</b> &mdash; runs in a split second right on your own computer, using your saved numbers. Run them in any order, as many times as you like; nothing here ever changes your saved plan.
   </div>
 
   <!-- SCENARIO TABS -->
@@ -452,7 +452,7 @@ window.addEventListener('storage', function(e) {
 
       <button class="reset-btn" onclick="setScenario('custom')">↺ Reset to Base</button>
       <button id="run-new-test-btn" onclick="runNewTest()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#f4b86a,#e09a3e);color:#041E2F;font-weight:900;font-size:14px;border:none;border-radius:12px;padding:14px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 4px 14px rgba(244,184,106,.3);">▶ Run New Test</button>
-      <div style="margin-top:8px;font-size:10px;line-height:1.5;color:#8aaabb;text-align:center;">Runs your <b>real engine</b> on these settings — give it <b>~20–30 sec</b> (thousands of calculations). No estimates: this is a true run of your plan.</div>
+      <div style="margin-top:8px;font-size:10px;line-height:1.5;color:#8aaabb;text-align:center;">Runs your <b>real engine</b> on these settings — <b>instantly</b>, right on your computer. No estimates: this is a true run of your plan.</div>
       <div id="run-status" style="margin-top:8px;font-size:11px;line-height:1.5;text-align:center;display:none;"></div>
     </div>
 
@@ -654,7 +654,7 @@ window.addEventListener('storage', function(e) {
   <div id="sweep-real-progress" style="display:none;margin-bottom:14px;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
       <span style="font-size:11.5px;color:#dceaf5;">Running real engine — scenario <span id="sweep-prog-n">1</span> of <span id="sweep-prog-total">8</span>…</span>
-    <span style="font-size:10px;color:#9fc1d6;">Each scenario runs on its own — rows fill in as they finish · keep tab open</span>
+    <span style="font-size:10px;color:#9fc1d6;">Every crash level — running instantly on your computer</span>
     </div>
     <div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden;">
       <div id="sweep-prog-bar" style="height:100%;background:#f4b86a;border-radius:4px;width:0%;transition:width .4s;"></div>
@@ -663,7 +663,7 @@ window.addEventListener('storage', function(e) {
   <div id="sweep-body">
     <div id="sweep-placeholder" style="font-size:11.5px;color:#7a9aaa;line-height:1.7;padding:6px 2px;">
       <strong style="color:#dceaf5;">How this works:</strong> The crash test asks one question — <em>"if the market drops X% in year 1, what's the most extra I can safely spend and still hit my legacy goal?"</em> This sweep runs that question at every crash level automatically.<br><br>
-      <span style="color:#f4b86a;">&#9654; Sweep All Scenarios</span> — calls your live engine for each crash level using full Master formula calculations: taxes, RMDs, and SS staggering all reflected. Each scenario runs on its own, so rows fill in one by one as they finish. Keep the tab open while it runs.<br><br>
+      <span style="color:#f4b86a;">&#9654; Sweep All Scenarios</span> — runs your real engine at every crash level instantly, right on your computer, with your full plan reflected: taxes, RMDs, and SS staggering. The whole table fills in at once.<br><br>
       <em style="color:#566576;">Other phases scale proportionally to Phase 1. All scenarios assume normal returns after year 1.</em>
     </div>
     <div id="sweep-chart-area" style="display:none;">
@@ -1721,43 +1721,6 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
   var scen=document.getElementById('active-scenario-label'); if(scen){scen.textContent='\u2713 Showing a REAL engine run';scen.style.color='#1CC7D0';}
 }
 
-function runEngineStressTest() {
-  if(!planData){ esShowErr('Load your plan first (Reload above).'); return; }
-  var btn=document.getElementById('es-run-btn');
-  var warn=document.getElementById('es-warning');
-  document.getElementById('es-error').style.display='none';
-  var params = {
-    action:'runStressTest',
-    eType:'bear',
-    eStart: gv('es-eStart'), eDur: gv('es-eDur'), eDrag: gv('es-eDrag'),
-    lType:'bear',
-    lStart: gv('es-lStart'), lDur: gv('es-lDur'), lDrag: gv('es-lDrag')
-  };
-  if((Number(params.eDur)<=0||Number(params.eDrag)<=0) && (Number(params.lDur)<=0||Number(params.lDrag)<=0)){
-    esShowErr('Enter at least one bear market (a duration and a drag % above 0).'); return;
-  }
-  btn.disabled=true; btn.textContent='Running…'; warn.style.display='block';
-  esJsonp(params, function(resp){
-    btn.disabled=false; btn.textContent='▶ Run Engine Stress Test'; warn.style.display='none';
-    if(!resp || !resp.ok){ esShowErr((resp&&resp.error)?('Engine error: '+resp.error):'The test did not complete. Please try again.'); return; }
-    var test = {
-      ts: Date.now(),
-      params: { eStart:params.eStart, eDur:params.eDur, eDrag:params.eDrag, lStart:params.lStart, lDur:params.lDur, lDrag:params.lDrag },
-      result: rbpHonestResult(resp)
-    };
-    // round-robin: fill 0..4, then overwrite from 0 again
-    if(_esTests.length<5){ _esTests.push(test); _esNextSlot=_esTests.length%5; }
-    else { _esTests[_esNextSlot]=test; _esNextSlot=(_esNextSlot+1)%5; }
-    esRenderSlots();
-    esPersist();
-  }, function(err){
-    btn.disabled=false; btn.textContent='▶ Run Engine Stress Test'; warn.style.display='none';
-    esShowErr(err);
-  });
-}
-
-function esShowErr(msg){ var e=document.getElementById('es-error'); if(e){ e.textContent='⚠️ '+msg; e.style.display='block'; } }
-function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
 
 function esRenderSlots() {
   var wrap=document.getElementById('es-slots');
@@ -2409,10 +2372,9 @@ function rbpRealSweep() {
   var firstErr  = null; // capture the first failure reason so we stop guessing
 
   // ── Sequential per-scenario calls ──
-  // Each scenario is its own connector round-trip (well under the 90s timeout).
-  // Sequential (not parallel) on purpose: every call writes then restores B12:B20,
-  // so they must not overlap. A single failed scenario just keeps its estimate and
-  // we move on — the rest still complete.
+  // Each scenario runs through the local engine (RBP.runStress) — instant, no sheet round-trip.
+  // Kept sequential (not parallel) so rows render in order; if one ever errors, it keeps the
+  // local estimate already in results[i].safe and we move on — the rest still complete.
   function runNext(i) {
     if (i >= results.length) { finish(); return; }
 
@@ -3141,7 +3103,9 @@ function rcsRun(){
 function rcsRender(){
   var ctx=window._rcsCtx, results=window._rcsResults; if(!ctx||!results) return;
   var rowsEl=document.getElementById('rcs-rows'); if(!rowsEl) return;
-  var maxTotal=ctx.floor + Math.max(ctx.baseSafe||0, 1);
+  var _maxSafe=ctx.baseSafe||0;
+  results.forEach(function(rr){ if(rr&&rr.safe!=null&&rr.safe>_maxSafe)_maxSafe=rr.safe; });
+  var maxTotal=ctx.floor + Math.max(_maxSafe, 1);
   var floorPct=(ctx.floor/maxTotal*100);
   var r2=ctx.ratios[1]||0, r3=ctx.ratios[2]||0;
   rowsEl.innerHTML=results.map(function(r,idx){
