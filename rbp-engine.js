@@ -394,7 +394,7 @@ function rbpBuildI(R, D) {
     taxBrackets:T.brackets, taxRates:T.rates,
     rmdAge:T.rmdAge, rmdDiv:T.rmdDiv, rmdStartC:T.rmdStartC, rmdStartG:T.rmdStartG,
     irmaaMFJ:T.irmaaMFJ, irmaaSingle:T.irmaaMFJ, magiMFJ:T.magiMFJ, magiSingle:T.magiSingle, magiThresh:true,
-    convTable:{},
+    convTable:(function(){ var ct={}; (R.rothPlan||[]).forEach(function(row){ if(!row) return; var y=parseInt(row.year,10); if(!y) return; ct[y]={ c:(+row.p1||0), g:(+row.p2||0) }; }); return ct; })(),
     debts:(R.debts||[]).map(function(d){ return {status:d.inc, amount:d.ann, start:D(d.start), end:D(d.end)}; }),
     ph1Start:Y(sp.phase1Start), ph1End:Y(sp.phase1End), ph1Spend:0,
     ph2Start:Y(sp.phase2Start), ph2End:Y(sp.phase2End), ph2Spend:0,
