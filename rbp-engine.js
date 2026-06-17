@@ -470,9 +470,12 @@ function rbpRunMonteCarlo(d,opts){
   else if(totalPF>0){ initialWR=Math.max(0,baseSpend-(ssYear1+pension))/totalPF; }
   initialWR=Math.max(0.02,Math.min(0.10,initialWR));
   var p1DeathAge=Math.min(p1.deathAge||90,110), p2DeathAge=Math.min(p2.deathAge||90,110);
-  var p1DeathYear=p1.age>0?curYear+(p1DeathAge-p1.age):curYear+30, p2DeathYear=p2.age>0?curYear+(p2DeathAge-p2.age):curYear+30;
+  // Longevity buffer: stress-test the last survivor to at least age 95, even if a younger death
+  // age was entered. Retirees frequently outlive their estimate, and outliving the money is the
+  // exact risk Monte Carlo exists to measure — stopping at an optimistic age overstates success.
+  var p1HorizonYr=p1.age>0?curYear+(Math.max(p1DeathAge,95)-p1.age):curYear+35, p2HorizonYr=p2.age>0?curYear+(Math.max(p2DeathAge,95)-p2.age):curYear+35;
   var mcSingle=!(p2&&p2.name&&String(p2.name).trim());
-  var endY=mcSingle?p1DeathYear:Math.max(p1DeathYear,p2DeathYear);
+  var endY=mcSingle?p1HorizonYr:Math.max(p1HorizonYr,p2HorizonYr);
   var yrs=Math.min(endY-curYear+1,100); yrs=Math.max(yrs,20);
   var mcYears=[]; var origYears=(proj.years&&proj.years.length)?proj.years:null;
   for(var y0=0;y0<yrs;y0++){ mcYears.push(origYears&&y0<origYears.length?origYears[y0]:curYear+y0); }
