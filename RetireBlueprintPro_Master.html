@@ -337,7 +337,11 @@ function go(d){
   var slots=(d.portfolio&&d.portfolio.slots)||[];
   var cols=buildColumns(slots, p1n, p2n, (who.p1.name||'Partner 1'), (who.p2.name||'Partner 2'));
   var _shownAccts=slots.filter(acctShown).length, _namedAccts=slots.filter(function(s){return s&&s.name;}).length, _hiddenAccts=Math.max(0,_namedAccts-_shownAccts);
-  document.getElementById('sub').textContent='Showing '+cols.length+' of 82 columns · '+rows.length+' years ('+rows[0].master[0]+'–'+rows[rows.length-1].master[0]+')';
+  var _esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});};
+  var _sid=window._rbpSheetId||localStorage.getItem('rbp_sheet_id')||'';
+  var _nm=[who.p1&&who.p1.name, who.p2&&who.p2.name].filter(Boolean).join(' & ')||'your plan';
+  document.getElementById('sub').innerHTML='Showing '+cols.length+' of 82 columns &middot; '+rows.length+' years ('+rows[0].master[0]+'\u2013'+rows[rows.length-1].master[0]+')'
+    +'<br><span style="font-size:11px;opacity:.78;">Reading <b>'+_esc(_nm)+'</b> &middot; Google Sheet ID <code style="font-size:10px;word-break:break-all;">'+_esc(_sid)+'</code></span>';
   render(rows, cols, {hidden:_hiddenAccts});
   window._rbpX={rows:rows, cols:cols, name:(who.p1&&who.p1.name)||'Plan'};
   var _xb=document.getElementById('xlsBtn'); if(_xb) _xb.style.display='inline-flex';
@@ -449,7 +453,7 @@ async function exportExcel(){
 }
 
 function load(){
-  var sheetId=localStorage.getItem('rbp_sheet_id');
+  var sheetId=localStorage.getItem('rbp_sheet_id'); window._rbpSheetId=sheetId;
   var host=window.location.hostname||'';
   var preview=(window.location.protocol==='file:'||host===''||host==='localhost'||host.indexOf('claude.ai')>=0);
   if(!sheetId){ fail('No sheet connected yet. Open the <a href="RetireBlueprintPro_SetupGuide.html">Setup Guide</a> to link your Google Sheet.'); return; }
