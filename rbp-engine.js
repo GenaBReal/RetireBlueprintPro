@@ -452,7 +452,8 @@ function rbpRunMonteCarlo(d,opts){
   var nRuns=opts.runs||5000, model=opts.model||'fat',
       flexPct=(opts.flex!=null?opts.flex:0.10),
       fixedYr1=(opts.fixedYr1!=null?opts.fixedYr1:null),
-      inflSigma=(opts.inflSigma!=null?opts.inflSigma:0.015);  // annual inflation volatility (CPI ~1.5%/yr)
+      inflSigma=(opts.inflSigma!=null?opts.inflSigma:0.015),  // annual inflation volatility (CPI ~1.5%/yr)
+      endAge95=(opts.endAge95!=null?opts.endAge95:true);      // horizon: true = stress last survivor to age 95; false = stop at entered death age
   if(!d) return null;
   var port=d.portfolio||{}, sp=d.spending||{}, gl=d.global||{}, leg=d.legacy||{}, proj=d.projections||{};
   var totalPF=port.total||0; if(totalPF<=0) return null;
@@ -470,10 +471,11 @@ function rbpRunMonteCarlo(d,opts){
   else if(totalPF>0){ initialWR=Math.max(0,baseSpend-(ssYear1+pension))/totalPF; }
   initialWR=Math.max(0.02,Math.min(0.10,initialWR));
   var p1DeathAge=Math.min(p1.deathAge||90,110), p2DeathAge=Math.min(p2.deathAge||90,110);
-  // Longevity buffer: stress-test the last survivor to at least age 95, even if a younger death
-  // age was entered. Retirees frequently outlive their estimate, and outliving the money is the
-  // exact risk Monte Carlo exists to measure — stopping at an optimistic age overstates success.
-  var p1HorizonYr=p1.age>0?curYear+(Math.max(p1DeathAge,95)-p1.age):curYear+35, p2HorizonYr=p2.age>0?curYear+(Math.max(p2DeathAge,95)-p2.age):curYear+35;
+  // Horizon: when endAge95 is on, stress-test the last survivor to at least age 95 even if a younger
+  // death age was entered (retirees often outlive their estimate, and outliving the money is the risk
+  // MC exists to measure). When off, the projection stops at the user's own entered death age.
+  var p1HorizonAge=endAge95?Math.max(p1DeathAge,95):p1DeathAge, p2HorizonAge=endAge95?Math.max(p2DeathAge,95):p2DeathAge;
+  var p1HorizonYr=p1.age>0?curYear+(p1HorizonAge-p1.age):curYear+(endAge95?35:30), p2HorizonYr=p2.age>0?curYear+(p2HorizonAge-p2.age):curYear+(endAge95?35:30);
   var mcSingle=!(p2&&p2.name&&String(p2.name).trim());
   var endY=mcSingle?p1HorizonYr:Math.max(p1HorizonYr,p2HorizonYr);
   var yrs=Math.min(endY-curYear+1,100); yrs=Math.max(yrs,20);
@@ -516,7 +518,7 @@ function rbpRunMonteCarlo(d,opts){
   var avg=allEnd.reduce(function(s,v){return s+v;},0)/(allEnd.length||1);
   return { runs:nRuns, model:model, mu:mu, sigma:sigma, equityFraction:ps.equityFraction, flex:flexPct,
     inflMean:inflMean, inflSigma:inflSigma,
-    years:mcYears, yrs:yrs, legacyGoal:legacyGoal, floor:floorNow,
+    years:mcYears, yrs:yrs, endAge95:endAge95, legacyGoal:legacyGoal, floor:floorNow,
     successPct:Math.round(succeedGoal/nRuns*100), survivePct:Math.round(survivePos/nRuns*100),
     neverRanOutPct:Math.round((nRuns-depletedFloor)/nRuns*100), depletedFloorPct:Math.round(depletedFloor/nRuns*100),
     depletedFullPct:Math.round(depletedFull/nRuns*100),
