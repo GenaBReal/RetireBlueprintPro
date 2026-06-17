@@ -816,6 +816,13 @@ window.addEventListener('storage', function(e) {
             <option value="-0.50">Pin year 1 at -50% · then random</option>
           </select>
         </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Planning Horizon</div>
+          <select id="mc-horizon" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
+            <option value="95" selected>Through age 95 — longevity stress test (recommended)</option>
+            <option value="death">Through my entered death age</option>
+          </select>
+        </div>
       </div>
 
       <!-- Results area — hidden until run -->
@@ -1874,6 +1881,8 @@ function runMonteCarlo() {
   var flexPct = parseInt(document.getElementById('mc-flex').value) / 100;
   var _fyr1El = document.getElementById('mc-fixed-yr1');
   var fixedYr1 = _fyr1El && _fyr1El.value ? parseFloat(_fyr1El.value) : null; // null = fully random
+  var _horizEl = document.getElementById('mc-horizon');
+  var endAge95 = !(_horizEl && _horizEl.value === 'death'); // true = stress to age 95; false = stop at entered death age
 
   // ── Pull plan data ───────────────────────────────────────
   var port  = planData.portfolio || {};
@@ -1949,8 +1958,12 @@ function runMonteCarlo() {
   // Use the later of the two projected death years, cap at age 110
   var p1DeathAge = Math.min(p1.deathAge || 90, 110);
   var p2DeathAge = Math.min(p2.deathAge || 90, 110);
-  var p1DeathYear = p1.age > 0 ? curYear + (p1DeathAge - p1.age) : curYear + 30;
-  var p2DeathYear = p2.age > 0 ? curYear + (p2DeathAge - p2.age) : curYear + 30;
+  // Planning Horizon toggle: when endAge95 is on, stress the last survivor through at least age 95
+  // (retirees often outlive their estimate); when off, stop at the user's own entered death age.
+  var p1HorizonAge = endAge95 ? Math.max(p1DeathAge, 95) : p1DeathAge;
+  var p2HorizonAge = endAge95 ? Math.max(p2DeathAge, 95) : p2DeathAge;
+  var p1DeathYear = p1.age > 0 ? curYear + (p1HorizonAge - p1.age) : curYear + (endAge95 ? 35 : 30);
+  var p2DeathYear = p2.age > 0 ? curYear + (p2HorizonAge - p2.age) : curYear + (endAge95 ? 35 : 30);
   // Singles-ready: with no real second partner, stop at the sole person's death year
   // (don't let the empty p2's default 30-year horizon stretch the sim past their death).
   var mcSingle = !(p2 && p2.name && String(p2.name).trim());
