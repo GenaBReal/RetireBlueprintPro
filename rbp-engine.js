@@ -24,7 +24,10 @@ function rbpProject(I, opts) {
 
   const gLife = (I.p1_lifeEnd - I.p1_ageStart) || 0;     // var_G_Life  (col-B person)
   const cLife = (I.p2_lifeEnd - I.p2_ageStart) || 0;     // var_C_Life  (col-D person)
-  const duration = Math.min(Math.max(gLife, cLife), 110);
+  // Run THROUGH the entered death-age year for the longest-lived person (not one year short).
+  // Age is stamped at year-start, so a death age of 102 needs (102-currentAge)+1 rows for the final
+  // row to read 102. MUST stay in lockstep with the sheet's var_Duration = MIN(var_Max_Duration+1,111).
+  const duration = Math.min(Math.max(gLife, cLife) + 1, 111);
 
   // Tax Engine tables
   const TB = I.taxBrackets, TR = I.taxRates;             // length 7 (C8:C14 / D8:D14)
@@ -159,7 +162,19 @@ function rbpProject(I, opts) {
 
     const baseTaxable = Math.max(0, taxableGross-stdDed);
     const curBrackets = filing==='MFJ'?TB : filing==='HoH'?[0,17700,67450,105700,201775,256225,640600] : TB.map(b=>b/2);
-    const baseTaxes = bracketTax(baseTaxable, curBrackets); // (MFS branch omitted in first pass; see notes)
+    // Married Filing Separately = two separate returns (mirrors the sheet's var_*_MFS path).
+    // Group income per person, tax each person's SS under the MFS rule (85% taxable once there is any
+    // other income — no $25k/$34k floor), subtract each person's own standard deduction, then tax each
+    // return on its own and sum. Engine prefixes are split: person 1 (Craig) income = g*, RMD/conv =
+    // rmdC/convC, 401k = c401; person 2 (Gena) income = c*, RMD/conv = rmdG/convG, 401k = g401.
+    const isMFS = (filing==='MFS');
+    const p1Inc = gSal+gPen+gOth+rmdC+convC, p2Inc = cSal+cPen+cOth+rmdG+convG;
+    const p1SSx = Math.min(0.85*gSS, 0.85*(p1Inc + 0.5*gSS));
+    const p2SSx = Math.min(0.85*cSS, 0.85*(p2Inc + 0.5*cSS));
+    const p1TaxableMFS = Math.max(0, (p1Inc + p1SSx) - stdDed);
+    const p2TaxableMFS = Math.max(0, (p2Inc + p2SSx) - stdDed);
+    const baseTaxes = isMFS ? bracketTax(p1TaxableMFS, curBrackets) + bracketTax(p2TaxableMFS, curBrackets)
+                            : bracketTax(baseTaxable, curBrackets);
     const baseStateTax = baseTaxable*I.stateTax;
 
     // chosen extra (smile) — projection input knob
@@ -193,7 +208,13 @@ function rbpProject(I, opts) {
     const effMarg = Math.min(0.99, marginal*ssMult);
     const W2 = Math.min(remNet1/(1-effMarg), B2);
     const totTaxableW2 = Math.max(0, taxableGross+W2-stdDed);
-    const taxesW2 = bracketTax(totTaxableW2, curBrackets);
+    // MFS: split the pre-tax W2 withdrawal between the two returns by 401k balance (mirrors the sheet's
+    // var_C_W2_Frac), add each share to that person's taxable, and tax each return separately.
+    const w2FracP1 = (c401+g401)>0 ? c401/(c401+g401) : 0.5;   // person 1 (Craig) share, by 401k balance
+    const p1TaxableWW2 = Math.max(0, (p1Inc + p1SSx + W2*w2FracP1) - stdDed);
+    const p2TaxableWW2 = Math.max(0, (p2Inc + p2SSx + W2*(1-w2FracP1)) - stdDed);
+    const taxesW2 = isMFS ? bracketTax(p1TaxableWW2, curBrackets) + bracketTax(p2TaxableWW2, curBrackets)
+                          : bracketTax(totTaxableW2, curBrackets);
     const ordTaxActual = taxesW2-baseTaxes;
     const net2 = W2-ordTaxActual, remNet2 = Math.max(0, remNet1-net2);
 
