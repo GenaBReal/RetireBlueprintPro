@@ -55,7 +55,7 @@ body{ font-family:'Segoe UI',system-ui,sans-serif; background:#f0f2f5; color:var
 .hero .htext p{ margin:0; color:var(--muted); font-size:14px; line-height:1.5; }
 
 .page{ }
-.sec{ padding:20px 40px; border-bottom:1px solid #eef1f5; break-inside:avoid; }
+.sec{ padding:20px 40px; border-bottom:1px solid #eef1f5; }
 .sec h3{ margin:0 0 13px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:var(--navy); border-bottom:2px solid var(--teal); padding:0 0 6px; }
 .sec h3 .secnote{ float:right; font-size:10px; letter-spacing:.4px; color:#9aa6b2; text-transform:none; font-weight:400; }
 .sec .lead{ color:var(--muted); font-size:13px; margin:-4px 0 12px; }
@@ -137,8 +137,9 @@ thead{ display:table-header-group; }
   .page.first{ break-before:auto; }
   .sec,.hero,.cover,.stat,.stats,.note{ break-inside:avoid; }
 }
-/* PDF capture (screen media): keep table rows and key blocks intact across page breaks */
-tr, thead, .stat, .stats, .hero, .cover, .note{ break-inside:avoid; page-break-inside:avoid; }
+/* PDF capture (screen media): let text & tables flow to fill pages; keep atomic blocks intact */
+tr, thead, .stat, .pcard, .chartwrap, .hero, .cover{ break-inside:avoid; page-break-inside:avoid; }
+h3{ break-after:avoid; break-inside:avoid; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.12.1/html2pdf.bundle.min.js" integrity="sha512-D25Z8/1q2z65ZpJ3NzY6XiPZfwjhbv34OTQHDIZd+KPK+uWCovGt+fMkSzW8ArzCMFUgZt6Cdu7qoXNuy6a2GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
