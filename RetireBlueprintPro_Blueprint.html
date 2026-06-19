@@ -137,8 +137,9 @@ thead{ display:table-header-group; }
   .page.first{ break-before:auto; }
   .sec,.hero,.cover,.stat,.stats,.note{ break-inside:avoid; }
 }
-/* PDF capture (screen media): let text & tables flow to fill pages; keep atomic blocks intact */
-tr, thead, .stat, .pcard, .chartwrap, .hero, .cover{ break-inside:avoid; page-break-inside:avoid; }
+/* PDF capture: keep ONLY the blocks that were clipping intact (scoped, not global) */
+tr, thead, .stats, .kv, .note, .pcard, .chartwrap, .hero, .cover{ break-inside:avoid; page-break-inside:avoid; }
+.sec p{ break-inside:avoid; page-break-inside:avoid; }
 h3{ break-after:avoid; break-inside:avoid; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.12.1/html2pdf.bundle.min.js" integrity="sha512-D25Z8/1q2z65ZpJ3NzY6XiPZfwjhbv34OTQHDIZd+KPK+uWCovGt+fMkSzW8ArzCMFUgZt6Cdu7qoXNuy6a2GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
