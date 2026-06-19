@@ -1,0 +1,49 @@
+name: Weekly link check
+
+# Runs every Monday at ~9am Pacific (16:00 UTC), and any time you click "Run workflow".
+on:
+  schedule:
+    - cron: '0 16 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write   # lets the check open an issue when a link is dead
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the site files
+        uses: actions/checkout@v4
+
+      - name: Check every link
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # What to check, and how forgiving to be.
+          # We accept 401/403/429 because some government sites block automated
+          # checkers even though the page is fine for real visitors — this keeps
+          # the weekly report from crying wolf. Genuine dead pages (404/410/no
+          # response) are still flagged.
+          args: >-
+            --no-progress
+            --max-retries 3
+            --retry-wait-time 2
+            --timeout 30
+            --accept 200,206,301,302,307,308,401,403,429
+            --exclude-mail
+            --exclude "script\.google\.com"
+            --exclude "docs\.google\.com"
+            --exclude "etsy\.com/your-listing-url"
+            "**/*.html"
+            "**/*.md"
+          fail: false   # don't error the run; we report via an issue instead
+
+      - name: Open an issue if any link is dead
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "🔗 Weekly link check found one or more dead links"
+          content-filepath: ./lychee/out.md
+          labels: link-check
