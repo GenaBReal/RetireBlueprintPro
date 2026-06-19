@@ -317,373 +317,397 @@ window.addEventListener('storage', function(e) {
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 
+<style id="rbp-revamp">
+/* ── HOME REVAMP ─────────────────────────────────────────────────────── */
+.page{max-width:1100px;margin:0 auto;padding:22px 20px 48px;}
+.skel{color:var(--muted);opacity:.55;}
 
+/* state banner (no-sheet / error) */
+.state-banner{border-radius:12px;padding:16px 20px;margin:0 0 20px;display:flex;
+  align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--border);}
+.state-banner.warn{background:#fff8ec;border-color:var(--orange-dim);}
+.state-banner.err{background:#fdecec;border-color:#c0504a;}
+.state-banner .sb-txt{flex:1;min-width:200px;}
+.state-banner .sb-h{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:2px;}
+.state-banner .sb-p{font-size:12px;color:var(--dark);line-height:1.5;}
+.state-banner .sb-btn{background:var(--navy);color:#fff;font-size:12px;font-weight:700;
+  text-decoration:none;padding:11px 18px;border-radius:8px;white-space:nowrap;}
+
+/* hero verdict */
+.hero-verdict{background:linear-gradient(135deg,#041E2F 0%,#0A3145 100%);
+  border-radius:14px;padding:26px 28px;display:flex;align-items:center;gap:30px;
+  flex-wrap:wrap;border:1px solid rgba(28,199,208,0.22);box-shadow:0 6px 22px rgba(4,30,47,0.18);}
+.hv-gauge{position:relative;width:132px;height:132px;flex-shrink:0;}
+.hv-gauge svg{transform:rotate(-90deg);}
+.hv-gauge .gv{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;}
+.hv-gauge .gv-num{font-size:30px;font-weight:900;color:#1CC7D0;line-height:1;}
+.hv-gauge .gv-lbl{font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:#8aaabb;margin-top:5px;}
+.hv-text{flex:1;min-width:240px;}
+.hv-headline{font-size:25px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.15;}
+.hv-headline .accent{color:#1CC7D0;}
+.hv-sub{font-size:13px;color:#bcd2de;margin-top:9px;line-height:1.55;}
+.hv-sub b{color:#f4b86a;font-weight:800;}
+
+/* section heading */
+.sec-h{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--teal-dim);margin:30px 2px 12px;}
+
+/* KPI grid */
+.kgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+.kpi{background:#fff;border:1px solid var(--border);border-left:3px solid var(--navy);
+  border-radius:10px;padding:14px 14px 13px;}
+.kpi.t{border-left-color:var(--teal-dim);}
+.kpi.g{border-left-color:var(--orange-dim);}
+.kpi.o{border-left-color:var(--teal);}
+.kpi-lbl{font-size:8.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);}
+.kpi-val{font-size:21px;font-weight:800;color:var(--navy);margin-top:5px;letter-spacing:-0.5px;}
+.kpi-sub{font-size:9.5px;color:var(--muted);margin-top:4px;line-height:1.3;}
+
+/* next moves */
+.moves{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.move{background:#fff;border:1px solid var(--border);border-radius:11px;padding:18px;
+  text-decoration:none;display:block;transition:border-color .15s,box-shadow .15s;}
+.move:hover{border-color:var(--teal-dim);box-shadow:0 4px 14px rgba(4,30,47,0.08);}
+.move-icon{width:36px;height:36px;border-radius:9px;background:#0c2438;display:flex;
+  align-items:center;justify-content:center;margin-bottom:11px;}
+.move-lbl{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--teal-dim);}
+.move-val{font-size:22px;font-weight:900;color:var(--navy);margin:5px 0 6px;letter-spacing:-0.5px;}
+.move-desc{font-size:12px;color:var(--dark);line-height:1.5;}
+.move-cta{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+  color:var(--teal-dim);margin-top:10px;}
+
+/* trust band */
+.trust{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px 24px;
+  margin-top:14px;display:grid;grid-template-columns:1.4fr 1fr;gap:24px;}
+.trust-privacy .tp-h{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:800;color:var(--navy);}
+.trust-privacy .tp-p{font-size:12.5px;color:var(--dark);line-height:1.6;margin:9px 0 11px;}
+.trust-privacy a{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--teal-dim);text-decoration:none;}
+.founder{font-size:12.5px;color:var(--dark);line-height:1.6;margin-top:14px;}
+.founder b{color:var(--navy);}
+.ph{position:relative;border:1.5px dashed var(--orange-dim);border-radius:10px;padding:16px 16px 14px;
+  background:#fffaf2;}
+.ph-tag{position:absolute;top:-9px;left:12px;background:var(--orange-dim);color:#fff;font-size:8px;
+  font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:2px 8px;border-radius:4px;}
+.ph-quote{font-size:13px;color:var(--navy);line-height:1.55;font-style:italic;}
+.ph-by{font-size:11px;color:var(--muted);font-weight:700;margin-top:8px;}
+
+/* app cards */
+.apps{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.app-card{background:#fff;border:1px solid var(--border);border-radius:11px;padding:16px 15px;
+  text-decoration:none;display:block;transition:border-color .15s,box-shadow .15s;}
+.app-card:hover{border-color:var(--teal-dim);box-shadow:0 4px 14px rgba(4,30,47,0.08);}
+.app-card .ac-ic{width:32px;height:32px;border-radius:8px;background:var(--navy);display:flex;
+  align-items:center;justify-content:center;margin-bottom:10px;}
+.app-title{font-size:13px;font-weight:800;color:var(--navy);}
+.app-sub{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.35;}
+
+@media(max-width:860px){
+  .kgrid{grid-template-columns:repeat(3,1fr);}
+  .moves{grid-template-columns:1fr;}
+  .trust{grid-template-columns:1fr;}
+  .apps{grid-template-columns:repeat(2,1fr);}
+  .hero-verdict{padding:22px;gap:20px;}
+  .hv-headline{font-size:21px;}
+}
+@media(max-width:480px){
+  .kgrid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+
+<!-- ── COMMAND STRIP (real data; neutral until loaded) ──────────────── -->
 <div class="command-strip">
   <div class="command-inner">
     <div class="plan-meta">
-      <div class="meta-item"><div class="mi-lbl">Partners</div><div class="mi-val" id="m-names">— · —</div></div>
-      <div class="meta-item"><div class="mi-lbl">Plan Year</div><div class="mi-val" id="m-year">2026</div></div>
-      <div class="meta-item"><div class="mi-lbl">Phase</div><div class="mi-val" id="m-phase">Transition</div></div>
-      <div class="meta-item"><div class="mi-lbl">Scenario</div><div class="mi-val" id="m-scenario">Base Case</div></div>
+      <div class="meta-item"><div class="mi-lbl">Partners</div><div class="mi-val" id="m-names">—</div></div>
+      <div class="meta-item"><div class="mi-lbl">Plan Year</div><div class="mi-val" id="m-year">—</div></div>
+      <div class="meta-item"><div class="mi-lbl">Phase</div><div class="mi-val" id="m-phase">—</div></div>
+      <div class="meta-item"><div class="mi-lbl">Scenario</div><div class="mi-val" id="m-scenario">—</div></div>
       <div class="meta-item"><div class="mi-lbl">Runway</div><div class="mi-val" id="m-runway">—</div></div>
-      <div class="meta-item"><div class="mi-lbl">Inflation</div><div class="mi-val" id="m-inflation">3.0% / yr</div></div>
-      <div class="meta-item"><div class="mi-lbl">SS COLA</div><div class="mi-val" id="m-cola">2.5% / yr</div></div>
+      <div class="meta-item"><div class="mi-lbl">Inflation</div><div class="mi-val" id="m-inflation">—</div></div>
+      <div class="meta-item"><div class="mi-lbl">SS COLA</div><div class="mi-val" id="m-cola">—</div></div>
     </div>
     <div class="status-pill">
       <div class="status-dot"></div>
-      <span class="status-text" id="m-status">On track · Legacy goal met</span>
+      <span class="status-text" id="m-status">Loading your plan…</span>
     </div>
   </div>
 </div>
 
 <div class="page">
 
-  
-  <div class="kpi-strip">
-    <div class="kpi o">
-      <div class="kpi-lbl">Plan Confidence</div>
+  <!-- honest no-sheet / error banner (hidden until needed) -->
+  <div id="rbp-state-banner" class="state-banner" style="display:none;"></div>
+
+  <!-- ── HERO VERDICT ─────────────────────────────────────────────── -->
+  <section class="hero-verdict">
+    <div class="hv-gauge">
+      <svg width="132" height="132" viewBox="0 0 132 132">
+        <circle cx="66" cy="66" r="52" fill="none" stroke="#0c2438" stroke-width="13"/>
+        <circle id="hv-ring" cx="66" cy="66" r="52" fill="none" stroke="#1CC7D0" stroke-width="13"
+          stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+      </svg>
+      <div class="gv">
+        <div class="gv-num" id="home-conf-big">—</div>
+        <div class="gv-lbl">Confidence</div>
+      </div>
+    </div>
+    <div class="hv-text">
+      <div class="hv-headline" id="hv-headline">Loading your plan…</div>
+      <div class="hv-sub" id="hv-sub">Reading your numbers from your connected Google Sheet.</div>
+    </div>
+  </section>
+
+  <!-- ── KEY NUMBERS ──────────────────────────────────────────────── -->
+  <div class="sec-h">Your plan at a glance</div>
+  <div class="kgrid">
+    <div class="kpi o"><div class="kpi-lbl">Plan Confidence</div>
       <div class="kpi-val" id="kpi-confidence">—</div>
-      <div class="kpi-sub" id="kpi-confidence-sub">Very Strong</div>
-    </div>
-    <div class="kpi t">
-      <div class="kpi-lbl">Safe Extra Spend</div>
-      <div class="kpi-val" id="kpi-extra">$20,227</div>
-      <div class="kpi-sub">Per year available</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-lbl">Total Portfolio</div>
-      <div class="kpi-val" id="kpi-portfolio">$943K</div>
-      <div class="kpi-sub" id="kpi-portfolio-sub">5 active accounts · 2026</div>
-    </div>
-    <div class="kpi g">
-      <div class="kpi-lbl">Legacy Goal</div>
-      <div class="kpi-val" id="kpi-legacy">Met ✓</div>
-      <div class="kpi-sub" id="kpi-legacy-sub">$250K target · +$62</div>
-    </div>
-    <div class="kpi t">
-      <div class="kpi-lbl">Roth Conv. Savings</div>
-      <div class="kpi-val" id="kpi-roth">$10,211</div>
-      <div class="kpi-sub">Converting now vs later</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-lbl" id="kpi-runway-lbl">Survivor Runway</div>
-      <div class="kpi-val" id="kpi-runway">49 yrs</div>
-      <div class="kpi-sub" id="kpi-runway-sub">Survivor covered</div>
-    </div>
+      <div class="kpi-sub" id="kpi-confidence-sub">—</div></div>
+    <div class="kpi t"><div class="kpi-lbl">Safe Extra Spend</div>
+      <div class="kpi-val" id="kpi-extra">—</div>
+      <div class="kpi-sub">Per year available</div></div>
+    <div class="kpi"><div class="kpi-lbl">Total Portfolio</div>
+      <div class="kpi-val" id="kpi-portfolio">—</div>
+      <div class="kpi-sub" id="kpi-portfolio-sub">—</div></div>
+    <div class="kpi g"><div class="kpi-lbl">Legacy Goal</div>
+      <div class="kpi-val" id="kpi-legacy">—</div>
+      <div class="kpi-sub" id="kpi-legacy-sub">—</div></div>
+    <div class="kpi t"><div class="kpi-lbl">Roth Conv. Savings</div>
+      <div class="kpi-val" id="kpi-roth">—</div>
+      <div class="kpi-sub">Lifetime taxes saved</div></div>
+    <div class="kpi"><div class="kpi-lbl" id="kpi-runway-lbl">Survivor Runway</div>
+      <div class="kpi-val" id="kpi-runway">—</div>
+      <div class="kpi-sub" id="kpi-runway-sub">—</div></div>
   </div>
 
-  
-  
-
-  
-  <div style="text-align:center;margin-bottom:16px;">
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_Demo.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f4b86a,#e09320);color:#041E2F;font-size:14px;font-weight:800;padding:14px 30px;border-radius:8px;text-decoration:none;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="#041E2F" stroke="#041E2F" stroke-linejoin="round"><polygon points="7 5 19 12 7 19 7 5"/></svg> Try the interactive demo (no sheet required)
+  <!-- ── YOUR NEXT MOVES ──────────────────────────────────────────── -->
+  <div class="sec-h">What this means for you</div>
+  <div class="moves">
+    <a class="move" href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html">
+      <div class="move-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="move-lbl">You can safely spend</div>
+      <div class="move-val" id="move-extra">—</div>
+      <div class="move-desc">more per year and still hit your legacy goal at your current plan settings.</div>
+      <div class="move-cta">Adjust spending →</div>
     </a>
-    <div style="font-size:10px;color:#8aaabb;margin-top:8px;">Real calculations with live sliders. Four personas: Traditional, FIRE, Single, and Fat FIRE.</div>
-  </div>
-
-  
-  <div style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:18px 24px;margin-bottom:16px;border:1px solid rgba(28,199,208,0.2);display:flex;align-items:center;justify-content:space-between;">
-    <div>
-      <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">A retirement plan that's recalculated every year, all the way to age 110, so you don't outlive your money.</div>
-      <div style="font-size:11px;color:#8aaabb;line-height:1.6;">Connect your Google Sheet once and your full lifetime projection updates automatically. Print a clean summary your financial advisor can read in five minutes.</div>
-    </div>
-    <div style="flex-shrink:0;margin-left:24px;text-align:center;">
-      <div style="font-size:28px;font-weight:900;color:#1CC7D0;" id="home-conf-big">—</div>
-      <div style="font-size:10px;color:#8aaabb;text-transform:uppercase;letter-spacing:1px;">Plan Confidence</div>
-    </div>
-  </div>
-
-  
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-    <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #1CC7D0;text-align:center;">
-      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="10" width="3.2" height="7" rx="0.6"/><rect x="10.4" y="6" width="3.2" height="11" rx="0.6"/><rect x="14.8" y="13" width="3.2" height="4" rx="0.6"/></svg></span></div>
-      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Lifetime projection to age 110</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Your Master spreadsheet builds a complete, year-by-year picture of your finances through age 110, whether you're planning early retirement or a traditional one.</div>
-    </div>
-    <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #f4b86a;text-align:center;">
-      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 0 1 14.5-6"/><polyline points="18.5 3 18.5 6.5 15 6.5"/><path d="M20.5 12a8.5 8.5 0 0 1-14.5 6"/><polyline points="5.5 21 5.5 17.5 9 17.5"/></svg></span></div>
-      <div style="font-size:12px;font-weight:700;color:#f4b86a;margin-bottom:4px;">Roth Conversion Solver</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">Finds the conversion amount that minimizes your lifetime taxes before RMDs begin at 73.</div>
-    </div>
-    <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #1CC7D0;text-align:center;">
-      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span></div>
-      <div style="font-size:12px;font-weight:700;color:#1CC7D0;margin-bottom:4px;">Stress test built in</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">See how a 30% market crash in your first year of retirement would affect your plan, before it ever happens.</div>
-    </div>
-    <div style="background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:10px;padding:16px;border-left:3px solid #9b59b6;text-align:center;">
-      <div style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></span></div>
-      <div style="font-size:12px;font-weight:700;color:#c39bd3;margin-bottom:4px;">Print-ready summary</div>
-      <div style="font-size:10px;color:#8aaabb;line-height:1.5;">A clean one-page PDF your spouse and financial advisor can read and understand.</div>
-    </div>
-  </div>
-
-  
-  <div id="review-banner" style="display:none;background:linear-gradient(135deg,#2E7D32,#1b5e20);border-radius:10px;padding:14px 20px;margin-bottom:20px;display:none;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div><svg width="22" height="22" viewBox="0 0 24 24" fill="#f4b86a" stroke="#f4b86a" stroke-linejoin="round"><polygon points="12 3 14.7 9 21 9.5 16 13.8 17.7 20 12 16.4 6.3 20 8 13.8 3 9.5 9.3 9 12 3"/></svg></div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#fff;">Getting value from RetireBlueprint Pro?</div>
-        <div style="font-size:10px;color:#a5d6a7;">A short review helps other families find the tool. It takes about a minute.</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;flex-shrink:0;">
-      <a href="https://www.etsy.com/your-listing-url" target="_blank" style="background:#fff;color:#2E7D32;font-size:11px;font-weight:700;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Leave a review<svg width="13" height="13" viewBox="0 0 24 24" fill="#2E7D32" stroke="#2E7D32" stroke-linejoin="round" style="vertical-align:-1px;margin-left:5px;"><polygon points="12 3 14.7 9 21 9.5 16 13.8 17.7 20 12 16.4 6.3 20 8 13.8 3 9.5 9.3 9 12 3"/></svg></a>
-      <button onclick="document.getElementById('review-banner').style.display='none';localStorage.setItem('rbp_reviewed','1');" style="background:transparent;color:#a5d6a7;border:1px solid #a5d6a7;font-size:10px;padding:8px 12px;border-radius:6px;cursor:pointer;">Not now</button>
-    </div>
-  </div>
-
-  
-  <div class="section-lbl">Planning Tools</div>
-<div id="fire-explainer" style="background:linear-gradient(135deg,#041E2F,#0d2d44);border-radius:10px;padding:14px 20px;margin-bottom:12px;border:1px solid rgba(28,199,208,0.25);display:flex;align-items:flex-start;gap:14px;">
-    <div style="flex-shrink:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></svg></span></div>
-    <div>
-      <div style="font-size:13px;font-weight:800;color:#1CC7D0;margin-bottom:4px;">What is FIRE? — Financial Independence, Retire Early</div>
-      <div style="font-size:11px;color:#c9d6de;line-height:1.7;">
-        FIRE — Financial Independence, Retire Early — comes down to one idea: <strong>save steadily, invest sensibly, and retire on a timeline you choose.</strong> RetireBlueprint Pro gives you the numbers behind it: your <strong>FI Date</strong> (when work becomes optional), your <strong>Safe Withdrawal Rate</strong> (whether you're drawing too much), your <strong>Coast FIRE number</strong> (when you can stop saving), and your <strong>FIRE type</strong> — Lean, Regular, or Fat — based on how you plan to spend. <span style="color:#1CC7D0;font-weight:700;">You don't have to be 30 or chasing an extreme budget to use it. This is for anyone who wants more control over when and how they retire.</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="apps-primary">
-
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_Dashboard.html" class="app-card">
-      <div class="app-card-accent navy"></div>
-      <div class="app-card-inner">
-        <div><span class="app-tag tag-primary"><span class="live-dot"></span> Live</span></div>
-        <div class="app-title">Retirement Dashboard</div>
-        <div class="app-desc">Your complete lifetime financial picture. Portfolio sustainability arc, income bridge by source, tax bucket evolution, smile curve spending by phase, survivor plan through the full plan, and At-a-Glance intelligence sidebar. Reads live from your Google Sheet.</div>
-        <div class="app-footer">
-          <span class="app-cta">Open Dashboard</span>
-          <span class="app-arrow">→</span>
-        </div>
-      </div>
+    <a class="move" href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html">
+      <div class="move-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 0 1 14.5-6"/><polyline points="18.5 3 18.5 6.5 15 6.5"/><path d="M20.5 12a8.5 8.5 0 0 1-14.5 6"/><polyline points="5.5 21 5.5 17.5 9 17.5"/></svg></div>
+      <div class="move-lbl">Roth conversions could save</div>
+      <div class="move-val" id="move-roth">—</div>
+      <div class="move-desc">in lifetime taxes. Open the Roth Conversion Solver to see the best years to convert.</div>
+      <div class="move-cta">Open the solver →</div>
     </a>
-
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" class="app-card">
-      <div class="app-card-accent teal"></div>
-      <div class="app-card-inner">
-        <div><span class="app-tag tag-teal">Connected</span></div>
-        <div class="app-title">Inputs Form</div>
-        <div class="app-desc">Update partner profiles, income, Social Security, accounts, expenses, smile curve phases, and Roth conversion plan. Saves directly to your Google Sheet.</div>
-        <div class="app-footer">
-          <span class="app-cta">Edit Your Plan</span>
-          <span class="app-arrow">→</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_AnnualCheckIn.html" class="app-card">
-      <div class="app-card-accent teal"></div>
-      <div class="app-card-inner">
-        <div><span class="app-tag tag-teal">Annual</span></div>
-        <div class="app-title">Annual Check-In</div>
-        <div class="app-desc">Enter your December 31 balances each January, then see how your actual results compare to the projection, year by year.</div>
-        <div class="app-footer">
-          <span class="app-cta">Open Check-In</span>
-          <span class="app-arrow">→</span>
-        </div>
-      </div>
-    </a>
-
-  </div>
-
-  <div class="apps-secondary">
-
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_TaxEngine.html" class="app-card">
-      <div class="app-card-accent slate"></div>
-      <div class="app-card-inner">
-        <div><span class="app-tag tag-slate">Tax Strategy</span></div>
-        <div class="app-title">Tax Engine</div>
-        <div class="app-desc">Federal bracket visualizer, Roth conversion solver, gross-up calculator, IRMAA surcharge table, capital gains rates, RMD schedule, and effective rate timeline across your plan.</div>
-        <div class="app-footer">
-          <span class="app-cta">Open Tax Engine</span>
-          <span class="app-arrow">→</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" class="app-card">
-      <div class="app-card-accent orange"></div>
-      <div class="app-card-inner">
-        <div><span class="app-tag tag-orange">Built In</span></div>
-        <div class="app-title">Scenario Planner</div>
-        <div class="app-desc">Early Bear Market, Late Bear Market, or Normal Returns. Configure start year, duration, and return drag. The Master engine recalculates your full lifetime projection instantly.</div>
-        <div class="app-footer">
-          <span class="app-cta">Open Scenarios</span>
-          <span class="app-arrow">→</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html" class="app-card">
-      <div class="app-card-accent" style="background:#6B7F8A;"></div>
-      <div class="app-card-inner">
-        <div><span class="app-tag tag-slate">Guide</span></div>
-        <div class="app-title">Setup & User Guide</div>
-        <div class="app-desc">8-section complete reference. Every input field explained, how the model works, annual check-in process, formula logic, Roth window strategy, and FAQ.</div>
-        <div class="app-footer">
-          <span class="app-cta orange">Open guide</span>
-          <span class="app-arrow">→</span>
-        </div>
-      </div>
-    </a>
-
-  </div>
-
-  
-  <div class="section-lbl">Quick Access — Your Planning Tools</div>
-  <div class="sheets-grid">
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html" class="sheet-card">
-      <div class="sheet-icon-box" style="background:#2E4053;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </div>
-      <div><div class="sheet-name">Inputs Form</div><div class="sheet-desc">Enter your data</div></div>
-    </a>
-    <a href="#" onclick="var sid=localStorage.getItem('rbp_sheet_id'); if(sid) window.open('https://docs.google.com/spreadsheets/d/'+sid+'/edit','_blank'); else alert('Complete setup first — go to Setup Guide.'); return false;" target="_blank" class="sheet-card">
-      <div class="sheet-icon-box" style="background:#1a3a52;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
-      </div>
-      <div><div class="sheet-name">Master Sheet</div><div class="sheet-desc">Lifetime projection</div></div>
-    </a>
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_AnnualCheckIn.html" class="sheet-card">
-      <div class="sheet-icon-box" style="background:#2E4053;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      </div>
-      <div><div class="sheet-name">Annual Check-In</div><div class="sheet-desc">Year-over-year tracker</div></div>
-    </a>
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_TaxEngine.html" class="sheet-card">
-      <div class="sheet-icon-box" style="background:#1a3a52;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      </div>
-      <div><div class="sheet-name">Tax Engine</div><div class="sheet-desc">Tax strategy viewer</div></div>
-    </a>
-    <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html" class="sheet-card">
-      <div class="sheet-icon-box" style="background:#2E3A4E;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f4b86a" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      </div>
-      <div><div class="sheet-name">Setup Guide</div><div class="sheet-desc">Full HTML guide</div></div>
+    <a class="move" href="https://retireblueprintpro.com/RetireBlueprintPro_Blueprint.html">
+      <div class="move-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="move-lbl">Your full picture</div>
+      <div class="move-val" id="move-horizon">to age 110</div>
+      <div class="move-desc">Every year of income, taxes, and withdrawals is modeled to age 110. See it all in your printable Blueprint.</div>
+      <div class="move-cta">View your Blueprint →</div>
     </a>
   </div>
 
-</div>
+  <!-- ── TRUST BAND ───────────────────────────────────────────────── -->
+  <div class="sec-h">Built to be trusted</div>
+  <div class="trust">
+    <div class="trust-privacy">
+      <div class="tp-h">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#147a82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Your numbers never leave your own Google account
+      </div>
+      <div class="tp-p">RetireBlueprint Pro can't see your financial data. It lives in <b>your</b> Google Sheet, on <b>your</b> account &mdash; never on our servers. The app simply reads your sheet to show your plan, and you can disconnect it at any time.</div>
+      <a href="https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html">See exactly how it works &rarr;</a>
+      <!-- PLACEHOLDER: replace the bracketed text with your own founder line -->
+      <div class="founder"><b>Why this exists:</b> [Built by a fellow planner who got tired of retirement math you can't check. Replace this sentence with your own story.]</div>
+    </div>
+    <!-- PLACEHOLDER TESTIMONIAL: swap the quote + name for a real one (e.g. Craig) -->
+    <div class="ph">
+      <span class="ph-tag">Placeholder &middot; edit me</span>
+      <div class="ph-quote">&ldquo;[Paste a real customer quote here &mdash; one or two sentences about what RetireBlueprint Pro showed them or how it made them feel about retirement.]&rdquo;</div>
+      <div class="ph-by">&mdash; [Customer name, role or location]</div>
+    </div>
+  </div>
 
-<div class="footer">
-  RetireBlueprint Pro · All values sourced from your Inputs & Master sheets · 7% avg return, 3% inflation, 2.5% SS COLA · Not financial advice · Personal planning use only
+  <!-- ── JUMP IN ──────────────────────────────────────────────────── -->
+  <div class="sec-h">Jump into your plan</div>
+  <div class="apps">
+    <a class="app-card" href="https://retireblueprintpro.com/RetireBlueprintPro_Dashboard.html">
+      <div class="ac-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></div>
+      <div class="app-title">Dashboard</div>
+      <div class="app-sub">Your live retirement command center</div>
+    </a>
+    <a class="app-card" href="https://retireblueprintpro.com/RetireBlueprintPro_Inputs.html">
+      <div class="ac-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+      <div class="app-title">Inputs</div>
+      <div class="app-sub">Edit your numbers &amp; assumptions</div>
+    </a>
+    <a class="app-card" href="https://retireblueprintpro.com/RetireBlueprintPro_StressTest.html">
+      <div class="ac-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <div class="app-title">Stress Test</div>
+      <div class="app-sub">See how crashes affect your plan</div>
+    </a>
+    <a class="app-card" href="https://retireblueprintpro.com/RetireBlueprintPro_Blueprint.html">
+      <div class="ac-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></div>
+      <div class="app-title">Blueprint</div>
+      <div class="app-sub">Your full printable report</div>
+    </a>
+    <a class="app-card" href="https://retireblueprintpro.com/RetireBlueprintPro_TaxEngine.html">
+      <div class="ac-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="app-title">Tax Engine</div>
+      <div class="app-sub">Brackets, RMDs &amp; IRMAA detail</div>
+    </a>
+  </div>
+
 </div>
 
 <script>
+/* ====================================================================
+   HOME — DATA LOADER (revamped)
+   Fills the page with the customer's REAL plan from their sheet.
+   If the sheet isn't connected or can't load, it shows an honest
+   "connect your sheet" / "couldn't load" state — never fake numbers.
+   ==================================================================== */
+
+/* Etsy listing link lives in ONE place. When your store is live, paste the
+   real listing URL here and it updates everywhere that uses ETSY_URL. */
+var ETSY_URL = '#';   /* TODO: replace with your Etsy listing URL when the store is live */
+
 var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
-// Fallback: if the shared rbp-connector.js didn't load (blocked in a preview,
-// cached 404, etc.), define a local RBP.load so the page works instead of
-// throwing "RBP is not defined". On the live site the shared connector wins.
+
+/* Fallback if the shared connector didn't load (preview / cached 404). */
 if (typeof window.RBP === 'undefined' || !window.RBP || typeof window.RBP.load !== 'function') {
   window.RBP = window.RBP || {};
   window.RBP.load = function(onOk, onErr){
     var sheetId = localStorage.getItem('rbp_sheet_id');
     var host = window.location.hostname || '';
     var isPreview = (window.location.protocol==='file:' || host==='' || host==='localhost' || host.indexOf('claude.ai')>=0);
-    if (!sheetId || isPreview) { if(onErr) onErr('no sheet / preview'); return; }
+    if (!sheetId || isPreview) { if(onErr) onErr('No sheet connected. Please complete Setup first.','no-sheet'); return; }
     var cb = 'rbpHome_' + Date.now(), done = false;
-    var t = setTimeout(function(){ if(!done){ done=true; try{delete window[cb];}catch(e){} if(onErr) onErr('timeout'); } }, 90000);
+    var t = setTimeout(function(){ if(!done){ done=true; try{delete window[cb];}catch(e){} if(onErr) onErr('timeout','timeout'); } }, 90000);
     window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); try{delete window[cb];}catch(e){}
-      if(d && d.error){ if(onErr) onErr(d.error); return; } if(onOk) onOk(d); };
+      if(d && d.error){ if(onErr) onErr(d.error,'server'); return; } if(onOk) onOk(d); };
     var s = document.createElement('script'); s.crossOrigin='anonymous';
     s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2);
-    s.onerror = function(){ if(!done){ done=true; clearTimeout(t); try{delete window[cb];}catch(e){} if(onErr) onErr('network'); } };
+    s.onerror = function(){ if(!done){ done=true; clearTimeout(t); try{delete window[cb];}catch(e){} if(onErr) onErr('network','network'); } };
     document.head.appendChild(s);
   };
 }
-/* ── Instant-paint cache (stale-while-revalidate) ──────────────────────────
-   Paints from the last read (held briefly in this tab) the moment the page
-   opens, then re-reads in the background and repaints with fresh data, so
-   navigating feels instant instead of waiting on a cold sheet each time. */
+
+/* Instant-paint cache (stale-while-revalidate). */
 var RBP_CACHE_TTL = 90000;
 function rbpCacheKey(){ try { return 'rbp_pd_' + (localStorage.getItem('rbp_sheet_id') || ''); } catch(e){ return ''; } }
 function rbpCacheGet(){ try { var r = sessionStorage.getItem(rbpCacheKey()); if(!r) return null; var o = JSON.parse(r); if(!o || (Date.now()-o.ts) > RBP_CACHE_TTL) return null; return o.d; } catch(e){ return null; } }
 function rbpCachePut(d){ try { if (d && !d.error) sessionStorage.setItem(rbpCacheKey(), JSON.stringify({ ts: Date.now(), d: d })); } catch(e){} }
-function rbpCacheClear(){ try { sessionStorage.removeItem(rbpCacheKey()); } catch(e){} }
 RBP.loadCached = function(onOk, onErr){
   var cached = rbpCacheGet();
   if (cached) { try { onOk(cached); } catch(e){} }
   RBP.load(function(d){ rbpCachePut(d); try { onOk(d); } catch(e){} },
-           function(msg){ if (!cached && onErr) onErr(msg); });
+           function(msg, kind){ if (!cached && onErr) onErr(msg, kind); });
 };
-function fmt(n){if(!n&&n!==0)return'--';if(Math.abs(n)>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString();}
+
+/* helpers */
+function fmt(n){if(!n&&n!==0)return'—';if(Math.abs(n)>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString();}
+function fmtK(n){ n=n||0; return Math.abs(n)>=1000000?'$'+(n/1000000).toFixed(1)+'M':Math.abs(n)>=1000?'$'+Math.round(n/1000)+'K':'$'+Math.round(n); }
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+function setHTML(id,v){var el=document.getElementById(id);if(el)el.innerHTML=v;}
+function setDot(color){var d=document.querySelector('.status-dot');if(d)d.style.background=color;}
+function setRing(pct){var r=document.getElementById('hv-ring');if(!r)return;var C=326.7;var p=Math.max(0,Math.min(100,pct||0));r.style.strokeDashoffset=(C*(1-p/100)).toFixed(1);}
+
+/* honest empty / error state — replaces fake numbers */
+function showState(kind, msg){
+  var b=document.getElementById('rbp-state-banner');
+  setRing(0); set('home-conf-big','—');
+  if(kind==='no-sheet'){
+    if(b){ b.className='state-banner warn'; b.style.display='flex';
+      b.innerHTML='<div class="sb-txt"><div class="sb-h">Connect your Google Sheet to see your plan</div>'+
+        '<div class="sb-p">Your numbers live in your own sheet. Once it\u2019s connected, your real plan appears here automatically.</div></div>'+
+        '<a class="sb-btn" href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html">Go to Setup &rarr;</a>'; }
+    set('m-status','No sheet connected'); setDot('#c8904a');
+    setHTML('hv-headline','Connect your sheet to <span class="accent">begin</span>');
+    set('hv-sub','Your plan will load here the moment your Google Sheet is connected.');
+  } else {
+    if(b){ b.className='state-banner err'; b.style.display='flex';
+      b.innerHTML='<div class="sb-txt"><div class="sb-h">We couldn\u2019t load your plan</div>'+
+        '<div class="sb-p">'+(msg||'Please refresh. If it keeps happening, make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.')+'</div></div>'+
+        '<a class="sb-btn" href="#" onclick="loadData();return false;">Try again</a>'; }
+    set('m-status','Couldn\u2019t reach your sheet'); setDot('#c0504a');
+    setHTML('hv-headline','We couldn\u2019t reach your <span class="accent">sheet</span>');
+    set('hv-sub', msg||'Refresh to try again. Make sure your sheet is shared with retireblueprintpro@gmail.com.');
+  }
+}
+
 function loadData(){
   RBP.loadCached(function(d){
     try{
-      var p=d.people,port=d.portfolio,sp=d.spending,leg=d.legacy,tax=d.tax,meta=d.meta;
+      var b=document.getElementById('rbp-state-banner'); if(b) b.style.display='none';
+      var p=d.people||{},port=d.portfolio||{},sp=d.spending||{},leg=d.legacy||{},tax=d.tax||{},meta=d.meta||{};
+      var gl=d.global||{};
       var p1=p.craig||p.person1||{},p2=p.gena||p.person2||{};
-      var craig=p1,gena=p2;
-  try { if(craig.name) localStorage.setItem("rbp_p1_name",craig.name.trim()); } catch(e){}
-  try { if(gena.name) localStorage.setItem("rbp_p2_name",gena.name.trim()); } catch(e){}
-  if (typeof rbpApplyNames==="function") rbpApplyNames(craig.name||"Partner 1", gena.name||"Partner 2");
+      try { if(p1.name) localStorage.setItem('rbp_p1_name',String(p1.name).trim()); } catch(e){}
+      try { if(p2.name) localStorage.setItem('rbp_p2_name',String(p2.name).trim()); } catch(e){}
+      if (typeof rbpApplyNames==='function') rbpApplyNames(p1.name||'Partner 1', p2.name||'Partner 2');
+
       var single = !(p2 && p2.name && String(p2.name).trim());
       var coverPerson = single ? p1 : p2;
-      var runway=(coverPerson.projectedDeathYear||meta.planYear)-meta.planYear;
-      set('kpi-runway-lbl', single ? 'Plan Coverage' : 'Survivor Runway');
-      set('k-confidence',Math.round(leg.achievedPct)+'%');
-      set('k-portfolio',fmt(port.total));
-      set('k-extra',fmt(sp.safeExtra));
-      set('k-roth',fmt(tax.rothConversionSavings));
-      set('k-legacy',leg.achievedPct>=100?'Goal Met ✓':Math.round(leg.achievedPct)+'%');
-      set('kpi-confidence',Math.round(leg.achievedPct)+'%');
-      set('kpi-extra',fmt(sp.safeExtra));
-      set('kpi-portfolio',fmt(port.total));
-      set('kpi-legacy',leg.achievedPct>=100?'Met ✓':Math.round(leg.achievedPct)+'%');
-      set('kpi-roth',fmt(tax.rothConversionSavings));
-      set('kpi-runway',runway+' yrs');
-      set('kpi-runway-sub',(coverPerson.name||'Plan')+' covered to age '+(coverPerson.deathAge||'—'));
-      set('m-names', single ? (p1.name+' '+p1.age) : (p1.name+' '+p1.age+' · '+p2.name+' '+p2.age));
-      set('m-year',meta.planYear);
-      set('m-runway',runway+' yrs ('+(coverPerson.name||'')+')');
-      set('m-status',leg.achievedPct>=100?'On track · Legacy goal met':'Review plan');
+      var endAge = coverPerson.deathAge || '—';
+      var runway = (coverPerson.projectedDeathYear||meta.planYear||0) - (meta.planYear||0);
+      var pct = (d.health && typeof d.health.confidencePct==='number') ? d.health.confidencePct : (leg.achievedPct||0);
+      pct = Math.round(pct);
+      var legPct = Math.round(leg.achievedPct||0);
+      var legVar = leg.variance||0;
 
-      // Phase and Scenario
-      var gl = d.global||{};
-      var p1working = p1.salary > 0;
-      set('m-phase', p1working ? 'Transition' : 'Distribution');
-      var earlyBear = gl.stressEarly && gl.stressEarly === 'Bear Market';
-      var lateBear  = gl.stressLate  && gl.stressLate  === 'Bear Market';
-      var scenario  = earlyBear && lateBear ? 'Early + Late Bear'
-                    : earlyBear ? 'Early Bear Market'
-                    : lateBear  ? 'Late Bear Market'
-                    : 'Base Case';
-      set('m-scenario', scenario);
-
-      // Inflation and SS COLA from sheet
+      /* ── command strip ── */
+      set('m-names', single ? ((p1.name||'')+' '+(p1.age||'')) : ((p1.name||'')+' '+(p1.age||'')+' · '+(p2.name||'')+' '+(p2.age||'')));
+      set('m-year', meta.planYear||'—');
+      set('m-phase', (p1.salary>0) ? 'Transition' : 'Distribution');
+      var earlyBear=gl.stressEarly==='Bear Market', lateBear=gl.stressLate==='Bear Market';
+      set('m-scenario', earlyBear&&lateBear?'Early + Late Bear':earlyBear?'Early Bear Market':lateBear?'Late Bear Market':'Base Case');
+      set('m-runway', runway+' yrs ('+(coverPerson.name||'')+')');
       function fmtPct(n){ var v=n<1?n*100:n; return v.toFixed(1)+'% / yr'; }
       set('m-inflation', fmtPct(tax.inflation||0.03));
-      set('m-cola',      fmtPct(tax.ssCola||0.025));
+      set('m-cola', fmtPct(tax.ssCola||0.025));
+      set('m-status', legPct>=100?'On track · Legacy goal met':pct>=80?'On track':pct>=60?'Review recommended':'Needs attention');
+      setDot(pct>=80?'#2E7032':pct>=60?'#c8904a':'#c0504a');
 
-      // KPI subs — confidence label
-      var pct = (d.health && typeof d.health.confidencePct==='number') ? d.health.confidencePct : (leg.achievedPct||0);
-      set('kpi-confidence', Math.round(pct)+'%');
-      set('k-confidence',   Math.round(pct)+'%');
-      set('home-conf-big',  Math.round(pct)+'%');
+      /* ── hero verdict ── */
+      set('home-conf-big', pct+'%'); setRing(pct);
+      var head = pct>=80 ? 'You\u2019re <span class="accent">on track</span>.'
+               : pct>=60 ? 'Your plan <span class="accent">needs a review</span>.'
+                         : 'Your plan <span class="accent">needs attention</span>.';
+      setHTML('hv-headline', head);
+      var subLegacy = legPct>=100
+            ? ('Your legacy goal is met'+(legVar?(' with <b>'+fmtK(legVar)+'</b> to spare'):'')+'.')
+            : ('You\u2019re at <b>'+legPct+'%</b> of your legacy goal.');
+      set('hv-sub', ''); /* clear */
+      setHTML('hv-sub', 'Funded through age <b>'+endAge+'</b>, modeled all the way to age 110. '+subLegacy);
+
+      /* ── KPIs ── */
+      set('kpi-confidence', pct+'%');
       set('kpi-confidence-sub', pct>=95?'Very Strong':pct>=80?'On Track':pct>=60?'Needs Review':'At Risk');
+      set('kpi-extra', fmt(sp.safeExtra));
+      set('kpi-portfolio', fmt(port.total));
+      var activeAccts = (port.accounts)?port.accounts.filter(function(a){return (a.showInCalc||'').toLowerCase()==='yes';}).length:0;
+      set('kpi-portfolio-sub', activeAccts+' active accounts · '+(meta.planYear||''));
+      set('kpi-legacy', legPct>=100?'Met ✓':legPct+'%');
+      set('kpi-legacy-sub', fmtK(leg.goal||gl.legacyGoal||0)+' target · '+(legVar>=0?'+':'')+fmtK(legVar));
+      set('kpi-roth', fmt(tax.rothConversionSavings));
+      set('kpi-runway-lbl', single?'Plan Coverage':'Survivor Runway');
+      set('kpi-runway', runway+' yrs');
+      set('kpi-runway-sub', (coverPerson.name||'Plan')+' covered to age '+endAge);
 
-      // Portfolio sub — active account count + year
-      var activeAccts = (d.portfolio && d.portfolio.accounts)
-        ? d.portfolio.accounts.filter(function(a){ return (a.showInCalc||'').toLowerCase()==='yes'; }).length
-        : 0;
-      set('kpi-portfolio-sub', activeAccts+' active accounts · '+(meta.planYear||2026));
-
-      // Legacy sub — goal + variance
-      var legGoal = leg.goal||gl.legacyGoal||0;
-      var legVar  = leg.variance||0;
-      function fmtK(n){ return n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+Math.round(n/1000)+'K':'$'+Math.round(n); }
-      set('kpi-legacy-sub', fmtK(legGoal)+' target · '+(legVar>=0?'+':'')+fmtK(legVar));
-    }catch(e){
-}
-  }, function(){});
+      /* ── next moves ── */
+      set('move-extra', fmt(sp.safeExtra));
+      set('move-roth', fmt(tax.rothConversionSavings));
+      set('move-horizon', 'to age 110');
+    }catch(e){ /* leave neutral state; don't paint fakes */ }
+  }, function(msg, kind){
+    showState(kind||'error', msg);
+  });
 }
 loadData();
 </script>
-
 <script>
 // ── AUTO-REFRESH: reloads data when Inputs saves ──────────────────
 (function() {
@@ -714,5 +738,6 @@ loadData();
 (function(){function w(){document.querySelectorAll('table').forEach(function(t){var p=t.parentElement;if(p&&p.classList&&p.classList.contains('rbp-tscroll'))return;var d=document.createElement('div');d.className='rbp-tscroll';t.parentNode.insertBefore(d,t);d.appendChild(t);});}
 if(document.readyState!=='loading')w();else document.addEventListener('DOMContentLoaded',w);})();
 </script>
+
 </body>
 </html>
