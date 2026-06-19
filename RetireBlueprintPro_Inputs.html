@@ -3484,6 +3484,7 @@ function fmt(n) {
 }
 
 function calcGrowth(p) {
+  // DEAD CODE — the on-page growth calculator was removed; this function is never called. Safe to delete.
   // Guard: if this partner's growth-calculator block isn't on the page, do nothing.
   // Prevents a TypeError on c2-results.style when the block is absent (e.g. single-person plans).
   var growthBox = document.getElementById('c'+p+'-results');
@@ -3689,6 +3690,7 @@ function useCalcValue(p) {
 }
 
 function calcHome() {
+  // DEAD CODE — the on-page home-equity calculator was removed; this function is never called. Safe to delete.
   var homeVal  = getNum('home-value');
   var rate     = getNum('home-rate') / 100 || 0.035;
   var mortgage = getNum('home-mortgage');
@@ -3898,10 +3900,7 @@ function loadCalcFromStorage() {
     setEl('c2-years',   d.c2_years);   setEl('c2-contrib-growth', d.c2_cgrowth);
     setEl('home-value',    d.home_value);    setEl('home-rate',     d.home_rate);
     setEl('home-mortgage', d.home_mortgage); setEl('home-years',    d.home_years);
-    // Recalculate after loading
-    setTimeout(function() {
-      calcGrowth(1); calcGrowth(2); calcHome();
-    }, 100);
+    // (Growth-calculator UI was removed; calcGrowth/calcHome are inert remnants and are no longer called.)
   } catch(e) {}
 }
 </script>

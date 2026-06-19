@@ -182,7 +182,7 @@ window.addEventListener('storage', function(e) {
     <div style="font-size:11px;color:#8aaabb;">Sample data — connect your sheet to see your real numbers</div>
   </div>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Home.html" style="flex-shrink:0;background:#1CC7D0;color:#041E2F;font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Connect My Sheet →</a>
-  <a href="https://www.etsy.com/your-listing-url" target="_blank" style="flex-shrink:0;background:#f4b86a;color:#041E2F;font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Get Your Copy →</a>
+  <a href="#" data-etsy="1" style="flex-shrink:0;background:#f4b86a;color:#041E2F;font-size:11px;font-weight:800;padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Get Your Copy →</a>
 </div>
 
 <div class="demo-hero">
@@ -328,7 +328,7 @@ window.addEventListener('storage', function(e) {
     <h2>Ready to see your numbers?</h2>
     <p>This demo uses sample data. Your real plan connects to your own private Google Sheet — your actual accounts, your Social Security, your spending, your legacy goal. Up to 100-year projection, Roth conversion optimizer, stress testing, and a printable PDF summary your financial advisor will read.</p>
     <div class="cta-btns">
-      <a href="https://www.etsy.com/your-listing-url" target="_blank" class="cta-btn-primary">Get RetireBlueprint Pro on Etsy</a>
+      <a href="#" data-etsy="1" class="cta-btn-primary">Get RetireBlueprint Pro on Etsy</a>
       <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html" class="cta-btn-secondary">See the full feature list</a>
     </div>
     <div class="feature-list" style="max-width:500px;margin:16px auto 0;">
@@ -596,6 +596,21 @@ loadPersona('traditional');
 /* mobile: wrap tables so wide ones scroll inside their own box instead of pushing the page wide */
 (function(){function w(){document.querySelectorAll('table').forEach(function(t){var p=t.parentElement;if(p&&p.classList&&p.classList.contains('rbp-tscroll'))return;var d=document.createElement('div');d.className='rbp-tscroll';t.parentNode.insertBefore(d,t);d.appendChild(t);});}
 if(document.readyState!=='loading')w();else document.addEventListener('DOMContentLoaded',w);})();
+</script>
+<script>
+/* ── Etsy listing link — lives in ONE place ──────────────────────────────
+   When your Etsy store is live, paste the real listing URL into ETSY_URL
+   below. Both "Get on Etsy" buttons update automatically. Until then,
+   clicking shows a friendly "launching soon" note instead of a dead link. */
+var ETSY_URL = '#';   /* TODO: paste your Etsy listing URL here when the store is live */
+(function(){
+  var live = ETSY_URL && ETSY_URL !== '#';
+  document.querySelectorAll('[data-etsy]').forEach(function(a){
+    if(live){ a.href = ETSY_URL; a.target='_blank'; a.rel='noopener'; }
+    else { a.href='#'; a.addEventListener('click', function(e){ e.preventDefault();
+      alert('Our Etsy store is launching soon — thanks for your interest! Check back shortly.'); }); }
+  });
+})();
 </script>
 </body>
 </html>

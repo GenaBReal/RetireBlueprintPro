@@ -138,6 +138,7 @@ thead{ display:table-header-group; }
   .sec,.hero,.cover,.stat,.stats,.note{ break-inside:avoid; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.12.1/html2pdf.bundle.min.js" integrity="sha512-D25Z8/1q2z65ZpJ3NzY6XiPZfwjhbv34OTQHDIZd+KPK+uWCovGt+fMkSzW8ArzCMFUgZt6Cdu7qoXNuy6a2GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -148,7 +149,8 @@ thead{ display:table-header-group; }
   </div>
   <div class="tb-right">
     <span class="fresh" id="fresh"></span>
-    <button class="btn" id="printBtn" onclick="window.print()">Download / Print My Blueprint</button>
+    <button class="btn" id="pdfBtn" onclick="downloadBlueprintPDF()">⬇ Download My Blueprint (PDF)</button>
+    <button class="btn" id="printBtn" onclick="window.print()" style="opacity:.78;">Print</button>
   </div>
 </div>
 <div class="nav">
@@ -1148,6 +1150,31 @@ function showConnect(h, p){
   }
   if(document.readyState!=='loading') watch(); else document.addEventListener('DOMContentLoaded', watch);
 })();
+</script>
+<script>
+/* ── Download the Blueprint as a real PDF (independent of the browser print dialog) ──
+   Captures the on-screen report (#blueprint), keeps each .page on its own PDF page,
+   and saves a file. If the library can't run, falls back to the Print button. */
+function downloadBlueprintPDF(){
+  var el  = document.getElementById('blueprint');
+  var btn = document.getElementById('pdfBtn');
+  if(!el){ alert('Could not find the report content to export.'); return; }
+  if(typeof html2pdf === 'undefined'){ alert('The PDF tool is still loading — please wait a moment and try again.'); return; }
+  var orig = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = 'Building your PDF… (a few seconds)'; }
+  var opt = {
+    margin:     [0.4, 0.4, 0.5, 0.4],
+    filename:   'RetireBlueprint-Pro-Blueprint.pdf',
+    image:      { type: 'jpeg', quality: 0.95 },
+    html2canvas:{ scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0, windowWidth: el.scrollWidth },
+    jsPDF:      { unit: 'in', format: 'letter', orientation: 'portrait' },
+    pagebreak:  { mode: ['css','legacy'], before: '.page:not(.first)' }
+  };
+  html2pdf().set(opt).from(el).save()
+    .then(function(){ if(btn){ btn.disabled=false; btn.textContent=orig; } })
+    .catch(function(){ if(btn){ btn.disabled=false; btn.textContent=orig; }
+      alert('Sorry — the PDF could not be generated in this browser. Please use the Print button as a backup.'); });
+}
 </script>
 </body>
 </html>
