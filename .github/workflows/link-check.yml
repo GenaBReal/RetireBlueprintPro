@@ -47,3 +47,4 @@ jobs:
           title: "🔗 Weekly link check found one or more dead links"
           content-filepath: ./lychee/out.md
           labels: link-check
+          assignees: GenaBReal
