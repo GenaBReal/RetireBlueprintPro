@@ -222,6 +222,18 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
             border-radius:4px;padding:3px 8px;cursor:pointer;font-size:10px;width:100%;}
 .toggle-no{background:#fff;color:var(--red);font-weight:700;border:1px solid #f8bbd0;
            border-radius:4px;padding:3px 8px;cursor:pointer;font-size:10px;width:100%;}
+/* ── Required-field validation highlight + multi-line status ────────────── */
+.rbp-needfix{outline:2px solid #e23b3b !important;outline-offset:1px;background:#fff5f5 !important;border-radius:5px;}
+#status-msg{white-space:pre-line;}
+/* ── Accounts table readability: shrink the Yes/No + % columns so the
+   important fields (name, balances, dates) aren't squished on a laptop ──── */
+.accounts-table td{padding-left:4px;padding-right:4px;}
+.accounts-table th{padding-left:4px;padding-right:4px;}
+.accounts-table .toggle-yes,.accounts-table .toggle-no{width:auto;min-width:34px;padding:3px 5px;}
+.accounts-table th:nth-child(1),.accounts-table td:nth-child(1){width:44px;text-align:center;}
+.accounts-table th:nth-child(7),.accounts-table td:nth-child(7){width:54px;}
+.accounts-table th:nth-child(14),.accounts-table td:nth-child(14){width:46px;text-align:center;}
+.accounts-table td:nth-child(2) input{min-width:130px;}
 
 /* ── EXPENSES TABLE ── */
 .expense-table{width:100%;border-collapse:collapse;font-size:11px;}
@@ -1527,6 +1539,7 @@ function buildAccountsTable() {
   tbody.innerHTML = '';
   accountsData.forEach(function(a, idx) {
     var tr = document.createElement('tr');
+    tr.id = 'acc-row-'+idx;
     var isYes = a.inc === 'Yes';
 
     // Col 1: Include toggle
@@ -1552,6 +1565,7 @@ function buildAccountsTable() {
     // Col 4: Type (select)
     var td4 = document.createElement('td');
     td4.innerHTML = typeSel(idx, a.type);
+    var _tsel = td4.querySelector('select'); if (_tsel) _tsel.id = 'acc-type-'+idx;
 
     // Col 5: Balance
     var td5 = document.createElement('td');
@@ -1631,6 +1645,7 @@ function buildAccountsTable() {
     var td10 = document.createElement('td');
     var ceInp = document.createElement('input');
     ceInp.type = 'date'; ceInp.style.width = '110px';
+    ceInp.id = 'acc-ce-'+idx;
     ceInp.value = a.contribEnd || '';
     (function(i){ ceInp.addEventListener('change', function() {
       accountsData[i].contribEnd = this.value; markDirty();
@@ -2429,6 +2444,13 @@ window.addEventListener('beforeunload', function(e) {
     return e.returnValue;
   }
 });
+// Gentle reminder so a long data-entry session can't quietly lose work.
+// There is NO session timeout — this only nudges the user to Save periodically.
+setInterval(function(){
+  if (isDirty && typeof showToast === 'function') {
+    showToast('Reminder: you have unsaved changes — click “Save All Changes” so you don’t lose your work.', 'info');
+  }
+}, 1200000); // every 20 minutes
 
 document.querySelectorAll('input, select').forEach(function(el) {
   el.addEventListener('change', markDirty);
@@ -2521,14 +2543,14 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
     }
   };
 
-  // 25 second timeout — generous for slow sheets
+  // Initial sheet-LOAD timeout only (does NOT limit data-entry time). 60 minutes.
   setTimeout(function() {
     if (!done) {
       cleanup();
       hideLoadingOverlay();
       setStatus('Timeout — make sure sheet is shared with retireblueprintpro@gmail.com as Editor.', 'error');
     }
-  }, 1800000); // 30 minutes
+  }, 3600000); // 60 minutes
 
   document.head.appendChild(script);
 }
@@ -3009,6 +3031,72 @@ function gpct(id) {
   return (parseFloat(val) || 0) / 100;
 }
 
+function rbpValidateRequired(){
+  // Clear any prior highlights
+  Array.prototype.forEach.call(document.querySelectorAll('.rbp-needfix'), function(el){ el.classList.remove('rbp-needfix'); });
+  var problems = []; // {label, el}
+  function val(id){ var el=document.getElementById(id); return el ? String(el.value).trim() : ''; }
+  function num(id){ return parseFloat(String(val(id)).replace(/[$,%\s]/g,'')) || 0; }
+  function need(id,label){ var el=document.getElementById(id); if(el && !String(el.value).trim()){ problems.push({label:label, el:el}); } }
+  function needIf(cond,id,label){ if(cond) need(id,label); }
+
+  // Plan basics — projection won't run without these
+  need('f-B6','Plan Start Year');
+  need('f-B31','Partner 1 name');
+  need('f-B32','Partner 1 date of birth');
+  need('f-B35','Partner 1 projected age of death');
+
+  // Partner 2 — only required if a second person is actually in the plan
+  var hasP2 = !!val('f-D31');
+  if (hasP2){
+    need('f-D32','Partner 2 date of birth');
+    need('f-D35','Partner 2 projected age of death');
+  }
+
+  // Income streams: an amount with no date makes the engine run it from year 1 / forever
+  needIf(num('f-B37')>0,'f-B39','Partner 1 salary END date');
+  needIf(num('f-B40')>0,'f-B44','Partner 1 Social Security START date');
+  needIf(num('f-B46')>0,'f-B47','Partner 1 pension START date');
+  needIf(num('f-B49')>0,'f-B50','Partner 1 other-income START date');
+  if (hasP2){
+    needIf(num('f-D37')>0,'f-D39','Partner 2 salary END date');
+    needIf(num('f-D40')>0,'f-D44','Partner 2 Social Security START date');
+    needIf(num('f-D46')>0,'f-D47','Partner 2 pension START date');
+    needIf(num('f-D49')>0,'f-D50','Partner 2 other-income START date');
+  }
+
+  // Debts: an INCLUDED debt with any substance needs BOTH dates
+  // (a blank date is exactly what made the website ignore the mortgage & RV)
+  for (var di=0; document.getElementById('d-inc-'+di); di++){
+    var inc = document.getElementById('d-inc-'+di);
+    if (inc.textContent.trim() !== 'Yes') continue;
+    var nm = val('d-name-'+di), mo = num('d-mo-'+di), bal = num('d-bal-'+di);
+    if (!nm && !mo && !bal) continue; // empty row
+    var lbl = nm || ('Debt #'+(di+1));
+    need('d-start-'+di, lbl+' — Start Date');
+    need('d-end-'+di,   lbl+' — End (payoff) Date');
+  }
+
+  // Accounts: an included account needs a Type; if it contributes, it needs a Contrib End
+  if (typeof accountsData !== 'undefined' && accountsData && accountsData.length){
+    accountsData.forEach(function(a,i){
+      if (!a || a.inc !== 'Yes') return;
+      var has = (a.name && a.name.trim()) || (+a.bal>0);
+      if (!has) return;
+      var lbl = (a.name && a.name.trim()) || ('Account #'+(i+1));
+      if (!a.type || !String(a.type).trim()){
+        problems.push({label: lbl+' — choose an Account Type', el: document.getElementById('acc-type-'+i) || document.getElementById('acc-row-'+i)});
+      }
+      if (+a.contrib>0 && (!a.contribEnd || !String(a.contribEnd).trim())){
+        problems.push({label: lbl+' — Contribution END date (otherwise it contributes forever)', el: document.getElementById('acc-ce-'+i) || document.getElementById('acc-row-'+i)});
+      }
+    });
+  }
+
+  problems.forEach(function(p){ if(p.el) p.el.classList.add('rbp-needfix'); });
+  return problems;
+}
+
 function saveAll() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId || sheetId === '1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA') {
@@ -3018,6 +3106,17 @@ function saveAll() {
   if (!rbpDataLoaded) {
     setStatus('⚠️ Your plan hasn’t finished loading from your sheet yet. Please refresh and wait until your numbers appear before saving — this protects your sheet from being overwritten with blanks.', 'error');
     showToast('Not saved — your data hasn’t loaded yet. Refresh and wait for your numbers.', 'error');
+    return;
+  }
+  // ── Required-field gate: block blanks that silently corrupt the projection ──
+  var _miss = rbpValidateRequired();
+  if (_miss.length){
+    var _lines = _miss.slice(0,7).map(function(p){ return '•  ' + p.label; }).join('\n');
+    var _more  = _miss.length>7 ? ('\n…and '+(_miss.length-7)+' more') : '';
+    setStatus('⚠️ Please complete these before saving — blank fields here make your projection wrong:\n'+_lines+_more, 'error');
+    showToast('Missing required fields — see the boxes highlighted in red.', 'error');
+    var _first = _miss[0].el;
+    if (_first && _first.scrollIntoView){ _first.scrollIntoView({behavior:'smooth', block:'center'}); try{ _first.focus({preventScroll:true}); }catch(e){} }
     return;
   }
   document.getElementById('save-btn').disabled = true;
