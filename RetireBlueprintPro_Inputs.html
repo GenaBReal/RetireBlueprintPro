@@ -574,7 +574,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       </div>
       <div class="field">
         <label>Legacy Target ($)</label>
-        <input type="number" id="f-B8" value="0" oninput="markDirty()" style="width:100%">
+        <input type="number" id="f-B8" value="0" oninput="markDirty();rbpSyncGoalHeader();" style="width:100%">
         <span class="hint">Ending balance goal</span>
       </div>
       <div class="field">
@@ -3033,6 +3033,10 @@ function gpct(id) {
   return (parseFloat(val) || 0) / 100;
 }
 
+// Keep the header “LEGACY GOAL” in step with the Legacy Target field as you type,
+// so it never shows a stale value while you edit.
+function rbpSyncGoalHeader(){ var hg=document.getElementById('hdr-goal'), el=document.getElementById('f-B8'); if(hg&&el){ var n=parseFloat(String(el.value).replace(/[$,\s]/g,''))||0; hg.textContent='$'+n.toLocaleString(); } }
+
 // ── LOCAL DRAFT AUTO-SAVE ──────────────────────────────────────────────────
 // Quietly saves a copy of every field to THIS browser as you type, so a crash,
 // an accidental close, or an hour of looking things up can't lose your work
@@ -3271,39 +3275,57 @@ function saveAll() {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) + '&data=' + encodeURIComponent(b64)
   })
-  .then(function() {
-    setStatus('⏳ Saving… verifying in 5s', 'info');
-    setTimeout(function() {
-      var cbName = 'rbpVerify_' + Date.now();
-      var done = false;
-      var t = setTimeout(function() {
-        if (!done) { done=true; delete window[cbName];
-          setStatus('✅ Save sent — open your sheet to confirm.', 'success');
-          isDirty = false; document.getElementById('save-btn').disabled = false;
-          localStorage.setItem('rbp_last_saved', Date.now().toString()); rbpClearDraft(); }
-      }, 10000);
-      window[cbName] = function(d) {
-        if (done) return; done=true; clearTimeout(t); delete window[cbName];
-        var sentYear = payload.global && payload.global.B6 ? String(payload.global.B6) : '';
-        var gotYear  = d && d.global && d.global.planStartYear ? String(d.global.planStartYear) : '';
-        if (sentYear && gotYear && sentYear === gotYear) {
-          setStatus('✅ Saved and verified!', 'success');
-        } else {
-          setStatus('✅ Save sent — check your sheet to confirm.', 'success');
-        }
-        isDirty = false; document.getElementById('save-btn').disabled = false;
-        localStorage.setItem('rbp_last_saved', Date.now().toString()); rbpClearDraft();
-      };
-      var s = document.createElement('script'); s.crossOrigin='anonymous';
-      s.src = SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName;
-      document.body.appendChild(s);
-      setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 15000);
-    }, 5000);
-  })
-  .catch(function(err) {
-    setStatus('❌ Save failed: ' + (err.message || err), 'error');
+  .then(function(){ rbpVerifyAndRetry(0); })
+  .catch(function(err){
+    setStatus('❌ Save failed to send: ' + (err.message || err) + ' — check your internet and try again.', 'error');
     document.getElementById('save-btn').disabled = false;
   });
+
+  // Confirm the save actually landed by reading the REAL value back (cache-busted),
+  // and retry automatically if it didn't — so one click just works.
+  function _rbpNorm(x){ return String(x==null?'':x).replace(/[$,\s]/g,''); }
+  function _rbpRePost(){
+    fetch(SCRIPT, { method:'POST', mode:'no-cors',
+      headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+      body:'action=save&enc=b64&sheetId='+encodeURIComponent(sheetId)+'&data='+encodeURIComponent(b64) });
+  }
+  function rbpVerifyAndRetry(attempt){
+    setStatus(attempt ? ('⏳ Not saved yet — retrying ('+attempt+' of 2)…') : '⏳ Saving… confirming with your sheet…', 'info');
+    setTimeout(function(){
+      var cbName='rbpVerify_'+Date.now()+'_'+attempt, done=false;
+      var giveUp=setTimeout(function(){
+        if(done) return; done=true; try{delete window[cbName];}catch(e){}
+        if(attempt<2){ _rbpRePost(); rbpVerifyAndRetry(attempt+1); }
+        else {
+          setStatus('✅ Save sent, but couldn’t auto-confirm — click Refresh in a moment to check your numbers.', 'success');
+          isDirty=false; document.getElementById('save-btn').disabled=false;
+          localStorage.setItem('rbp_last_saved', Date.now().toString()); rbpClearDraft();
+        }
+      }, 7000);
+      window[cbName]=function(d){
+        if(done) return; done=true; clearTimeout(giveUp); try{delete window[cbName];}catch(e){}
+        var leg=(d&&d.legacy)||{}, gl=(d&&d.global)||{};
+        var want=(parseFloat(_rbpNorm(payload.global.B8))||0);
+        var goalOK=_rbpNorm(leg.goal)===_rbpNorm(payload.global.B8);
+        var yearOK=_rbpNorm(gl.planStartYear)===_rbpNorm(payload.global.B6);
+        if(goalOK && yearOK){
+          setStatus('✅ Saved & confirmed — your sheet now shows Legacy Goal $'+want.toLocaleString()+'.', 'success');
+          var hg=document.getElementById('hdr-goal'); if(hg) hg.textContent='$'+want.toLocaleString();
+          isDirty=false; document.getElementById('save-btn').disabled=false;
+          localStorage.setItem('rbp_last_saved', Date.now().toString()); rbpClearDraft();
+        } else if(attempt<2){
+          _rbpRePost(); rbpVerifyAndRetry(attempt+1);
+        } else {
+          setStatus('⚠️ Save did NOT reach your sheet — it still shows the old value. Click “Save All Changes” once more. If it keeps failing, open your sheet and make sure it isn’t Protected (Data ▸ Protect sheets and ranges) and is shared with retireblueprintpro@gmail.com as Editor.', 'error');
+          document.getElementById('save-btn').disabled=false;
+        }
+      };
+      var s=document.createElement('script'); s.crossOrigin='anonymous';
+      s.src=SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
+      document.body.appendChild(s);
+      setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 11000);
+    }, attempt ? 2500 : 4000);
+  }
 }
 
 function buildPayload() {
