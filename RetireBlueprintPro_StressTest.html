@@ -1301,7 +1301,7 @@ function rbpFailState(kind, sheetId, statusEl){
   var retryBtn='<button onclick="loadData()" style="margin-top:10px;padding:7px 18px;background:#1CC7D0;color:#041E2F;border:none;border-radius:5px;font-weight:800;cursor:pointer;font-family:inherit;">&#8635; Try Again</button>';
   var rawLink='';
   if(sheetId){
-    var rawUrl=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId);
+    var rawUrl=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId)+'&nc='+Date.now();
     rawLink=' <a href="'+rawUrl+'" target="_blank" rel="noopener" style="margin-left:6px;padding:7px 14px;background:transparent;color:#8aaabb;border:1px solid #1a3a52;border-radius:5px;font-weight:700;font-family:inherit;text-decoration:none;display:inline-block;">Open raw connector response &#8599;</a>';
   }
   if(kind==='timeout'){
