@@ -82,7 +82,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
 /* GRID LAYOUTS */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr;}.grid2>*,.grid3>*,.field,.field>*{min-width:0;}.field input,.field select,.field textarea{width:100%;max-width:100%;box-sizing:border-box;}}
 
 /* INFO BOXES — replaces the dark inner boxes */
 .info-box{background:#f5f7fa;border-radius:8px;padding:14px 18px;margin-bottom:12px;border-left:3px solid #1CC7D0;}
@@ -172,7 +172,8 @@ input[type=number]:focus,select:focus{outline:none;border-color:#1CC7D0;}
   /* let inline flex rows wrap (nav/header use classes, so they're untouched) */
   [style*="display:flex"],[style*="display: flex"],.plan-meta{flex-wrap:wrap !important;}
   /* keep fields, media, charts within the viewport */
-  input,select,textarea{max-width:100% !important;box-sizing:border-box;}
+  input,select,textarea{width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box;}
+  .grid2>*,.grid3>*,.field,.field>*{min-width:0 !important;}
   img,canvas{max-width:100% !important;}
   /* neutralize full-bleed negative margins that cause a sliver of scroll */
   .disclaimer{margin-left:0 !important;margin-right:0 !important;}
