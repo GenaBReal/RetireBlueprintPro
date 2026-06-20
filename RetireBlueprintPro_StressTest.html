@@ -115,7 +115,7 @@ function rbpApplyEngine(d){
 .nav a.active{color:#f4b86a;border-bottom:2px solid #f4b86a;}
 
 
-:root{--paper:#F4F7FA;--card:#fff;--ink:#0C2436;--muted:#33414e;--line:#e6ebf0;--navy:#041E2F;--navy2:#0A3145;--teal:#1CC7D0;--teal-deep:#0c7b84;--gold:#f4b86a;--gold-deep:#b3792f;--red:#d64545;--green:#2E7032;--sh-sm:0 1px 2px rgba(12,36,54,.05);--sh:0 1px 2px rgba(12,36,54,.04),0 6px 22px rgba(12,36,54,.07);--sh-dark:0 14px 50px rgba(4,30,47,.40);--orange:#f4b86a;--n2:#0A3145;--mid:#0A3145;}
+:root{--paper:#F4F7FA;--card:#fff;--ink:#0C2436;--muted:#566576;--line:#e6ebf0;--navy:#041E2F;--navy2:#0A3145;--teal:#1CC7D0;--teal-deep:#0c7b84;--gold:#f4b86a;--gold-deep:#b3792f;--red:#d64545;--green:#2E7032;--sh-sm:0 1px 2px rgba(12,36,54,.05);--sh:0 1px 2px rgba(12,36,54,.04),0 6px 22px rgba(12,36,54,.07);--sh-dark:0 14px 50px rgba(4,30,47,.40);--orange:#f4b86a;--n2:#0A3145;--mid:#0A3145;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(1200px 400px at 50% -120px,#eaf1f6,var(--paper) 60%) fixed,var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden;}
 .body{max-width:1140px;margin:0 auto;padding:22px 20px 90px;}
@@ -382,7 +382,7 @@ window.addEventListener('storage', function(e) {
   </div>
 
   <!-- SCENARIO TABS -->
-  <div style="font-size:11px;color:#33414e;margin-bottom:8px;font-weight:600;">
+  <div style="font-size:11px;color:#566576;margin-bottom:8px;font-weight:600;">
     Pick a preset or dial in your own downturn with the sliders, then press <b>▶ Run New Test</b>.
   </div>
   <div class="scenario-tabs">
@@ -664,7 +664,7 @@ window.addEventListener('storage', function(e) {
     <div id="sweep-placeholder" style="font-size:11.5px;color:#7a9aaa;line-height:1.7;padding:6px 2px;">
       <strong style="color:#dceaf5;">How this works:</strong> The crash test asks one question — <em>"if the market drops X% in year 1, what's the most extra I can safely spend and still hit my legacy goal?"</em> This sweep runs that question at every crash level automatically.<br><br>
       <span style="color:#f4b86a;">&#9654; Sweep All Scenarios</span> — runs your real engine at every crash level instantly, right on your computer, with your full plan reflected: taxes, RMDs, and SS staggering. The whole table fills in at once.<br><br>
-      <em style="color:#33414e;">Other phases scale proportionally to Phase 1. All scenarios assume normal returns after year 1.</em>
+      <em style="color:#9fc1d6;">Other phases scale proportionally to Phase 1. All scenarios assume normal returns after year 1.</em>
     </div>
     <div id="sweep-chart-area" style="display:none;">
       <div id="sweep-bars"></div>
@@ -781,7 +781,7 @@ window.addEventListener('storage', function(e) {
       <!-- Settings row -->
       <div style="padding:14px 22px;border-bottom:1px solid #1a3a52;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;">
         <div>
-          <div style="font-size:10px;font-weight:700;color:#33414e;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Simulations</div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Simulations</div>
           <select id="mc-runs" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="500">500 (fast)</option>
             <option value="1000">1,000 (quick)</option>
@@ -790,7 +790,7 @@ window.addEventListener('storage', function(e) {
           </select>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;color:#33414e;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Return Model</div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Return Model</div>
           <select id="mc-model" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="normal">Normal distribution (classic)</option>
             <option value="fat" selected>Fat-tailed (more realistic)</option>
@@ -798,7 +798,7 @@ window.addEventListener('storage', function(e) {
           </select>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;color:#33414e;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Spending Flexibility</div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Spending Flexibility</div>
           <select id="mc-flex" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="0">Fixed spending — rigid (no adjustments)</option>
             <option value="10" selected>Guardrails — trim 10% in strained markets (standard)</option>
@@ -806,7 +806,7 @@ window.addEventListener('storage', function(e) {
           </select>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Year 1 Return <span style="color:#33414e;font-weight:400;">(stress-condition)</span></div>
+          <div style="font-size:10px;font-weight:700;color:#f4b86a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Year 1 Return <span style="color:#566576;font-weight:400;">(stress-condition)</span></div>
           <select id="mc-fixed-yr1" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="" selected>Random — all years fully random (standard)</option>
             <option value="-0.10">Pin year 1 at -10% · then random</option>
@@ -817,7 +817,7 @@ window.addEventListener('storage', function(e) {
           </select>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;color:#33414e;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Planning Horizon</div>
+          <div style="font-size:10px;font-weight:700;color:#566576;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">Planning Horizon</div>
           <select id="mc-horizon" style="background:#0A3145;color:#c8dae8;border:1px solid #1a3a52;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;">
             <option value="95" selected>Through age 95 — longevity stress test (recommended)</option>
             <option value="death">Through my entered death age</option>
@@ -995,7 +995,7 @@ window.addEventListener('storage', function(e) {
   All 82 columns behind your plan are calculated fresh in your browser and checked line-by-line against your Google Sheet — and match it to the exact dollar on almost every one. On long-range running balances you may occasionally see a difference of a few dollars — that&rsquo;s normal rounding between two calculators compounding over decades, not an error. Your Google Sheet stays the official record.
 </div>
 <div class="rbp-disclaimer" style="max-width:1140px;margin:28px auto 8px;padding:14px 20px;border-top:1px solid #e6ebf0;text-align:center;font-size:10.5px;color:#7a8a99;line-height:1.7;">
-  <strong style="color:#33414e;">Educational tool — not financial, tax, or legal advice.</strong>
+  <strong style="color:#566576;">Educational tool — not financial, tax, or legal advice.</strong>
   RetireBlueprint Pro provides general retirement-planning projections for personal use only. Markets are unpredictable and your actual results will differ. Always consult a licensed financial, tax, or legal professional before making major retirement decisions. © 2026 RetireBlueprint Pro
 </div>
 <!-- /body -->
@@ -1536,7 +1536,7 @@ function rbpDrawRealChart(baseSeries, stressSeries, crashYrs){
   ds.push({label:'Base Plan',data:baseData,borderColor:'#1CC7D0',backgroundColor:'rgba(28,199,208,0.06)',fill:false,tension:0.3,pointRadius:0,borderWidth:3,order:0});
   stressChart=new Chart(ctx,{ type:'line', data:{labels:labels,datasets:ds},
     options:{ responsive:true, maintainAspectRatio:false, animation:false,
-      plugins:{ legend:{display:true,labels:{font:{size:10},color:'#33414e',boxWidth:14,filter:function(it){return it.text!=='';}}},
+      plugins:{ legend:{display:true,labels:{font:{size:10},color:'#566576',boxWidth:14,filter:function(it){return it.text!=='';}}},
         tooltip:{ callbacks:{ label:function(c){ if(c.dataset.type==='bar') return null; var v=c.raw; if(!v&&v!==0) return null; return c.dataset.label+': '+(v>=1000000?'$'+(v/1000000).toFixed(2)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0'); } } } },
       scales:{ x:{ticks:{font:{size:10},color:'#8aaabb',maxTicksLimit:8},grid:{display:false}},
         y:{ticks:{font:{size:10},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(0,0,0,0.04)'}} } }
@@ -1735,15 +1735,15 @@ function rbpRenderRealResult(resp, yr1, yrs, inf){
 function esRenderSlots() {
   var wrap=document.getElementById('es-slots');
   if(!wrap) return;
-  if(!_esTests.length){ wrap.innerHTML='<div style="font-size:11px;color:#33414e;padding:10px 0;">No tests yet — press ▶ Run New Test above and your results will save here to compare.</div>'; return; }
+  if(!_esTests.length){ wrap.innerHTML='<div style="font-size:11px;color:#566576;padding:10px 0;">No tests yet — press ▶ Run New Test above and your results will save here to compare.</div>'; return; }
   var base=esBaseNumbers()||{};
   var html='';
   _esTests.forEach(function(t,i){
     var p=t.params, r=t.result;
     var spDelta = (base.safeExtra!=null && r.safeExtra!=null) ? (r.safeExtra-base.safeExtra) : null;
     var enDelta = (base.ending!=null && r.ending!=null) ? (r.ending-base.ending) : null;
-    var spColor = spDelta==null?'#33414e':(spDelta<0?'#f4b86a':'#1CC7D0');
-    var enColor = enDelta==null?'#33414e':(enDelta<0?'#f4b86a':'#1CC7D0');
+    var spColor = spDelta==null?'#566576':(spDelta<0?'#f4b86a':'#1CC7D0');
+    var enColor = enDelta==null?'#566576':(enDelta<0?'#f4b86a':'#1CC7D0');
     var belowTxt = r.belowYear ? ('<span style="color:#f4b86a;">Drops below legacy goal in <strong>'+r.belowYear+'</strong></span>')
                                : ('<span style="color:#1CC7D0;">Stays at/above legacy goal throughout ✓</span>');
     var pTxt = 'Early: '+(Number(p.eDur)>0&&Number(p.eDrag)>0?(p.eDrag+'% for '+p.eDur+'yr from '+p.eStart):'none');
@@ -1751,13 +1751,13 @@ function esRenderSlots() {
     html += '<div style="background:#fff;border:1px solid #e6ebf0;border-top:3px solid #f4b86a;border-radius:11px;padding:12px 14px;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
       +   '<span style="font-size:10px;font-weight:900;color:#b3792f;text-transform:uppercase;letter-spacing:.6px;">Test '+(i+1)+'</span>'
-      +   '<span style="font-size:9.5px;color:#33414e;">'+pTxt+'</span>'
+      +   '<span style="font-size:9.5px;color:#566576;">'+pTxt+'</span>'
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">'
-      +   '<div><div style="font-size:9px;color:#33414e;text-transform:uppercase;letter-spacing:.5px;">Extra above floor</div>'
+      +   '<div><div style="font-size:9px;color:#566576;text-transform:uppercase;letter-spacing:.5px;">Extra above floor</div>'
       +     '<div style="font-size:15px;font-weight:800;color:'+spColor+';">'+esFmt(r.safeExtra)+'/yr'
       +       (spDelta!=null?' <span style="font-size:10px;font-weight:600;">('+(spDelta>=0?'+':'')+esFmt(spDelta)+')</span>':'')+'</div></div>'
-      +   '<div><div style="font-size:9px;color:#33414e;text-transform:uppercase;letter-spacing:.5px;">Ending balance</div>'
+      +   '<div><div style="font-size:9px;color:#566576;text-transform:uppercase;letter-spacing:.5px;">Ending balance</div>'
       +     '<div style="font-size:15px;font-weight:800;color:'+enColor+';">'+esFmt(r.ending)
       +       (enDelta!=null?' <span style="font-size:10px;font-weight:600;">('+(enDelta>=0?'+':'')+esFmt(enDelta)+')</span>':'')+'</div></div>'
       + '</div>'
@@ -2239,7 +2239,7 @@ function _rbpSweepRender(results, p1Planned, legacyGoal, pfx) {
 
     bHtml += '<div style="display:grid;grid-template-columns:150px 80px 1fr 100px;gap:8px;align-items:start;margin-bottom:8px;">'
       + '<div style="font-size:11px;color:#dceaf5;font-family:monospace;padding-top:2px;">' + r.label + '</div>'
-      + '<div style="font-size:11.5px;color:#33414e;padding-top:2px;">' + (p1Planned>0 ? fmtKno(p1Planned)+'/yr' : '\u2014') + '</div>'
+      + '<div style="font-size:11.5px;color:#cfe3ef;padding-top:2px;">' + (p1Planned>0 ? fmtKno(p1Planned)+'/yr' : '\u2014') + '</div>'
       + '<div>'
       +   '<div style="background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden;">'
       +     '<div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;transition:width .4s;"></div></div>'
@@ -2273,7 +2273,7 @@ function _rbpSweepRender(results, p1Planned, legacyGoal, pfx) {
     var atReducedCol = (!blank && r.safe > 0) ? '#1CC7D0' : '#f4b86a';
     dHtml += '<div class="swp-dep-row" style="display:grid;grid-template-columns:140px 75px 1fr 90px 90px 1fr;gap:6px;align-items:center;margin-bottom:5px;font-size:11px;">'
       + '<div style="color:#9fc1d6;font-family:monospace;">' + r.label + '</div>'
-      + '<div data-label="Floor/yr" style="color:#33414e;">' + floorStr + '</div>'
+      + '<div data-label="Floor/yr" style="color:#cfe3ef;font-weight:600;">' + floorStr + '</div>'
       + '<div data-label="Floor only" style="color:'+lCol+';font-weight:500;">' + floorOnlyCell + '</div>'
       + '<div data-label="At full extra" style="color:'+fCol+';font-weight:500;">' + fullExtraCell + '</div>'
       + '<div data-label="Reduce to" style="color:#f4b86a;font-weight:700;">' + safeStr + '</div>'
@@ -2643,10 +2643,10 @@ function showMCResults(endings, yearlyBals, failYears, depleteYears,
               : '<strong>' + fmt(_mbest) + '/yr</strong>';
             sMid.innerHTML = _phHtml + '<br><span style="font-size:9px;color:#8aaabb;line-height:1.5;">At expected returns, cutting to these amounts clears your legacy goal.<br>Below this = sustainable · Above this = some scenarios fail.</span>';
           } else {
-            sMid.innerHTML = '<span style="font-size:10px;color:#33414e;">Run Scenario Sweep above for safe spending levels.</span>';
+            sMid.innerHTML = '<span style="font-size:10px;color:#566576;">Run Scenario Sweep above for safe spending levels.</span>';
           }
         } catch(e) {
-          sMid.innerHTML = '<span style="font-size:10px;color:#33414e;">Run Scenario Sweep above.</span>';
+          sMid.innerHTML = '<span style="font-size:10px;color:#566576;">Run Scenario Sweep above.</span>';
         }
       }
     }
