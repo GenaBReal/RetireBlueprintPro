@@ -1418,31 +1418,15 @@ function esJsonp(params, onResult, onError) {
   document.head.appendChild(s);
 }
 
-// Local engine path — same signature as esJsonp, but the crash math runs instantly
-// client-side off the single-source engine (no connector round-trip, no $500 rounding).
+// Route every stress run through the SHEET — the connector's server-side stress
+// engine applies the crash to your REAL Master, recalculates, and reads it back.
+// That's the accurate path (no browser approximation, no divergence from the sheet).
+// Same signature and same response shape as before, so all callers are unchanged.
+// We pass params through as-is — the connector does the % conversions itself.
+// Trade-off: a real sheet round-trip per run is slower than the old browser math,
+// which is why the UI warns about per-test wait times.
 function rbpRunStressLocal(params, onResult, onError) {
-  try {
-    var I = window.RBP_I;
-    if (!window.RBP || !I) { if(onError) onError('Engine not loaded yet — refresh and retry.'); return; }
-    // The page passes inflation as a whole percent (e.g. 3.0); the engine wants a decimal.
-    // Match the connector's /100 convention; undefined leaves the saved plan inflation intact.
-    var inflDec = isFinite(parseFloat(params.infl)) ? (parseFloat(params.infl) / 100) : undefined;
-    // Drags arrive as whole points (e.g. 17 for −10%); the engine wants decimals (0.17),
-    // the same /100 the connector applied via setPct on B15/B19.
-    var dec = function(v){ return (isFinite(parseFloat(v)) ? parseFloat(v) : 0) / 100; };
-    var r;
-    if (params.action === 'runSweepOne') {
-      r = RBP.runStress(I, { drag: dec(params.drag), start: params.startYr,
-        dur: Math.max(1, params.dur || 1), inflation: inflDec, plannedExtra: I.committedExtra });
-    } else { // runStressTest (single test)
-      r = RBP.runStress(I, { drag: dec(params.eDrag), start: params.eStart, dur: Math.max(1, params.eDur || 1),
-        inflation: inflDec, lateDrag: dec(params.lDrag), lateStart: params.lStart, lateDur: params.lDur,
-        plannedExtra: I.committedExtra });
-    }
-    var resp = { ok: true, series: r.series, ending: r.ending, legacyGoal: Math.round(I.legacyB8 || 0),
-      safeExtra: r.safeExtra, safeExtraBase: r.safeExtraBase, belowYear: r.crossover, surplus: 0 };
-    setTimeout(function(){ if(onResult) onResult(resp); }, 0); // keep the async contract
-  } catch (e) { if(onError) onError(String((e && e.message) || e)); }
+  esJsonp(params, onResult, onError);
 }
 
 // Base-plan numbers for comparison (from the already-loaded planData)
@@ -2380,9 +2364,21 @@ function rbpRealSweep() {
   var progBar= document.getElementById('sweep-prog-bar');
 
   var runBtn = document.getElementById('sweep-real-btn');
-  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running\u2026 1 of ' + toRun; }
+  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running\u2026 1 of ' + toRun + ' (~25s each)'; }
   if (progEl) progEl.style.display = 'block';
   if (progT)  progT.textContent = String(toRun);
+
+  // Each scenario is a REAL sheet round-trip now (~20\u201330s each), so warn up front
+  // with a rough total and tell the user rows fill in as each one finishes.
+  var _estMin = Math.max(1, Math.round(toRun * 25 / 60));
+  var _swNote = document.getElementById('sweep-placeholder');
+  if (_swNote) {
+    _swNote.style.display = 'block';
+    _swNote.style.color = '#e09a3e';
+    _swNote.innerHTML = '\u23f3 <strong>Each scenario runs live on your sheet (~20\u201330 seconds each)</strong>, so all '
+      + toRun + ' take about ' + _estMin + '\u2013' + (_estMin + 1) + ' minutes total. The rows below fill in as each one finishes \u2014 '
+      + 'you can watch them populate, and you don\u2019t have to stay on this screen.';
+  }
 
   // Show local estimates immediately, so all 8 rows are visible right away.
   // Each row is then overwritten with the real engine number as its scenario returns.
@@ -2398,15 +2394,15 @@ function rbpRealSweep() {
   var firstErr  = null; // capture the first failure reason so we stop guessing
 
   // ── Sequential per-scenario calls ──
-  // Each scenario runs through the local engine (RBP.runStress) — instant, no sheet round-trip.
-  // Kept sequential (not parallel) so rows render in order; if one ever errors, it keeps the
-  // local estimate already in results[i].safe and we move on — the rest still complete.
+  // Each scenario runs through the SHEET (the connector's stress engine) — a real
+  // round-trip (~20\u201330s each), accurate, not a browser estimate. Kept sequential so
+  // rows render in order; if one errors, the rest still complete.
   function runNext(i) {
     if (i >= results.length) { finish(); return; }
 
     if (progN)   progN.textContent = String(i + 1);
     if (progBar) progBar.style.width = Math.round(i / results.length * 100) + '%';
-    if (runBtn)  runBtn.textContent = 'Running\u2026 ' + (i + 1) + ' of ' + toRun;
+    if (runBtn)  runBtn.textContent = 'Running\u2026 ' + (i + 1) + ' of ' + toRun + ' (~25s each)';
 
     rbpRunStressLocal({ action:'runSweepOne', idx:i, drag:results[i]._drag, dur:Math.max(1,results[i]._dur||1), startYr:startYr, infl:inf }, function(resp) {
       if (resp && resp.ok) {
@@ -3105,6 +3101,7 @@ function rcsRun(){
   var planEnd=(typeof rbpPlanEndYear==='function')?rbpPlanEndYear():null;
   function runNext(i){
     if(i>=RCS.length){ if(btn){ btn.disabled=false; btn.textContent='\u21bb Re-run'; } rcsPickDefault(); return; }
+    if(btn) btn.textContent='Running\u2026 '+(i+1)+' of '+RCS.length+' (~25s each)';
     var s=RCS[i];
     var p={ action:'runStressTest', eType:'bear', eStart:ctx.startYr, eDur:s.eDur, eDrag:s.eDrag,
             lType:'bear', lStart:(s.lDrag?ctx.startYr+s.lOff:0), lDur:(s.lDrag?s.lDur:0), lDrag:(s.lDrag||0), infl:s.infl };
