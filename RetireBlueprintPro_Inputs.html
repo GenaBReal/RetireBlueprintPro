@@ -521,7 +521,7 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
 <div class="status-bar">
   <button class="save-btn" id="save-btn" onclick="saveAll()" disabled>Save All Changes</button>
-  <button id="rbpRefreshBtn" type="button" onclick="return rbpDoRefresh()" title="Reload your saved numbers from the sheet">&#8635; Refresh</button>
+  <button id="rbpRefreshBtn" class="save-btn" type="button" onclick="return rbpDoRefresh()" title="Reload your saved numbers from the sheet">&#8635; Refresh</button>
   <span class="status-msg" id="status-msg">Loading your plan data...</span>
 </div>
 
@@ -4117,15 +4117,15 @@ if(document.readyState!=='loading')w();else document.addEventListener('DOMConten
 <script>window.RBP_REFRESH_NO_GLOW=true;</script>
 <!-- ===== RBP Refresh button: self-contained styling + behavior (no external file) ===== -->
 <style>
-#rbpRefreshBtn{display:inline-flex;align-items:center;gap:6px;background:#0A3145;color:#1CC7D0;border:1.5px solid #1CC7D0;font-family:inherit;font-size:15px;font-weight:700;line-height:1;padding:10px 18px;border-radius:9px;cursor:pointer;letter-spacing:.3px;text-decoration:none;vertical-align:middle;-webkit-appearance:none;appearance:none;transition:box-shadow .2s,background .2s,color .2s;}
-#rbpRefreshBtn:hover{background:#1CC7D0;color:#041E2F;}
+#rbpRefreshBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#1CC7D0!important;color:#041E2F!important;border:none;cursor:pointer;text-decoration:none;font-family:inherit;box-sizing:border-box;-webkit-appearance:none;appearance:none;transition:background .2s,box-shadow .2s;}
+#rbpRefreshBtn:hover{background:#16b3bb!important;}
 #rbpRefreshBtn:focus-visible{outline:3px solid #f4b86a;outline-offset:2px;}
-#rbpRefreshBtn.rbp-nav{font-size:12px;padding:7px 13px;border-radius:7px;border-width:1px;text-transform:uppercase;letter-spacing:.6px;}
-#rbpRefreshBtn .rbp-r-new{display:none;font-size:12px;font-weight:800;}
-#rbpRefreshBtn.rbp-needed{color:#041E2F;background:#f4b86a;border-color:#f4b86a;animation:rbpPulse 1.4s ease-in-out infinite;}
-#rbpRefreshBtn.rbp-needed .rbp-r-new{display:inline;}
+#rbpRefreshBtn.rbp-needed{background:#f4b86a!important;animation:rbpPulse 1.4s ease-in-out infinite;}
 @keyframes rbpPulse{0%,100%{box-shadow:0 0 0 0 rgba(244,184,106,.7);}50%{box-shadow:0 0 0 9px rgba(244,184,106,0);}}
 @media (prefers-reduced-motion:reduce){#rbpRefreshBtn.rbp-needed{animation:none;box-shadow:0 0 0 3px rgba(244,184,106,.7);}}
+#rbpRefreshBtn.rbp-xls{padding:9px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:.3px;}
+#rbpRefreshBtn.rbp-nav{padding:6px 12px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}
+@media (max-width:640px){#rbpRefreshBtn.rbp-xls{width:100%;padding:12px;font-size:13px;}}
 </style>
 <script>
 (function(){

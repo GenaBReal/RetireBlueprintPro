@@ -134,7 +134,7 @@ input[type=range],input[type="range"]{touch-action:none;}
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Blueprint.html">Blueprint</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
+  <a href="#" id="rbpRefreshBtn" class="rbp-nav" onclick="return rbpDoRefresh()" title="Pull the latest numbers from your sheet">&#8635; Refresh</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Master.html" style="margin-left:auto;color:#8aaabb;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">Master</a>
 </div>
 
@@ -538,6 +538,37 @@ document.addEventListener('DOMContentLoaded', function(){ loadData(); });
 /* mobile: wrap tables so wide ones scroll inside their own box instead of pushing the page wide */
 (function(){function w(){document.querySelectorAll('table').forEach(function(t){var p=t.parentElement;if(p&&p.classList&&p.classList.contains('rbp-tscroll'))return;var d=document.createElement('div');d.className='rbp-tscroll';t.parentNode.insertBefore(d,t);d.appendChild(t);});}
 if(document.readyState!=='loading')w();else document.addEventListener('DOMContentLoaded',w);})();
+</script>
+<!-- ===== RBP Refresh button: self-contained styling + behavior (no external file) ===== -->
+<style>
+#rbpRefreshBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#1CC7D0!important;color:#041E2F!important;border:none;cursor:pointer;text-decoration:none;font-family:inherit;box-sizing:border-box;-webkit-appearance:none;appearance:none;transition:background .2s,box-shadow .2s;}
+#rbpRefreshBtn:hover{background:#16b3bb!important;}
+#rbpRefreshBtn:focus-visible{outline:3px solid #f4b86a;outline-offset:2px;}
+#rbpRefreshBtn.rbp-needed{background:#f4b86a!important;animation:rbpPulse 1.4s ease-in-out infinite;}
+@keyframes rbpPulse{0%,100%{box-shadow:0 0 0 0 rgba(244,184,106,.7);}50%{box-shadow:0 0 0 9px rgba(244,184,106,0);}}
+@media (prefers-reduced-motion:reduce){#rbpRefreshBtn.rbp-needed{animation:none;box-shadow:0 0 0 3px rgba(244,184,106,.7);}}
+#rbpRefreshBtn.rbp-xls{padding:9px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:.3px;}
+#rbpRefreshBtn.rbp-nav{padding:6px 12px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}
+@media (max-width:640px){#rbpRefreshBtn.rbp-xls{width:100%;padding:12px;font-size:13px;}}
+</style>
+<script>
+(function(){
+  function btn(){return document.getElementById('rbpRefreshBtn');}
+  function setNeeded(on){var b=btn();if(b)b.classList[on?'add':'remove']('rbp-needed');}
+  function lastSaved(){return parseInt(localStorage.getItem('rbp_last_saved')||'0',10)||0;}
+  if(window.RBP_REFRESH_BASE===undefined)window.RBP_REFRESH_BASE=lastSaved();
+  function check(){ if(window.RBP_REFRESH_NO_GLOW)return; if(lastSaved()>window.RBP_REFRESH_BASE)setNeeded(true); }
+  window.rbpDoRefresh=function(){
+    if(window.isDirty===true && !window.confirm('You have unsaved changes. Refresh and lose them?'))return false;
+    window.RBP_REFRESH_BASE=lastSaved(); setNeeded(false);
+    try{ if(typeof loadData==='function'){loadData();return false;} if(typeof loadReport==='function'){loadReport();return false;} }catch(e){}
+    location.reload(); return false;
+  };
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});
+  window.addEventListener('focus',check);
+  setInterval(check,8000);
+  if(document.readyState!=='loading')check();else document.addEventListener('DOMContentLoaded',check);
+})();
 </script>
 </body>
 </html>

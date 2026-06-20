@@ -358,6 +358,7 @@ window.addEventListener('storage', function(e) {
 </div>
 <div class="save-bar">
   <button class="save-btn" id="save-btn" onclick="saveCheckIn()" disabled>Save Actuals to Sheet</button>
+  <button class="save-btn" id="rbpRefreshBtn" type="button" onclick="return rbpDoRefresh()" title="Reload your saved numbers from the sheet">&#8635; Refresh</button>
   <span class="save-msg" id="save-msg">Loading your check-in data...</span>
 </div>
 
@@ -800,6 +801,38 @@ renderTable = function(data) {
 /* mobile: wrap tables so wide ones scroll inside their own box instead of pushing the page wide */
 (function(){function w(){document.querySelectorAll('table').forEach(function(t){var p=t.parentElement;if(p&&p.classList&&p.classList.contains('rbp-tscroll'))return;var d=document.createElement('div');d.className='rbp-tscroll';t.parentNode.insertBefore(d,t);d.appendChild(t);});}
 if(document.readyState!=='loading')w();else document.addEventListener('DOMContentLoaded',w);})();
+</script>
+<script>window.RBP_REFRESH_NO_GLOW=true;</script>
+<!-- ===== RBP Refresh button: self-contained styling + behavior (no external file) ===== -->
+<style>
+#rbpRefreshBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#1CC7D0!important;color:#041E2F!important;border:none;cursor:pointer;text-decoration:none;font-family:inherit;box-sizing:border-box;-webkit-appearance:none;appearance:none;transition:background .2s,box-shadow .2s;}
+#rbpRefreshBtn:hover{background:#16b3bb!important;}
+#rbpRefreshBtn:focus-visible{outline:3px solid #f4b86a;outline-offset:2px;}
+#rbpRefreshBtn.rbp-needed{background:#f4b86a!important;animation:rbpPulse 1.4s ease-in-out infinite;}
+@keyframes rbpPulse{0%,100%{box-shadow:0 0 0 0 rgba(244,184,106,.7);}50%{box-shadow:0 0 0 9px rgba(244,184,106,0);}}
+@media (prefers-reduced-motion:reduce){#rbpRefreshBtn.rbp-needed{animation:none;box-shadow:0 0 0 3px rgba(244,184,106,.7);}}
+#rbpRefreshBtn.rbp-xls{padding:9px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:.3px;}
+#rbpRefreshBtn.rbp-nav{padding:6px 12px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}
+@media (max-width:640px){#rbpRefreshBtn.rbp-xls{width:100%;padding:12px;font-size:13px;}}
+</style>
+<script>
+(function(){
+  function btn(){return document.getElementById('rbpRefreshBtn');}
+  function setNeeded(on){var b=btn();if(b)b.classList[on?'add':'remove']('rbp-needed');}
+  function lastSaved(){return parseInt(localStorage.getItem('rbp_last_saved')||'0',10)||0;}
+  if(window.RBP_REFRESH_BASE===undefined)window.RBP_REFRESH_BASE=lastSaved();
+  function check(){ if(window.RBP_REFRESH_NO_GLOW)return; if(lastSaved()>window.RBP_REFRESH_BASE)setNeeded(true); }
+  window.rbpDoRefresh=function(){
+    if(window.isDirty===true && !window.confirm('You have unsaved changes. Refresh and lose them?'))return false;
+    window.RBP_REFRESH_BASE=lastSaved(); setNeeded(false);
+    try{ if(typeof loadData==='function'){loadData();return false;} if(typeof loadReport==='function'){loadReport();return false;} }catch(e){}
+    location.reload(); return false;
+  };
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});
+  window.addEventListener('focus',check);
+  setInterval(check,8000);
+  if(document.readyState!=='loading')check();else document.addEventListener('DOMContentLoaded',check);
+})();
 </script>
 </body>
 </html>
