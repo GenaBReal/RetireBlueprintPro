@@ -125,7 +125,7 @@
 <div class="topbar">
   <img id="brandLogo" class="brandlogo" alt="RetireBlueprint Pro">
   <h1>Master <span class="accent">Projection</span></h1>
-  <div class="sub" id="sub">Every Master column, year by year — computed live by your plan's engine.</div>
+  <div class="sub" id="sub">Every Master column, year by year — read straight from your Google Sheet.</div>
   <div class="who" id="who"></div>
   <div class="legend" id="legend"></div>
   <button id="xlsBtn" onclick="ensureExcelJS(exportExcel)" aria-label="Download the columns shown in the grid as an Excel file">Download to Excel (.xlsx)</button>
@@ -279,7 +279,7 @@ function render(rows, cols, meta){
     +'<div class="caveat"><b>About these numbers:</b> '
     +((meta&&meta.fromSheet)
        ? 'These are your Google Sheet\u2019s own Master figures, read directly from the sheet \u2014 so this grid matches your sheet exactly, column for column. Your Google Sheet stays the official record.'
-       : 'All 82 columns behind your plan are calculated fresh in your browser and checked line-by-line against your Google Sheet \u2014 and match it to the exact dollar on almost every one. On long-range running balances you may occasionally see a difference of a few dollars \u2014 that\u2019s normal rounding between two calculators compounding over decades, not an error. Your Google Sheet stays the official record.')
+       : 'All 82 columns behind your plan are read straight from your Google Sheet, line by line \u2014 and match it to the exact dollar on almost every one. On long-range running balances you may occasionally see a difference of a few dollars \u2014 that\u2019s normal rounding between two calculators compounding over decades, not an error. Your Google Sheet stays the official record.')
     +'</div>';
   freezeCols();
 }
@@ -382,11 +382,8 @@ function go(d){
   // a fallback for older connectors that don't send the grid — it can diverge from
   // the sheet, so the sheet's numbers win whenever they're available.
   var _grid = (d.projections && d.projections.masterGrid) || null;
-  var rows = (_grid && _grid.length)
-    ? _grid.map(function(row){ return {master: row}; })
-    : RBP.project(I,{extraOverride:function(yr){
-        var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2;
-        return ph<0?0:ext*w[ph]/avg; }});
+  if(!_grid || !_grid.length){ fail('We reached your sheet but it returned no projection rows. Hit Refresh in a moment; if it persists, open your sheet and confirm it calculated.'); return; }
+  var rows = _grid.map(function(row){ return {master: row}; });
   var p1n=String(who.p1.name||'').toLowerCase(), p2n=String(who.p2.name||'').toLowerCase();
   var slots=(d.portfolio&&d.portfolio.slots)||[];
   var cols=buildColumns(slots, p1n, p2n, (who.p1.name||'Partner 1'), (who.p2.name||'Partner 2'));

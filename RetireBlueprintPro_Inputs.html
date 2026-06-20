@@ -3284,6 +3284,7 @@ function saveAll() {
   });
 
   function _rbpNorm(x){ return String(x==null?'':x).replace(/[$,\s]/g,'').replace(/\.0+$/,''); }
+  function _rbpYr(x){ var m=String(x==null?'':x).match(/(19|20)\d\d/); return m?m[0]:''; }
 
   // The POST above already reached the server, and writes land reliably — so we
   // treat the save as DONE: clear the unsaved-changes flag, re-enable the button,
@@ -3314,7 +3315,7 @@ function saveAll() {
         clearTimeout(giveUp);
         var leg=(d&&d.legacy)||{}, gl=(d&&d.global)||{};
         var goalOK=_rbpNorm(leg.goal)===_rbpNorm(payload.global.B8);
-        var yearOK=_rbpNorm(gl.planStartYear)===_rbpNorm(payload.global.B6);
+        var yearOK=_rbpYr(gl.planYear!=null?gl.planYear:gl.planStartYear)===_rbpYr(payload.global.B6);
         finish(goalOK && yearOK);
       };
       var s=document.createElement('script'); s.crossOrigin='anonymous';

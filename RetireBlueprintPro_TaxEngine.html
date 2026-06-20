@@ -272,9 +272,8 @@ function rbpApplyEngine(d){
   // Prefer the SHEET's own Master rows (connector masterGrid) so every figure matches
   // the sheet exactly; the JS engine stays only as a fallback for older connectors.
   var _grid=(d.projections&&d.projections.masterGrid)||null;
-  var rows=(_grid&&_grid.length)?_grid.map(function(r){return {master:r};}):RBP.project(I,{extraOverride:function(yr){
-    var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2;
-    return ph<0?0:ext*w[ph]/avg; }});
+  if(!_grid||!_grid.length){ try{ if(!document.getElementById('rbpSheetErr')){ document.body.insertAdjacentHTML('afterbegin','<div id="rbpSheetErr" style="background:#7a1f1f;color:#fff;padding:14px 16px;text-align:center;font-weight:700;font-size:14px;">\u26a0\ufe0f Couldn\u2019t load your sheet\u2019s numbers right now \u2014 please hit Refresh in a moment.</div>'); } }catch(_e){} return; }
+  var rows=_grid.map(function(r){return {master:r};});
   if(!rows || !rows.length) return;
 
   function R(v){ return Math.round(Number(v)||0); }
