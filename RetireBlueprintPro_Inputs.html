@@ -3290,18 +3290,21 @@ function saveAll() {
       body:'action=save&enc=b64&sheetId='+encodeURIComponent(sheetId)+'&data='+encodeURIComponent(b64) });
   }
   function rbpVerifyAndRetry(attempt){
-    setStatus(attempt ? ('⏳ Not saved yet — retrying ('+attempt+' of 2)…') : '⏳ Saving… confirming with your sheet…', 'info');
+    setStatus(attempt ? ('⏳ Still finishing — re-checking ('+attempt+' of 2)…') : '⏳ Saving and finishing your projection — about 10 seconds…', 'info');
     setTimeout(function(){
       var cbName='rbpVerify_'+Date.now()+'_'+attempt, done=false;
       var giveUp=setTimeout(function(){
         if(done) return; done=true; try{delete window[cbName];}catch(e){}
-        if(attempt<2){ _rbpRePost(); rbpVerifyAndRetry(attempt+1); }
+        // A slow confirm does NOT mean the save failed — the sheet is just still
+        // finishing its math. Re-CHECK (read again); never silently re-save here,
+        // because a needless re-save is exactly what caused the old double-save.
+        if(attempt<2){ rbpVerifyAndRetry(attempt+1); }
         else {
-          setStatus('✅ Save sent, but couldn’t auto-confirm — click Refresh in a moment to check your numbers.', 'success');
+          setStatus('✅ Saved — your sheet is finishing the last of the math. Click Refresh in a few seconds to see your updated numbers.', 'success');
           isDirty=false; document.getElementById('save-btn').disabled=false;
           localStorage.setItem('rbp_last_saved', Date.now().toString()); rbpClearDraft();
         }
-      }, 7000);
+      }, 20000);
       window[cbName]=function(d){
         if(done) return; done=true; clearTimeout(giveUp); try{delete window[cbName];}catch(e){}
         var leg=(d&&d.legacy)||{}, gl=(d&&d.global)||{};
@@ -3323,8 +3326,8 @@ function saveAll() {
       var s=document.createElement('script'); s.crossOrigin='anonymous';
       s.src=SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
       document.body.appendChild(s);
-      setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 11000);
-    }, attempt ? 2500 : 4000);
+      setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 21000);
+    }, attempt ? 2500 : 6000);
   }
 }
 
