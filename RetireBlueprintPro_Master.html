@@ -131,6 +131,8 @@
   <button id="xlsBtn" onclick="ensureExcelJS(exportExcel)" aria-label="Download the columns shown in the grid as an Excel file">Download to Excel (.xlsx)</button>
 </div>
 
+<div id="solverCard" style="display:none;"></div>
+
 <div id="status">
   <div class="big">Loading your plan…</div>
   Reading your inputs and running the projection.
@@ -325,7 +327,47 @@ function applyThemeAndHeader(d){
   return {p1:p1,p2:p2};
 }
 
+/* Solver summary card — shows the safe-spend verdict and the chosen extra for each
+   spending phase (go-go / slow-go / no-go), read straight from the sheet's solver. */
+function renderSolverCard(d){
+  var el=document.getElementById('solverCard'); if(!el) return;
+  var sp=(d&&d.spending)||{}, leg=(d&&d.legacy)||{};
+  var status=String(leg.status||'').trim();
+  var goal=Math.round(leg.goal||0), ending=Math.round(leg.projectedEnding||0);
+  var surplus=Math.round((sp.surplus!=null?sp.surplus:(ending-goal))||0);
+  var safe=Math.round(sp.safeExtra||0), base=Math.round(sp.baseAnnual||0);
+  if(!(safe>0) && !(ending>0)){ el.style.display='none'; return; } // nothing solved yet
+  var onTrack=/go|track|on\s*track|\u2705/i.test(status);
+  function yr(v){ return (v===null||v===undefined||v==='')?'?':(''+v); }
+  var phases=[
+    {nm:'Go-Go',   sb:'most active', s:sp.phase1Start, e:sp.phase1End, x:Math.round(sp.phase1Extra||0)},
+    {nm:'Slow-Go', sb:'easing off',  s:sp.phase2Start, e:sp.phase2End, x:Math.round(sp.phase2Extra||0)},
+    {nm:'No-Go',   sb:'later years', s:sp.phase3Start, e:sp.phase3End, x:Math.round(sp.phase3Extra||0)}
+  ];
+  var chips=phases.map(function(p){
+    return '<div style="flex:1 1 150px;background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.35);border-radius:12px;padding:12px 14px;">'
+      +'<div style="font-size:14px;font-weight:800;color:var(--gold);letter-spacing:.3px;">'+p.nm+' years</div>'
+      +'<div style="font-size:12px;color:#bcd;opacity:.85;margin:2px 0 8px;">'+yr(p.s)+'\u2013'+yr(p.e)+' \u00b7 '+p.sb+'</div>'
+      +'<div style="font-size:24px;font-weight:800;color:#fff;line-height:1;">+'+money(p.x)+'<span style="font-size:13px;font-weight:600;opacity:.7;"> /yr</span></div>'
+      +'</div>';
+  }).join('');
+  el.innerHTML=
+    '<div style="background:linear-gradient(135deg,var(--navy1),var(--n2));border:1px solid rgba(28,199,208,.4);border-radius:16px;padding:18px 20px;margin:0 0 18px;color:#fff;">'
+    +'<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-bottom:14px;">'
+      +'<div style="font-size:16px;font-weight:800;letter-spacing:.3px;">Safe-Spend Solver</div>'
+      +(status?'<div style="font-size:15px;font-weight:800;color:'+(onTrack?'var(--teal)':'var(--gold)')+';">'+status+'</div>':'')
+      +'<div style="margin-left:auto;font-size:14px;color:#cfe;opacity:.9;">Ends at <b style="color:#fff;">'+money(ending)+'</b> vs <b style="color:#fff;">'+money(goal)+'</b> goal'
+        +(surplus>=0?' \u00b7 <span style="color:var(--teal);">+'+money(surplus)+' cushion</span>':' \u00b7 <span style="color:#ffb4a0;">'+money(surplus)+' short</span>')+'</div>'
+    +'</div>'
+    +'<div style="font-size:14px;color:#cfe;opacity:.92;margin-bottom:11px;">On top of your '+money(base)+' base spending, your plan can safely spend this much <b>extra</b> each phase and still land on your legacy goal:</div>'
+    +'<div style="display:flex;gap:10px;flex-wrap:wrap;">'+chips+'</div>'
+    +'<div style="font-size:12px;color:#9fb6c4;margin-top:12px;">Solved on your Google Sheet \u00b7 base safe extra '+money(safe)+'/yr, shaped across the phases by your spending curve.</div>'
+    +'</div>';
+  el.style.display='block';
+}
+
 function go(d){
+  try{ renderSolverCard(d); }catch(_e){}
   var who=applyThemeAndHeader(d);
   var I; try{ I=RBP.buildI(d); }catch(e){ fail('Could not read your inputs ('+e+').'); return; }
   if(!I){ fail('Inputs did not load.'); return; }
