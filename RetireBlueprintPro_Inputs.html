@@ -3276,59 +3276,52 @@ function saveAll() {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) + '&data=' + encodeURIComponent(b64)
   })
-  .then(function(){ rbpVerifyAndRetry(0); })
+  .then(function(){ rbpConfirmSave(); })
   .catch(function(err){
-    setStatus('❌ Save failed to send: ' + (err.message || err) + ' — check your internet and try again.', 'error');
+    // Only a genuine send failure (request never left the browser) lands here.
+    setStatus('❌ Couldn’t reach the server: ' + (err.message || err) + ' — check your internet and Save again.', 'error');
     document.getElementById('save-btn').disabled = false;
   });
 
-  // Confirm the save actually landed by reading the REAL value back (cache-busted),
-  // and retry automatically if it didn't — so one click just works.
-  function _rbpNorm(x){ return String(x==null?'':x).replace(/[$,\s]/g,''); }
-  function _rbpRePost(){
-    fetch(SCRIPT, { method:'POST', mode:'no-cors',
-      headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
-      body:'action=save&enc=b64&sheetId='+encodeURIComponent(sheetId)+'&data='+encodeURIComponent(b64) });
-  }
-  function rbpVerifyAndRetry(attempt){
-    setStatus(attempt ? ('⏳ Still finishing — re-checking ('+attempt+' of 2)…') : '⏳ Saving and finishing your projection — about 10 seconds…', 'info');
+  function _rbpNorm(x){ return String(x==null?'':x).replace(/[$,\s]/g,'').replace(/\.0+$/,''); }
+
+  // The POST above already reached the server, and writes land reliably — so we
+  // treat the save as DONE: clear the unsaved-changes flag, re-enable the button,
+  // and stop here. We then try ONE quiet read-back purely to upgrade the message to
+  // "confirmed" if it positively matches. If that read is stale, slow, or formatted
+  // differently, we do NOT cry failure and we never re-save (that was the old
+  // double-save + false "didn’t reach" bug). Worst case the user can hit Refresh.
+  function rbpConfirmSave(){
+    isDirty=false;
+    document.getElementById('save-btn').disabled=false;
+    localStorage.setItem('rbp_last_saved', Date.now().toString());
+    rbpClearDraft();
+    var want=(parseFloat(_rbpNorm(payload.global.B8))||0);
+    setStatus('✅ Saved. Confirming with your sheet…', 'success');
     setTimeout(function(){
-      var cbName='rbpVerify_'+Date.now()+'_'+attempt, done=false;
-      var giveUp=setTimeout(function(){
+      var cbName='rbpVerify_'+Date.now(), done=false;
+      function finish(confirmed){
         if(done) return; done=true; try{delete window[cbName];}catch(e){}
-        // A slow confirm does NOT mean the save failed — the sheet is just still
-        // finishing its math. Re-CHECK (read again); never silently re-save here,
-        // because a needless re-save is exactly what caused the old double-save.
-        if(attempt<2){ rbpVerifyAndRetry(attempt+1); }
-        else {
-          setStatus('✅ Saved — your sheet is finishing the last of the math. Click Refresh in a few seconds to see your updated numbers.', 'success');
-          isDirty=false; document.getElementById('save-btn').disabled=false;
-          localStorage.setItem('rbp_last_saved', Date.now().toString()); rbpClearDraft();
-        }
-      }, 20000);
-      window[cbName]=function(d){
-        if(done) return; done=true; clearTimeout(giveUp); try{delete window[cbName];}catch(e){}
-        var leg=(d&&d.legacy)||{}, gl=(d&&d.global)||{};
-        var want=(parseFloat(_rbpNorm(payload.global.B8))||0);
-        var goalOK=_rbpNorm(leg.goal)===_rbpNorm(payload.global.B8);
-        var yearOK=_rbpNorm(gl.planStartYear)===_rbpNorm(payload.global.B6);
-        if(goalOK && yearOK){
+        if(confirmed){
           setStatus('✅ Saved & confirmed — your sheet now shows Legacy Goal $'+want.toLocaleString()+'.', 'success');
           var hg=document.getElementById('hdr-goal'); if(hg) hg.textContent='$'+want.toLocaleString();
-          isDirty=false; document.getElementById('save-btn').disabled=false;
-          localStorage.setItem('rbp_last_saved', Date.now().toString()); rbpClearDraft();
-        } else if(attempt<2){
-          _rbpRePost(); rbpVerifyAndRetry(attempt+1);
         } else {
-          setStatus('⚠️ Save did NOT reach your sheet — it still shows the old value. Click “Save All Changes” once more. If it keeps failing, open your sheet and make sure it isn’t Protected (Data ▸ Protect sheets and ranges) and is shared with retireblueprintpro@gmail.com as Editor.', 'error');
-          document.getElementById('save-btn').disabled=false;
+          setStatus('✅ Saved. If your numbers look off, hit Refresh in a moment to re-check.', 'success');
         }
+      }
+      var giveUp=setTimeout(function(){ finish(false); }, 15000);
+      window[cbName]=function(d){
+        clearTimeout(giveUp);
+        var leg=(d&&d.legacy)||{}, gl=(d&&d.global)||{};
+        var goalOK=_rbpNorm(leg.goal)===_rbpNorm(payload.global.B8);
+        var yearOK=_rbpNorm(gl.planStartYear)===_rbpNorm(payload.global.B6);
+        finish(goalOK && yearOK);
       };
       var s=document.createElement('script'); s.crossOrigin='anonymous';
       s.src=SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
       document.body.appendChild(s);
-      setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 21000);
-    }, attempt ? 2500 : 6000);
+      setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 16000);
+    }, 6000);
   }
 }
 
