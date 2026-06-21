@@ -276,33 +276,7 @@ function rbpApplyEngine(d){
     });
   });
 
-  // ── extend to 100 years from plan start (flat growth, no income/withdrawals) ──
-  if(P.years.length){
-    var firstYr=P.years[0], lastYr=P.years[P.years.length-1], targetEnd=firstYr+99, baseReturn=0.07;
-    try{ var accs=(d.portfolio&&d.portfolio.accounts)||[], rs=0,rc=0;
-      accs.forEach(function(a){ if((a.expectedReturn||0)>0){ rs+=a.expectedReturn/100; rc++; } });
-      if(rc>0) baseReturn=rs/rc; }catch(e){}
-    var lb=P.endLiquid[P.endLiquid.length-1]||0, lp=P.preTax[P.preTax.length-1]||0,
-        lr=P.roth[P.roth.length-1]||0, lt=P.taxable[P.taxable.length-1]||0, lh=P.hsa[P.hsa.length-1]||0;
-    for(var ey=lastYr+1; ey<=targetEnd; ey++){
-      lb=Math.round(Math.max(0,lb*(1+baseReturn))); lp=Math.round(Math.max(0,lp*(1+baseReturn)));
-      lr=Math.round(Math.max(0,lr*(1+baseReturn))); lt=Math.round(Math.max(0,lt*(1+baseReturn)));
-      lh=Math.round(Math.max(0,lh*(1+baseReturn)));
-      P.years.push(ey); P.income.push(0); P.withdrawals.push(0); P.endLiquid.push(lb);
-      P.federalTaxes.push(0); P.taxableIncome.push(0); P.stateIncome.push(0); P.capGainsTax.push(0);
-      P.preTax.push(lp); P.roth.push(lr); P.taxable.push(lt); P.hsa.push(lh);
-      P.acctWithdrawals.push([0,0,0,0,0,0,0,0,0,0,0,0]); P.totalRMD.push(0);
-      P.byYear.push({ year:ey, craigAge:0, genaAge:0,
-        gSal:0,gSS:0,gProjSS:0,gPen:0,gOth:0, cSal:0,cSS:0,cProjSS:0,cPen:0,cOth:0,
-        totalGross:0, craigContrib:0,craigMatch:0,genaContrib:0,genaMatch:0,totalContrib:0,
-        stdDed:0, baseLiving:0, healthcare:0, debt:0, totalNeed:0,
-        gap:0, surplus:0, chosenExtra:0, fundingRequired:0,
-        rmdC:0, rmdG:0, totalRMD:0, convC:0, convG:0, totalConv:0,
-        totalTaxable:0, federalTaxes:0, stateTax:0, totalTaxes:0,
-        acctW:[0,0,0,0,0,0,0,0,0,0,0,0], monthlyWithdraw:0, acctEnd:[0,0,0,0,0,0,0,0,0,0,0,0],
-        preTaxTotal:lp, rothTotal:lr, taxableTotal:lt, hsaTotal:lh, endLiquid:lb });
-    }
-  }
+  // projection ends at the death-age year (post-death flat-growth padding removed)
 
   d.projections = P;
   // legacy ending = liquid at the last LIVE year (before the flat extension)
