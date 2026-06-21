@@ -595,7 +595,7 @@ window.addEventListener('storage', function(e) {
       <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:3px;">Can your plan take a real crash &mdash; and what can you still spend?</div>
       <div style="font-size:11.5px;color:#9fc1d6;line-height:1.6;">Each row is an actual bear market run through your saved plan, as if it hit in your first retirement year. The bar shows your must-haves plus the extra you could add on top and still leave your full legacy.</div>
     </div>
-    <button id="rcs-btn" onclick="rcsRun()" style="font-size:11px;font-weight:800;padding:8px 16px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.6);color:#f4b86a;cursor:pointer;white-space:nowrap;flex-shrink:0;">&#8635; Re-run</button>
+    <button id="rcs-btn" onclick="rcsRun()" style="font-size:11px;font-weight:800;padding:8px 16px;border-radius:8px;background:rgba(244,184,106,.18);border:1px solid rgba(244,184,106,.6);color:#f4b86a;cursor:pointer;white-space:nowrap;flex-shrink:0;">&#9654; Run Real Crashes</button>
   </div>
 
   <div style="display:flex;align-items:center;gap:11px;background:rgba(28,199,208,.08);border:1px solid rgba(28,199,208,.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;">
@@ -3088,7 +3088,7 @@ function rcsCtx(){
 function rcsRun(){
   var $=function(id){return document.getElementById(id);};
   if(!planData || !window.RBP_I){
-    var ph=$('rcs-rows'); if(ph) ph.innerHTML='<div style="font-size:12px;color:#ff8c8c;padding:6px 2px;">Load your plan first (Reload at the top of the page) \u2014 then each real crash runs automatically.</div>';
+    var ph=$('rcs-rows'); if(ph) ph.innerHTML='<div style="font-size:12px;color:#ff8c8c;padding:6px 2px;">Load your plan first (Reload at the top of the page) \u2014 then press \u25B6 Run Real Crashes.</div>';
     return;
   }
   var ctx=rcsCtx();
@@ -3211,8 +3211,15 @@ function rcsChart(idx){
 
 function rcsAuto(tries){
   if(!document.getElementById('rcs-rows')) return;
-  if(window.RBP_I && planData){ rcsRun(); return; }
+  if(window.RBP_I && planData){ rcsReady(); return; }   // data ready -> prompt the user; do NOT auto-run (they click the button)
   if(tries>0) setTimeout(function(){ rcsAuto(tries-1); }, 600);
+}
+function rcsReady(){
+  if(window._rcsResults) return;   // already run this session -> leave results in place
+  var btn=document.getElementById('rcs-btn');
+  if(btn){ btn.disabled=false; btn.textContent='\u25B6 Run Real Crashes'; }
+  var rows=document.getElementById('rcs-rows');
+  if(rows){ rows.innerHTML='<div style="font-size:12.5px;color:#9fb6c6;padding:10px 2px;line-height:1.65;">Press <b style="color:#f4b86a;">\u25B6 Run Real Crashes</b> to test your plan against six real bear markets \u2014 COVID, the 2022 rate shock, the dot-com bust, 2008, 1970s stagflation, and the Great Depression. Each runs a full projection through your numbers (about 25 seconds each), so the whole set takes a couple of minutes \u2014 you don\u2019t have to stay on this screen while it runs.</div>'; }
 }
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',function(){ rcsAuto(30); }); }
 else { rcsAuto(30); }
