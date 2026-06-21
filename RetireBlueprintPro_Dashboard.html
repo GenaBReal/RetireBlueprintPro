@@ -70,7 +70,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .at-lbl{font-size:8px;color:#f4b86a;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
 .at-val{font-size:22px;font-weight:800;color:#fff;margin-top:3px;line-height:1;}
 .at-sub{font-size:8px;color:#8a9ab0;margin-top:3px;}
-.kpi-grid{display:grid;grid-template-columns:200px repeat(5,1fr);gap:8px;margin-bottom:10px;align-items:stretch;}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;align-items:stretch;}
 .plan-health{background:#041E2F;border-radius:6px;padding:12px 14px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;}
 .ph-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#f4b86a;text-transform:uppercase;margin-bottom:4px;}
 .ph-score{font-size:50px;font-weight:800;color:#fff;line-height:1;}
@@ -425,173 +425,6 @@ window.addEventListener('storage', function(e) {
 </div>
 <script>try{if(localStorage.getItem('rbp_dash_tip'))document.getElementById('dashboard-tip-panel').style.display='none';}catch(e){}</script>
 
-<div class="kpi-grid">
-  <div class="plan-health">
-    <div class="ph-label"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/></svg></span>Plan Health Score</div>
-    <div>
-      <div class="ph-score" id="kpi-health">—</div>
-      <div class="ph-sub">Retirement Confidence Score</div>
-    </div>
-    <div>
-      <div class="ph-bar-bg">
-        <div class="ph-bar"></div>
-        <div class="ph-marker" id="ph-marker"></div>
-      </div>
-      <div class="ph-zone">You are in the <span id="ph-zone">SAFE ZONE</span></div>
-      <div style="font-size:10px;line-height:1.45;margin-top:8px;opacity:0.78;">
-        100% means your money is projected to last your whole retirement (for the longer-living spouse). Below 100% is the share of retirement years covered before it runs out — a measure of whether the money <em>lasts</em>, separate from your legacy goal.
-      </div>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span><span id="kpi-runway-title">Survivor Runway</span> <span class="tooltip-icon" data-tip="Years the plan covers the longer-lived partner after the first spouse passes. SS survivor benefit (keeping the higher of two SS amounts) is automatically included." style="font-size:9px;">?</span></div>
-      <div class="kc-value" id="kpi-runway">—</div>
-      <div class="kc-sub" id="kpi-runway-sub">—</div>
-      <div class="kc-delta-up" id="kpi-runway-delta">—</div>
-    </div>
-    <div>
-      <div id="runway-dots" style="display:flex;gap:3px;margin-top:6px;flex-wrap:wrap;"></div>
-      <div class="kc-footer" id="kpi-runway-foot">Longest survivor fully funded</div>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#1CC7D0;"></span>Household Income This Year <span class="tooltip-icon" data-tip="Total guaranteed income this year from all sources: salaries, Social Security, pensions, and other income. This is money coming in regardless of market performance." style="font-size:9px;">?</span></div>
-      <div class="kc-value" id="kpi-income">—</div>
-      <div class="kc-sub">Total guaranteed income</div>
-      <div class="kc-delta-watch" id="kpi-income-note">—</div>
-    </div>
-    <div>
-      <span class="badge-watch" id="kpi-income-badge">—</span>
-      <div class="kc-footer" id="kpi-income-foot">—</div>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#6A4A6D;"></span>Tax Efficiency <span class="tooltip-icon" data-tip="Your effective federal tax rate: taxes paid ÷ gross income. The Roth conversion window aims to keep this low NOW before RMDs force higher rates at age 73." style="font-size:9px;">?</span></div>
-      <div class="kc-value" id="kpi-tax">—</div>
-      <div class="kc-sub">Effective federal rate · MFJ</div>
-      <div class="kc-delta-up" id="kpi-tax-delta">—</div>
-    </div>
-    <div>
-      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-tax-bar" style="background:#1CC7D0;"></div></div>
-      <div class="kc-footer" id="kpi-tax-foot">—</div>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#2E7D5B;"></span>Withdrawal Rate <span class="tooltip-icon" data-tip="This is the withdrawal rate for the year selected above — the actual amount pulled from your portfolio that year (including taxes and any extra spending) divided by the balance at the start of that year. It changes as you move through the years. Think of it as 'how hard am I drawing right now.' This is NOT the 4% rule itself — for the classic 4%-rule planning number, see the Safe Withdrawal Rate in the FIRE panel below." style="font-size:9px;">?</span></div>
-      <div class="kc-value" id="kpi-wdraw">—</div>
-      <div class="kc-sub" id="kpi-wdraw-sub">Portfolio draw · typical retirement year</div>
-      <div class="kc-delta-up" id="kpi-wdraw-delta">—</div>
-    </div>
-    <div>
-      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-wdraw-bar" style="background:#2E7D5B;"></div></div>
-      <div class="kc-footer" id="kpi-wdraw-foot">—</div>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div>
-      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Legacy Goal <span class="tooltip-icon" data-tip="Target ending portfolio balance to leave as inheritance or estate. Set to $0 to maximize lifetime spending instead. The solver optimizes all spending around this goal." style="font-size:9px;">?</span></div>
-      <div class="kc-value" id="kpi-legacy">—</div>
-      <div class="kc-sub">Projected ending liquid assets</div>
-      <div class="kc-delta-up" id="kpi-legacy-delta">—</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-      <svg width="55" height="32" viewBox="0 0 55 32">
-        <path d="M5,28 A22,22 0 0,1 50,28" fill="none" stroke="#e8eaed" stroke-width="6" stroke-linecap="round"/>
-        <path d="M5,28 A22,22 0 0,1 50,28" fill="none" stroke="#051628" stroke-width="6" stroke-linecap="round" stroke-dasharray="69" id="legacy-arc"/>
-        <text x="27" y="26" text-anchor="middle" fill="#0B2239" font-size="10" font-weight="800" id="legacy-pct-text">—</text>
-      </svg>
-      <div class="kc-footer" id="kpi-legacy-status">—</div>
-    </div>
-  </div>
-</div>
-
-<!-- ── REQUIRED SPENDING BREAKDOWN + WITHDRAWAL SOURCES ───────────── -->
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-  <div class="kpi-card" style="display:block;">
-    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#C0392B;"></span>Required Spending — What You Must Cover <span class="tooltip-icon" data-tip="Your required floor this year (living + healthcare + included debts), then your extra-spend choice: what you COULD safely add (from the solver) vs what you're CHOOSING this year. The big total includes ONLY the chosen extra — so if you choose $0, the total is just your required floor. Turn extra spending on/off with 'Assume Extra Spending' on the Inputs page." style="font-size:9px;">?</span></div>
-    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
-      <div class="kc-value" id="req-total" style="color:#C0392B;">—</div>
-      <div style="font-size:12px;color:var(--muted);">/yr &nbsp;·&nbsp; <span id="req-total-mo" style="font-weight:700;">—</span>/mo</div>
-    </div>
-    <div class="kc-sub" id="req-year" style="margin-bottom:8px;">current plan year</div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px;" id="req-breakdown-table">
-      <thead>
-        <tr style="text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">
-          <th style="padding:4px 0;font-weight:600;">Item</th>
-          <th style="padding:4px 0;font-weight:600;text-align:right;">Annual</th>
-          <th style="padding:4px 0;font-weight:600;text-align:right;">Monthly</th>
-        </tr>
-      </thead>
-      <tbody id="req-breakdown-body"></tbody>
-    </table>
-  </div>
-
-  <div class="kpi-card" style="display:block;">
-    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#2E7D5B;"></span>Where Withdrawals Come From <span class="tooltip-icon" data-tip="For the first year your plan draws from the portfolio, this shows how much comes from each account. The strategy pulls taxable/brokerage first, then pre-tax (401k/403b), and preserves Roth for last (tax-free growth). RMDs and Roth conversions are handled automatically by the engine." style="font-size:9px;">?</span></div>
-    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
-      <div class="kc-value" id="wsrc-total" style="color:#2E7D5B;">—</div>
-      <div style="font-size:12px;color:var(--muted);">total draw &nbsp;·&nbsp; <span id="wsrc-year" style="font-weight:700;">—</span></div>
-    </div>
-    <div class="kc-sub" id="wsrc-note" style="margin-bottom:8px;">portfolio withdrawal by account</div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px;" id="wsrc-table">
-      <thead>
-        <tr style="text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">
-          <th style="padding:4px 0;font-weight:600;">Account</th>
-          <th style="padding:4px 0;font-weight:600;text-align:right;">Withdrawal</th>
-          <th style="padding:4px 0;font-weight:600;text-align:right;">% of draw</th>
-        </tr>
-      </thead>
-      <tbody id="wsrc-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ── PLAN MILESTONES & LIFETIME NUMBERS ─────────────────────────── -->
-<div class="kpi-card" style="display:block;margin-bottom:14px;">
-  <div class="kc-title" style="margin-bottom:10px;"><span class="kc-dot" style="background:#456A73;"></span>Plan Milestones & Lifetime Numbers <span class="tooltip-icon" data-tip="Key dates and whole-of-plan totals computed across your full projection: when your portfolio peaks, when withdrawals and RMDs begin, total lifetime taxes, your plan's lowest point, and how much guaranteed income replaces your working income." style="font-size:9px;">?</span></div>
-  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
-    <div style="border-left:3px solid #2E7D5B;padding:4px 0 4px 10px;">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Portfolio Peaks</div>
-      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-peak">—</div>
-      <div style="font-size:11px;color:var(--muted);" id="ms-peak-yr">—</div>
-    </div>
-    <div style="border-left:3px solid #1CC7D0;padding:4px 0 4px 10px;">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">First Portfolio Draw</div>
-      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-firstdraw">—</div>
-      <div style="font-size:11px;color:var(--muted);" id="ms-firstdraw-note">—</div>
-    </div>
-    <div style="border-left:3px solid #6A4A6D;padding:4px 0 4px 10px;">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">RMDs Begin</div>
-      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-rmd">—</div>
-      <div style="font-size:11px;color:var(--muted);" id="ms-rmd-note">—</div>
-    </div>
-    <div style="border-left:3px solid #C0392B;padding:4px 0 4px 10px;">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Lifetime Taxes</div>
-      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-ltaxes">—</div>
-      <div style="font-size:11px;color:var(--muted);" id="ms-ltaxes-note">—</div>
-    </div>
-    <div style="border-left:3px solid #f4b86a;padding:4px 0 4px 10px;">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Plan Low Point</div>
-      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-low">—</div>
-      <div style="font-size:11px;color:var(--muted);" id="ms-low-yr">—</div>
-    </div>
-    <div style="border-left:3px solid #2E4053;padding:4px 0 4px 10px;">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Income Replaced</div>
-      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-repl">—</div>
-      <div style="font-size:11px;color:var(--muted);" id="ms-repl-note">—</div>
-    </div>
-  </div>
-</div>
-
 <div class="engines-grid">
   <div class="engine">
     <div class="eng-hdr"><div class="eng-hdr-title">Income Engine</div><div class="eng-hdr-sub" id="eng-income-hdr">—</div></div>
@@ -675,6 +508,171 @@ window.addEventListener('storage', function(e) {
         <div class="eng-row"><span class="er-lbl">Achievement</span><span class="er-val"><span id="eng-leg-pct">—</span><span class="s-go"></span></span></div>
       </div>
       <div class="eng-hl"><div><div class="eh-lbl">Legacy Status</div><div class="eh-val" id="eng-leg-status">—</div></div><div class="eh-go" id="eng-leg-badge">—</div></div>
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:0.9fr 1fr 1fr;gap:14px;margin-bottom:14px;">
+  <div class="plan-health">
+    <div class="ph-label"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/></svg></span>Plan Health Score</div>
+    <div>
+      <div class="ph-score" id="kpi-health">—</div>
+      <div class="ph-sub">Retirement Confidence Score</div>
+    </div>
+    <div>
+      <div class="ph-bar-bg">
+        <div class="ph-bar"></div>
+        <div class="ph-marker" id="ph-marker"></div>
+      </div>
+      <div class="ph-zone">You are in the <span id="ph-zone">SAFE ZONE</span></div>
+      <div style="font-size:10px;line-height:1.45;margin-top:8px;opacity:0.78;">
+        100% means your money is projected to last your whole retirement (for the longer-living spouse). Below 100% is the share of retirement years covered before it runs out — a measure of whether the money <em>lasts</em>, separate from your legacy goal.
+      </div>
+    </div>
+  </div>
+  <div class="kpi-card" style="display:block;">
+    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#C0392B;"></span>Required Spending — What You Must Cover <span class="tooltip-icon" data-tip="Your required floor this year (living + healthcare + included debts), then your extra-spend choice: what you COULD safely add (from the solver) vs what you're CHOOSING this year. The big total includes ONLY the chosen extra — so if you choose $0, the total is just your required floor. Turn extra spending on/off with 'Assume Extra Spending' on the Inputs page." style="font-size:9px;">?</span></div>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+      <div class="kc-value" id="req-total" style="color:#C0392B;">—</div>
+      <div style="font-size:12px;color:var(--muted);">/yr &nbsp;·&nbsp; <span id="req-total-mo" style="font-weight:700;">—</span>/mo</div>
+    </div>
+    <div class="kc-sub" id="req-year" style="margin-bottom:8px;">current plan year</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;" id="req-breakdown-table">
+      <thead>
+        <tr style="text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">
+          <th style="padding:4px 0;font-weight:600;">Item</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">Annual</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">Monthly</th>
+        </tr>
+      </thead>
+      <tbody id="req-breakdown-body"></tbody>
+    </table>
+  </div>
+
+  <div class="kpi-card" style="display:block;">
+    <div class="kc-title" style="margin-bottom:4px;"><span class="kc-dot" style="background:#2E7D5B;"></span>Where Withdrawals Come From <span class="tooltip-icon" data-tip="For the first year your plan draws from the portfolio, this shows how much comes from each account. The strategy pulls taxable/brokerage first, then pre-tax (401k/403b), and preserves Roth for last (tax-free growth). RMDs and Roth conversions are handled automatically by the engine." style="font-size:9px;">?</span></div>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+      <div class="kc-value" id="wsrc-total" style="color:#2E7D5B;">—</div>
+      <div style="font-size:12px;color:var(--muted);">total draw &nbsp;·&nbsp; <span id="wsrc-year" style="font-weight:700;">—</span></div>
+    </div>
+    <div class="kc-sub" id="wsrc-note" style="margin-bottom:8px;">portfolio withdrawal by account</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;" id="wsrc-table">
+      <thead>
+        <tr style="text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">
+          <th style="padding:4px 0;font-weight:600;">Account</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">Withdrawal</th>
+          <th style="padding:4px 0;font-weight:600;text-align:right;">% of draw</th>
+        </tr>
+      </thead>
+      <tbody id="wsrc-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span><span id="kpi-runway-title">Survivor Runway</span> <span class="tooltip-icon" data-tip="Years the plan covers the longer-lived partner after the first spouse passes. SS survivor benefit (keeping the higher of two SS amounts) is automatically included." style="font-size:9px;">?</span></div>
+      <div class="kc-value" id="kpi-runway">—</div>
+      <div class="kc-sub" id="kpi-runway-sub">—</div>
+      <div class="kc-delta-up" id="kpi-runway-delta">—</div>
+    </div>
+    <div>
+      <div id="runway-dots" style="display:flex;gap:3px;margin-top:6px;flex-wrap:wrap;"></div>
+      <div class="kc-footer" id="kpi-runway-foot">Longest survivor fully funded</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#1CC7D0;"></span>Household Income This Year <span class="tooltip-icon" data-tip="Total guaranteed income this year from all sources: salaries, Social Security, pensions, and other income. This is money coming in regardless of market performance." style="font-size:9px;">?</span></div>
+      <div class="kc-value" id="kpi-income">—</div>
+      <div class="kc-sub">Total guaranteed income</div>
+      <div class="kc-delta-watch" id="kpi-income-note">—</div>
+    </div>
+    <div>
+      <span class="badge-watch" id="kpi-income-badge">—</span>
+      <div class="kc-footer" id="kpi-income-foot">—</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#6A4A6D;"></span>Tax Efficiency <span class="tooltip-icon" data-tip="Your effective federal tax rate: taxes paid ÷ gross income. The Roth conversion window aims to keep this low NOW before RMDs force higher rates at age 73." style="font-size:9px;">?</span></div>
+      <div class="kc-value" id="kpi-tax">—</div>
+      <div class="kc-sub">Effective federal rate · MFJ</div>
+      <div class="kc-delta-up" id="kpi-tax-delta">—</div>
+    </div>
+    <div>
+      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-tax-bar" style="background:#1CC7D0;"></div></div>
+      <div class="kc-footer" id="kpi-tax-foot">—</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#2E7D5B;"></span>Withdrawal Rate <span class="tooltip-icon" data-tip="This is the withdrawal rate for the year selected above — the actual amount pulled from your portfolio that year (including taxes and any extra spending) divided by the balance at the start of that year. It changes as you move through the years. Think of it as 'how hard am I drawing right now.' This is NOT the 4% rule itself — for the classic 4%-rule planning number, see the Safe Withdrawal Rate in the FIRE panel below." style="font-size:9px;">?</span></div>
+      <div class="kc-value" id="kpi-wdraw">—</div>
+      <div class="kc-sub" id="kpi-wdraw-sub">Portfolio draw · typical retirement year</div>
+      <div class="kc-delta-up" id="kpi-wdraw-delta">—</div>
+    </div>
+    <div>
+      <div class="kc-bar-bg"><div class="kc-bar-fill" id="kpi-wdraw-bar" style="background:#2E7D5B;"></div></div>
+      <div class="kc-footer" id="kpi-wdraw-foot">—</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kc-title"><span class="kc-dot" style="background:#f4b86a;"></span>Legacy Goal <span class="tooltip-icon" data-tip="Target ending portfolio balance to leave as inheritance or estate. Set to $0 to maximize lifetime spending instead. The solver optimizes all spending around this goal." style="font-size:9px;">?</span></div>
+      <div class="kc-value" id="kpi-legacy">—</div>
+      <div class="kc-sub">Projected ending liquid assets</div>
+      <div class="kc-delta-up" id="kpi-legacy-delta">—</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+      <svg width="55" height="32" viewBox="0 0 55 32">
+        <path d="M5,28 A22,22 0 0,1 50,28" fill="none" stroke="#e8eaed" stroke-width="6" stroke-linecap="round"/>
+        <path d="M5,28 A22,22 0 0,1 50,28" fill="none" stroke="#051628" stroke-width="6" stroke-linecap="round" stroke-dasharray="69" id="legacy-arc"/>
+        <text x="27" y="26" text-anchor="middle" fill="#0B2239" font-size="10" font-weight="800" id="legacy-pct-text">—</text>
+      </svg>
+      <div class="kc-footer" id="kpi-legacy-status">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PLAN MILESTONES & LIFETIME NUMBERS ─────────────────────────── -->
+<div class="kpi-card" style="display:block;margin-bottom:14px;">
+  <div class="kc-title" style="margin-bottom:10px;"><span class="kc-dot" style="background:#456A73;"></span>Plan Milestones & Lifetime Numbers <span class="tooltip-icon" data-tip="Key dates and whole-of-plan totals computed across your full projection: when your portfolio peaks, when withdrawals and RMDs begin, total lifetime taxes, your plan's lowest point, and how much guaranteed income replaces your working income." style="font-size:9px;">?</span></div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
+    <div style="border-left:3px solid #2E7D5B;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Portfolio Peaks</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-peak">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-peak-yr">—</div>
+    </div>
+    <div style="border-left:3px solid #1CC7D0;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">First Portfolio Draw</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-firstdraw">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-firstdraw-note">—</div>
+    </div>
+    <div style="border-left:3px solid #6A4A6D;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">RMDs Begin</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-rmd">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-rmd-note">—</div>
+    </div>
+    <div style="border-left:3px solid #C0392B;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Lifetime Taxes</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-ltaxes">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-ltaxes-note">—</div>
+    </div>
+    <div style="border-left:3px solid #f4b86a;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Plan Low Point</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-low">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-low-yr">—</div>
+    </div>
+    <div style="border-left:3px solid #2E4053;padding:4px 0 4px 10px;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Income Replaced</div>
+      <div style="font-size:18px;font-weight:800;color:#0B2239;" id="ms-repl">—</div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-repl-note">—</div>
     </div>
   </div>
 </div>
