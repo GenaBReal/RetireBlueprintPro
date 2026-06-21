@@ -1364,7 +1364,12 @@ function loadData() {
       planData=d;
       // single-source: rebuild the projection with the shared engine so this page's Monte Carlo
       // (the canonical run the report reads) matches every other page. Copy-based; sheet KPIs untouched.
-      try { if (typeof rbpApplyEngine==='function' && window.RBP && window.RBP.buildI) { var _engD=JSON.parse(JSON.stringify(d)); rbpApplyEngine(_engD); if(_engD&&_engD.projections) planData.projections=_engD.projections; } } catch(_e){}
+      // ── ENGINE OVERRIDE DISABLED (accuracy) ──────────────────────────
+      // The local engine (rbp-engine.js) had drifted from the Google Sheet and is
+      // pending re-verification, so it no longer replaces the sheet's numbers.
+      // planData.projections stays EXACTLY as the Google Sheet returned it (the
+      // authoritative source) for the base case AND the Monte Carlo.
+      // window.RBP_I is still built below so the Real Crashes panel can run.
       // One-time: turn the loaded inputs into the engine's input I (single source of truth).
       try { window.RBP_I = (window.RBP && RBP.buildI) ? RBP.buildI(d) : null; } catch(e){ window.RBP_I = null; }
       document.getElementById('loading-msg').style.display='none';
