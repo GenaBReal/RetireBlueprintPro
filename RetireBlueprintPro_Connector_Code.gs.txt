@@ -3,8 +3,6 @@
 // NEVER write to formula cells: B33,B36,B42,B43,B45,B48,B51(formula?),
 //   B86,B87,B119,B120,B128-B130,B133,B134,B140,B142,B143,B144,B146,G122-G124
 
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCPNzU1A9jT8eiOrc-fg2kWSo9aZmSHYBFfPILZzdZD-IEhDCr0uYhGeOqUSysaCpP/exec';
-
 function doGet(e) {
   var action   = e.parameter.action;
   var sheetId  = e.parameter.sheetId;
@@ -41,9 +39,11 @@ function doGet(e) {
       if (_hit) { try { return respond(JSON.parse(_hit)); } catch(eP){} } // fast path — no sheet access
       rbpHealStress(ss, inp, false); // self-heal a stale orphaned stress state so a reload shows true numbers
       addWelcomeBanner(ss, inp);
+      try { rbpEnsureCalcSettings(ss); } catch(e){} // guarantee iterative calc + iteration headroom on every sheet
+      try { rbpHealSolver(inp); } catch(e){} // self-heal solver cells (E120 + restore the original B119 formula) on page load
       rbpWaitForReadSettle(inp); // wait out any in-progress recalc so the read returns settled numbers, not mid-calculation ones
       var _result = readAll(ss, inp);
-      try { var _js = JSON.stringify(_result); if (_js.length < 95000) _cache.put(_ck, _js, 8); } catch(eS){} // CacheService item limit ~100KB; 8s TTL keeps refreshes fresh
+      try { var _js = JSON.stringify(_result); if (_js.length < 95000) _cache.put(_ck, _js, 3); } catch(eS){} // CacheService item limit ~100KB; short 3s TTL so a single refresh pulls fresh, settled numbers (not a stale snapshot) while still smoothing a quick page-to-page navigation burst
       return respond(_result);
     }
 
@@ -631,6 +631,14 @@ function writeInputs(ss, inp, data) {
   }
 
   try {
+    // Heal the solver cells FIRST — before the (sometimes multi-second) input
+    // writes — so B119 is back on the /500 step well before the page's save-
+    // confirm read runs. Pass false: NO recovery loop on a save, so the save
+    // stays short and the confirm never times out. The one-time recovery that
+    // pulls an overshot B119 back down happens on the next page LOAD instead.
+    try { rbpEnsureCalcSettings(ss); } catch(e){} // guarantee iterative calc + iteration headroom on this sheet
+    try { rbpHealSolver(inp); } catch(e){ Logger.log('Solver heal (save) error: '+e); }
+
     // ── GLOBAL SETTINGS ──────────────────────────────────────
     if (data.global) {
       var g = data.global;
@@ -949,64 +957,17 @@ function writeInputs(ss, inp, data) {
 
     SpreadsheetApp.flush();
 
-    // ── HEAL THE SOLVER'S ERROR SIGNAL (E120) ────────────────────────────────
-    // The safe-spend solver (B119) only moves when its error signal E120 is
-    // non-zero — B119's formula adds N($E$120)/500 on each iterative pass. E120
-    // is meant to mirror the surplus cell B120 but read the SolverEngine SHADOW
-    // tab instead of Master. A column-reference bug had E120 reading empty
-    // columns (GJ:GU) on SolverEngine, so it returned blank, the solver's
-    // increment was always zero, and B119 stayed frozen on its $15,000 seed —
-    // the plan never drew down to the legacy goal. We rebuild E120 from the
-    // KNOWN-GOOD B120 formula (no hand-typed formula = zero transcription risk)
-    // by swapping Master! -> SolverEngine!. Idempotent: only writes if different.
+    // Let the solver (B119) settle briefly after the save, then return — a converging
+    // plan stabilizes in a flush or two and breaks out early; an oscillating one just
+    // hits the short backstop instead of stalling the save. The page-load read does
+    // its own settle, so we keep this short to keep saves fast and the connection solid.
     try {
-      var _b120f = inp.getRange('B120').getFormula();
-      if (_b120f && _b120f.indexOf('Master!') >= 0) {
-        var _e120fixed = _b120f.replace(/Master!/g, 'SolverEngine!');
-        if (inp.getRange('E120').getFormula() !== _e120fixed) {
-          inp.getRange('E120').setFormula(_e120fixed);
-          SpreadsheetApp.flush();
-        }
-      }
-    } catch (e) { Logger.log('E120 solver-signal heal error: ' + e); }
-
-    // ── SPEED UP THE SOLVER (B119 step size) ─────────────────────────────────
-    // B119 is iterative: each recalc pass moves it by N($E$120)/<divisor> toward
-    // the answer. The template ships with /500 — very gentle — so it needs ~270
-    // passes to fully arrive, forcing the save to grind ~40s (and still sometimes
-    // return mid-climb). We widen the step to /100: the measured response is only
-    // ~0.19 of the gap per pass at /100 (far below the 1.0 that would overshoot),
-    // so it stays smooth and monotonic but converges in ~50 passes — ~5x fewer —
-    // landing on the SAME final number in ~10s. We anchor the swap on "$E$120)"
-    // so only the solver's own divisor changes, never the 200000/15000 guards.
-    // Idempotent: only writes if it isn't already /100.
-    try {
-      var _b119f = inp.getRange('B119').getFormula();
-      if (_b119f && /\$E\$120\)\s*\/\s*500/.test(_b119f)) {
-        var _b119new = _b119f.replace(/(\$E\$120\)\s*\/\s*)500/, function(m, p1){ return p1 + '100'; });
-        if (_b119new !== _b119f) { inp.getRange('B119').setFormula(_b119new); SpreadsheetApp.flush(); }
-      }
-    } catch (e) { Logger.log('B119 step-size heal error: ' + e); }
-
-    // Wait for the safe-spend SOLVER (B119) to finish recalculating before we
-    // report the save complete. B119 sits DOWNSTREAM of the Master array and
-    // lags after a save — without this, a reload right after saving can read a
-    // stale / mid-recalc value, making the solver number appear to "wobble"
-    // between loads. Poll B119 until it stops moving (same approach the
-    // stress-test path uses after it writes).
-    try {
-      // With the widened /100 step above, B119 converges in ~50 passes. Flush
-      // rapidly until it stops moving (6 straight sub-$1 reads), with a 14s
-      // backstop — comfortably enough for /100 to fully arrive, while keeping the
-      // save short so the page's save-confirm read isn't left waiting. If a sheet
-      // somehow still had a slower formula, it just hits the cap and the next
-      // page-load read finishes the last bit of settling.
       var _prevSafe = Number(inp.getRange('B119').getValue()) || 0, _stable = 0;
-      var _solveDeadline = Date.now() + 14000;
+      var _solveDeadline = Date.now() + 4000;
       while (Date.now() < _solveDeadline) {
         SpreadsheetApp.flush();
         var _curSafe = Number(inp.getRange('B119').getValue()) || 0;
-        if (Math.abs(_curSafe - _prevSafe) < 1) { if (++_stable >= 6) break; } // settled
+        if (Math.abs(_curSafe - _prevSafe) < 1) { if (++_stable >= 4) break; }
         else { _stable = 0; }
         _prevSafe = _curSafe;
         Utilities.sleep(25);
@@ -1448,6 +1409,55 @@ function rbpHealStress(ss, inp, force) {
     sh.getRange(RBP_STRESS_STASH_CELL).clearContent();
     SpreadsheetApp.flush();
   } catch (e) {}
+}
+
+// Self-heal the solver cells on a customer's sheet, idempotently. Runs on BOTH
+// saves and reads, so any sheet repairs itself the moment its owner opens a page
+// — no save, and no owner access to that sheet, required. Two repairs:
+//   (1) E120 error-signal: must mirror the surplus cell B120 but read the
+//       SolverEngine shadow tab; if a column-reference bug left it pointed at the
+//       wrong range, the solver can't move. Rebuilt from B120 (Master!→SolverEngine!).
+//   (2) B119 step size: an earlier build widened it from /500 to /100, which
+//       overshot and destabilized the solver. Put back to the known-good /500.
+// Each repair only writes when actually needed (idempotent). When the /100→/500
+// step repair fires, the sheet's B119 may be sitting at an old overshoot, so we
+// drive it back toward the answer right then with the now-stable /500 step — a
+// one-time recovery (only on the single read/save that flips the formula) so the
+// numbers show correct immediately instead of drifting back over several reloads.
+// Make sure iterative calculation is ON (the solver is a circular formula and won't
+// resolve without it). We deliberately do NOT touch Max iterations — the template's
+// value is right, and forcing it higher just makes a heavy sheet recalc slowly,
+// which drags saves and drops the connection. Idempotent and cheap.
+function rbpEnsureCalcSettings(ss) {
+  try {
+    if (!ss.isIterativeCalculationEnabled()) ss.setIterativeCalculationEnabled(true);
+  } catch (e) { Logger.log('calc-settings ensure error: ' + e); }
+}
+
+function rbpHealSolver(inp) {
+  var changed = false;
+  try {
+    var _b120f = inp.getRange('B120').getFormula();
+    if (_b120f && _b120f.indexOf('Master!') >= 0) {
+      var _e120fixed = _b120f.replace(/Master!/g, 'SolverEngine!');
+      if (inp.getRange('E120').getFormula() !== _e120fixed) {
+        inp.getRange('E120').setFormula(_e120fixed); SpreadsheetApp.flush(); changed = true;
+      }
+    }
+  } catch (e) { Logger.log('E120 heal error: ' + e); }
+  try {
+    // Restore the ORIGINAL self-correcting solver formula in B119. A prior build may
+    // have left it as a /100 variant, or replaced it with a static value (binary
+    // search). Either way, put the canonical /500 formula back so the sheet solves
+    // the way it always has. Idempotent: only writes when it isn't already that
+    // formula (whitespace-insensitive compare avoids needless rewrites).
+    var CANON = '=MAX(0, MIN(200000, IFERROR(IF(B119=0, 15000, B119 + (N($E$120) / 500)), 15000)))';
+    var _cur = inp.getRange('B119').getFormula();   // '' when B119 is a static value
+    if (!_cur || /\$E\$120\)\s*\/\s*100/.test(_cur)) {  // value (from the binary build) or an old /100 step -> put the original back; a healthy /500 formula is left untouched
+      inp.getRange('B119').setFormula(CANON); SpreadsheetApp.flush(); changed = true;
+    }
+  } catch (e) { Logger.log('B119 formula restore error: ' + e); }
+  return changed;
 }
 
 // Make a read WAIT until the heavy formulas have settled, so a page shows final
