@@ -196,9 +196,7 @@ function rbpProject(I, opts) {
     const smile = [ [I.ph1Start,I.ph1End,I.ph1Spend], [I.ph2Start,I.ph2End,I.ph2Spend], [I.ph3Start,I.ph3End,I.ph3Spend] ]
       .reduce((acc,p)=> acc!=null?acc:phYr(p[0],p[1],p[2]), null) || 0;
     const assumeExtra = nameL(I.assumeExtra)==='yes';
-    const chosenExtra = (opts.extraOverride!=null) ? opts.extraOverride(yr, smile)
-                      : (I.chosenExtraByYear && I.chosenExtraByYear[yr]!=null) ? I.chosenExtraByYear[yr]
-                      : (assumeExtra ? smile : 0);
+    const chosenExtra = (opts.extraOverride!=null) ? opts.extraOverride(yr, smile) : (assumeExtra?smile:0);
 
     const targetNet = Math.max(0, gs15(wTotal+chosenExtra+baseTaxes+baseStateTax-totalGross-totalRMD));
 
@@ -433,17 +431,13 @@ function rbpBuildI(R, D) {
     irmaaMFJ:T.irmaaMFJ, irmaaSingle:T.irmaaMFJ, magiMFJ:T.magiMFJ, magiSingle:T.magiSingle, magiThresh:true,
     convTable:(function(){ var ct={}; (R.rothPlan||[]).forEach(function(row){ if(!row) return; var y=parseInt(row.year,10); if(!y) return; ct[y]={ c:(+row.p1||0), g:(+row.p2||0) }; }); return ct; })(),
     debts:(R.debts||[]).map(function(d){ return {status:d.inc, amount:d.ann, start:D(d.start), end:D(d.end)}; }),
-    ph1Start:Y(sp.phase1Start), ph1End:Y(sp.phase1End), ph1Spend:0,
-    ph2Start:Y(sp.phase2Start), ph2End:Y(sp.phase2End), ph2Spend:0,
-    ph3Start:Y(sp.phase3Start), ph3End:Y(sp.phase3End), ph3Spend:0,
+    ph1Start:Y(sp.phase1Start), ph1End:Y(sp.phase1End), ph1Spend:((+sp.phase1Override>0)?+sp.phase1Override:(+sp.phase1Extra||0)),
+    ph2Start:Y(sp.phase2Start), ph2End:Y(sp.phase2End), ph2Spend:((+sp.phase2Override>0)?+sp.phase2Override:(+sp.phase2Extra||0)),
+    ph3Start:Y(sp.phase3Start), ph3End:Y(sp.phase3End), ph3Spend:((+sp.phase3Override>0)?+sp.phase3Override:(+sp.phase3Extra||0)),
     w1:sp.phase1Weight, w2:sp.phase2Weight, w3:sp.phase3Weight,
     legacyB8:leg.goal, floorB9:leg.safetyFloor,
     crashType:'', crashStart:0, crashDur:0, crashDrag:0, lateCrashType:'', lateStart:0, lateDur:0, lateDrag:0,
     committedExtra:sp.safeExtra,   // the saved plan's safe extra — the red line's spend
-    // Per-year chosen extra (the smile) taken straight from the Sheet's own Master column 31 —
-    // the authoritative pass-through of the user's phase spend, identical across stress scenarios.
-    chosenExtraByYear:(function(){ var m={}; var g=(R.projections&&R.projections.masterGrid)||[];
-      for(var i=0;i<g.length;i++){ var row=g[i]; if(row&&row.length>31){ var y=+row[0]; if(y) m[y]=Math.round(+row[31]||0); } } return m; })(),
     accounts:(R.portfolio.accounts||[]).map(function(a){ return {
       statusA:a.showInCalc, statusG:a.status, type:a.type, name:a.name, owner:a.owner, start:a.balance,
       rate:(a.expectedReturn||0)/100, basis:a.costBasis, contrib:a.contrib||0, match:a.match||0,
