@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RetireBlueprint Pro — Survivor-RMD What-If</title>
+<!-- Loads a SEPARATE engine copy with the survivor-RMD flag. Your live rbp-engine.js is NOT touched. Always-fresh. -->
+<script>document.write('<scr'+'ipt src="rbp-engine-whatif.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:#f4f7fa;color:#0c2436;line-height:1.55;}
+  .header{background:#051628;border-bottom:3px solid #f4b86a;padding:14px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .header .mark{color:#fff;font-weight:900;font-size:18px;letter-spacing:.3px;}
+  .header .mark span{color:#1CC7D0;}
+  .header .tag{color:#8aa6b6;font-size:12px;font-weight:600;}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 22px 80px;}
+  .intro{background:#fff;border:1px solid #e6ebf0;border-left:4px solid #1CC7D0;border-radius:10px;padding:16px 18px;margin-bottom:18px;font-size:13.5px;color:#33424d;}
+  .intro b{color:#0c2436;}
+  .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+  button{font-family:inherit;font-weight:800;cursor:pointer;border:none;}
+  .btn-gold{background:linear-gradient(135deg,#f4b86a,#e09a3e);color:#041E2F;font-size:13px;padding:11px 22px;border-radius:9px;box-shadow:0 4px 14px rgba(244,184,106,.3);}
+  .btn-ghost{background:#fff;border:1px solid #cdd6de;color:#41525e;font-size:12px;padding:9px 16px;border-radius:8px;}
+  #status{font-size:13.5px;color:#566576;padding:10px 2px;}
+  .verdict{border-radius:12px;padding:20px 22px;margin:6px 0 16px;color:#fff;}
+  .verdict h2{font-size:21px;font-weight:900;margin-bottom:4px;}
+  .verdict p{font-size:13.5px;opacity:.96;}
+  .v-up{background:linear-gradient(135deg,#1f7a44,#2E9C57);}
+  .v-flat{background:linear-gradient(135deg,#41637a,#577891);}
+  .v-down{background:linear-gradient(135deg,#9a2b2b,#c54545);}
+  .note{background:#fff;border:1px solid #e6ebf0;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:#566576;}
+  .note b{color:#0c7b84;}
+  .cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+  .card{flex:1;min-width:150px;background:#fff;border:1px solid #e6ebf0;border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(12,36,54,.05);}
+  .card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#7a8a96;font-weight:800;margin-bottom:6px;}
+  .card .val{font-size:19px;font-weight:900;color:#0c2436;font-variant-numeric:tabular-nums;}
+  .card .sub{font-size:11.5px;color:#7a8a96;margin-top:3px;}
+  .panel{background:#fff;border:1px solid #e6ebf0;border-radius:12px;padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 2px rgba(12,36,54,.05);}
+  .panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:#0c7b84;margin-bottom:12px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:right;padding:7px 10px;border-bottom:1px solid #eef2f5;}
+  th:first-child,td:first-child{text-align:left;}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#7a8a96;font-weight:800;}
+  tr.changed td{background:#eef7f0;font-weight:700;color:#1f6b3d;}
+  tr.death td{border-top:2px solid #f4b86a;}
+  .mono{font-variant-numeric:tabular-nums;}
+  .scroll{max-height:460px;overflow:auto;}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="mark">RETIRE<span>BLUEPRINT</span> · Survivor-RMD What-If</div>
+    <div class="tag">internal tool — measures only, changes nothing</div>
+  </div>
+  <div class="wrap">
+    <div class="intro">
+      <b>What this does:</b> it loads your connected sheet and runs the engine <b>twice</b> on the same plan —
+      once the way it works <b>today</b> (a deceased spouse keeps aging and forcing RMDs on their pre-tax money),
+      and once with the <b>survivor-rollover</b> rule (when the first spouse dies, their pre-tax money becomes the
+      survivor's, so RMDs follow the <b>survivor's</b> age and start age). It then shows you the dollar difference,
+      year by year. <b>Nothing here changes your sheet or your live site</b> — it's a measurement only, on a separate
+      engine copy. Run it on <b>your connected sheet</b>.
+    </div>
+    <div class="controls">
+      <button class="btn-gold" onclick="runWhatIf()">&#9654; Run What-If</button>
+      <button class="btn-ghost" onclick="copySummary()">Copy summary</button>
+    </div>
+    <div id="status">Loading…</div>
+    <div id="verdict"></div>
+    <div id="note"></div>
+    <div id="cards"></div>
+    <div id="table"></div>
+  </div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
+var COL_END = 81, COL_RMD = 35, COL_TAX = 43;
+var LAST = null;
+
+function $(id){ return document.getElementById(id); }
+function status(m){ $('status').textContent = m; }
+function fmt(n){ n=Math.round(n||0); return (n<0?'-$':'$')+Math.abs(n).toLocaleString(); }
+function signed(n){ n=Math.round(n||0); return (n>0?'+$':(n<0?'-$':'$'))+Math.abs(n).toLocaleString(); }
+
+function loadSheet(onOk, onErr){
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  var host = location.hostname || '';
+  var isPreview = (location.protocol==='file:' || host==='' || host==='localhost' || host.indexOf('claude.ai')>=0);
+  if(!sheetId){ onErr('No connected sheet found in this browser. Open this on retireblueprintpro.com after the sheet you want is connected — it uses the same saved Sheet ID as your other pages.'); return; }
+  if(isPreview){ onErr('Preview mode — open this on your live site (retireblueprintpro.com) so it can reach the connector.'); return; }
+  var cb = 'rbpWhatIf_' + Date.now(), done = false;
+  var t = setTimeout(function(){ if(!done){ done=true; onErr('Timed out reaching the connector after 90s (the sheet may be mid-recalculation). Try again in a moment.'); } }, 90000);
+  window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); try{ delete window[cb]; }catch(e){} onOk(d); };
+  var s = document.createElement('script'); s.crossOrigin='anonymous';
+  s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now();
+  s.onerror = function(){ if(!done){ done=true; clearTimeout(t); onErr('Network error reaching the connector. Check your connection and retry.'); } };
+  document.head.appendChild(s);
+}
+
+function byYear(rows){ var o={}; rows.forEach(function(row){ var m=row.master||[]; var y=+(m[0]||row.yr); if(y) o[y]=m; }); return o; }
+
+function runWhatIf(){
+  $('verdict').innerHTML=''; $('note').innerHTML=''; $('cards').innerHTML=''; $('table').innerHTML='';
+  if(typeof RBP==='undefined' || !RBP.project || !RBP.buildI){
+    status('Could not find rbp-engine-whatif.js. Make sure that file sits in the same folder as this page in your repo.'); return;
+  }
+  var supportsFlag = /survivorRMD/.test(RBP.project.toString());
+  if(!supportsFlag){ status('The loaded engine does not have the survivor-RMD flag. Make sure rbp-engine-whatif.js is the new copy (not a renamed old engine).'); return; }
+  status('Loading your connected sheet… (first read can take 20–30s)');
+  loadSheet(function(d){
+    var grid = (d.projections && d.projections.masterGrid) || null;
+    var I, base, surv;
+    try { I = RBP.buildI(d); } catch(e){ status('The engine could not build inputs from this sheet: ' + e.message); return; }
+    if(!I){ status('The engine returned no inputs. (If this is not the Craig/Gena couple, the engine may need the partner-name generalization first.)'); return; }
+    try { base = RBP.project(I); } catch(e){ status('Baseline run failed: ' + e.message); return; }
+    try { surv = RBP.project(I, {survivorRMD:true}); } catch(e){ status('Survivor run failed: ' + e.message); return; }
+    if(!base.length || !surv.length){ status('Engine returned no rows.'); return; }
+    render(byYear(base), byYear(surv), grid);
+  }, function(msg){ status(msg); });
+}
+
+function render(baseY, survY, grid){
+  var sheetY = {};
+  if(grid && grid.length){ grid.forEach(function(r){ if(r&&r.length) sheetY[+r[0]] = r; }); }
+  var years = Object.keys(baseY).map(Number).filter(function(y){ return survY[y]; }).sort(function(a,b){ return a-b; });
+  if(!years.length){ status('No overlapping years to compare.'); return; }
+
+  // baseline sanity vs the live sheet (proves the what-if engine's "today" path still matches your sheet)
+  var baseMatch = 0, haveSheet = false;
+  years.forEach(function(y){
+    if(sheetY[y]){ haveSheet = true;
+      var sb=Math.round(+sheetY[y][COL_END]||0), bb=Math.round(+baseY[y][COL_END]||0);
+      baseMatch = Math.max(baseMatch, Math.abs(sb-bb));
+    }
+  });
+
+  var rows=[], firstChange=null, lastYr=years[years.length-1];
+  var sumBaseRMD=0,sumSurvRMD=0,sumBaseTax=0,sumSurvTax=0;
+  years.forEach(function(y){
+    var be=Math.round(+baseY[y][COL_END]||0), se=Math.round(+survY[y][COL_END]||0);
+    var diff=se-be;
+    if(diff!==0 && firstChange===null) firstChange=y;
+    sumBaseRMD += Math.round(+baseY[y][COL_RMD]||0); sumSurvRMD += Math.round(+survY[y][COL_RMD]||0);
+    sumBaseTax += Math.round(+baseY[y][COL_TAX]||0); sumSurvTax += Math.round(+survY[y][COL_TAX]||0);
+    rows.push({yr:y, base:be, surv:se, diff:diff});
+  });
+  var finalDelta = rows[rows.length-1].surv - rows[rows.length-1].base;
+  var rmdDelta = sumSurvRMD - sumBaseRMD;     // negative = less forced out
+  var taxDelta = sumSurvTax - sumBaseTax;     // negative = taxes saved
+
+  // verdict
+  var cls = Math.abs(finalDelta) < 500 ? 'v-flat' : (finalDelta>0 ? 'v-up' : 'v-down');
+  var head = Math.abs(finalDelta) < 500
+    ? 'Survivor-RMD barely moves this plan'
+    : 'Survivor-RMD leaves ' + signed(finalDelta) + ' in the plan by ' + lastYr;
+  var sub = (firstChange ? ('Identical until '+firstChange+' (first death year), then the two paths separate. ') : 'No death occurs inside the projection, so the two paths are identical. ')
+    + 'Over the whole plan it changes forced RMD withdrawals by ' + signed(rmdDelta) + ' and lifetime taxes by ' + signed(taxDelta) + '.';
+  $('verdict').innerHTML = '<div class="verdict '+cls+'"><h2>'+head+'</h2><p>'+sub+'</p></div>';
+
+  // baseline sanity note
+  $('note').innerHTML = '<div class="note"><b>Baseline check:</b> ' + (haveSheet
+      ? ('the what-if engine\u2019s \u201ctoday\u201d run matches your live sheet within ' + fmt(baseMatch) + ' across ' + years.length + ' years, so the comparison is trustworthy.')
+      : ('sheet grid not returned this read \u2014 comparison still valid (engine vs engine), but couldn\u2019t re-confirm against the sheet this time.'))
+    + '</div>';
+
+  // cards
+  $('cards').innerHTML =
+    '<div class="card"><div class="lbl">Final balance change</div><div class="val">'+signed(finalDelta)+'</div><div class="sub">at '+lastYr+' (survivor vs today)</div></div>'
+   +'<div class="card"><div class="lbl">Lifetime taxes</div><div class="val">'+signed(taxDelta)+'</div><div class="sub">'+(taxDelta<0?'saved':'added')+' over the plan</div></div>'
+   +'<div class="card"><div class="lbl">Lifetime forced RMDs</div><div class="val">'+signed(rmdDelta)+'</div><div class="sub">'+(rmdDelta<0?'less':'more')+' pulled from pre-tax</div></div>';
+
+  // per-year table
+  var th='<div class="panel"><h3>Ending balance, year by year — today vs survivor-rollover</h3><div class="scroll"><table>'
+        +'<tr><th>Year</th><th>Today</th><th>Survivor RMD</th><th>Difference</th></tr>';
+  rows.forEach(function(r){
+    var c = r.diff!==0 ? ' class="changed"' : (r.yr===firstChange?' class="death"':'');
+    th += '<tr'+c+'><td class="mono">'+r.yr+'</td><td class="mono">'+fmt(r.base)+'</td><td class="mono">'+fmt(r.surv)+'</td><td class="mono">'+(r.diff?signed(r.diff):'$0')+'</td></tr>';
+  });
+  th += '</table></div></div>';
+  $('table').innerHTML = th;
+
+  status('Done — compared '+years.length+' years on the connected sheet.');
+
+  var L=[];
+  L.push('RBP Survivor-RMD What-If');
+  L.push('Years compared: '+years.length+(firstChange?('   First death year: '+firstChange):'   (no death in projection)'));
+  L.push('Baseline vs live sheet: '+(haveSheet?('matches within '+fmt(baseMatch)):'sheet grid not returned this read'));
+  L.push('Final balance change by '+lastYr+': '+signed(finalDelta));
+  L.push('Lifetime forced RMDs: '+fmt(sumBaseRMD)+' (today) -> '+fmt(sumSurvRMD)+' (survivor) = '+signed(rmdDelta));
+  L.push('Lifetime taxes: '+fmt(sumBaseTax)+' (today) -> '+fmt(sumSurvTax)+' (survivor) = '+signed(taxDelta));
+  L.push('Per-year ending balance where it changes (year: today | survivor | diff):');
+  rows.forEach(function(r){ if(r.diff!==0) L.push('  '+r.yr+': '+fmt(r.base)+' | '+fmt(r.surv)+' | '+signed(r.diff)); });
+  LAST = L.join('\n');
+}
+
+function copySummary(){
+  if(!LAST){ alert('Run the what-if first.'); return; }
+  if(navigator.clipboard){ navigator.clipboard.writeText(LAST).then(function(){ alert('Summary copied — paste it back to Claude.'); }); }
+  else { prompt('Copy this:', LAST); }
+}
+
+if(document.readyState!=='loading') runWhatIf();
+else document.addEventListener('DOMContentLoaded', runWhatIf);
+</script>
+</body>
+</html>
