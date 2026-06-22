@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RetireBlueprint Pro — Engine Parity Check</title>
 <!-- Load the SAME engine your live pages use (cache-busted hourly, like your other pages) -->
-<script>document.write('<scr'+'ipt src="rbp-engine.js?v='+Math.floor(Date.now()/3600000)+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="rbp-engine.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:#f4f7fa;color:#0c2436;line-height:1.55;}
@@ -246,6 +246,11 @@ function compareAndRender(grid, eng){
     var os0=colDiffsAt(onsetAny);
     os0.slice(0,16).forEach(function(r){ lines.push('  '+colName(r.c)+': sheet '+fmt(r.sheet)+' vs engine '+fmt(r.eng)+' = '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
   }
+  try {
+    var _fp = (typeof RBP!=='undefined' && RBP.project) ? RBP.project.toString() : '';
+    lines.push('');
+    lines.push('ENGINE FINGERPRINT: basisFix='+(_fp.indexOf('basisNextR')>=0?'YES':'NO')+'  otherIncomeFix='+(_fp.indexOf('otherFrac')>=0?'YES':'NO'));
+  } catch(e){}
   try {
     var spP = (window.RAWD && window.RAWD.spending) || {};
     lines.push('');
