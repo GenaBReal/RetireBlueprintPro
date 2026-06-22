@@ -69,6 +69,20 @@ function rbpProject(I, opts) {
     if (yr===ye) return mOf(E)/12;
     return 1;
   }
+  // OTHER income window — mirrors the sheet's var_*_Oth EXACTLY, including its quirk that a blank
+  // end date reads as YEAR(blank)=1899, so any plan year is "after" it and the income becomes 0.
+  function otherFrac(yr, S, E) {
+    if (!S) return 0;
+    const ys = yOf(S);
+    if (yr < ys) return 0;
+    if (!E) return 0;                         // blank end date -> 0 (matches the sheet)
+    const ye = yOf(E);
+    if (yr > ye) return 0;
+    if (ys === ye) return (mOf(E)-mOf(S)+1)/12;
+    if (yr === ys) return (13-mOf(S))/12;
+    if (yr === ye) return mOf(E)/12;
+    return 1;
+  }
   const bracketTax = (taxable, brackets) =>
     brackets.reduce((s,b,i)=> s + (taxable>b ? (taxable-b)*TRDiff[i] : 0), 0);
   const xlookupRate = (x, B, R) => { let r=R[0]; for(let i=0;i<B.length;i++){ if(x>=B[i]) r=R[i]; } return r; };
@@ -104,10 +118,10 @@ function rbpProject(I, opts) {
     const gSS = gAlive ? ((!cAlive && craigAge>=60) ? Math.max(gProjSS,cProjSS) : gProjSS) : 0;
     const cSS = cAlive ? ((!gAlive && genaAge>=60)  ? Math.max(cProjSS,gProjSS) : cProjSS) : 0;
     const gPen = gAlive ? I.p1_pension*12*annualFrac(yr, I.p1_penStart, I.p1_penEnd, true) : 0;
-    const gOth = gAlive ? I.p1_other*annualFrac(yr, I.p1_othStart, I.p1_othEnd, false) : 0;
+    const gOth = gAlive ? I.p1_other*otherFrac(yr, I.p1_othStart, I.p1_othEnd) : 0;
     const cSal = cAlive ? I.p2_salary*(!I.p2_salEnd?1:(yr<yOf(I.p2_salEnd)?1:(yr===yOf(I.p2_salEnd)?mOf(I.p2_salEnd)/12:0))) : 0;
     const cPen = cAlive ? I.p2_pension*12*annualFrac(yr, I.p2_penStart, I.p2_penEnd, true) : 0;
-    const cOth = cAlive ? I.p2_other*annualFrac(yr, I.p2_othStart, I.p2_othEnd, false) : 0;
+    const cOth = cAlive ? I.p2_other*otherFrac(yr, I.p2_othStart, I.p2_othEnd) : 0;
     const totalGross = gSal+gSS+gPen+gOth+cSal+cSS+cPen+cOth;
 
     // RMD / conversions off pre-tax
@@ -129,7 +143,7 @@ function rbpProject(I, opts) {
     // filing status / std deduction / SS taxation
     const survMult = !n2 ? 1 : ((gAlive&&cAlive)?1 : ((gAlive||cAlive)? 1-I.survivorReduce : 0));
     const rInf = I.baseLiving*survMult*Math.pow(1+I.inflLiving, idx);
-    const bothAliveFS = (gAlive&&cAlive)||(yr===gDeath)||(yr===cDeath);
+    const bothAliveFS = (gAlive&&cAlive)||(yr===gDeath&&cAlive)||(yr===cDeath&&gAlive);
     const fsRaw = String(I.filingStatus||'').toUpperCase().trim();
     const chosenFS = (fsRaw==='MARRIED FILING SEPARATELY'||fsRaw==='MFS')?'MFS':
                      (fsRaw==='HEAD OF HOUSEHOLD'||fsRaw==='HOH')?'HoH':
@@ -182,7 +196,9 @@ function rbpProject(I, opts) {
     const smile = [ [I.ph1Start,I.ph1End,I.ph1Spend], [I.ph2Start,I.ph2End,I.ph2Spend], [I.ph3Start,I.ph3End,I.ph3Spend] ]
       .reduce((acc,p)=> acc!=null?acc:phYr(p[0],p[1],p[2]), null) || 0;
     const assumeExtra = nameL(I.assumeExtra)==='yes';
-    const chosenExtra = (opts.extraOverride!=null) ? opts.extraOverride(yr, smile) : (assumeExtra?smile:0);
+    const chosenExtra = (opts.extraOverride!=null) ? opts.extraOverride(yr, smile)
+                      : (I.chosenExtraByYear && I.chosenExtraByYear[yr]!=null) ? I.chosenExtraByYear[yr]
+                      : (assumeExtra ? smile : 0);
 
     const targetNet = Math.max(0, gs15(wTotal+chosenExtra+baseTaxes+baseStateTax-totalGross-totalRMD));
 
@@ -424,6 +440,10 @@ function rbpBuildI(R, D) {
     legacyB8:leg.goal, floorB9:leg.safetyFloor,
     crashType:'', crashStart:0, crashDur:0, crashDrag:0, lateCrashType:'', lateStart:0, lateDur:0, lateDrag:0,
     committedExtra:sp.safeExtra,   // the saved plan's safe extra — the red line's spend
+    // Per-year chosen extra (the smile) taken straight from the Sheet's own Master column 31 —
+    // the authoritative pass-through of the user's phase spend, identical across stress scenarios.
+    chosenExtraByYear:(function(){ var m={}; var g=(R.projections&&R.projections.masterGrid)||[];
+      for(var i=0;i<g.length;i++){ var row=g[i]; if(row&&row.length>31){ var y=+row[0]; if(y) m[y]=Math.round(+row[31]||0); } } return m; })(),
     accounts:(R.portfolio.accounts||[]).map(function(a){ return {
       statusA:a.showInCalc, statusG:a.status, type:a.type, name:a.name, owner:a.owner, start:a.balance,
       rate:(a.expectedReturn||0)/100, basis:a.costBasis, contrib:a.contrib||0, match:a.match||0,
