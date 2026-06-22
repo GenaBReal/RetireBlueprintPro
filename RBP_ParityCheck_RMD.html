@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RetireBlueprint Pro — RMD-Change Verification</title>
+<!-- Load the SAME engine your live pages use (cache-busted hourly, like your other pages) -->
+<script>document.write('<scr'+'ipt src="rbp-engine-rmd.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:#f4f7fa;color:#0c2436;line-height:1.55;}
+  .header{background:#051628;border-bottom:3px solid #f4b86a;padding:14px 26px;display:flex;align-items:center;gap:14px;}
+  .header .mark{color:#fff;font-weight:900;font-size:18px;letter-spacing:.3px;}
+  .header .mark span{color:#1CC7D0;}
+  .header .tag{color:#8aa6b6;font-size:12px;font-weight:600;}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 22px 80px;}
+  .intro{background:#fff;border:1px solid #e6ebf0;border-left:4px solid #1CC7D0;border-radius:10px;padding:16px 18px;margin-bottom:18px;font-size:13.5px;color:#33424d;}
+  .intro b{color:#0c2436;}
+  .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+  .controls label{font-size:13px;font-weight:700;color:#41525e;}
+  .controls input[type=number]{width:90px;padding:8px 10px;border:1px solid #cdd6de;border-radius:7px;font-size:14px;font-family:inherit;}
+  button{font-family:inherit;font-weight:800;cursor:pointer;border:none;}
+  .btn-gold{background:linear-gradient(135deg,#f4b86a,#e09a3e);color:#041E2F;font-size:13px;padding:11px 22px;border-radius:9px;box-shadow:0 4px 14px rgba(244,184,106,.3);}
+  .btn-ghost{background:#fff;border:1px solid #cdd6de;color:#41525e;font-size:12px;padding:9px 16px;border-radius:8px;}
+  #status{font-size:13.5px;color:#566576;padding:10px 2px;}
+  .verdict{border-radius:12px;padding:20px 22px;margin:6px 0 20px;color:#fff;}
+  .verdict h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .verdict p{font-size:13.5px;opacity:.95;}
+  .v-pass{background:linear-gradient(135deg,#1f7a44,#2E9C57);}
+  .v-warn{background:linear-gradient(135deg,#b3792f,#d89a3e);}
+  .v-fail{background:linear-gradient(135deg,#9a2b2b,#c54545);}
+  .panel{background:#fff;border:1px solid #e6ebf0;border-radius:12px;padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 2px rgba(12,36,54,.05);}
+  .panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:#0c7b84;margin-bottom:12px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:right;padding:7px 10px;border-bottom:1px solid #eef2f5;}
+  th:first-child,td:first-child{text-align:left;}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#7a8a96;font-weight:800;}
+  tr.over td{background:#fdeced;color:#9a2b2b;font-weight:700;}
+  .mono{font-variant-numeric:tabular-nums;}
+  .scroll{max-height:460px;overflow:auto;}
+  .muted{color:#7a8a96;}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="mark">RETIRE<span>BLUEPRINT</span> · RMD-Change Verification</div>
+    <div class="tag">internal tool — not customer facing</div>
+  </div>
+  <div class="wrap">
+    <div class="intro">
+      <b>What this verifies:</b> drop this next to <b>rbp-engine-rmd.js</b> and open it while a <b>throwaway sheet</b> (one that has the NEW Master!A8 with the survivor-RMD change) is connected. It runs the new engine on that sheet and compares both projections <b>cell by cell</b>. You want <b>PASS within $10</b> — that means the new engine and the new formula agree, so the pair is safe to ship. The fingerprint line should read <b>survivorRMD=YES</b>. Run this ONLY on a throwaway copy — never a real customer sheet.
+    </div>
+    <div class="controls">
+      <label>Pass tolerance $ <input type="number" id="tol" value="10" min="0" step="1"></label>
+      <button class="btn-gold" onclick="runCheck()">&#9654; Run Parity Check</button>
+      <button class="btn-ghost" onclick="copySummary()">Copy summary</button>
+    </div>
+    <div id="status">Loading your sheet…</div>
+    <div id="verdict"></div>
+    <div id="summary"></div>
+    <div id="table"></div>
+  </div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
+
+// Column meanings (from the Master layout your pages map). Unknown columns show as "Col N".
+var COLS = {0:'Year',2:'Craig age',3:'Gena age',14:'Total gross income',19:'Total contributions',
+  20:'Std deduction',23:'Base living',26:'Healthcare',27:'Debt',28:'Total need',29:'Gap',30:'Surplus',
+  31:'Chosen extra',32:'Funding required',35:'Total RMD',38:'Total conversions',39:'Total taxable',
+  40:'Federal taxes',41:'State tax',43:'Total taxes',58:'Monthly withdrawal',72:'Pre-tax total',
+  73:'Roth total',74:'Taxable total',76:'HSA total',81:'Ending liquid balance'};
+function colName(c){ return COLS[c] ? (COLS[c]+' (col '+c+')') : ('Col '+c); }
+
+var LAST = null; // last summary text for copy
+
+function $(id){ return document.getElementById(id); }
+function status(msg){ $('status').textContent = msg; }
+function fmt(n){ n=Math.round(n||0); return (n<0?'-$':'$')+Math.abs(n).toLocaleString(); }
+
+function loadSheet(onOk, onErr){
+  var sheetId = localStorage.getItem('rbp_sheet_id');
+  var host = location.hostname || '';
+  var isPreview = (location.protocol==='file:' || host==='' || host==='localhost' || host.indexOf('claude.ai')>=0);
+  if(!sheetId){ onErr('No connected sheet found in this browser. Open this page on retireblueprintpro.com after your sheet is connected — it reads the same saved Sheet ID as your Stress Test page.'); return; }
+  if(isPreview){ onErr('Preview mode detected — open this on your live site (retireblueprintpro.com) so it can reach the connector.'); return; }
+  var cb = 'rbpParity_' + Date.now(), done = false;
+  var t = setTimeout(function(){ if(!done){ done=true; onErr('Timed out reaching the connector after 90s (the sheet may be mid-recalculation). Try again in a moment.'); } }, 90000);
+  window[cb] = function(d){ if(done) return; done=true; clearTimeout(t); try{ delete window[cb]; }catch(e){} onOk(d); };
+  var s = document.createElement('script'); s.crossOrigin='anonymous';
+  s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now();
+  s.onerror = function(){ if(!done){ done=true; clearTimeout(t); onErr('Network error reaching the connector. Check your connection and retry.'); } };
+  document.head.appendChild(s);
+}
+
+function runCheck(){
+  $('verdict').innerHTML=''; $('summary').innerHTML=''; $('table').innerHTML='';
+  if(typeof RBP==='undefined' || !RBP.project || !RBP.buildI){
+    status('Could not find rbp-engine.js. Make sure this file sits in the same folder as rbp-engine.js in your repo.'); return;
+  }
+  status('Loading your sheet from the connector… (first read can take 20–30s)');
+  loadSheet(function(d){
+    var grid = (d.projections && d.projections.masterGrid) || null;
+    if(!grid || !grid.length){ status('Your sheet loaded, but it returned no master grid to compare against.'); return; }
+    window.RAWD = d;
+    var I, eng;
+    try { I = RBP.buildI(d); } catch(e){ status('The engine could not build its inputs from your sheet: ' + e.message); return; }
+    if(!I){ status('The engine returned no inputs (RBP.buildI gave null). It may expect people keyed “craig”/“gena” — run this on your own sheet.'); return; }
+    try { eng = RBP.project(I); } catch(e){ status('The JS engine threw an error while projecting: ' + e.message); return; }
+    if(!eng || !eng.length){ status('The JS engine returned no rows.'); return; }
+    status('Loaded ' + grid.length + ' sheet years and ' + eng.length + ' engine years. Comparing…');
+    compareAndRender(grid, eng);
+  }, function(msg){ status(msg); });
+}
+
+function compareAndRender(grid, eng){
+  var sheetByYr = {}, engByYr = {};
+  grid.forEach(function(r){ if(r && r.length) sheetByYr[ +r[0] ] = r; });
+  eng.forEach(function(row){ var m = row.master || []; var y = +(m[0] || row.yr); if(y) engByYr[y] = m; });
+  var years = Object.keys(sheetByYr).map(Number).filter(function(y){ return engByYr[y]; }).sort(function(a,b){ return a-b; });
+  if(!years.length){ status('Sheet and engine produced no overlapping years to compare.'); return; }
+
+  var tol = Math.max(0, +($('tol').value) || 10);
+  var worst = { diff:0, yr:null, col:null };
+  var colMax = {};            // col -> {diff, yr}
+  var balRows = [];           // ending-balance per year
+  var balWorst = { diff:0, yr:null };
+
+  years.forEach(function(yr){
+    var sr = sheetByYr[yr], er = engByYr[yr];
+    var n = Math.min(sr.length, er.length);
+    for(var c=0;c<n;c++){
+      var a = Number(sr[c]), b = Number(er[c]);
+      if(!isFinite(a) || !isFinite(b)) continue;       // skip text/blank cells
+      var dlt = Math.abs(Math.round(a) - Math.round(b));
+      if(!colMax[c] || dlt > colMax[c].diff) colMax[c] = { diff:dlt, yr:yr };
+      if(dlt > worst.diff) worst = { diff:dlt, yr:yr, col:c };
+    }
+    var sb = Math.round(Number(sr[81]) || 0), eb = Math.round(Number(er[81]) || 0);
+    var bd = Math.abs(sb - eb);
+    balRows.push({ yr:yr, sheet:sb, eng:eb, diff:bd });
+    if(bd > balWorst.diff) balWorst = { diff:bd, yr:yr };
+  });
+
+  // ── verdict ──
+  var pass = worst.diff <= tol;
+  var cls = pass ? 'v-pass' : (worst.diff <= tol*100 ? 'v-warn' : 'v-fail');
+  var head = pass
+    ? '\u2713 Engine matches your sheet within $' + tol
+    : '\u26A0 Largest gap: ' + fmt(worst.diff);
+  var sub = pass
+    ? 'Across ' + years.length + ' years and every column, the biggest single difference is ' + fmt(worst.diff) + ' (' + colName(worst.col) + ', ' + worst.yr + '). The JS engine is sound to your tolerance.'
+    : 'The biggest single-cell difference is ' + fmt(worst.diff) + ', in ' + colName(worst.col) + ' for ' + worst.yr + '. Ending-balance gap peaks at ' + fmt(balWorst.diff) + ' (' + balWorst.yr + '). Compared across ' + years.length + ' years.';
+  $('verdict').innerHTML = '<div class="verdict '+cls+'"><h2>'+head+'</h2><p>'+sub+'</p></div>';
+
+  // ── worst columns ──
+  var cols = Object.keys(colMax).map(Number).sort(function(a,b){ return colMax[b].diff - colMax[a].diff; }).slice(0,8);
+  var ch = '<div class="panel"><h3>Where the differences live (worst columns)</h3><table><tr><th>Column</th><th>Max difference</th><th>Worst year</th><th>Status</th></tr>';
+  cols.forEach(function(c){
+    var over = colMax[c].diff > tol;
+    ch += '<tr'+(over?' class="over"':'')+'><td>'+colName(c)+'</td><td class="mono">'+fmt(colMax[c].diff)+'</td><td class="mono">'+colMax[c].yr+'</td><td>'+(over?'\u26A0 over':'\u2713 ok')+'</td></tr>';
+  });
+  ch += '</table></div>';
+  $('summary').innerHTML = ch;
+
+  // ── per-year ending balance table ──
+  var th = '<div class="panel"><h3>Ending balance, year by year (col 81)</h3><div class="scroll"><table><tr><th>Year</th><th>Sheet</th><th>Engine</th><th>Difference</th></tr>';
+  balRows.forEach(function(r){
+    var over = r.diff > tol;
+    th += '<tr'+(over?' class="over"':'')+'><td class="mono">'+r.yr+'</td><td class="mono">'+fmt(r.sheet)+'</td><td class="mono">'+fmt(r.eng)+'</td><td class="mono">'+fmt(r.diff)+'</td></tr>';
+  });
+  th += '</table></div></div>';
+  $('table').innerHTML = th;
+
+  // ── ONSET: first year ANY numeric column diverges by more than $1, with that row's full breakdown ──
+  var onsetYr=null, onsetCols=[];
+  for(var yi=0; yi<years.length && !onsetYr; yi++){
+    var Y=years[yi], sr2=sheetByYr[Y], er2=engByYr[Y], n2=Math.min(sr2.length,er2.length), diffs=[];
+    for(var c2=0;c2<n2;c2++){
+      var a2=Number(sr2[c2]), b2=Number(er2[c2]);
+      if(!isFinite(a2)||!isFinite(b2)) continue;
+      var dd=Math.round(a2)-Math.round(b2);
+      if(Math.abs(dd)>1) diffs.push({c:c2, s:Math.round(a2), e:Math.round(b2), d:dd});
+    }
+    if(diffs.length){ onsetYr=Y; onsetCols=diffs; }
+  }
+
+  // ── ONSET: the first year ANY column diverges, with that year's full breakdown ──
+  function colDiffsAt(yr){
+    var sr=sheetByYr[yr], er=engByYr[yr]; if(!sr||!er) return [];
+    var n=Math.min(sr.length,er.length), out=[];
+    for(var c=0;c<n;c++){ var a=Number(sr[c]), b=Number(er[c]); if(!isFinite(a)||!isFinite(b)) continue;
+      var dd=Math.round(a)-Math.round(b); if(Math.abs(dd)>=1) out.push({c:c, sheet:Math.round(a), eng:Math.round(b), diff:dd}); }
+    out.sort(function(x,y){ return Math.abs(y.diff)-Math.abs(x.diff); }); return out;
+  }
+  var onsetAny=null;
+  for(var oi=0; oi<years.length; oi++){ if(colDiffsAt(years[oi]).length){ onsetAny=years[oi]; break; } }
+
+  var oh='<div class="panel"><h3>Onset — the first year anything diverges (the root)</h3>';
+  if(onsetAny){
+    oh += '<p style="font-size:13px;color:#41525e;margin-bottom:10px;">First year any column differs by $1+: <b>'+onsetAny+'</b>. Every differing column that year, worst first — this is where it starts, before compounding takes over.</p>';
+    var r0=colDiffsAt(onsetAny);
+    oh += '<table><tr><th>Column</th><th>Sheet</th><th>Engine</th><th>Diff</th></tr>';
+    r0.slice(0,16).forEach(function(r){ oh += '<tr'+(Math.abs(r.diff)>10?' class="over"':'')+'><td>'+colName(r.c)+'</td><td class="mono">'+fmt(r.sheet)+'</td><td class="mono">'+fmt(r.eng)+'</td><td class="mono">'+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))+'</td></tr>'; });
+    oh += '</table>';
+  } else { oh += '<p style="font-size:13px;color:#1f7a44;">No column ever differs by $1+ — fully matched.</p>'; }
+  oh += '</div>';
+  $('table').innerHTML += oh;
+
+  status('Done — compared ' + years.length + ' years across all columns.');
+
+  // ── on-page onset panel (the root) ──
+  if(onsetYr){
+    var oh='<div class="panel"><h3>First year anything diverges — '+onsetYr+' (the root cause lives here)</h3><table><tr><th>Column</th><th>Sheet</th><th>Engine</th><th>Diff</th></tr>';
+    onsetCols.forEach(function(o){ oh+='<tr class="over"><td>'+colName(o.c)+'</td><td class="mono">'+fmt(o.s)+'</td><td class="mono">'+fmt(o.e)+'</td><td class="mono">'+fmt(o.d)+'</td></tr>'; });
+    oh+='</table></div>';
+    $('summary').innerHTML = oh + $('summary').innerHTML;
+  }
+
+  // build a copyable summary
+  var lines = [];
+  lines.push('RBP Engine Parity Check');
+  lines.push('Tolerance: $'+tol+'   Years compared: '+years.length);
+  lines.push('Largest single-cell gap: '+fmt(worst.diff)+' in '+colName(worst.col)+' ('+worst.yr+')');
+  lines.push('Ending-balance gap peaks at: '+fmt(balWorst.diff)+' ('+balWorst.yr+')');
+  lines.push('Verdict: '+(pass?'PASS within $'+tol:'FAIL — exceeds $'+tol));
+  lines.push('Worst columns:');
+  cols.forEach(function(c){ lines.push('  '+colName(c)+': max '+fmt(colMax[c].diff)+' ('+colMax[c].yr+')'); });
+  if(onsetYr){
+    lines.push('');
+    lines.push('FIRST divergence at year '+onsetYr+' — every column that differs:');
+    onsetCols.forEach(function(o){ lines.push('  '+colName(o.c)+': sheet '+fmt(o.s)+' | engine '+fmt(o.e)+' | diff '+fmt(o.d)); });
+  } else {
+    lines.push('No column diverged by more than $1 in any year.');
+  }
+  lines.push('');
+  lines.push('Ending-balance trace (year: sheet | engine | sheet-minus-engine):');
+  balRows.forEach(function(r){ lines.push('  '+r.yr+': '+fmt(r.sheet)+' | '+fmt(r.eng)+' | '+fmt(r.sheet-r.eng)); });
+  if(onsetAny){
+    lines.push('');
+    lines.push('ONSET — first year anything diverges: '+onsetAny);
+    var os0=colDiffsAt(onsetAny);
+    os0.slice(0,16).forEach(function(r){ lines.push('  '+colName(r.c)+': sheet '+fmt(r.sheet)+' vs engine '+fmt(r.eng)+' = '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
+  }
+  try {
+    var _fp = (typeof RBP!=='undefined' && RBP.project) ? RBP.project.toString() : '';
+    lines.push('');
+    lines.push('ENGINE FINGERPRINT: survivorRMD='+(_fp.indexOf('cRmdAge')>=0?'YES':'NO')+'  basisFix='+(_fp.indexOf('basisNextR')>=0?'YES':'NO')+'  otherIncomeFix='+(_fp.indexOf('otherFrac')>=0?'YES':'NO'));
+  } catch(e){}
+  try {
+    var spP = (window.RAWD && window.RAWD.spending) || {};
+    lines.push('');
+    lines.push('PAYLOAD PEEK — spending object:');
+    lines.push('  '+JSON.stringify(spP));
+    var pk = Object.keys((window.RAWD && window.RAWD.people) || {});
+    pk.forEach(function(k){ var p=window.RAWD.people[k]||{};
+      lines.push('  '+k+': otherIncome='+p.otherIncome+' otherStart='+p.otherStart+' otherEnd='+p.otherEnd); });
+  } catch(e){ lines.push('payload peek failed: '+e.message); }
+  LAST = lines.join('\n');
+}
+
+function copySummary(){
+  if(!LAST){ alert('Run the check first.'); return; }
+  if(navigator.clipboard){ navigator.clipboard.writeText(LAST).then(function(){ alert('Summary copied — paste it back to Claude.'); }); }
+  else { prompt('Copy this:', LAST); }
+}
+
+// auto-run on load
+if(document.readyState!=='loading') runCheck();
+else document.addEventListener('DOMContentLoaded', runCheck);
+</script>
+</body>
+</html>
