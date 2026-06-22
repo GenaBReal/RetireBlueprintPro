@@ -106,6 +106,7 @@ function runCheck(){
   loadSheet(function(d){
     var grid = (d.projections && d.projections.masterGrid) || null;
     if(!grid || !grid.length){ status('Your sheet loaded, but it returned no master grid to compare against.'); return; }
+    window.RAWD = d;
     var I, eng;
     try { I = RBP.buildI(d); } catch(e){ status('The engine could not build its inputs from your sheet: ' + e.message); return; }
     if(!I){ status('The engine returned no inputs (RBP.buildI gave null). It may expect people keyed “craig”/“gena” — run this on your own sheet.'); return; }
@@ -245,6 +246,15 @@ function compareAndRender(grid, eng){
     var os0=colDiffsAt(onsetAny);
     os0.slice(0,16).forEach(function(r){ lines.push('  '+colName(r.c)+': sheet '+fmt(r.sheet)+' vs engine '+fmt(r.eng)+' = '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
   }
+  try {
+    var spP = (window.RAWD && window.RAWD.spending) || {};
+    lines.push('');
+    lines.push('PAYLOAD PEEK — spending object:');
+    lines.push('  '+JSON.stringify(spP));
+    var pk = Object.keys((window.RAWD && window.RAWD.people) || {});
+    pk.forEach(function(k){ var p=window.RAWD.people[k]||{};
+      lines.push('  '+k+': otherIncome='+p.otherIncome+' otherStart='+p.otherStart+' otherEnd='+p.otherEnd); });
+  } catch(e){ lines.push('payload peek failed: '+e.message); }
   LAST = lines.join('\n');
 }
 
