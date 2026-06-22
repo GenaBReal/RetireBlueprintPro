@@ -266,6 +266,7 @@ function rbpProject(I, opts) {
     const basisConsumed = W1*(B1? prevBasis/B1:0);
     const basisAdded = contribAmt.reduce((s,_,i)=> s + ((hier[i]===1)?(contribAmt[i]+matchAmt[i]+reinvArr[i]):0), 0);
     const basisNext = Math.max(0, prevBasis-basisConsumed+basisAdded);
+    const basisNextR = gsR(basisNext);   // sheet stores & carries ROUND(var_TaxBasis_Next,0)
 
     const post = prevBals.map((b,i)=> gsR(b-D[i]+reinvArr[i]+contribAmt[i]+matchAmt[i]));
     const mid  = prevBals.map((b,i)=> gsR((b+post[i])/2));
@@ -296,7 +297,7 @@ function rbpProject(I, opts) {
       D[0],D[1],D[2],D[3],D[4],D[5],D[6],D[7],D[8],D[9],D[10],D[11], (D.reduce((s,v)=>s+v,0))/12,
       ends[0],ends[1],ends[2],ends[3],ends[4],ends[5],ends[6],ends[7],ends[8],ends[9],ends[10],ends[11],
       _startTot, _sm(prevBals,i=>hier[i]===2), _sm(prevBals,i=>hier[i]===3), _sm(prevBals,i=>hier[i]===1),
-      prevBasis, _sm(prevBals,i=>typeL[i].includes('hsa')), _sm(prevBals,i=>typeL[i].includes('529')),
+      basisNextR, _sm(prevBals,i=>typeL[i].includes('hsa')), _sm(prevBals,i=>typeL[i].includes('529')),
       _postTot, _midTot, _endTot-_postTot, _endTot
     ];
 
@@ -309,7 +310,7 @@ function rbpProject(I, opts) {
       liquidEnd: ends.reduce((s,v,i)=> s + (typeL[i].includes('liquid')?v:0), 0),
       basisNext: Math.round(basisNext), master: master
     });
-    prevBals = ends; prevBasis = basisNext;
+    prevBals = ends; prevBasis = basisNextR;
   }
   return rows;
 }
