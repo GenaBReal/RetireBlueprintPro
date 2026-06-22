@@ -129,8 +129,15 @@ function rbpProject(I, opts) {
     const gPreMask = owner.map((o,i)=> (o===2 && hier[i]===2)?1:0);
     const c401 = sp(prevBals, cPreMask), g401 = sp(prevBals, gPreMask);
     const rmdDiv = (age)=> { const a=Math.min(age,120); let div=0; for(let i=0;i<I.rmdAge.length;i++){ if(a>=I.rmdAge[i]) div=I.rmdDiv[i]; } return div; };
-    const rmdC = craigAge>=I.rmdStartC ? (rmdDiv(craigAge)? c401/rmdDiv(craigAge):0) : 0;
-    const rmdG = genaAge >=I.rmdStartG ? (rmdDiv(genaAge)?  g401/rmdDiv(genaAge):0) : 0;
+    // SURVIVOR ROLLOVER: once an owner has died, their pre-tax money is the surviving spouse's,
+    // so its RMD follows the SURVIVOR's age and RMD-start age (not the deceased's continuing age).
+    // Per-account pre-tax balances (c401/g401) are unchanged. Must stay in lockstep with Master!A8.
+    const cRmdAge   = (yr>gDeath && cAlive) ? genaAge     : craigAge;   // Craig's pre-tax bucket
+    const cRmdStart = (yr>gDeath && cAlive) ? I.rmdStartG : I.rmdStartC;
+    const gRmdAge   = (yr>cDeath && gAlive) ? craigAge    : genaAge;    // Gena's pre-tax bucket
+    const gRmdStart = (yr>cDeath && gAlive) ? I.rmdStartC : I.rmdStartG;
+    const rmdC = cRmdAge>=cRmdStart ? (rmdDiv(cRmdAge)? c401/rmdDiv(cRmdAge):0) : 0;
+    const rmdG = gRmdAge>=gRmdStart ? (rmdDiv(gRmdAge)? g401/rmdDiv(gRmdAge):0) : 0;
     const totalRMD = rmdC+rmdG;
     const convCreq = (I.convTable[yr]?.c)||0, convGreq = (I.convTable[yr]?.g)||0;
     const convC = Math.max(0, Math.min(convCreq, c401-rmdC));
