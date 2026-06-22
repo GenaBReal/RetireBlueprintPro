@@ -2279,61 +2279,47 @@ function _rbpSweepRender(results, p1Planned, legacyGoal, pfx) {
 
 
 // ══════════════════════════════════════════════════════
-// REAL SWEEP — calls the live connector for each crash
-// level and returns 100% accurate safeExtra values.
-// Same accuracy as clicking "Run New Test" manually.
+// REAL SWEEP — runs all 8 crash levels through the in-browser
+// engine (rbp-engine.js / RBP.runStress, reusing window.RBP_I).
+// Instant, no sheet round-trip, no connector redeploy. Each row's
+// amount is the crash-re-solved safe extra (RBP.runStress .safeExtra).
 // ══════════════════════════════════════════════════════
 function rbpRealSweep() {
   if (!planData) { alert('Load your plan data first (Reload Data above).'); return; }
+  // The in-browser engine (rbp-engine.js) must be loaded and the plan compiled into RBP_I.
+  // If not, say so plainly — never show a browser estimate dressed up as a real result.
+  if (typeof RBP === 'undefined' || !RBP.runStress || !window.RBP_I) {
+    var _ph0 = document.getElementById('sweep-placeholder');
+    if (_ph0) { _ph0.style.display = 'block'; _ph0.style.color = '#ff8c8c';
+      _ph0.innerHTML = '\u26a0\ufe0f The calculation engine isn\u2019t ready yet \u2014 hit <strong>Reload</strong> at the top of the page, then press \u201cSweep All Scenarios\u201d again.'; }
+    return;
+  }
   window._rbpSweepRan = true;   // real results now own the grid; don't let a refresh blank them
 
+  var I    = window.RBP_I;
   var proj = planData.projections || {};
-  var gl   = planData.global      || {};
   var leg  = planData.legacy      || {};
-  var port = planData.portfolio   || {};
 
-  var startYr  = (proj.years && proj.years.length) ? proj.years[0] : new Date().getFullYear();
-  var inf      = ((+gl.inflation) || 0.025) * 100;
-  var legGoal  = (+leg.goal) || 0;
-  var meanRet  = rbpPortfolioStats(port).meanReturn;
-  var withdrawals = proj.withdrawals || [];
-  var byYear   = proj.byYear || [];
-  var yrsLen   = withdrawals.length || 38;
+  var startYr = (proj.years && proj.years.length) ? proj.years[0] : new Date().getFullYear();
+  var legGoal = (+leg.goal) || 0;
 
-  // ── Local binary search for amounts (connector can't recompute safeExtra per crash) ──
-  var floorW = [], p1Amt = 0;
-  for (var _i = 0; _i < yrsLen; _i++) {
+  // The committed plan's safe extra IS the red line, and the "below goal" (crossover) year is
+  // read off that line. committedExtra is the saved safe-extra the page already runs on.
+  var plannedExtra = (I && I.committedExtra != null) ? I.committedExtra : 0;
+
+  // p1Amt = the saved Phase-1 chosen extra — only used by the renderer's "Your Plan" column.
+  var byYear = proj.byYear || [];
+  var p1Amt = 0;
+  for (var _i = 0; _i < byYear.length; _i++) {
     var _cx = (byYear[_i] && (+byYear[_i].chosenExtra)) || 0;
-    floorW.push(Math.max(0, (+withdrawals[_i]||0) - _cx));
-    if (_cx > 0 && p1Amt === 0) p1Amt = _cx;
-  }
-  var phaseMult = byYear.map(function(y){ var c=(y&&+y.chosenExtra)||0; return (p1Amt>0)?c/p1Amt:0; });
-  var hasPhase = phaseMult.some(function(m){ return m > 0; });
-  if (!hasPhase) phaseMult = phaseMult.map(function(){ return 1; });
-
-  function localProjectEnd(yr1Ret, p1x) {
-    var b = (planData.portfolio||{}).total || 0;
-    for (var i = 1; i < floorW.length; i++) {
-      var r = (i===1) ? yr1Ret : meanRet;
-      var h = Math.sqrt(Math.max(0.1, 1 + r));
-      b = Math.max(0, b * h - (floorW[i] + p1x * (phaseMult[i]||0)));
-      b = Math.max(0, b * h);
-      if (b <= 0) return 0;
-    }
-    return b;
-  }
-  function localSafeP1(yr1Ret) {
-    var lo = 0, hi = 400000, best = 0;
-    for (var it = 0; it < 30; it++) {
-      var m = (lo + hi) / 2;
-      if (localProjectEnd(yr1Ret, m) >= legGoal) { best = m; lo = m; } else { hi = m; }
-    }
-    return Math.round(best / 500) * 500;
+    if (_cx > 0) { p1Amt = _cx; break; }
   }
 
   // ── 8 crash scenarios ────────────────────────────────────────────────────────
-  // All go through connector (no local-only shortcuts) for consistent tax treatment.
-  // drag = Math.round(7 - yr1): yr1=+10 → drag=-3, yr1=0 → drag=7, yr1=-30 → drag=37
+  // drag (points) = Math.round(7 - yr1):  yr1=+10 -> -3,  yr1=0 -> 7,  yr1=-30 -> 37.
+  // The in-browser engine subtracts crashDrag straight off the growth RATE (a decimal),
+  // so the points value must be passed as drag/100 (e.g. 37 points -> 0.37). This is the
+  // divide-by-100 fix: passing whole points blew the endings up to +$37M / -$349M.
   var sweepScens = [
     { label: '+10%  (great year)', yr1:  10, cat: 'great', drag: -3, dur: 1 },
     { label: ' +5%  (good year)',  yr1:   5, cat: 'good',  drag:  2, dur: 1 },
@@ -2345,113 +2331,65 @@ function rbpRealSweep() {
     { label: '-50%  (crash)',      yr1: -50, cat: 'bad',   drag: 57, dur: 1 },
   ];
 
-  // Pre-compute local safeExtra amounts for all scenarios (shown instantly while connector runs)
-  var results = sweepScens.map(function(s) {
-    return {
-      label: s.label, cat: s.cat,
-      safe: null,   // blank until the REAL engine number arrives for this scenario
-      fullDepl: null, floorDepl: null,
-      _done: false, _drag: s.drag, _dur: s.dur, _yr1: s.yr1 / 100
-    };
-  });
-
-  // ── UI setup ───────────────────────────────────────────────────────────────
-  var toRun  = results.length;  // all 8 scenarios call the connector, one at a time
-  var progEl = document.getElementById('sweep-real-progress');
-  var progN  = document.getElementById('sweep-prog-n');
-  var progT  = document.getElementById('sweep-prog-total');
-  var progBar= document.getElementById('sweep-prog-bar');
-
   var runBtn = document.getElementById('sweep-real-btn');
-  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running\u2026 1 of ' + toRun + ' (~25s each)'; }
-  if (progEl) progEl.style.display = 'block';
-  if (progT)  progT.textContent = String(toRun);
+  var progEl = document.getElementById('sweep-real-progress');
+  if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running\u2026'; }
 
-  // Each scenario is a REAL sheet round-trip now (~20\u201330s each), so warn up front
-  // with a rough total and tell the user rows fill in as each one finishes.
-  var _estMin = Math.max(1, Math.round(toRun * 25 / 60));
-  var _swNote = document.getElementById('sweep-placeholder');
-  if (_swNote) {
-    _swNote.style.display = 'block';
-    _swNote.style.color = '#e09a3e';
-    _swNote.innerHTML = '\u23f3 <strong>Each scenario runs live on your sheet (~20\u201330 seconds each)</strong>, so all '
-      + toRun + ' take about ' + _estMin + '\u2013' + (_estMin + 1) + ' minutes total. The rows below fill in as each one finishes \u2014 '
-      + 'you can watch them populate, and you don\u2019t have to stay on this screen.';
-  }
-
-  // Show local estimates immediately, so all 8 rows are visible right away.
-  // Each row is then overwritten with the real engine number as its scenario returns.
-  function reRender() {
-    _rbpSweepRender(results.map(function(r){
-      return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl, safeBase:r.safeBase };
-    }), p1Amt, legGoal);
-  }
-  reRender();
-
-  var realCount = 0;   // how many scenarios came back from the real engine
-  var failCount = 0;   // how many couldn't be reached (kept as estimate)
-  var firstErr  = null; // capture the first failure reason so we stop guessing
-
-  // ── Sequential per-scenario calls ──
-  // Each scenario runs through the SHEET (the connector's stress engine) — a real
-  // round-trip (~20\u201330s each), accurate, not a browser estimate. Kept sequential so
-  // rows render in order; if one errors, the rest still complete.
-  function runNext(i) {
-    if (i >= results.length) { finish(); return; }
-
-    if (progN)   progN.textContent = String(i + 1);
-    if (progBar) progBar.style.width = Math.round(i / results.length * 100) + '%';
-    if (runBtn)  runBtn.textContent = 'Running\u2026 ' + (i + 1) + ' of ' + toRun + ' (~25s each)';
-
-    rbpRunStressLocal({ action:'runSweepOne', idx:i, drag:results[i]._drag, dur:Math.max(1,results[i]._dur||1), startYr:startYr, infl:inf }, function(resp) {
-      if (resp && resp.ok) {
-        if (resp.safeExtra != null) results[i].safe = +resp.safeExtra;
-        results[i].fullDepl = resp.belowYear || null;
-        results[i].safeBase = (resp.safeExtraBase != null) ? (+resp.safeExtraBase) : null;
-        results[i]._real = true;
-        realCount++;
-      } else {
-        failCount++;   // keep the local estimate already in results[i].safe
-        if (firstErr == null) firstErr = (resp && resp.error) ? String(resp.error) : 'connector returned no data';
-      }
-      if (progBar) progBar.style.width = Math.round((i + 1) / results.length * 100) + '%';
-      reRender();
-      runNext(i + 1);
-    }, function(err) {
-      failCount++;     // unreachable — keep the estimate and continue
-      if (firstErr == null) firstErr = err ? String(err) : 'could not reach the connector';
-      if (progBar) progBar.style.width = Math.round((i + 1) / results.length * 100) + '%';
-      reRender();
-      runNext(i + 1);
-    });
-  }
-
-  function finish() {
+  // ── Run every scenario in the browser (instant; no sheet round-trip) ──
+  var results = [], realCount = 0, firstErr = null;
+  for (var s = 0; s < sweepScens.length; s++) {
+    var sc = sweepScens[s];
+    var row = { label: sc.label, cat: sc.cat, safe: null, fullDepl: null, floorDepl: null,
+                safeBase: null, _drag: sc.drag, _dur: sc.dur, _yr1: sc.yr1 / 100, _real: false };
     try {
-      var _swP={ ts:Date.now(), goal:legGoal, p1Amt:p1Amt, realCount:realCount, rows:results.map(function(r){ return { label:r.label, drag:r._drag, yr1:r._yr1, safe:r.safe, belowYear:r.fullDepl||null, real:!!r._real }; }) };
-      esJsonp({ action:'saveSweep', enc:'b64', data:btoa(unescape(encodeURIComponent(JSON.stringify(_swP)))) }, function(){}, function(){});
-    } catch(e){}
-    if (progEl) progEl.style.display = 'none';
-    if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Sweep All Scenarios'; }
-    reRender();
-    var note = document.getElementById('sweep-placeholder');
-    if (note) {
-      note.style.display = 'block';
-      if (failCount === 0) {
-        note.style.color = '#1CC7D0';
-        note.innerHTML = '\u2705 <strong>All ' + realCount + ' scenarios ran live</strong> against your real plan data. '
-          + 'Each amount is the most Phase\u20111 extra you could safely spend and still hit your legacy goal if that crash hit in year 1 \u2014 '
-          + 'taxes, RMDs, and Social Security timing all reflected. The deeper the crash, the less you can safely spend.';
-      } else {
-        note.style.color = '#f4b86a';
-        note.innerHTML = '\u26a0\ufe0f <strong>' + realCount + ' of ' + toRun + ' scenarios ran live;</strong> ' + failCount
-          + ' couldn\u2019t be reached and still show a quick estimate (italic). Hit \u201cSweep All Scenarios\u201d again to retry the ones that timed out.'
-          + (firstErr ? '<div style="margin-top:8px;font-size:11px;color:#ff9b9b;font-family:monospace;word-break:break-word;">Engine said: ' + firstErr + '</div>' : '');
-      }
+      var res = RBP.runStress(I, {
+        drag:  sc.drag / 100,            // points -> decimal (the divide-by-100 fix)
+        dur:   Math.max(1, sc.dur || 1),
+        start: startYr,
+        plannedExtra: plannedExtra       // committed plan = the red line the "below goal" year is read from
+        // inflation omitted on purpose: the engine uses the plan's own saved inflation (already baked into I)
+      });
+      // safe = the crash-RE-SOLVED safe extra (RBP.runStress's .safeExtra), NOT the flat base.
+      row.safe     = (res && res.safeExtra    != null) ? Math.round(res.safeExtra)     : null;
+      row.fullDepl = (res && res.crossover)                ? res.crossover             : null;   // first year the plan dips below the legacy goal
+      row.safeBase = (res && res.safeExtraBase!= null) ? Math.round(res.safeExtraBase) : null;
+      row._real    = true;
+      realCount++;
+    } catch (e) {
+      if (firstErr == null) firstErr = (e && e.message) ? e.message : String(e);
+    }
+    results.push(row);
+  }
+
+  // ── Render once (every row is a real engine number) ──
+  _rbpSweepRender(results.map(function(r){
+    return { label:r.label, cat:r.cat, safe:r.safe, fullDepl:r.fullDepl, floorDepl:r.floorDepl, safeBase:r.safeBase };
+  }), p1Amt, legGoal);
+
+  // ── Persist the sweep to the customer's sheet (single fast save, fire-and-forget) ──
+  try {
+    var _swP = { ts:Date.now(), goal:legGoal, p1Amt:p1Amt, realCount:realCount,
+      rows: results.map(function(r){ return { label:r.label, drag:r._drag, yr1:r._yr1, safe:r.safe, belowYear:r.fullDepl||null, real:!!r._real }; }) };
+    esJsonp({ action:'saveSweep', enc:'b64', data:btoa(unescape(encodeURIComponent(JSON.stringify(_swP)))) }, function(){}, function(){});
+  } catch(e){}
+
+  // ── UI finish ──
+  if (progEl) progEl.style.display = 'none';
+  if (runBtn) { runBtn.disabled = false; runBtn.textContent = '\u25B6 Sweep All Scenarios'; }
+  var note = document.getElementById('sweep-placeholder');
+  if (note) {
+    note.style.display = 'block';
+    if (firstErr == null && realCount === sweepScens.length) {
+      note.style.color = '#1CC7D0';
+      note.innerHTML = '\u2705 <strong>All ' + realCount + ' scenarios ran instantly</strong> on your own computer, against your real plan data. '
+        + 'Each amount is the most Phase\u20111 extra you could safely spend and still hit your legacy goal if that crash hit in year 1 \u2014 '
+        + 'taxes, RMDs, and Social Security timing all reflected. The deeper the crash, the less you can safely spend.';
+    } else {
+      note.style.color = '#f4b86a';
+      note.innerHTML = '\u26a0\ufe0f <strong>' + realCount + ' of ' + sweepScens.length + ' scenarios completed.</strong> '
+        + (firstErr ? '<div style="margin-top:8px;font-size:11px;color:#ff9b9b;font-family:monospace;word-break:break-word;">Engine said: ' + firstErr + '</div>' : '');
     }
   }
-
-  runNext(0);
 }
 
 function mcPercentile(arr, p) {
