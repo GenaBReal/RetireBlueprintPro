@@ -175,7 +175,50 @@ function compareAndRender(grid, eng){
   th += '</table></div></div>';
   $('table').innerHTML = th;
 
+  // ── ONSET: first year ANY numeric column diverges by more than $1, with that row's full breakdown ──
+  var onsetYr=null, onsetCols=[];
+  for(var yi=0; yi<years.length && !onsetYr; yi++){
+    var Y=years[yi], sr2=sheetByYr[Y], er2=engByYr[Y], n2=Math.min(sr2.length,er2.length), diffs=[];
+    for(var c2=0;c2<n2;c2++){
+      var a2=Number(sr2[c2]), b2=Number(er2[c2]);
+      if(!isFinite(a2)||!isFinite(b2)) continue;
+      var dd=Math.round(a2)-Math.round(b2);
+      if(Math.abs(dd)>1) diffs.push({c:c2, s:Math.round(a2), e:Math.round(b2), d:dd});
+    }
+    if(diffs.length){ onsetYr=Y; onsetCols=diffs; }
+  }
+
+  // ── ONSET: the first year ANY column diverges, with that year's full breakdown ──
+  function colDiffsAt(yr){
+    var sr=sheetByYr[yr], er=engByYr[yr]; if(!sr||!er) return [];
+    var n=Math.min(sr.length,er.length), out=[];
+    for(var c=0;c<n;c++){ var a=Number(sr[c]), b=Number(er[c]); if(!isFinite(a)||!isFinite(b)) continue;
+      var dd=Math.round(a)-Math.round(b); if(Math.abs(dd)>=1) out.push({c:c, sheet:Math.round(a), eng:Math.round(b), diff:dd}); }
+    out.sort(function(x,y){ return Math.abs(y.diff)-Math.abs(x.diff); }); return out;
+  }
+  var onsetAny=null;
+  for(var oi=0; oi<years.length; oi++){ if(colDiffsAt(years[oi]).length){ onsetAny=years[oi]; break; } }
+
+  var oh='<div class="panel"><h3>Onset — the first year anything diverges (the root)</h3>';
+  if(onsetAny){
+    oh += '<p style="font-size:13px;color:#41525e;margin-bottom:10px;">First year any column differs by $1+: <b>'+onsetAny+'</b>. Every differing column that year, worst first — this is where it starts, before compounding takes over.</p>';
+    var r0=colDiffsAt(onsetAny);
+    oh += '<table><tr><th>Column</th><th>Sheet</th><th>Engine</th><th>Diff</th></tr>';
+    r0.slice(0,16).forEach(function(r){ oh += '<tr'+(Math.abs(r.diff)>10?' class="over"':'')+'><td>'+colName(r.c)+'</td><td class="mono">'+fmt(r.sheet)+'</td><td class="mono">'+fmt(r.eng)+'</td><td class="mono">'+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))+'</td></tr>'; });
+    oh += '</table>';
+  } else { oh += '<p style="font-size:13px;color:#1f7a44;">No column ever differs by $1+ — fully matched.</p>'; }
+  oh += '</div>';
+  $('table').innerHTML += oh;
+
   status('Done — compared ' + years.length + ' years across all columns.');
+
+  // ── on-page onset panel (the root) ──
+  if(onsetYr){
+    var oh='<div class="panel"><h3>First year anything diverges — '+onsetYr+' (the root cause lives here)</h3><table><tr><th>Column</th><th>Sheet</th><th>Engine</th><th>Diff</th></tr>';
+    onsetCols.forEach(function(o){ oh+='<tr class="over"><td>'+colName(o.c)+'</td><td class="mono">'+fmt(o.s)+'</td><td class="mono">'+fmt(o.e)+'</td><td class="mono">'+fmt(o.d)+'</td></tr>'; });
+    oh+='</table></div>';
+    $('summary').innerHTML = oh + $('summary').innerHTML;
+  }
 
   // build a copyable summary
   var lines = [];
@@ -186,6 +229,22 @@ function compareAndRender(grid, eng){
   lines.push('Verdict: '+(pass?'PASS within $'+tol:'FAIL — exceeds $'+tol));
   lines.push('Worst columns:');
   cols.forEach(function(c){ lines.push('  '+colName(c)+': max '+fmt(colMax[c].diff)+' ('+colMax[c].yr+')'); });
+  if(onsetYr){
+    lines.push('');
+    lines.push('FIRST divergence at year '+onsetYr+' — every column that differs:');
+    onsetCols.forEach(function(o){ lines.push('  '+colName(o.c)+': sheet '+fmt(o.s)+' | engine '+fmt(o.e)+' | diff '+fmt(o.d)); });
+  } else {
+    lines.push('No column diverged by more than $1 in any year.');
+  }
+  lines.push('');
+  lines.push('Ending-balance trace (year: sheet | engine | sheet-minus-engine):');
+  balRows.forEach(function(r){ lines.push('  '+r.yr+': '+fmt(r.sheet)+' | '+fmt(r.eng)+' | '+fmt(r.sheet-r.eng)); });
+  if(onsetAny){
+    lines.push('');
+    lines.push('ONSET — first year anything diverges: '+onsetAny);
+    var os0=colDiffsAt(onsetAny);
+    os0.slice(0,16).forEach(function(r){ lines.push('  '+colName(r.c)+': sheet '+fmt(r.sheet)+' vs engine '+fmt(r.eng)+' = '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
+  }
   LAST = lines.join('\n');
 }
 
