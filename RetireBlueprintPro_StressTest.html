@@ -3529,18 +3529,26 @@ function rbpRunMonteCarlo(d,opts){
     $('t-p10').style.color = res.p10<=0?'var(--bad)':'var(--warn)';
 
     $('results').style.display='block';
-    // transparency: show the withdrawal rate the simulation actually used (the main driver)
+    // transparency: show the withdrawal the simulation actually used across retirement, not just year 1
     try{
       var startPF=(d&&d.portfolio&&d.portfolio.total)||(res.yearlyBals[0]&&res.yearlyBals[0][0])||0;
-      var proj=(d&&d.projections)||{}, wd0=0;
-      if(proj.withdrawals&&proj.withdrawals.length){ for(var wi=0;wi<proj.withdrawals.length;wi++){ if((+proj.withdrawals[wi])>0){ wd0=+proj.withdrawals[wi]; break; } } }
+      var proj=(d&&d.projections)||{}, wds=proj.withdrawals||[], yearsArr=proj.years||[];
+      var wd0=0, wd0y='', wdMax=0, wdMaxy='', peakRate=0;
+      var el=proj.endLiquid||[];
+      for(var wi=0;wi<wds.length;wi++){ var w=+wds[wi]||0;
+        if(w>0 && wd0===0){ wd0=w; wd0y=yearsArr[wi]||''; }
+        if(w>wdMax){ wdMax=w; wdMaxy=yearsArr[wi]||''; }
+        var b=+el[wi]||0; if(w>0 && b>0){ var rr=w/b; if(rr>peakRate && rr<1) peakRate=rr; }
+      }
       var A=$('r-assumed');
-      if(startPF>0 && wd0>0){
-        var wr=wd0/startPF, wrTxt=(wr*100).toFixed(1)+'%';
-        var flag = wr>=0.055 ? ' That is a high rate \u2014 the main reason the result is this fragile. Lowering spending (or the early-year draws before Social Security starts) is what moves this number most.' :
-                   wr>=0.045 ? ' That is on the higher side, which is why sequence risk shows up here.' :
-                   ' That is a sustainable rate.';
-        A.innerHTML='<b>What the simulation used:</b> a starting portfolio of about <b>'+fmt(startPF)+'</b> and a first-year withdrawal of about <b>'+fmt(wd0)+'</b> \u2014 a <b>'+wrTxt+'</b> withdrawal rate.'+flag;
+      if(startPF>0 && wdMax>0){
+        var peakPctStart=(wdMax/startPF*100);
+        var rateTxt = peakRate>0 ? (peakRate*100).toFixed(1)+'%' : peakPctStart.toFixed(1)+'%';
+        var driver = peakRate>=0.055 ? ' That peak rate is high \u2014 the main reason the plan runs short in so many futures.' :
+                     peakRate>=0.045 ? ' That is on the higher side, which is where the sequence risk comes from.' :
+                     ' The risk here comes mostly from the heaviest-spending years landing in a bad market early.';
+        A.innerHTML='<b>What the simulation used:</b> withdrawals start around <b>'+fmt(wd0)+'</b>'+(wd0y?' ('+wd0y+')':'')+
+          ' and climb to about <b>'+fmt(wdMax)+'/yr</b>'+(wdMaxy?' by '+wdMaxy:'')+'. At their peak that is roughly a <b>'+rateTxt+'</b> withdrawal rate on the balance at the time.'+driver;
         A.style.display='';
       } else { A.style.display='none'; }
     }catch(e){ var A2=$('r-assumed'); if(A2) A2.style.display='none'; }
