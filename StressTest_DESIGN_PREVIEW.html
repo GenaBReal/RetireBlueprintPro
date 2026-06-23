@@ -39,6 +39,9 @@
   .preset{font-size:11px;padding:6px 10px;border-radius:5px;background:#F1F4F6;border:1px solid var(--border);
     color:var(--body);cursor:pointer;user-select:none;font-weight:600}
   .preset.on{border-color:var(--teal);color:var(--navy);background:#e6f8f9}
+  .howto{background:#e9f7f8;border:1px solid #bfe7ea;border-left:4px solid var(--teal);border-radius:10px;padding:13px 16px;margin:0 0 16px;font-size:13.5px;line-height:1.55;color:#1f3340}
+  .howto .hn{margin-top:6px;color:#46606e;font-size:12.5px}
+  .howto b.tl{color:#16AEB6} .howto b.cl{color:#E8745E}
 
   .sg{margin:13px 0}
   .sl-lab{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px}
@@ -112,12 +115,17 @@
 <div class="shell">
   <div id="loading" style="padding:48px 16px;text-align:center;color:#5F6368;font-size:13px">Loading your saved plan\u2026<br><span style="font-size:11px;color:#90A4AE">If this stays, hit <b>Reload</b> at the top of the page.</span></div>
   <div id="t1body" style="display:none">
-  <div class="hero"><div class="tg">Test 1 · Crash Test</div><h1>Dial in a downturn — see it the same second</h1><div class="sub" id="heroSub">your saved plan<br>real engine · instant</div></div>
+  <div class="hero"><div class="tg">Test 1 · Crash Test</div><h1>What a crash does to your plan</h1><div class="sub" id="heroSub">your saved plan<br>real engine · instant</div></div>
+
+  <div class="howto">
+    <div><b>How to read this:</b> the <b class="tl">teal line</b> is your plan exactly as it stands. The <b class="cl">coral line</b> is that same plan after a market crash.</div>
+    <div class="hn">Showing <b id="howNow">a 2008-style crash the year you retire</b>. Tap a different crash below to switch it — or drag a slider to build your own.</div>
+  </div>
 
   <div class="grid">
     <!-- LEFT -->
     <div class="card">
-      <div class="seclbl">Scenario parameters</div>
+      <div class="seclbl">Pick a crash to test</div>
       <div class="presets" id="presets">
         <div class="preset on" data-p="custom">Custom</div>
         <div class="preset" data-p="c2008">2008</div>
@@ -963,6 +971,11 @@ function rbpRunMonteCarlo(d,opts){
       g.fillText('\u25BC over by $'+Math.round(worst/1000)+'K/yr by '+worstYr, padL+4, padT+2);}
   }
   function recompute(){
+    (function(){var h=$('howNow'); if(h){var y=Math.round(+$('yr1').value),n=+$('yrs').value,ds=(y<0?'\u2212'+Math.abs(y):'+'+y)+'%',lab;
+      if(y>=12)lab='a strong bull market ('+ds+')';
+      else if(y>=0)lab='a flat, low-return market ('+ds+')';
+      else lab='a '+ds+' crash'+(n>1?(' lasting '+n+' years'):' the year you retire');
+      h.textContent=lab;}})();
     $('v-yr1').textContent=(+$('yr1').value>0?'+':'')+$('yr1').value+'%';
     $('v-yrs').textContent=$('yrs').value+(+$('yrs').value>1?' yrs':' yr');
     $('v-inf').textContent=(+$('inf').value).toFixed(1)+'%';
@@ -1005,7 +1018,7 @@ function rbpRunMonteCarlo(d,opts){
   }
   function paintGoal(){var g=I.legacyB8*(+$('goal').value)/100;$('goalVal').textContent=fmtM(g);var r=RBP.runStress(I,knobs(COMMITTED,g));$('safeAtGoal').textContent=fmtK(r.safeExtra)+'/yr';}
 
-  var PRE={custom:{yr1:0,yrs:1,inf:2.5,cola:2.5,spend:0},c2008:{yr1:-37,yrs:2,inf:2,cola:2.5,spend:0},dotcom:{yr1:-25,yrs:3,inf:2.5,cola:2.5,spend:0},covid:{yr1:-20,yrs:1,inf:3,cola:2.5,spend:0},stag:{yr1:-15,yrs:4,inf:8,cola:4,spend:0},bull:{yr1:18,yrs:1,inf:2.5,cola:2.5,spend:0}};
+  var PRE={custom:{yr1:0,yrs:1,inf:2.5,cola:2.5,spend:0},c2008:{yr1:-37,yrs:1,inf:2.5,cola:2.5,spend:0},dotcom:{yr1:-25,yrs:3,inf:2.5,cola:2.5,spend:0},covid:{yr1:-20,yrs:1,inf:3,cola:2.5,spend:0},stag:{yr1:-15,yrs:4,inf:8,cola:4,spend:0},bull:{yr1:18,yrs:1,inf:2.5,cola:2.5,spend:0}};
   document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});b.classList.add('on');var p=PRE[b.dataset.p];$('yr1').value=p.yr1;$('yrs').value=p.yrs;$('inf').value=p.inf;$('cola').value=p.cola;$('spendadj').value=p.spend;$('lateSw').classList.remove('on');$('lateBody').classList.add('hide');recompute();});});
   function mark(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});document.querySelector('[data-p=custom]').classList.add('on');}
   ['yr1','yrs','inf','cola','spendadj','lt-ret','lt-yrs'].forEach(function(id){$(id).addEventListener('input',function(){mark();recompute();});});
@@ -1025,9 +1038,11 @@ function rbpRunMonteCarlo(d,opts){
     var smax=Math.max(80, Math.round((baseR.safeExtra||0)/1000*1.6)); $('spend').max=smax;
     $('spendScale').innerHTML='<span>$0</span><span>$'+Math.round(smax/2)+'K</span><span>$'+smax+'K</span>';
     $('goalScale').innerHTML='<span>'+fmtM(I.legacyB8*0.5)+'</span><span>'+fmtM(I.legacyB8)+'</span><span>'+fmtM(I.legacyB8*1.5)+'</span>';
-    $('yr1').value=Math.round(REP);
+    $('yr1').value=-37; $('yrs').value=1; $('spendadj').value=0;
     $('inf').value=Math.max(1,Math.min(10,(I.inflLiving!=null?I.inflLiving:0.025)*100)).toFixed(1);
     $('cola').value=Math.max(0,Math.min(5,(I.inflSS!=null?I.inflSS:0.025)*100)).toFixed(1);
+    document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});
+    var _b08=document.querySelector('[data-p=c2008]'); if(_b08) _b08.classList.add('on');
     $('loading').style.display='none'; $('t1body').style.display='';
     var hs=$('heroSub'); if(hs) hs.innerHTML='your saved plan<br>real engine \u00b7 instant';
     recompute(); postHeight(); setTimeout(postHeight,80);
@@ -1240,6 +1255,9 @@ function rbpRunMonteCarlo(d,opts){
   <div id="load">Waiting for your saved plan&hellip;<br><span style="font-size:11px;color:#90A4AE">This fills in with your real numbers on the live site. Hit <b>Reload</b> at the top if needed.</span></div>
   <div id="body" style="display:none">
     <div class="hero"><div class="tg">Test 3 &middot; Scenario Sweep</div><h1>The most you can safely spend, at every crash level</h1><div class="sub" id="heroSub">your saved plan<br>real engine &middot; instant</div></div>
+    <div style="background:#e9f7f8;border:1px solid #bfe7ea;border-left:4px solid #1CC7D0;border-radius:10px;padding:13px 16px;margin:14px 0 2px;font-size:13.5px;line-height:1.55;color:#1f3340">
+      <b>How to read this:</b> each bar is a different size of crash hitting the year you retire &mdash; from no crash down to a 50% drop. The bar's height is the most you could still safely spend every year in that case, while keeping your floor and full legacy intact.
+    </div>
     <div class="wrap">
       <div class="head" id="head">&mdash;</div>
       <div class="card">
@@ -2005,6 +2023,9 @@ function rbpRunMonteCarlo(d,opts){
   <div id="load">Waiting for your saved plan&hellip;<br><span style="font-size:11px;color:#90A4AE">This fills in with your real numbers on the live site. Hit <b>Reload</b> at the top if needed.</span></div>
   <div id="body" style="display:none">
     <div class="hero"><div class="tg">Test 4 &middot; Monte Carlo</div><h1>Your plan across thousands of random futures</h1><div class="sub" id="heroSub">your saved plan<br>real engine &middot; instant</div></div>
+    <div style="background:#e9f7f8;border:1px solid #bfe7ea;border-left:4px solid #1CC7D0;border-radius:10px;padding:13px 16px;margin:14px 0 2px;font-size:13.5px;line-height:1.55;color:#1f3340">
+      <b>What this is:</b> we replayed your plan through 2,000 different versions of the future &mdash; strong markets, crashes, high inflation, low &mdash; to see how often it still holds up. The big number below is how often your plan made it.
+    </div>
     <div class="wrap">
       <div class="head" id="head">&mdash;</div>
       <div class="stats" id="stats"></div>
@@ -3329,9 +3350,8 @@ function rbpRunMonteCarlo(d,opts){
 </script>
 <script>
 (function(){
-  var SAMPLE={people:{craig:{name:'Craig',age:64,deathAge:92,salary:0,salaryEnd:'',ssMonthly:3000,ssStartDate:'2027-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65},gena:{name:'Gena',age:62,deathAge:94,salary:0,salaryEnd:'',ssMonthly:2400,ssStartDate:'2029-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65}},global:{planStartYear:'2026-01-01',survivorReduction:0.25,filingStatus:'MFJ',inflation:0.03,ssCola:0.025},tax:{ssCola:0.025,inflation:0.03,stdDedInflation:0.02,healthcareInflation:0.045,stateRate:0.05},spending:{baseAnnual:84000,phase1Start:2026,phase1End:2035,phase1Extra:30000,phase1Weight:1,phase2Start:2036,phase2End:2045,phase2Extra:25000,phase2Weight:0.85,phase3Start:2046,phase3End:2060,phase3Extra:20000,phase3Weight:0.75,safeExtra:30000},legacy:{goal:1000000,safetyFloor:150000},rothPlan:[],debts:[{inc:'Yes',ann:18000,start:'2026-01-01',end:'2032-12-31'}],portfolio:{total:2550000,accounts:[{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'C',owner:'Craig',balance:1071000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'G',owner:'Gena',balance:714000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Taxable',name:'J',owner:'Joint',balance:510000,expectedReturn:5.5,costBasis:306000},{showInCalc:'Yes',status:'Use',type:'Roth',name:'R',owner:'Craig',balance:255000,expectedReturn:6.5,costBasis:0}]}};
-  var I=RBP.buildI(SAMPLE);
-  var D=JSON.parse(JSON.stringify(SAMPLE));
+  var SAMPLE={people:{craig:{name:'Craig',age:64,deathAge:92,salary:0,salaryEnd:'',ssMonthly:3000,ssStartDate:'2027-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65},gena:{name:'Gena',age:62,deathAge:94,salary:0,salaryEnd:'',ssMonthly:2400,ssStartDate:'2029-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65}},global:{planStartYear:'2026-01-01',survivorReduction:0.25,filingStatus:'MFJ',inflation:0.03,ssCola:0.025,assumeExtraSpend:true},tax:{ssCola:0.025,inflation:0.03,stdDedInflation:0.02,healthcareInflation:0.045,stateRate:0.05},spending:{baseAnnual:84000,phase1Start:2026,phase1End:2035,phase1Extra:30000,phase1Weight:1,phase2Start:2036,phase2End:2045,phase2Extra:25000,phase2Weight:0.85,phase3Start:2046,phase3End:2060,phase3Extra:20000,phase3Weight:0.75,safeExtra:30000},legacy:{goal:1000000,safetyFloor:150000},rothPlan:[],debts:[{inc:'Yes',ann:18000,start:'2026-01-01',end:'2032-12-31'}],portfolio:{total:2550000,accounts:[{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'C',owner:'Craig',balance:1071000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'G',owner:'Gena',balance:714000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Taxable',name:'J',owner:'Joint',balance:510000,expectedReturn:5.5,costBasis:306000},{showInCalc:'Yes',status:'Use',type:'Roth',name:'R',owner:'Craig',balance:255000,expectedReturn:6.5,costBasis:0}]}};
+  var I=RBP.buildI(SAMPLE); var D=JSON.parse(JSON.stringify(SAMPLE));
   function wire(fid,sid,readyType,heightType,payload){
     var fr=document.getElementById(fid), el=document.getElementById(sid);
     fr.srcdoc=el.textContent.replace(/<\\\/script>/g,'<'+'/script>');
@@ -3343,7 +3363,6 @@ function rbpRunMonteCarlo(d,opts){
   wire('f1','s1','rbpT1Ready','rbpT1Height',{type:'rbpPlan',I:I});
   wire('f3','s3','rbpSWReady','rbpSWHeight',{type:'rbpPlan',I:I});
   wire('f4','s4','rbpMCReady','rbpMCHeight',{type:'rbpPlan',I:D});
-  // Test 2 — show the Run button, then fake the connector run with sample numbers
   var f2=document.getElementById('f2'), s2=document.getElementById('s2');
   f2.srcdoc=s2.textContent.replace(/<\\\/script>/g,'<'+'/script>');
   var RCF=[{name:'COVID 2020',sev:'+18% (recovered)',end:3100000,safe:78000,depl:false,below:null},
