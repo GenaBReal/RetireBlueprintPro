@@ -478,6 +478,31 @@ window.addEventListener('storage', function(e) {
   .debtnote{font-size:11px;line-height:1.5;color:#7a5a1e;background:#fbf3e3;border:1px solid #f0dcb8;border-radius:7px;padding:9px 12px;margin-bottom:16px}
   .swatch.sq{height:11px;width:11px;border-radius:3px}
   .foot{font-size:10.5px;color:#90A4AE;margin-top:15px;text-align:center;line-height:1.5}
+
+  /* ── dark decision panel (left column, fills the blank space) ── */
+  .leftcol{display:flex;flex-direction:column;gap:14px}
+  .decide{background:linear-gradient(165deg,#06243a,#0A3145);border-radius:8px;border-top:3px solid var(--gold);padding:16px 16px 17px;box-shadow:0 6px 22px rgba(4,30,47,.20)}
+  .d-head{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#7ecfda;margin-bottom:13px}
+  .d-must{margin-bottom:14px}
+  .d-must-lbl{font-size:8.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:#f4b86a;margin-bottom:4px}
+  .d-must-v{font-size:33px;font-weight:800;color:#fff;line-height:1}
+  .d-must-v small{font-size:14px;font-weight:600;color:#8a9ab0}
+  .d-must-s{font-size:9.5px;color:#9fc1d6;margin-top:5px;line-height:1.45}
+  .d-extra{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:11px 12px;margin-bottom:13px}
+  .d-extra-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:#cdd9e3;font-weight:600;margin-bottom:1px}
+  .d-extra-h b{font-size:15px;font-weight:800;color:#f4b86a}
+  .d-extra input[type=range]{background:#072636;margin:9px 0 4px}
+  .d-extra input[type=range]::-webkit-slider-thumb{background:var(--gold)}
+  .d-extra-n{font-size:9.5px;color:#9fc1d6;line-height:1.4}
+  .d-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:13px}
+  .d-kpi{background:rgba(255,255,255,.05);border-radius:7px;padding:9px 6px;text-align:center}
+  .dk-k{font-size:7.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#8fb4c4;margin-bottom:4px;line-height:1.2}
+  .dk-v{font-size:16px;font-weight:800;color:#fff;line-height:1}
+  .dk-v.gold{color:#f4b86a}.dk-v.teal{color:#3fd0d8}.dk-v.coral{color:#ff7a5e}
+  .dk-s{font-size:7.5px;color:#7e9bab;margin-top:4px;line-height:1.25}
+  .d-verdict{font-size:11.5px;line-height:1.55;color:#dceef2;background:rgba(28,199,208,.1);border-left:3px solid var(--teal);border-radius:6px;padding:10px 12px}
+  .d-verdict.bad{background:rgba(192,57,43,.16);border-left-color:#ff7a5e}
+  .d-verdict b{font-weight:800}
 </style>
 </head>
 <body>
@@ -493,6 +518,7 @@ window.addEventListener('storage', function(e) {
 
   <div class="grid">
     <!-- LEFT -->
+    <div class="leftcol">
     <div class="card">
       <div class="seclbl">Pick a crash to test</div>
       <div class="presets" id="presets">
@@ -538,6 +564,28 @@ window.addEventListener('storage', function(e) {
         <div class="sg"><div class="sl-lab"><span>…lasting</span><span class="v" id="v-ltyrs">2 yrs</span></div><input type="range" id="lt-yrs" min="1" max="5" step="1" value="2"></div>
       </div>
     </div>
+
+    <!-- DARK DECISION PANEL — fills the blank space under the sliders -->
+    <div class="decide" id="decide">
+      <div class="d-head">Your decision · in this crash</div>
+      <div class="d-must">
+        <div class="d-must-lbl">Must have to live · taxes in</div>
+        <div class="d-must-v" id="d-must">$—<small>/yr</small></div>
+        <div class="d-must-s">living · healthcare · debt · taxes — the whole bill you can&rsquo;t skip</div>
+      </div>
+      <div class="d-extra">
+        <div class="d-extra-h"><span>Extra spend on top</span><b id="d-extraV">$0/yr</b></div>
+        <input type="range" id="d-extra" min="0" max="120" step="1" value="0">
+        <div class="d-extra-n" id="d-extraN">drag to spend more now — watch your legacy move</div>
+      </div>
+      <div class="d-kpis">
+        <div class="d-kpi"><div class="dk-k">Safe to add</div><div class="dk-v gold" id="d-safe">$—</div><div class="dk-s">still hits legacy</div></div>
+        <div class="d-kpi"><div class="dk-k">Survives?</div><div class="dk-v teal" id="d-surv">—</div><div class="dk-s" id="d-surv-s">stays above floor</div></div>
+        <div class="d-kpi"><div class="dk-k">Legacy left</div><div class="dk-v teal" id="d-leg">$—</div><div class="dk-s" id="d-leg-s">vs your goal</div></div>
+      </div>
+      <div class="d-verdict" id="d-verdict">—</div>
+    </div>
+    </div><!-- /leftcol -->
 
     <!-- RIGHT -->
     <div>
@@ -1234,7 +1282,7 @@ function rbpRunMonteCarlo(d,opts){
 <script>
 (function(){
   var RBP=window.RBP;
-  var I=null, START=new Date().getFullYear(), COMMITTED=0, baseR=null, REP=6.5, gotPlan=false;
+  var I=null, START=new Date().getFullYear(), COMMITTED=0, baseR=null, REP=6.5, gotPlan=false, MUSTHAVE=0;
 
   var $=function(id){return document.getElementById(id)};
   function fmtK(n){return '$'+Math.round(n/1000)+'K';}
@@ -1356,7 +1404,8 @@ function rbpRunMonteCarlo(d,opts){
     var r=RBP.runStress(I,knobs(COMMITTED));
     $('spend').value=Math.round(r.safeExtra/1000);
     $('goal').value=100;
-    paintFacts(r); paintSafe(r); paintSpend(); paintGoal(); drawReturns(); var rSafe=RBP.runStress(I,knobs(r.safeExtra)); drawSafety(r.cashflow, rSafe.cashflow);
+    $('d-extra').value=Math.round(Math.max(0,r.safeExtra)/1000);
+    paintFacts(r); paintSafe(r); paintSpend(); paintGoal(); drawReturns(); var rSafe=RBP.runStress(I,knobs(r.safeExtra)); drawSafety(r.cashflow, rSafe.cashflow); paintDecision();
   }
   function paintSafe(r){
     var safe=r.safeExtra,brk=(safe<=0&&r.floorBreach);
@@ -1387,6 +1436,27 @@ function rbpRunMonteCarlo(d,opts){
   }
   function paintGoal(){var g=I.legacyB8*(+$('goal').value)/100;$('goalVal').textContent=fmtM(g);var r=RBP.runStress(I,knobs(COMMITTED,g));$('safeAtGoal').textContent=fmtK(r.safeExtra)+'/yr';}
 
+  function paintDecision(){
+    if(!I)return;
+    var extra=(+$('d-extra').value)*1000;
+    var r=RBP.runStress(I,knobs(extra));
+    var safe=r.safeExtra;
+    $('d-must').innerHTML='$'+Math.round(MUSTHAVE/1000)+'<small>K/yr</small>';
+    $('d-extraV').textContent=fmtK(extra)+'/yr';
+    $('d-safe').textContent=fmtK(safe);
+    var br=!!r.floorBreach, surv=$('d-surv'), survS=$('d-surv-s');
+    surv.textContent=br?'No':'Yes'; surv.className='dk-v '+(br?'coral':'teal');
+    survS.textContent=br?('dips below floor '+r.floorBreach):'stays above floor';
+    var ending=Math.max(0,r.ending), gap=ending-I.legacyB8;
+    $('d-leg').textContent=fmtM(ending); $('d-leg').className='dk-v '+(gap>=0?'teal':'coral');
+    $('d-leg-s').textContent=gap>=0?('+'+fmtM(gap)+' over goal'):(fmtM(-gap)+' under goal');
+    $('d-extraN').innerHTML=(extra>safe+500)?("<b style='color:#ff7a5e'>"+fmtK(extra-safe)+" over</b> the safe line — legacy takes the hit"):((extra<safe-500)?(fmtK(safe-extra)+" under the safe line — room to spare"):"right at the safe line");
+    var v=$('d-verdict');
+    if(br){ v.className='d-verdict bad'; v.innerHTML="At <b>"+fmtK(extra)+"/yr</b> extra, the account <b>drops below your floor around "+r.floorBreach+"</b>. Pull the slider down until Survives reads Yes."; }
+    else if(gap>=0){ v.className='d-verdict'; v.innerHTML="You cover every must-have, spend <b style='color:#f4b86a'>"+fmtK(extra)+"/yr</b> extra, and still leave <b style='color:#3fd0d8'>"+fmtM(ending)+"</b> — "+fmtM(gap)+" above your goal."; }
+    else { v.className='d-verdict'; v.innerHTML="You can spend <b style='color:#f4b86a'>"+fmtK(extra)+"/yr</b> extra and still survive, but legacy lands at <b style='color:#ff7a5e'>"+fmtM(ending)+"</b> — "+fmtM(-gap)+" under your goal. Your call: spend now, or pull back to protect it."; }
+  }
+
   var PRE={custom:{yr1:0,yrs:1,inf:2.5,cola:2.5,spend:0},c2008:{yr1:-37,yrs:1,inf:2.5,cola:2.5,spend:0},dotcom:{yr1:-25,yrs:3,inf:2.5,cola:2.5,spend:0},covid:{yr1:-20,yrs:1,inf:3,cola:2.5,spend:0},stag:{yr1:-15,yrs:4,inf:8,cola:4,spend:0},bull:{yr1:18,yrs:1,inf:2.5,cola:2.5,spend:0}};
   document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});b.classList.add('on');var p=PRE[b.dataset.p];$('yr1').value=p.yr1;$('yrs').value=p.yrs;$('inf').value=p.inf;$('cola').value=p.cola;$('spendadj').value=p.spend;$('lateSw').classList.remove('on');$('lateBody').classList.add('hide');recompute();});});
   function mark(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});document.querySelector('[data-p=custom]').classList.add('on');}
@@ -1395,6 +1465,7 @@ function rbpRunMonteCarlo(d,opts){
   $('lateTog').addEventListener('click',function(){var sw=$('lateSw');sw.classList.toggle('on');$('lateBody').classList.toggle('hide',!sw.classList.contains('on'));mark();recompute();});
   $('spend').addEventListener('input',paintSpend);
   $('goal').addEventListener('input',paintGoal);
+  $('d-extra').addEventListener('input',function(){ $('spend').value=$('d-extra').value; paintSpend(); paintDecision(); });
   function postHeight(){ try{ parent.postMessage({type:'rbpT1Height', h:Math.ceil(document.body.scrollHeight)}, '*'); }catch(e){} }
   function applyPlan(plan){
     if(!plan){ return; }
@@ -1404,7 +1475,8 @@ function rbpRunMonteCarlo(d,opts){
     REP=(function(){var s=0,w=0;(I.accounts||[]).forEach(function(a){s+=(a.rate||0)*(a.start||0);w+=(a.start||0);});return w?s/w*100:6.5;})();
     try{ baseR=RBP.runStress(I,{start:START,plannedExtra:COMMITTED}); }
     catch(e){ var L=$('loading'); if(L){L.innerHTML='Couldn\u2019t read your plan \u2014 hit <b>Reload</b> at the top of the page.';} return; }
-    var smax=Math.max(80, Math.round((baseR.safeExtra||0)/1000*1.6)); $('spend').max=smax;
+    try{ var _b0=RBP.runStress(I,{start:START,plannedExtra:0}); MUSTHAVE=(_b0.floorY1?_b0.floorY1.total:0)+((_b0.cashflow&&_b0.cashflow[0])?(_b0.cashflow[0].taxes||0):0); }catch(e){ MUSTHAVE=0; }
+    var smax=Math.max(80, Math.round((baseR.safeExtra||0)/1000*1.6)); $('spend').max=smax; $('d-extra').max=smax;
     $('spendScale').innerHTML='<span>$0</span><span>$'+Math.round(smax/2)+'K</span><span>$'+smax+'K</span>';
     $('goalScale').innerHTML='<span>'+fmtM(I.legacyB8*0.5)+'</span><span>'+fmtM(I.legacyB8)+'</span><span>'+fmtM(I.legacyB8*1.5)+'</span>';
     $('yr1').value=-37; $('yrs').value=1; $('spendadj').value=0;
