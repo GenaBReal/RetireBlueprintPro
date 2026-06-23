@@ -2736,9 +2736,8 @@ function rbpRunMonteCarlo(d,opts){
        your money lasts. Set the assumptions below and press run.</p>
   </div>
 
-  <div id="load">Waiting for your plan numbers&hellip;</div>
-
-  <div id="mcbody" style="display:none;">
+  <div id="mcbody">
+    <div id="load" style="margin-top:14px;padding:11px 16px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;font-size:12px;color:var(--mut);">Connecting to your plan numbers&hellip;</div>
     <div class="card">
       <div class="seclbl">Set up the simulation</div>
       <div class="secsub">Defaults are the industry-standard settings. Adjust any of them to stress the plan harder.</div>
@@ -2778,7 +2777,7 @@ function rbpRunMonteCarlo(d,opts){
           </select></div>
       </div>
       <div class="runrow">
-        <button id="run">&#9654;&nbsp; Run the simulation</button>
+        <button id="run" disabled>Connecting&hellip;</button>
         <div class="runnote">Runs entirely in your browser. Same settings always give the same result.</div>
       </div>
       <div id="prog"><div class="lbl" id="prog-lbl">Running&hellip;</div><div class="bar"><div class="fill" id="prog-fill"></div></div></div>
@@ -2802,6 +2801,7 @@ function rbpRunMonteCarlo(d,opts){
       </div>
 
       <div class="readout" id="r-readout">&mdash;</div>
+      <div class="readout" id="r-assumed" style="border-left-color:var(--gold);display:none;">&mdash;</div>
 
       <div class="tiles">
         <div class="tile"><div class="tlab">Rough markets &middot; bottom 10%</div>
@@ -2820,7 +2820,7 @@ function rbpRunMonteCarlo(d,opts){
         <div class="csub">The shaded band is where most futures land. The teal line is the typical path; the gold line is your legacy goal.</div>
         <div id="fanwrap"><canvas id="fan"></canvas></div>
         <div class="legend">
-          <span><i style="background:rgba(28,199,208,.16);"></i>middle 80% of futures</span>
+          <span><i style="background:rgba(28,199,208,.16);"></i>middle 50% of futures</span>
           <span><i style="background:#1CC7D0;height:3px;border-radius:2px;"></i>typical path</span>
           <span><i style="background:#f4b86a;height:3px;border-radius:2px;"></i>legacy goal</span>
         </div>
@@ -3529,6 +3529,21 @@ function rbpRunMonteCarlo(d,opts){
     $('t-p10').style.color = res.p10<=0?'var(--bad)':'var(--warn)';
 
     $('results').style.display='block';
+    // transparency: show the withdrawal rate the simulation actually used (the main driver)
+    try{
+      var startPF=(d&&d.portfolio&&d.portfolio.total)||(res.yearlyBals[0]&&res.yearlyBals[0][0])||0;
+      var proj=(d&&d.projections)||{}, wd0=0;
+      if(proj.withdrawals&&proj.withdrawals.length){ for(var wi=0;wi<proj.withdrawals.length;wi++){ if((+proj.withdrawals[wi])>0){ wd0=+proj.withdrawals[wi]; break; } } }
+      var A=$('r-assumed');
+      if(startPF>0 && wd0>0){
+        var wr=wd0/startPF, wrTxt=(wr*100).toFixed(1)+'%';
+        var flag = wr>=0.055 ? ' That is a high rate \u2014 the main reason the result is this fragile. Lowering spending (or the early-year draws before Social Security starts) is what moves this number most.' :
+                   wr>=0.045 ? ' That is on the higher side, which is why sequence risk shows up here.' :
+                   ' That is a sustainable rate.';
+        A.innerHTML='<b>What the simulation used:</b> a starting portfolio of about <b>'+fmt(startPF)+'</b> and a first-year withdrawal of about <b>'+fmt(wd0)+'</b> \u2014 a <b>'+wrTxt+'</b> withdrawal rate.'+flag;
+        A.style.display='';
+      } else { A.style.display='none'; }
+    }catch(e){ var A2=$('r-assumed'); if(A2) A2.style.display='none'; }
     drawFan(res);
     postHeight(); setTimeout(postHeight,60);
   }
@@ -3540,11 +3555,14 @@ function rbpRunMonteCarlo(d,opts){
     cv.width=W*dpr; cv.height=H*dpr; cv.style.height=H+'px';
     var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
     var padL=52, padR=14, padT=12, padB=26, yrs=res.yrs, years=res.years||[];
-    var p10=[],p50=[],p90=[];
-    for(var y=0;y<yrs;y++){ var col=res.yearlyBals[y]||[]; p10.push(pctile(col,10)); p50.push(pctile(col,50)); p90.push(pctile(col,90)); }
-    var maxV=0,i; for(i=0;i<yrs;i++){ if(p90[i]>maxV)maxV=p90[i]; } if(res.legacyGoal>maxV)maxV=res.legacyGoal; maxV=maxV*1.08||1;
+    var lo=[],mid=[],hi=[];  // middle 50% band (p25-p75) so the extreme top tail doesn't blow out the scale
+    for(var y=0;y<yrs;y++){ var col=res.yearlyBals[y]||[]; lo.push(pctile(col,25)); mid.push(pctile(col,50)); hi.push(pctile(col,75)); }
+    // robust y-axis: top of the p75 band, but always tall enough to show the starting balance and the legacy goal
+    var maxV=0,i; for(i=0;i<yrs;i++){ if(hi[i]>maxV)maxV=hi[i]; }
+    var start=(res.yearlyBals[0]&&res.yearlyBals[0][0])||0;
+    maxV=Math.max(maxV, res.legacyGoal*1.4, start*1.05); maxV=maxV*1.08||1;
     function X(ix){ return padL + (W-padL-padR)*(yrs<=1?0:ix/(yrs-1)); }
-    function Y(v){ return padT + (H-padT-padB)*(1 - Math.max(0,v)/maxV); }
+    function Y(v){ return padT + (H-padT-padB)*(1 - Math.min(maxV,Math.max(0,v))/maxV); }
 
     ctx.font='10px -apple-system,sans-serif'; ctx.textBaseline='middle';
     for(var g=0;g<=4;g++){ var gv=maxV*g/4, gy=Y(gv);
@@ -3552,8 +3570,8 @@ function rbpRunMonteCarlo(d,opts){
       ctx.fillStyle='#9aabb8'; ctx.textAlign='right'; ctx.fillText(fmt(gv), padL-7, gy); }
 
     ctx.beginPath();
-    for(var a=0;a<yrs;a++){ var x=X(a),yy=Y(p90[a]); a===0?ctx.moveTo(x,yy):ctx.lineTo(x,yy); }
-    for(var b=yrs-1;b>=0;b--){ ctx.lineTo(X(b),Y(p10[b])); }
+    for(var a=0;a<yrs;a++){ var x=X(a),yy=Y(hi[a]); a===0?ctx.moveTo(x,yy):ctx.lineTo(x,yy); }
+    for(var b=yrs-1;b>=0;b--){ ctx.lineTo(X(b),Y(lo[b])); }
     ctx.closePath(); ctx.fillStyle='rgba(28,199,208,.16)'; ctx.fill();
 
     if(res.legacyGoal>0){ var gly=Y(res.legacyGoal);
@@ -3561,7 +3579,7 @@ function rbpRunMonteCarlo(d,opts){
       ctx.beginPath(); ctx.moveTo(padL,gly); ctx.lineTo(W-padR,gly); ctx.stroke(); ctx.setLineDash([]); }
 
     ctx.strokeStyle='#1CC7D0'; ctx.lineWidth=2.5; ctx.beginPath();
-    for(var m=0;m<yrs;m++){ var mx=X(m),my=Y(p50[m]); m===0?ctx.moveTo(mx,my):ctx.lineTo(mx,my); } ctx.stroke();
+    for(var m=0;m<yrs;m++){ var mx=X(m),my=Y(mid[m]); m===0?ctx.moveTo(mx,my):ctx.lineTo(mx,my); } ctx.stroke();
 
     ctx.fillStyle='#9aabb8'; ctx.textAlign='center'; ctx.textBaseline='top';
     [0, Math.floor(yrs/2), yrs-1].forEach(function(mi){ var yr=years[mi]||''; if(yr) ctx.fillText(yr, X(mi), H-padB+7); });
@@ -3569,18 +3587,18 @@ function rbpRunMonteCarlo(d,opts){
 
   function applyPlan(plan){
     d=plan;
-    $('load').style.display='none';
-    $('mcbody').style.display='block';
+    var L=$('load'); if(L) L.style.display='none';
+    var btn=$('run'); if(btn && !btn.dataset.running){ btn.disabled=false; btn.innerHTML='\u25B6&nbsp; Run the simulation'; }
     postHeight(); setTimeout(postHeight,60);
   }
 
   $('run').addEventListener('click', function(){
-    if(!d){ return; }
+    if(!d){ var L=$('load'); if(L){ L.style.display=''; L.innerHTML='Still loading your plan numbers \u2014 give it a moment, then press Run.'; } return; }
     var opts=readOpts();
-    var btn=$('run'); btn.disabled=true; var oldTxt=btn.innerHTML; btn.innerHTML='Running\u2026';
+    var btn=$('run'); btn.disabled=true; btn.dataset.running='1'; btn.innerHTML='Running\u2026';
     $('results').style.display='none'; postHeight();
     runBatched(opts, function(res){
-      btn.disabled=false; btn.innerHTML=oldTxt; ran=true; $('prog').style.display='none';
+      btn.disabled=false; btn.dataset.running=''; btn.innerHTML='\u25B6&nbsp; Run the simulation'; ran=true; $('prog').style.display='none';
       if(!res){ $('r-readout').innerHTML='Couldn\u2019t run the simulation on this plan.'; $('results').style.display='block'; postHeight(); return; }
       paint(res, opts);
     });
