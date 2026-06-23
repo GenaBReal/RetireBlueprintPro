@@ -2653,58 +2653,182 @@ function rbpRunMonteCarlo(d,opts){
   <script type="text/plain" id="rbpMCsrc"><!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-  *{box-sizing:border-box}
-  #mc{--navy:#041E2F;--ink:#0B2239;--teal:#16AEB6;--gold:#E0A33A;--salmon:#E8745E;--line:#E6EAEE;--mut:#5F6368;
-     font-family:-apple-system,'Segoe UI',system-ui,sans-serif;color:var(--ink);background:#F8F9FA;padding:2px}
-  #mc .hero{background:linear-gradient(100deg,#041E2F,#0A3145);border-bottom:3px solid var(--gold);border-radius:12px 12px 0 0;padding:18px 22px;display:flex;align-items:center;gap:16px;color:#fff}
-  #mc .tg{background:var(--teal);color:#041E2F;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:7px 16px;border-radius:20px;white-space:nowrap}
-  #mc .hero h1{font-size:21px;font-weight:800;margin:0;letter-spacing:-.3px}
-  #mc .hero .sub{margin-left:auto;text-align:right;font-size:11px;color:#9fb4c4;line-height:1.5}
-  #mc .wrap{background:#fff;border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding:20px 22px}
-  #mc .card{background:#fff;border:1px solid var(--line);border-top:3px solid var(--navy);border-radius:10px;padding:16px 18px;margin-bottom:16px}
-  #mc .ttl{font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
-  #mc .sub2{font-size:11.5px;color:var(--mut);margin:3px 0 12px}
-  #mc canvas{width:100%;display:block}
-  #mc .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--mut);margin-top:10px}
-  #mc .legend i{display:flex;align-items:center;gap:6px;font-style:normal}
-  #mc .sq{width:11px;height:11px;border-radius:2px;display:inline-block}
-  #mc .head{background:linear-gradient(135deg,#06243a,#0A3145);color:#eaf3f8;border-radius:10px;padding:18px 20px;margin-bottom:16px;border-left:4px solid var(--gold);font-size:13.5px;line-height:1.6}
-  #mc .head b{color:#fff}
-  #mc .head .big{font-size:30px;font-weight:900;color:var(--teal);display:block;margin-bottom:2px;letter-spacing:-.5px}
-  #mc .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-  #mc .stat{background:#fff;border:1px solid var(--line);border-top:3px solid var(--teal);border-radius:9px;padding:12px 13px}
-  #mc .stat .k{font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);font-weight:700}
-  #mc .stat .v{font-size:20px;font-weight:900;letter-spacing:-.3px;margin-top:3px;font-variant-numeric:tabular-nums}
-  #mc .stat .s{font-size:10.5px;color:var(--mut);margin-top:2px}
-  #mc .foot{font-size:10.5px;color:#90A4AE;margin-top:4px;text-align:center;line-height:1.6}
-  #mc #load{padding:48px 16px;text-align:center;color:var(--mut);font-size:13px}
-  @media(max-width:640px){#mc .stats{grid-template-columns:repeat(2,1fr)}}
+  :root{
+    --ink:#0f2433; --ink2:#3a5161; --mut:#6b8294; --line:#e3e9ee;
+    --teal:#1CC7D0; --gold:#f4b86a; --navy:#051628; --navy2:#041E2F;
+    --good:#0A6E76; --warn:#A85A12; --bad:#B5301F;
+    --card:#ffffff; --canvas:#F8F9FA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--canvas);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .wrap{padding:2px 2px 6px;}
+  .hero{background:linear-gradient(135deg,var(--navy2),var(--navy));border-radius:14px;
+    padding:20px 24px;color:#eaf4f8;box-shadow:0 8px 28px rgba(5,22,40,.18);}
+  .hero h2{margin:0;font-size:19px;font-weight:900;letter-spacing:-.3px;color:#fff;}
+  .hero p{margin:7px 0 0;font-size:12.5px;line-height:1.6;color:#aecadb;max-width:680px;}
+  .hero .tag{display:inline-block;margin-bottom:9px;font-size:10.5px;font-weight:900;letter-spacing:1.3px;
+    text-transform:uppercase;color:var(--navy2);background:var(--gold);padding:4px 12px;border-radius:20px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 4px 18px rgba(15,36,51,.06);padding:20px 22px;margin-top:14px;}
+  .seclbl{font-size:11px;font-weight:900;letter-spacing:1.1px;text-transform:uppercase;color:var(--teal);margin-bottom:3px;}
+  .secsub{font-size:12px;color:var(--mut);line-height:1.55;margin-bottom:16px;}
+  .ctrls{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;}
+  @media(max-width:560px){ .ctrls{grid-template-columns:1fr;} }
+  .field label{display:block;font-size:11.5px;font-weight:800;color:var(--ink2);margin-bottom:5px;}
+  .field select{width:100%;background:#fff;color:var(--ink);border:1.5px solid var(--line);
+    border-radius:9px;padding:9px 11px;font-size:12.5px;font-family:inherit;font-weight:600;
+    cursor:pointer;appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%236b8294' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
+  .field select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(28,199,208,.15);}
+  .runrow{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap;}
+  #run{background:linear-gradient(135deg,var(--teal),#159aa1);color:#03242a;border:0;border-radius:11px;
+    padding:13px 26px;font-size:14px;font-weight:900;letter-spacing:.2px;cursor:pointer;font-family:inherit;
+    box-shadow:0 6px 18px rgba(28,199,208,.32);transition:transform .08s,box-shadow .15s;}
+  #run:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(28,199,208,.42);}
+  #run:active{transform:translateY(0);}
+  #run[disabled]{opacity:.6;cursor:default;transform:none;box-shadow:none;}
+  .runnote{font-size:11px;color:var(--mut);line-height:1.5;flex:1;min-width:160px;}
+  #prog{margin-top:16px;display:none;}
+  #prog .lbl{font-size:11.5px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+  #prog .bar{height:9px;background:#eef2f5;border-radius:6px;overflow:hidden;}
+  #prog .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--gold));
+    border-radius:6px;transition:width .12s linear;}
+  #results{display:none;margin-top:14px;}
+  .head{background:linear-gradient(135deg,var(--navy2),var(--navy));border-radius:16px;
+    padding:24px 26px;color:#eaf4f8;box-shadow:0 10px 30px rgba(5,22,40,.2);}
+  .head .big{font-size:54px;font-weight:900;line-height:1;color:var(--gold);letter-spacing:-2.5px;}
+  .head .bigsub{font-size:13px;color:#cfe3ef;margin-top:8px;font-weight:700;}
+  .head .bigsub b{color:#fff;}
+  .head .ctx{font-size:11px;color:#9fc1d6;margin-top:6px;line-height:1.5;max-width:520px;}
+  .head .two{display:flex;gap:26px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12);}
+  .head .two .n{font-size:22px;font-weight:900;line-height:1;}
+  .head .two .nlab{font-size:10px;color:#9fc1d6;margin-top:5px;max-width:150px;line-height:1.4;}
+  .readout{margin-top:14px;padding:14px 18px;background:#fff;border:1px solid var(--line);
+    border-left:4px solid var(--teal);border-radius:11px;font-size:12.5px;color:var(--ink2);line-height:1.65;}
+  .readout b{color:var(--ink);}
+  .tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px;}
+  @media(max-width:560px){ .tiles{grid-template-columns:1fr;} }
+  .tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:0 3px 12px rgba(15,36,51,.05);}
+  .tile .tlab{font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);}
+  .tile .tval{font-size:22px;font-weight:900;margin-top:5px;letter-spacing:-.6px;}
+  .tile .tnote{font-size:10.5px;color:var(--mut);margin-top:4px;line-height:1.45;}
+  .chartcard{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:13px;
+    padding:18px 18px 12px;box-shadow:0 4px 16px rgba(15,36,51,.05);}
+  .chartcard .ctitle{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:2px;}
+  .chartcard .csub{font-size:11px;color:var(--mut);margin-bottom:10px;line-height:1.5;}
+  #fanwrap{width:100%;position:relative;}
+  canvas{display:block;width:100%;height:auto;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:var(--ink2);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:13px;height:11px;border-radius:3px;display:inline-block;}
+  #load{padding:30px 22px;text-align:center;color:var(--mut);font-size:13px;}
 </style></head>
 <body>
-<div id="mc">
-  <div id="load">Waiting for your saved plan&hellip;<br><span style="font-size:11px;color:#90A4AE">This fills in with your real numbers on the live site. Hit <b>Reload</b> at the top if needed.</span></div>
-  <div id="body" style="display:none">
-    <div class="hero"><div class="tg">Test 4 &middot; Monte Carlo</div><h1>Your plan across thousands of random futures</h1><div class="sub" id="heroSub">your saved plan<br>real engine &middot; instant</div></div>
-    <div style="background:#e9f7f8;border:1px solid #bfe7ea;border-left:4px solid #1CC7D0;border-radius:10px;padding:13px 16px;margin:14px 0 2px;font-size:13.5px;line-height:1.55;color:#1f3340">
-      <b>What this is:</b> we replayed your plan through 2,000 different versions of the future &mdash; strong markets, crashes, high inflation, low &mdash; to see how often it still holds up. The big number below is how often your plan made it.
+<div class="wrap">
+  <div class="hero">
+    <span class="tag">Test 4 &middot; Monte Carlo</span>
+    <h2>5,000 possible futures for your plan</h2>
+    <p>Real markets never deliver the same return every year. This runs your exact plan through thousands
+       of randomized market histories &mdash; good runs, bad runs, and brutal ones &mdash; and counts how often
+       your money lasts. Set the assumptions below and press run.</p>
+  </div>
+
+  <div id="load">Waiting for your plan numbers&hellip;</div>
+
+  <div id="mcbody" style="display:none;">
+    <div class="card">
+      <div class="seclbl">Set up the simulation</div>
+      <div class="secsub">Defaults are the industry-standard settings. Adjust any of them to stress the plan harder.</div>
+      <div class="ctrls">
+        <div class="field"><label>How many futures to test</label>
+          <select id="mc-runs">
+            <option value="500">500 &mdash; fast</option>
+            <option value="1000">1,000 &mdash; quick</option>
+            <option value="2000">2,000 &mdash; thorough</option>
+            <option value="5000" selected>5,000 &mdash; industry standard</option>
+          </select></div>
+        <div class="field"><label>Market return model</label>
+          <select id="mc-model">
+            <option value="normal">Normal &mdash; textbook bell curve</option>
+            <option value="fat" selected>Fat-tailed &mdash; more realistic crashes</option>
+            <option value="historical">Historical US returns (1928&ndash;2024)</option>
+          </select></div>
+        <div class="field"><label>Spending flexibility</label>
+          <select id="mc-flex">
+            <option value="0">Rigid &mdash; never cut spending</option>
+            <option value="10" selected>Guardrails &mdash; trim 10% in down markets</option>
+            <option value="20">Guardrails &mdash; trim 20% in down markets</option>
+          </select></div>
+        <div class="field"><label>First-year shock</label>
+          <select id="mc-fixed">
+            <option value="" selected>Random &mdash; every year fully random</option>
+            <option value="-0.10">Start with a &minus;10% year, then random</option>
+            <option value="-0.20">Start with a &minus;20% year, then random</option>
+            <option value="-0.30">Start with a &minus;30% year, then random</option>
+            <option value="-0.40">Start with a &minus;40% year, then random</option>
+            <option value="-0.50">Start with a &minus;50% year, then random</option>
+          </select></div>
+        <div class="field"><label>How long to test</label>
+          <select id="mc-horizon">
+            <option value="95" selected>Through age 95 &mdash; longevity stress test</option>
+            <option value="death">Through your entered plan age</option>
+          </select></div>
+      </div>
+      <div class="runrow">
+        <button id="run">&#9654;&nbsp; Run the simulation</button>
+        <div class="runnote">Runs entirely in your browser. Same settings always give the same result.</div>
+      </div>
+      <div id="prog"><div class="lbl" id="prog-lbl">Running&hellip;</div><div class="bar"><div class="fill" id="prog-fill"></div></div></div>
     </div>
-    <div class="wrap">
-      <div class="head" id="head">&mdash;</div>
-      <div class="stats" id="stats"></div>
-      <div class="card">
-        <div class="ttl">The range of where you could end up</div>
-        <div class="sub2">each random future deals a different run of market returns and inflation. the band shows the middle 80% of outcomes; the line is the typical (median) path.</div>
-        <canvas id="chart"></canvas>
-        <div class="legend">
-          <i><span class="sq" style="background:rgba(22,174,182,.22)"></span>Middle 80% of futures</i>
-          <i><span style="width:16px;height:0;border-top:3px solid var(--navy);display:inline-block"></span>Typical (median) path</i>
-          <i><span style="width:16px;height:0;border-top:2px dashed var(--gold);display:inline-block"></span>Legacy goal</i>
+
+    <div id="results">
+      <div class="head">
+        <div class="big" id="r-never">&mdash;</div>
+        <div class="bigsub">of the time, your plan <b>never runs out of money</b></div>
+        <div class="ctx" id="r-never-ctx">&mdash;</div>
+        <div class="two">
+          <div>
+            <div class="n" id="r-legacy" style="color:var(--gold);">&mdash;</div>
+            <div class="nlab">leave at least your full legacy goal behind</div>
+          </div>
+          <div>
+            <div class="n" id="r-median" style="color:#7fe3e9;">&mdash;</div>
+            <div class="nlab">typical (middle) amount left at the end</div>
+          </div>
         </div>
       </div>
-      <p class="foot" id="foot">&mdash;</p>
+
+      <div class="readout" id="r-readout">&mdash;</div>
+
+      <div class="tiles">
+        <div class="tile"><div class="tlab">Rough markets &middot; bottom 10%</div>
+          <div class="tval" id="t-p10" style="color:var(--warn);">&mdash;</div>
+          <div class="tnote">9 in 10 plans end with more than this</div></div>
+        <div class="tile"><div class="tlab">Typical &middot; middle</div>
+          <div class="tval" id="t-p50" style="color:var(--good);">&mdash;</div>
+          <div class="tnote">half end above, half below</div></div>
+        <div class="tile"><div class="tlab">Great markets &middot; top 10%</div>
+          <div class="tval" id="t-p90" style="color:var(--good);">&mdash;</div>
+          <div class="tnote">1 in 10 plans end above this</div></div>
+      </div>
+
+      <div class="chartcard">
+        <div class="ctitle">The range of outcomes, year by year</div>
+        <div class="csub">The shaded band is where most futures land. The teal line is the typical path; the gold line is your legacy goal.</div>
+        <div id="fanwrap"><canvas id="fan"></canvas></div>
+        <div class="legend">
+          <span><i style="background:rgba(28,199,208,.16);"></i>middle 80% of futures</span>
+          <span><i style="background:#1CC7D0;height:3px;border-radius:2px;"></i>typical path</span>
+          <span><i style="background:#f4b86a;height:3px;border-radius:2px;"></i>legacy goal</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
 <script>/* ============================================================================
  * RetireBlueprint Pro — Engine  (rbp-engine.js)  · SINGLE SOURCE OF TRUTH
  * ----------------------------------------------------------------------------
@@ -3322,73 +3446,148 @@ function rbpRunMonteCarlo(d,opts){
 <script>
 (function(){
   var RBP=window.RBP, $=function(id){return document.getElementById(id);};
-  var d=null, gotPlan=false, RUNS=2000;
-  var fmtM=function(v){return (v<0?'-$':'$')+(Math.abs(v)/1e6).toFixed(2)+'M';};
-  function pctile(arr,p){ if(!arr||!arr.length)return 0; var s=arr.slice().sort(function(a,b){return a-b;}); return s[Math.floor(p/100*(s.length-1))]; }
-  function setup(c,h){var dpr=window.devicePixelRatio||1,W=c.clientWidth;c.width=W*dpr;c.height=h*dpr;var g=c.getContext('2d');g.scale(dpr,dpr);g.clearRect(0,0,W,h);return{g:g,W:W,H:h};}
-
-  function draw(res){
-    var c=$('chart'),s=setup(c,220),g=s.g,W=s.W,H=s.H;
-    var yrs=res.yrs, years=res.years||[];
-    var lo=[],mid=[],hi=[];
-    for(var i=0;i<yrs;i++){ var col=res.yearlyBals[i]||[]; lo.push(pctile(col,10)); mid.push(pctile(col,50)); hi.push(pctile(col,90)); }
-    var maxV=Math.max(res.legacyGoal||0, Math.max.apply(null,hi))*1.08||1;
-    var padL=56,padR=12,padT=12,padB=24,pw=W-padL-padR,ph=H-padT-padB;
-    var X=function(i){return padL+(yrs<=1?0:i/(yrs-1)*pw);},Y=function(v){return padT+(1-v/maxV)*ph;};
-    g.strokeStyle='#EEF1F4';g.fillStyle='#5F6368';g.font='10px sans-serif';g.textAlign='right';g.textBaseline='middle';
-    for(var k=0;k<=3;k++){var v=maxV*k/3,yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText(v>=1e6?('$'+(v/1e6).toFixed(1)+'M'):('$'+Math.round(v/1000)+'K'),padL-7,yy);}
-    // band p10-p90
-    g.fillStyle='rgba(22,174,182,.20)';g.beginPath();
-    for(var i=0;i<yrs;i++){var x=X(i),yy=Y(hi[i]);i?g.lineTo(x,yy):g.moveTo(x,yy);}
-    for(var i2=yrs-1;i2>=0;i2--){g.lineTo(X(i2),Y(lo[i2]));}
-    g.closePath();g.fill();
-    // goal line
-    if(res.legacyGoal>0){var gy=Y(res.legacyGoal);g.strokeStyle='#E0A33A';g.setLineDash([6,4]);g.lineWidth=2;g.beginPath();g.moveTo(padL,gy);g.lineTo(W-padR,gy);g.stroke();g.setLineDash([]);}
-    // median line
-    g.strokeStyle='#041E2F';g.lineWidth=2.6;g.beginPath();
-    for(var j=0;j<yrs;j++){var x=X(j),yy=Y(mid[j]);j?g.lineTo(x,yy):g.moveTo(x,yy);}
-    g.stroke();
-    // x labels
-    g.fillStyle='#5F6368';g.font='10px sans-serif';g.textAlign='center';g.textBaseline='top';
-    var step=Math.max(1,Math.ceil(yrs/5));
-    for(var t=0;t<yrs;t+=step){ g.fillText(years[t]||'',X(t),H-padB+4); }
-  }
-
-  function paint(res){
-    var success=res.successPct, never=res.neverRanOutPct;
-    var h='<span class="big">'+success+'% of futures hit your legacy goal.</span>';
-    h+='Across '+RUNS.toLocaleString()+' random runs of markets and inflation, you finish <b>at or above your '+fmtM(res.legacyGoal)+' legacy goal</b> '+success+'% of the time'+
-       (never>=success?(', and you <b>never run out of money</b> in '+never+'% of them.'):('. You don\u2019t run out of money in '+never+'% of them.'));
-    if(success>=85) h+=' That\u2019s a resilient plan.';
-    else if(success>=70) h+=' That\u2019s a reasonably solid plan with some room to firm up.';
-    else h+=' There\u2019s meaningful risk here worth a closer look at spending or allocation.';
-    $('head').innerHTML=h;
-    var st=[
-      {k:'Hit legacy goal',v:success+'%',s:'finish \u2265 '+fmtM(res.legacyGoal)},
-      {k:'Never ran out',v:never+'%',s:'money lasts the whole way'},
-      {k:'Typical ending',v:fmtM(res.median),s:'median across futures'},
-      {k:'Likely range',v:fmtM(res.p10),s:'to '+fmtM(res.p90)+' (mid 80%)'}
-    ];
-    $('stats').innerHTML=st.map(function(x){return '<div class="stat"><div class="k">'+x.k+'</div><div class="v">'+x.v+'</div><div class="s">'+x.s+'</div></div>';}).join('');
-    $('foot').innerHTML='Industry-standard simulation: each future draws fresh market returns (sequence-of-returns risk) and its own inflation path, with spending guardrails. Run on your saved plan; nothing here changes your data. Re-run to see fresh draws.';
-  }
+  var d=null, ran=false, lastRes=null;
 
   function postHeight(){ try{ parent.postMessage({type:'rbpMCHeight', h:Math.ceil(document.body.scrollHeight)}, '*'); }catch(e){} }
-  function go(){
-    var res;
-    try{ res=RBP.runMonteCarlo(d,{runs:RUNS,model:'fat'}); }catch(e){ res=null; }
-    if(!res){ var L=$('load'); if(L){ L.style.display=''; L.innerHTML='Couldn\u2019t run the simulation on this plan.'; } $('body').style.display='none'; postHeight(); return; }
-    $('load').style.display='none'; $('body').style.display='';
-    draw(res); paint(res); postHeight(); setTimeout(postHeight,80);
+  function fmt(n){ n=Math.round(n||0); var neg=n<0; n=Math.abs(n);
+    var s = n>=1e6 ? '$'+(n/1e6).toFixed(n>=1e7?1:2)+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : '$'+n;
+    return (neg?'\u2212':'')+s; }
+
+  function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function pctile(arr,p){ if(!arr||!arr.length) return 0; var s=arr.slice().sort(function(x,y){return x-y;}); var i=Math.floor(p/100*(s.length-1)); return s[i]; }
+
+  function readOpts(){
+    var fxV=$('mc-fixed').value;
+    return {
+      runs:parseInt($('mc-runs').value,10)||5000,
+      model:$('mc-model').value,
+      flex:(parseFloat($('mc-flex').value)||0)/100,
+      fixedYr1: fxV===''?null:parseFloat(fxV),
+      endAge95: $('mc-horizon').value==='95'
+    };
   }
+
+  function runBatched(opts, onDone){
+    var total=opts.runs, nB = total>=2000?10:(total>=1000?5:2), per=Math.ceil(total/nB);
+    var done=0, agg=null, sSucc=0, sSurv=0, sMed=0, sP10=0, sP90=0;
+    var realRandom=Math.random; Math.random=mulberry32(0x5eed1234);  // one seed for the whole run
+    $('prog').style.display='block'; $('prog-fill').style.width='0%';
+
+    function step(){
+      var thisN=Math.min(per, total-done); if(thisN<=0){ finish(); return; }
+      var r; try{ r=RBP.runMonteCarlo(d, {runs:thisN, model:opts.model, flex:opts.flex, fixedYr1:opts.fixedYr1, endAge95:opts.endAge95}); }
+      catch(e){ Math.random=realRandom; onDone(null); return; }
+      if(!r){ Math.random=realRandom; onDone(null); return; }
+      if(!agg){ agg={ yrs:r.yrs, years:r.years, legacyGoal:r.legacyGoal, model:r.model, flex:r.flex, yearlyBals:[] };
+                 for(var y0=0;y0<r.yrs;y0++) agg.yearlyBals.push([]); }
+      // concatenate per-year balances for the fan chart
+      for(var y=0;y<r.yrs;y++){ var src=r.yearlyBals[y]||[]; for(var k=0;k<src.length;k++) agg.yearlyBals[y].push(src[k]); }
+      // accumulate the engine's own stats, weighted by this batch's size
+      sSucc += (r.successPct||0)*thisN;   // reached legacy goal
+      sSurv += (r.survivePct||0)*thisN;   // survived but under goal
+      sMed  += (r.median||0)*thisN; sP10 += (r.p10||0)*thisN; sP90 += (r.p90||0)*thisN;
+      done+=thisN;
+      $('prog-fill').style.width=Math.round(done/total*100)+'%';
+      $('prog-lbl').textContent='Running '+done.toLocaleString()+' of '+total.toLocaleString()+' futures\u2026';
+      setTimeout(step, 0);   // yield so the page stays responsive + the bar paints
+    }
+    function finish(){
+      Math.random=realRandom;
+      var legacyPct=Math.round(sSucc/total);
+      var neverOutPct=Math.round((sSucc+sSurv)/total);   // reached goal OR survived under it = never ran out
+      onDone({
+        yrs:agg.yrs, years:agg.years, legacyGoal:agg.legacyGoal||0, model:agg.model, flex:agg.flex, yearlyBals:agg.yearlyBals,
+        neverOutPct:Math.min(100,neverOutPct), legacyPct:legacyPct,
+        median:Math.round(sMed/total), p10:Math.round(sP10/total), p90:Math.round(sP90/total)
+      });
+    }
+    setTimeout(step, 30);   // let the "Running\u2026" state paint first
+  }
+
+  function paint(res, opts){
+    lastRes=res;
+    var nv=res.neverOutPct, lg=res.legacyPct;
+    $('r-never').textContent=nv+'%';
+    $('r-never').style.color = nv>=90?'#7fe3a0':nv>=75?'var(--gold)':'#ff9b7e';
+    $('r-legacy').textContent=lg+'%';
+    $('r-median').textContent=fmt(res.median);
+    var flexTxt = res.flex>0 ? 'trimming discretionary spending '+Math.round(res.flex*100)+'% in strained markets' : 'never adjusting spending';
+    var modelTxt = res.model==='historical'?'real historical US returns':res.model==='fat'?'a fat-tailed model (realistic crash risk)':'a classic bell-curve model';
+    $('r-never-ctx').textContent='Across '+opts.runs.toLocaleString()+' randomized futures using '+modelTxt+', '+flexTxt+'.';
+
+    var goalTxt = res.legacyGoal>0 ? 'Your legacy goal is <b>'+fmt(res.legacyGoal)+'</b>. ' : '';
+    var verdict = nv>=90 ? 'This is a strong, resilient plan.' :
+                  nv>=75 ? 'This plan holds up in most futures, with some risk in the worst ones.' :
+                  nv>=50 ? 'This plan is vulnerable &mdash; a meaningful share of futures run short.' :
+                           'This plan runs out of money in most futures and needs attention.';
+    $('r-readout').innerHTML=goalTxt+'In the toughest 10% of markets your plan still ends with about <b>'+fmt(res.p10)+'</b>; '+
+      'in a typical future, <b>'+fmt(res.median)+'</b>. <b>'+verdict+'</b>';
+
+    $('t-p10').textContent=fmt(res.p10);
+    $('t-p50').textContent=fmt(res.median);
+    $('t-p90').textContent=fmt(res.p90);
+    $('t-p10').style.color = res.p10<=0?'var(--bad)':'var(--warn)';
+
+    $('results').style.display='block';
+    drawFan(res);
+    postHeight(); setTimeout(postHeight,60);
+  }
+
+  function drawFan(res){
+    var cv=$('fan'); if(!cv) return;
+    var wrap=$('fanwrap'); var W=Math.max(320, wrap.clientWidth||640), H=300;
+    var dpr=window.devicePixelRatio||1;
+    cv.width=W*dpr; cv.height=H*dpr; cv.style.height=H+'px';
+    var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+    var padL=52, padR=14, padT=12, padB=26, yrs=res.yrs, years=res.years||[];
+    var p10=[],p50=[],p90=[];
+    for(var y=0;y<yrs;y++){ var col=res.yearlyBals[y]||[]; p10.push(pctile(col,10)); p50.push(pctile(col,50)); p90.push(pctile(col,90)); }
+    var maxV=0,i; for(i=0;i<yrs;i++){ if(p90[i]>maxV)maxV=p90[i]; } if(res.legacyGoal>maxV)maxV=res.legacyGoal; maxV=maxV*1.08||1;
+    function X(ix){ return padL + (W-padL-padR)*(yrs<=1?0:ix/(yrs-1)); }
+    function Y(v){ return padT + (H-padT-padB)*(1 - Math.max(0,v)/maxV); }
+
+    ctx.font='10px -apple-system,sans-serif'; ctx.textBaseline='middle';
+    for(var g=0;g<=4;g++){ var gv=maxV*g/4, gy=Y(gv);
+      ctx.strokeStyle='#eef2f5'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,gy); ctx.lineTo(W-padR,gy); ctx.stroke();
+      ctx.fillStyle='#9aabb8'; ctx.textAlign='right'; ctx.fillText(fmt(gv), padL-7, gy); }
+
+    ctx.beginPath();
+    for(var a=0;a<yrs;a++){ var x=X(a),yy=Y(p90[a]); a===0?ctx.moveTo(x,yy):ctx.lineTo(x,yy); }
+    for(var b=yrs-1;b>=0;b--){ ctx.lineTo(X(b),Y(p10[b])); }
+    ctx.closePath(); ctx.fillStyle='rgba(28,199,208,.16)'; ctx.fill();
+
+    if(res.legacyGoal>0){ var gly=Y(res.legacyGoal);
+      ctx.strokeStyle='#f4b86a'; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+      ctx.beginPath(); ctx.moveTo(padL,gly); ctx.lineTo(W-padR,gly); ctx.stroke(); ctx.setLineDash([]); }
+
+    ctx.strokeStyle='#1CC7D0'; ctx.lineWidth=2.5; ctx.beginPath();
+    for(var m=0;m<yrs;m++){ var mx=X(m),my=Y(p50[m]); m===0?ctx.moveTo(mx,my):ctx.lineTo(mx,my); } ctx.stroke();
+
+    ctx.fillStyle='#9aabb8'; ctx.textAlign='center'; ctx.textBaseline='top';
+    [0, Math.floor(yrs/2), yrs-1].forEach(function(mi){ var yr=years[mi]||''; if(yr) ctx.fillText(yr, X(mi), H-padB+7); });
+  }
+
   function applyPlan(plan){
-    if(!plan) return; d=plan;
-    var L=$('load'); if(L){ L.style.display=''; L.innerHTML='Running '+RUNS.toLocaleString()+' futures on your plan\u2026'; }
-    $('body').style.display='none';
-    setTimeout(go,30);   // let the "running" message paint first
+    d=plan;
+    $('load').style.display='none';
+    $('mcbody').style.display='block';
+    postHeight(); setTimeout(postHeight,60);
   }
-  window.addEventListener('message',function(ev){ if(ev.data&&ev.data.type==='rbpPlan'){ gotPlan=true; applyPlan(ev.data.I); } });
-  window.addEventListener('resize',function(){ if(d){ var res; try{res=RBP.runMonteCarlo(d,{runs:RUNS,model:'fat'});}catch(e){} if(res){draw(res);postHeight();} } });
+
+  $('run').addEventListener('click', function(){
+    if(!d){ return; }
+    var opts=readOpts();
+    var btn=$('run'); btn.disabled=true; var oldTxt=btn.innerHTML; btn.innerHTML='Running\u2026';
+    $('results').style.display='none'; postHeight();
+    runBatched(opts, function(res){
+      btn.disabled=false; btn.innerHTML=oldTxt; ran=true; $('prog').style.display='none';
+      if(!res){ $('r-readout').innerHTML='Couldn\u2019t run the simulation on this plan.'; $('results').style.display='block'; postHeight(); return; }
+      paint(res, opts);
+    });
+  });
+
+  window.addEventListener('message', function(ev){ if(ev&&ev.data&&ev.data.type==='rbpPlan'){ applyPlan(ev.data.I); } });
+  window.addEventListener('resize', function(){ if(ran&&lastRes){ drawFan(lastRes); } postHeight(); });
   try{ parent.postMessage({type:'rbpMCReady'}, '*'); }catch(e){}
   postHeight();
 })();
