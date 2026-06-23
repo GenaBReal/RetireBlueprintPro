@@ -310,6 +310,7 @@ function rbpProject(I, opts) {
 
     rows.push({
       yr, craigAge, genaAge, totalGross: Math.round(totalGross),
+      floorLiving: Math.round(rInf), floorHC: Math.round(uInf), floorDebt: Math.round(vDebt),
       wTotal: Math.round(wTotal), surplus: Math.round(surplus), chosenExtra: Math.round(chosenExtra),
       fundingReq: Math.round(fundingReq), totalRMD: Math.round(totalRMD), totalConv: Math.round(totalConv),
       totalTaxes: Math.round(totalTaxes), totalTaxable: Math.round(totalTaxable),
@@ -344,7 +345,7 @@ function rbpSolveSafeExtra(I){
 
 /* ── runStress: one crash scenario, fully re-solved, no approximations ──────
  * params = { drag, dur, start, inflation, lateDrag, lateDur, lateStart, plannedExtra }
- *   drag        crash drag in points (7 − return%, e.g. −10% → 17)
+ *   drag        crash drag as a DECIMAL off the growth rate (points/100): -10% return -> 0.17
  *   start, dur  crash year and length (default this plan's start, 1 yr)
  *   inflation   living-cost inflation FOR THE STRESS RUN (the panel slider, e.g. 0.03);
  *               omit to use the saved plan's own inflLiving
@@ -368,6 +369,9 @@ function rbpRunStress(I, params) {
     lateDur: (params.lateDur || 0), lateDrag: (params.lateDrag || 0)
   });
   if (params.inflation != null) S.inflLiving = params.inflation;   // stress-only inflation (B20)
+  if (params.cola      != null) S.inflSS     = params.cola;        // SS COLA override (Test 1 slider) — feeds lines 116-117
+  if (params.spendAdj  != null) S.baseLiving = (I.baseLiving || 0) * (1 + params.spendAdj); // ± floor spending (Test 1 slider)
+  if (params.goal      != null) S.legacyB8   = params.goal;        // legacy-target override (the "leave less" slider)
 
   // calm-weather safe extra (same regardless of crash) — solved once, reused for the red line
   const baseSafe = (params.plannedExtra != null) ? params.plannedExtra : rbpSolveSafeExtra(I).safeExtra;
@@ -385,6 +389,28 @@ function rbpRunStress(I, params) {
   const ending = rows.length ? Math.round(rows[rows.length - 1].endTotal) : 0;
   const below = series.find(p => p.bal < legacy);
   const zero = series.find(p => p.bal <= 0);
+  // Floor (survival) signal — same definition the solver enforces: lowest liquid total
+  // vs the safety reserve (B9). floorBreach is the first year it dips below the reserve.
+  const reserve = S.floorB9 || 0;
+  const minLiquid = series.length ? Math.min.apply(null, series.map(p => p.bal)) : 0;
+  const floorPt = series.find(p => p.bal < reserve);
+  // Year-1 spending floor breakdown (essential living + healthcare + debts) and when debts end.
+  const f0 = rows[0] || {};
+  const floorY1 = { living: (f0.floorLiving || 0), healthcare: (f0.floorHC || 0), debt: (f0.floorDebt || 0),
+    total: (f0.floorLiving || 0) + (f0.floorHC || 0) + (f0.floorDebt || 0) };
+  let debtEndYr = null;
+  for (let di = 0; di < rows.length; di++) { if ((rows[di].floorDebt || 0) > 0) debtEndYr = rows[di].yr; }
+  // Per-year cash flow for the withdrawal chart (all exact named fields — no allocation guesswork).
+  // The part of (floor+debt+extra+taxes) above `income` is `withdrawal` (= fundingReq).
+  const cashflow = rows.map(r => ({
+    year: r.yr,
+    floor: (r.floorLiving || 0) + (r.floorHC || 0),
+    debt: (r.floorDebt || 0),
+    extra: (r.chosenExtra || 0),
+    taxes: (r.totalTaxes || 0),
+    income: Math.round(r.totalGross || 0),
+    withdrawal: (r.fundingReq || 0)
+  }));
 
   // honest re-solve of safe extra UNDER this crash — full precision, exact taxes
   const crashSafe = rbpSolveSafeExtra(S).safeExtra;
@@ -394,6 +420,13 @@ function rbpRunStress(I, params) {
     hit: Math.round(ending - legacy),
     crossover: below ? below.year : null,
     depletes: zero ? zero.year : null,
+    floorBreach: floorPt ? floorPt.year : null,
+    minLiquid: Math.round(minLiquid),
+    reserve: Math.round(reserve),
+    floorY1: floorY1,
+    debtEndYr: debtEndYr,
+    cashflow: cashflow,
+    goalUsed: Math.round(legacy),
     safeExtra: crashSafe,
     safeExtraBase: Math.round(baseSafe),
     series: series
