@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test 1 · Crash Test — light prototype</title>
+<style>
+  :root{ --navy:#041E2F; --navy2:#0A3145; --teal:#1CC7D0; --gold:#f4b86a; --border:#e8eaed;
+    --ink:#0B2239; --body:#37474F; --faint:#5F6368; --bg:#F8F9FA; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--body);
+    font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;padding:16px}
+  .shell{max-width:1120px;margin:0 auto}
+  .hero{background:var(--navy);border-bottom:3px solid var(--gold);border-radius:8px 8px 0 0;
+    padding:13px 18px;display:flex;align-items:center;gap:12px}
+  .hero .tg{background:var(--teal);color:#06303a;font-size:11px;font-weight:800;letter-spacing:1.1px;
+    text-transform:uppercase;padding:6px 14px;border-radius:18px}
+  .hero h1{color:#fff;font-size:17px;font-weight:800;letter-spacing:.2px}
+  .hero .sub{color:#8a9ab0;font-size:11px;font-weight:600;margin-left:auto;text-align:right}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start;margin-top:14px}
+  @media(max-width:780px){ .grid{grid-template-columns:1fr} body{padding:11px} }
+
+  .card{background:#fff;border:1px solid var(--border);border-top:3px solid var(--navy);border-radius:7px;
+    padding:15px;box-shadow:0 1px 3px rgba(15,40,60,.05)}
+  .seclbl{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink);
+    display:flex;align-items:center;gap:6px;margin-bottom:2px}
+  .seclbl::before{content:'';width:3px;height:12px;border-radius:2px;background:var(--teal)}
+  .secsub{font-size:10.5px;color:var(--faint);margin:0 0 10px 9px}
+
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0 15px}
+  .preset{font-size:11px;padding:6px 10px;border-radius:5px;background:#F1F4F6;border:1px solid var(--border);
+    color:var(--body);cursor:pointer;user-select:none;font-weight:600}
+  .preset.on{border-color:var(--teal);color:var(--navy);background:#e6f8f9}
+
+  .sg{margin:13px 0}
+  .sl-lab{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px}
+  .sl-lab .v{font-size:14px;font-weight:800;color:#0E8E96}
+  .sl-desc{font-size:10px;color:var(--faint);line-height:1.45;margin-top:4px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:5px;background:#DCE3E8;outline:none;margin:8px 0 2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:var(--gold);border:3px solid #fff;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+  input[type=range].teal::-webkit-slider-thumb{background:var(--teal)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);border:3px solid #fff;cursor:pointer}
+  .sl-range{display:flex;justify-content:space-between;font-size:9px;color:#90A4AE}
+
+  .late-toggle{display:flex;align-items:center;gap:9px;margin-top:6px;padding-top:13px;border-top:1px solid var(--border);font-size:12px;color:var(--ink);font-weight:600;cursor:pointer;user-select:none}
+  .switch{width:36px;height:20px;border-radius:11px;background:#DCE3E8;border:1px solid var(--border);position:relative;flex:none;transition:.15s}
+  .switch::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:.15s}
+  .switch.on{background:rgba(28,199,208,.35);border-color:var(--teal)}.switch.on::after{left:18px}
+  .late-body.hide{display:none}
+  .yrinput{width:100%;background:#F1F4F6;border:1px solid var(--border);border-radius:5px;color:var(--ink);padding:7px 8px;font-size:12px;font-family:inherit;text-align:center}
+
+  .chart-h{font-size:9px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);margin-bottom:1px}
+  .chart-sub{font-size:10px;color:var(--faint);margin-bottom:9px}
+  canvas{display:block;width:100%}#chart{height:236px}#rchart{height:148px}
+  .legend{display:flex;flex-wrap:wrap;gap:13px;margin-top:9px;font-size:10px;color:var(--body)}
+  .legend i{font-style:normal;display:inline-flex;align-items:center;gap:5px}
+  .swatch{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .swatch.dash{height:0;border-top:2px dashed var(--gold);width:15px}
+  .swatch.band{height:11px;width:11px;border-radius:3px;background:rgba(192,57,43,.18)}
+  .mb14{margin-bottom:14px}
+
+  .verdict{font-size:13px;line-height:1.5;color:var(--ink);margin:0 0 15px;padding:11px 13px;border-radius:7px;background:#EAF8F9;border-left:4px solid var(--teal)}
+  .verdict.bad{background:#FBEFEC;border-left-color:#C0392B}
+  .gauge{margin-bottom:15px}
+  .glabel{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .glabel .t{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--faint);font-weight:700}
+  .glabel .r{font-size:14px;font-weight:800;color:var(--ink)}
+  .chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:5px}
+  .chip.ok{color:#0A7E84;background:#def6f4}
+  .chip.no{color:#B0392B;background:#fbe3de}
+  .ftrack{position:relative;height:9px;border-radius:5px;background:#ECEFF1;border:1px solid var(--border)}
+  .ffill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;transition:width .15s,background .15s}
+  .fres{position:absolute;top:-4px;bottom:-4px;width:2px;background:#90A4AE}
+  .fcap{font-size:11px;color:var(--faint);margin-top:9px}
+
+  .safetile{background:var(--navy);border-radius:7px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 17px}
+  .safetile .k{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+  .safetile .k b{display:block;color:#cdd9e3;font-size:11px;font-weight:600;text-transform:none;letter-spacing:0;margin-top:3px}
+  .safetile .v{font-size:30px;font-weight:800;color:#fff;line-height:1}
+  .safetile .v small{font-size:13px;font-weight:600;color:#8a9ab0}
+
+  .track{position:relative;height:32px;border-radius:6px;background:#ECEFF1;overflow:hidden;border:1px solid var(--border)}
+  .fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px 0 0 6px;transition:width .15s,background .15s}
+  .goalmark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--navy);z-index:3}
+  .goalmark::after{content:attr(data-l);position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--body);white-space:nowrap;font-weight:700}
+  .barcap{font-size:11.5px;margin-top:19px}
+  .ctrl{background:#F6F8FA;border:1px solid var(--border);border-radius:7px;padding:13px;margin-top:11px}
+  .ctrlhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+  .ctrlhead .k{font-size:12px;color:var(--body);font-weight:600}.ctrlhead .v{font-size:16px;font-weight:800}
+  .green{color:#2E7032}.coral{color:#C0392B}.teal{color:#0E8E96}.gold{color:#C98322}.mut{color:var(--faint)}
+  .mb16{margin-bottom:16px}
+  .planfacts{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-bottom:13px}
+  .pf{background:#F6F8FA;border:1px solid var(--border);border-radius:7px;padding:10px 12px}
+  .pf-k{font-size:8.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#0A7E84}
+  .pf-v{font-size:19px;font-weight:800;color:var(--ink);line-height:1.1;margin-top:3px}
+  .pf-v small{font-size:11px;font-weight:600;color:var(--faint)}
+  .pf-s{font-size:9.5px;color:var(--faint);margin-top:3px;line-height:1.35}
+  .debtnote{font-size:11px;line-height:1.5;color:#7a5a1e;background:#fbf3e3;border:1px solid #f0dcb8;border-radius:7px;padding:9px 12px;margin-bottom:16px}
+  .swatch.sq{height:11px;width:11px;border-radius:3px}
+  .foot{font-size:10.5px;color:#90A4AE;margin-top:15px;text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div id="loading" style="padding:48px 16px;text-align:center;color:#5F6368;font-size:13px">Loading your saved plan\u2026<br><span style="font-size:11px;color:#90A4AE">If this stays, hit <b>Reload</b> at the top of the page.</span></div>
+  <div id="t1body" style="display:none">
+  <div class="hero"><div class="tg">Test 1 · Crash Test</div><h1>Dial in a downturn — see it the same second</h1><div class="sub" id="heroSub">your saved plan<br>real engine · instant</div></div>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <div class="card">
+      <div class="seclbl">Scenario parameters</div>
+      <div class="presets" id="presets">
+        <div class="preset on" data-p="custom">Custom</div>
+        <div class="preset" data-p="c2008">2008</div>
+        <div class="preset" data-p="dotcom">Dot-Com</div>
+        <div class="preset" data-p="covid">COVID</div>
+        <div class="preset" data-p="stag">1970s</div>
+        <div class="preset" data-p="bull">Bull</div>
+      </div>
+      <div class="sg">
+        <div class="sl-lab"><span>Early crash — year-1 return</span><span class="v" id="v-yr1">0%</span></div>
+        <input type="range" id="yr1" min="-50" max="30" step="1" value="0">
+        <div class="sl-range"><span>−50%</span><span>0%</span><span>+30%</span></div>
+        <div class="sl-desc">A crash in your first retirement year is the worst case — you sell at the bottom to live on.</div>
+      </div>
+      <div class="sg">
+        <div class="sl-lab"><span>…lasting</span><span class="v" id="v-yrs">1 yr</span></div>
+        <input type="range" id="yrs" min="1" max="5" step="1" value="1">
+        <div class="sl-range"><span>1 yr</span><span>3 yrs</span><span>5 yrs</span></div>
+      </div>
+      <div class="sg">
+        <div class="sl-lab"><span>Inflation</span><span class="v" id="v-inf">2.5%</span></div>
+        <input type="range" id="inf" min="1" max="10" step="0.1" value="2.5">
+        <div class="sl-range"><span>1%</span><span>5%</span><span>10%</span></div>
+      </div>
+      <div class="sg">
+        <div class="sl-lab"><span>Social Security COLA</span><span class="v" id="v-cola">2.5%</span></div>
+        <input type="range" id="cola" min="0" max="5" step="0.1" value="2.5">
+        <div class="sl-range"><span>0%</span><span>2.5%</span><span>5%</span></div>
+        <div class="sl-desc">0% models a worst-case Social Security reform.</div>
+      </div>
+      <div class="sg">
+        <div class="sl-lab"><span>Spending vs plan</span><span class="v" id="v-spend">0%</span></div>
+        <input type="range" id="spendadj" min="-30" max="20" step="5" value="0">
+        <div class="sl-range"><span>−30%</span><span>0%</span><span>+20%</span></div>
+        <div class="sl-desc">Your most powerful lever in a downturn.</div>
+      </div>
+      <div class="late-toggle" id="lateTog"><span class="switch" id="lateSw"></span><span>Add a second crash later in retirement</span></div>
+      <div class="late-body hide" id="lateBody">
+        <div class="sg" style="margin-top:6px"><div class="sl-lab"><span>Starts (year)</span></div><input class="yrinput" id="lt-start" type="number" value="2045"></div>
+        <div class="sg"><div class="sl-lab"><span>Year-1 return</span><span class="v" id="v-ltret">−20%</span></div><input type="range" id="lt-ret" min="-50" max="10" step="1" value="-20"></div>
+        <div class="sg"><div class="sl-lab"><span>…lasting</span><span class="v" id="v-ltyrs">2 yrs</span></div><input type="range" id="lt-yrs" min="1" max="5" step="1" value="2"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card mb16">
+        <div class="chart-h">Portfolio over time — base plan vs. this scenario</div>
+        <div class="chart-sub">every year through the plan, with the legacy goal marked</div>
+        <canvas id="chart"></canvas>
+        <div class="legend">
+          <i><span class="swatch" style="background:#16AEB6"></span>Base plan</i>
+          <i><span class="swatch" id="leg-stress" style="background:var(--salmon)"></span>This scenario</i>
+          <i><span class="swatch dash"></span>Legacy goal</i>
+          <i><span class="swatch" style="height:0;border-top:2px dotted #8499A8;width:15px"></span>Account floor</i>
+          <i><span class="swatch band"></span>Crash years</i>
+        </div>
+      </div>
+
+      <div class="card mb16">
+        <div class="chart-h">Return each year — the sequence your plan must survive</div>
+        <div class="chart-sub">crash years drop into the warm colors; deeper crash = warmer</div>
+        <canvas id="rchart"></canvas>
+      </div>
+
+      <div class="card mb16">
+        <div class="chart-h">Your spending vs. the most you can safely spend</div>
+        <div class="chart-sub">one rule — stay under the dashed line. green is room to spare; red is the cut you'd need, in dollars.</div>
+        <canvas id="wchart"></canvas>
+        <div class="legend">
+          <i><span class="swatch sq" style="background:rgba(28,199,208,.30)"></span>Essentials</i>
+          <i><span class="swatch" style="background:var(--navy);height:3px"></span>You plan to spend</i>
+          <i><span class="swatch" style="height:0;border-top:2px dashed #0A7E84;width:15px"></span>Safe-to-spend ceiling</i>
+          <i><span class="swatch sq" style="background:rgba(70,200,150,.45)"></span>Room to spare</i>
+          <i><span class="swatch sq" style="background:rgba(192,57,43,.4)"></span>Overspending</i>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="seclbl">Your plan — what everything is measured against</div>
+        <div class="planfacts" style="margin-top:11px">
+          <div class="pf"><div class="pf-k">Essentials · every year</div><div class="pf-v" id="factFloor">$118K<small>/yr</small></div><div class="pf-s" id="factFloorBreak">living · healthcare · debt</div></div>
+          <div class="pf"><div class="pf-k">Account floor</div><div class="pf-v" id="factReserve">$150K</div><div class="pf-s">balance can\u2019t drop below this</div></div>
+          <div class="pf"><div class="pf-k">Legacy goal</div><div class="pf-v" id="factLegacy">$1.00M</div><div class="pf-s">to leave behind</div></div>
+        </div>
+        <div class="debtnote" id="debtNote"></div>
+        <div class="verdict" id="verdict">…</div>
+        <div class="gauge">
+          <div class="glabel"><span class="t">Account floor · balance stays above this</span><span class="chip ok" id="floorChip">Stays above</span></div>
+          <div class="ftrack"><div class="ffill" id="ffill"></div><div class="fres" id="fres" style="left:25%"></div></div>
+          <div class="fcap" id="fcap">lowest balance stays above your reserve</div>
+        </div>
+        <div class="safetile">
+          <div class="k">Guilt-free extra / yr<b id="safeNote">and still leave your full legacy</b></div>
+          <div class="v" id="safeAmt">$30K<small>/yr</small></div>
+        </div>
+        <div class="gauge">
+          <div class="glabel"><span class="t">Legacy you'd leave</span><span class="r" id="legR">$1.00M</span></div>
+          <div class="track"><div class="fill" id="legFill"></div><div class="goalmark" id="goalMark" data-l="goal" style="left:40%"></div></div>
+          <div class="barcap" id="legCap">right on your goal</div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrlhead"><span class="k">If you spent this much extra…</span><span class="v gold" id="spendVal">$30K/yr</span></div>
+          <input type="range" id="spend" min="0" max="120" step="1" value="30">
+          <div class="sl-range" id="spendScale"><span>$0</span><span>$60K</span><span>$120K</span></div>
+          <div class="fcap" id="spendNote" style="margin-top:8px">you're right at the safe line</div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrlhead"><span class="k">If you'd accept leaving less legacy…</span><span class="v teal" id="goalVal">$1.00M</span></div>
+          <input type="range" class="teal" id="goal" min="50" max="150" step="5" value="100">
+          <div class="sl-range" id="goalScale"><span>$0.5M</span><span>$1.0M</span><span>$1.5M</span></div>
+          <div class="fcap" id="goalNote" style="margin-top:8px">guilt-free extra becomes <b class="gold" id="safeAtGoal">$30K/yr</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="foot">Every figure is computed live from your saved plan \u2014 taxes, RMDs, and Social Security timing included. Nothing here changes your saved data.</p>
+  </div>
+</div>
+
+<script>
+/* ============================================================================
+ * RetireBlueprint Pro — Engine  (rbp-engine.js)  · SINGLE SOURCE OF TRUTH
+ * ----------------------------------------------------------------------------
+ * One shared, full-precision engine for every page. No $500 rounding, no
+ * estimated tax margins — taxes are computed exactly inside the projection.
+ *
+ *   RBP.project(I, opts)        → year-by-year rows (the Master array, ported)
+ *   RBP.solveSafeExtra(I)       → max safe extra spend (honest binary search)
+ *   RBP.runStress(I, params)    → crash scenario: ending / hit / crossover /
+ *                                 re-solved safe extra / full series
+ *   RBP.buildI(payload, D)      → map a connector input payload → engine input I
+ *
+ * Validated to the dollar against the live Google Sheet: base case (all cash-
+ * flow columns exact, balances within 0.005%) and the full crash ladder
+ * (ending, hit, AND crossover year exact, −10% through −40%).
+ * ==========================================================================*/
+function gs15(x){ if(!isFinite(x)||x===0)return x; var d=Math.ceil(Math.log10(Math.abs(x))); var p=15-d; var f=Math.pow(10,p); return Math.round(x*f)/f; }
+function gsR(x){ x=gs15(x); return x<0?-Math.round(-x):Math.round(x); }
+function rbpProject(I, opts) {
+  opts = opts || {};
+  const yOf = d => (d ? new Date(d).getFullYear() : null);
+  const mOf = d => (d ? new Date(d).getMonth() + 1 : null);
+  const startYear = yOf(I.planStart), pm = mOf(I.planStart), pd = new Date(I.planStart).getDate();
+
+  const gLife = (I.p1_lifeEnd - I.p1_ageStart) || 0;     // var_G_Life  (col-B person)
+  const cLife = (I.p2_lifeEnd - I.p2_ageStart) || 0;     // var_C_Life  (col-D person)
+  // Run THROUGH the entered death-age year for the longest-lived person (not one year short).
+  // Age is stamped at year-start, so a death age of 102 needs (102-currentAge)+1 rows for the final
+  // row to read 102. MUST stay in lockstep with the sheet's var_Duration = MIN(var_Max_Duration+1,111).
+  const duration = Math.min(Math.max(gLife, cLife) + 1, 111);
+
+  // Tax Engine tables
+  const TB = I.taxBrackets, TR = I.taxRates;             // length 7 (C8:C14 / D8:D14)
+  const TRDiff = TR.map((r,i) => r - (i ? TR[i-1] : 0)); // var_Tax_Rate_Diffs
+  const LTCG_B = [0, 94050, 583750], LTCG_R = [0, 0.15, 0.20];
+
+  // accounts (length 12)
+  const A = I.accounts; // {statusA, statusG, type, name, start, rate, basis, contrib, match, cStart, cEnd, wStart}
+  const nameL = s => String(s||'').toLowerCase().trim();
+  const n1 = nameL(I.name1), n2 = nameL(I.name2);
+  const owner = A.map(a => {
+    const ow = nameL(a.owner);          // Owner column (C): partner name or "Joint"
+    if (n1 && ow.includes(n1)) return 1;  // → partner 1 (Craig)
+    if (n2 && ow.includes(n2)) return 2;  // → partner 2 (Gena)
+    return 0;                              // Joint / blank → unattributed (matches Sheet)
+  });
+  const incYes = A.map(a => nameL(a.statusA) === 'yes');
+  const rate = A.map(a => (a.rate||0));                 // already decimal
+  const startBal = A.map((a,i) => (a.start||0) * (incYes[i]?1:0));
+  const typeL = A.map(a => nameL(a.type));
+  const hier = typeL.map(t => t.includes('taxable')?1 : t.includes('pre')?2 : t.includes('roth')?3 : 99);
+  const gUnlock = I.p1_unlock ? yOf(I.p1_unlock) : startYear;
+  const cUnlock = I.p2_unlock ? yOf(I.p2_unlock) : startYear;
+  const acctUnlock = A.map((a,i) => a.wStart ? yOf(a.wStart) : (owner[i]===1?gUnlock : owner[i]===2?cUnlock : startYear));
+
+  const taxBasisInit = A.reduce((s,a,i)=> s + ((hier[i]===1 && incYes[i]) ? (a.basis||0) : 0), 0);
+
+  // window proration helper: income active fraction for [S,E] in year yr (matches the IF ladders)
+  function annualFrac(yr, S, E, startInclusive) {
+    // mirrors the pension/other LET windows
+    if (!S) return startInclusive ? 1 : 0;
+    const ys = yOf(S);
+    if (yr < ys) return 0;
+    if (!E) return (yr===ys) ? (13-mOf(S))/12 : 1;
+    const ye = yOf(E);
+    if (yr > ye) return 0;
+    if (ys===ye) return (mOf(E)-mOf(S)+1)/12;
+    if (yr===ys) return (13-mOf(S))/12;
+    if (yr===ye) return mOf(E)/12;
+    return 1;
+  }
+  // OTHER income window — mirrors the sheet's var_*_Oth EXACTLY, including its quirk that a blank
+  // end date reads as YEAR(blank)=1899, so any plan year is "after" it and the income becomes 0.
+  function otherFrac(yr, S, E) {
+    if (!S) return 0;
+    const ys = yOf(S);
+    if (yr < ys) return 0;
+    if (!E) return 0;                         // blank end date -> 0 (matches the sheet)
+    const ye = yOf(E);
+    if (yr > ye) return 0;
+    if (ys === ye) return (mOf(E)-mOf(S)+1)/12;
+    if (yr === ys) return (13-mOf(S))/12;
+    if (yr === ye) return mOf(E)/12;
+    return 1;
+  }
+  const bracketTax = (taxable, brackets) =>
+    brackets.reduce((s,b,i)=> s + (taxable>b ? (taxable-b)*TRDiff[i] : 0), 0);
+  const xlookupRate = (x, B, R) => { let r=R[0]; for(let i=0;i<B.length;i++){ if(x>=B[i]) r=R[i]; } return r; };
+
+  let prevBals = startBal.slice(), prevBasis = taxBasisInit;
+  const rows = [];
+
+  for (let k=0; k<duration; k++) {
+    const yr = startYear + k, idx = yr - startYear;
+
+    // contributions
+    const cActive = A.map((a,i)=> (a.contrib>0) *
+      (a.cStart? (yr>=yOf(a.cStart)?1:0):1) * (a.cEnd? (yr<=yOf(a.cEnd)?1:0):1) * (incYes[i]?1:0));
+    const cPro = A.map((a)=> (a.cStart? (yOf(a.cStart)===yr? (13-mOf(a.cStart))/12 : 1):1) *
+      (a.cEnd? (yOf(a.cEnd)===yr? mOf(a.cEnd)/12 : 1):1));
+    const contribAmt = A.map((a,i)=> Math.round((a.contrib||0)*cActive[i]*cPro[i]));
+    const matchAmt   = A.map((a,i)=> Math.round((a.match||0)*cActive[i]*cPro[i]));
+    const sp = (arr,m)=> arr.reduce((s,v,i)=> s + v*(m[i]?1:0), 0);
+    const craigContrib = Math.round(sp(contribAmt, owner.map(o=>o===1)));
+    const craigMatch   = Math.round(sp(matchAmt,   owner.map(o=>o===1)));
+    const genaContrib  = Math.round(sp(contribAmt, owner.map(o=>o===2)));
+    const genaMatch    = Math.round(sp(matchAmt,   owner.map(o=>o===2)));
+    const totalContrib = craigContrib+craigMatch+genaContrib+genaMatch;
+
+    const gDeath = startYear+gLife, cDeath = startYear+cLife;
+    const gAlive = yr<=gDeath, cAlive = yr<=cDeath;
+    const craigAge = I.p1_ageStart+idx, genaAge = I.p2_ageStart+idx;
+
+    const gSal = gAlive ? I.p1_salary*(!I.p1_salEnd?1:(yr<yOf(I.p1_salEnd)?1:(yr===yOf(I.p1_salEnd)?mOf(I.p1_salEnd)/12:0))) : 0;
+    const ssFrac = (start)=> !start?1:(yr<yOf(start)?0:(yr===yOf(start)?(13-mOf(start))/12:1));
+    const gProjSS = I.p1_ssMonthly*12*ssFrac(I.p1_ssStart)*Math.pow(1+I.inflSS, idx);
+    const cProjSS = I.p2_ssMonthly*12*ssFrac(I.p2_ssStart)*Math.pow(1+I.inflSS, idx);
+    const gSS = gAlive ? ((!cAlive && craigAge>=60) ? Math.max(gProjSS,cProjSS) : gProjSS) : 0;
+    const cSS = cAlive ? ((!gAlive && genaAge>=60)  ? Math.max(cProjSS,gProjSS) : cProjSS) : 0;
+    const gPen = gAlive ? I.p1_pension*12*annualFrac(yr, I.p1_penStart, I.p1_penEnd, true) : 0;
+    const gOth = gAlive ? I.p1_other*otherFrac(yr, I.p1_othStart, I.p1_othEnd) : 0;
+    const cSal = cAlive ? I.p2_salary*(!I.p2_salEnd?1:(yr<yOf(I.p2_salEnd)?1:(yr===yOf(I.p2_salEnd)?mOf(I.p2_salEnd)/12:0))) : 0;
+    const cPen = cAlive ? I.p2_pension*12*annualFrac(yr, I.p2_penStart, I.p2_penEnd, true) : 0;
+    const cOth = cAlive ? I.p2_other*otherFrac(yr, I.p2_othStart, I.p2_othEnd) : 0;
+    const totalGross = gSal+gSS+gPen+gOth+cSal+cSS+cPen+cOth;
+
+    // RMD / conversions off pre-tax
+    const cPreMask = owner.map((o,i)=> (o===1 && hier[i]===2)?1:0);
+    const gPreMask = owner.map((o,i)=> (o===2 && hier[i]===2)?1:0);
+    const c401 = sp(prevBals, cPreMask), g401 = sp(prevBals, gPreMask);
+    const rmdDiv = (age)=> { const a=Math.min(age,120); let div=0; for(let i=0;i<I.rmdAge.length;i++){ if(a>=I.rmdAge[i]) div=I.rmdDiv[i]; } return div; };
+    // SURVIVOR ROLLOVER: once an owner has died, their pre-tax money is the surviving spouse's,
+    // so its RMD follows the SURVIVOR's age and RMD-start age (not the deceased's continuing age).
+    // Per-account pre-tax balances (c401/g401) are unchanged. Must stay in lockstep with Master!A8.
+    const cRmdAge   = (yr>gDeath && cAlive) ? genaAge     : craigAge;   // Craig's pre-tax bucket
+    const cRmdStart = (yr>gDeath && cAlive) ? I.rmdStartG : I.rmdStartC;
+    const gRmdAge   = (yr>cDeath && gAlive) ? craigAge    : genaAge;    // Gena's pre-tax bucket
+    const gRmdStart = (yr>cDeath && gAlive) ? I.rmdStartC : I.rmdStartG;
+    const rmdC = cRmdAge>=cRmdStart ? (rmdDiv(cRmdAge)? c401/rmdDiv(cRmdAge):0) : 0;
+    const rmdG = gRmdAge>=gRmdStart ? (rmdDiv(gRmdAge)? g401/rmdDiv(gRmdAge):0) : 0;
+    const totalRMD = rmdC+rmdG;
+    const convCreq = (I.convTable[yr]?.c)||0, convGreq = (I.convTable[yr]?.g)||0;
+    const convC = Math.max(0, Math.min(convCreq, c401-rmdC));
+    const convG = Math.max(0, Math.min(convGreq, g401-rmdG));
+    const totalConv = convC+convG;
+    const forcedW = prevBals.map((b,i)=>
+      cPreMask[i]*(c401? b/c401:0)*(rmdC+convC) + gPreMask[i]*(g401? b/g401:0)*(rmdG+convG));
+    const remBals = prevBals.map((b,i)=> Math.max(0, b-forcedW[i]));
+
+    // filing status / std deduction / SS taxation
+    const survMult = !n2 ? 1 : ((gAlive&&cAlive)?1 : ((gAlive||cAlive)? 1-I.survivorReduce : 0));
+    const rInf = I.baseLiving*survMult*Math.pow(1+I.inflLiving, idx);
+    const bothAliveFS = (gAlive&&cAlive)||(yr===gDeath&&cAlive)||(yr===cDeath&&gAlive);
+    const fsRaw = String(I.filingStatus||'').toUpperCase().trim();
+    const chosenFS = (fsRaw==='MARRIED FILING SEPARATELY'||fsRaw==='MFS')?'MFS':
+                     (fsRaw==='HEAD OF HOUSEHOLD'||fsRaw==='HOH')?'HoH':
+                     (fsRaw==='SINGLE')?'Single':'MFJ';
+    const filing = bothAliveFS?chosenFS : (chosenFS==='HoH'?'HoH':'Single');
+    const stdBase = filing==='MFJ'?32200 : filing==='HoH'?24150 : 16100;
+    const stdDed = stdBase*Math.pow(1+I.inflStdDed, idx);
+    const totalSS = gSS+cSS;
+    const nonSSGross = gSal+gPen+gOth+cSal+cPen+cOth;
+    const combIncome = nonSSGross+totalRMD+totalConv+0.5*totalSS;
+    let taxableSS;
+    if (filing==='MFJ') taxableSS = combIncome>44000 ? Math.min(0.85*totalSS, 0.85*(combIncome-44000)+Math.min(6000,0.5*totalSS))
+                        : combIncome>32000 ? Math.min(0.5*totalSS, 0.5*(combIncome-32000)) : 0;
+    else taxableSS = combIncome>34000 ? Math.min(0.85*totalSS, 0.85*(combIncome-34000)+Math.min(4500,0.5*totalSS))
+                        : combIncome>25000 ? Math.min(0.5*totalSS, 0.5*(combIncome-25000)) : 0;
+    const taxableGross = nonSSGross+taxableSS+totalRMD+totalConv;
+
+    // IRMAA + healthcare
+    const irmaaT = filing==='MFJ'?I.irmaaMFJ:I.irmaaSingle;
+    const irmaaAdd = (age, pAlive, mAge)=> {
+      if (!(pAlive && age>=mAge)) return 0;
+      let v=0; for(let i=0;i<irmaaT.length;i++){ if(I.magiThresh && (filing==='MFJ'?I.magiMFJ:I.magiSingle)[i]<=taxableGross) v=irmaaT[i]; }
+      return v*12;
+    };
+    const gHC = gAlive ? (craigAge>=I.p1_medAge ? I.p1_medPrem+irmaaAdd(craigAge,gAlive,I.p1_medAge) : I.p1_preMed) : 0;
+    const cHC = cAlive ? (genaAge >=I.p2_medAge ? I.p2_medPrem+irmaaAdd(genaAge, cAlive,I.p2_medAge) : I.p2_preMed) : 0;
+    const uInf = (gHC+cHC)*Math.pow(1+I.inflHC, idx);
+    const vDebt = I.debts.reduce((s,d)=> s + (nameL(d.status)==='yes' && yOf(d.start)<=yr && yOf(d.end)>=yr ? d.amount : 0), 0);
+    const wTotal = gs15(gs15(rInf)+gs15(uInf)+vDebt);
+
+    const baseTaxable = Math.max(0, taxableGross-stdDed);
+    const curBrackets = filing==='MFJ'?TB : filing==='HoH'?[0,17700,67450,105700,201775,256225,640600] : TB.map(b=>b/2);
+    // Married Filing Separately = two separate returns (mirrors the sheet's var_*_MFS path).
+    // Group income per person, tax each person's SS under the MFS rule (85% taxable once there is any
+    // other income — no $25k/$34k floor), subtract each person's own standard deduction, then tax each
+    // return on its own and sum. Engine prefixes are split: person 1 (Craig) income = g*, RMD/conv =
+    // rmdC/convC, 401k = c401; person 2 (Gena) income = c*, RMD/conv = rmdG/convG, 401k = g401.
+    const isMFS = (filing==='MFS');
+    const p1Inc = gSal+gPen+gOth+rmdC+convC, p2Inc = cSal+cPen+cOth+rmdG+convG;
+    const p1SSx = Math.min(0.85*gSS, 0.85*(p1Inc + 0.5*gSS));
+    const p2SSx = Math.min(0.85*cSS, 0.85*(p2Inc + 0.5*cSS));
+    const p1TaxableMFS = Math.max(0, (p1Inc + p1SSx) - stdDed);
+    const p2TaxableMFS = Math.max(0, (p2Inc + p2SSx) - stdDed);
+    const baseTaxes = isMFS ? bracketTax(p1TaxableMFS, curBrackets) + bracketTax(p2TaxableMFS, curBrackets)
+                            : bracketTax(baseTaxable, curBrackets);
+    const baseStateTax = baseTaxable*I.stateTax;
+
+    // chosen extra (smile) — projection input knob
+    const phYr = (s,e,amt)=> (yr>=yOf(s)&&yr<=yOf(e))?amt:null;
+    const smile = [ [I.ph1Start,I.ph1End,I.ph1Spend], [I.ph2Start,I.ph2End,I.ph2Spend], [I.ph3Start,I.ph3End,I.ph3Spend] ]
+      .reduce((acc,p)=> acc!=null?acc:phYr(p[0],p[1],p[2]), null) || 0;
+    const assumeExtra = nameL(I.assumeExtra)==='yes';
+    const chosenExtra = (opts.extraOverride!=null) ? opts.extraOverride(yr, smile) : (assumeExtra?smile:0);
+
+    const targetNet = Math.max(0, gs15(wTotal+chosenExtra+baseTaxes+baseStateTax-totalGross-totalRMD));
+
+    // effective hierarchy (locked accounts deferred unless owner deceased)
+    const ownerDeceased = (i)=> owner[i]===1?yr>gDeath : owner[i]===2?yr>cDeath : false;
+    const effH = remBals.map((b,i)=> yr<acctUnlock[i] ? (ownerDeceased(i)?hier[i]:(hier[i]===1?1:99)) : hier[i]);
+    const B1 = sp(remBals, effH.map(h=>h===1)), B2 = sp(remBals, effH.map(h=>h===2)), B3 = sp(remBals, effH.map(h=>h===3));
+
+    // W1 taxable (cap gains)
+    const cgFrac = Math.max(0, B1? (B1-prevBasis)/B1 : 0);
+    const cgEst = Math.min(targetNet,B1)*cgFrac;
+    const cgTaxEst = cgEst*xlookupRate(baseTaxable+cgEst, LTCG_B, LTCG_R);
+    const W1 = Math.min(targetNet+cgTaxEst, B1);
+    const cgActGain = W1*cgFrac;
+    const cgTaxActual = cgActGain*xlookupRate(baseTaxable+cgActGain, LTCG_B, LTCG_R);
+    const net1 = W1-cgTaxActual, remNet1 = Math.max(0, targetNet-net1);
+
+    // W2 pre-tax (marginal gross-up w/ SS multiplier)
+    const marginal = taxableGross<stdDed ? 0 : xlookupRate(baseTaxable, curBrackets, TR);
+    const ssMult = taxableSS>=0.85*totalSS ? 1 :
+      (filing==='MFJ' ? (combIncome>44000?1.85:combIncome>32000?1.5:1)
+                      : (combIncome>34000?1.85:combIncome>25000?1.5:1));
+    const effMarg = Math.min(0.99, marginal*ssMult);
+    const W2 = Math.min(remNet1/(1-effMarg), B2);
+    const totTaxableW2 = Math.max(0, taxableGross+W2-stdDed);
+    // MFS: split the pre-tax W2 withdrawal between the two returns by 401k balance (mirrors the sheet's
+    // var_C_W2_Frac), add each share to that person's taxable, and tax each return separately.
+    const w2FracP1 = (c401+g401)>0 ? c401/(c401+g401) : 0.5;   // person 1 (Craig) share, by 401k balance
+    const p1TaxableWW2 = Math.max(0, (p1Inc + p1SSx + W2*w2FracP1) - stdDed);
+    const p2TaxableWW2 = Math.max(0, (p2Inc + p2SSx + W2*(1-w2FracP1)) - stdDed);
+    const taxesW2 = isMFS ? bracketTax(p1TaxableWW2, curBrackets) + bracketTax(p2TaxableWW2, curBrackets)
+                          : bracketTax(totTaxableW2, curBrackets);
+    const ordTaxActual = taxesW2-baseTaxes;
+    const net2 = W2-ordTaxActual, remNet2 = Math.max(0, remNet1-net2);
+
+    // W3 roth
+    const W3 = Math.min(remNet2, B3);
+
+    const extraTaxes = cgTaxActual+ordTaxActual;
+    const totalTaxable = Math.max(0, taxableGross+W2-stdDed);
+    const stateTax = totalTaxable*I.stateTax;
+    const totalTaxes = baseTaxes+extraTaxes+stateTax;
+    const fundingReq = Math.max(0, wTotal+chosenExtra+totalTaxes-totalGross);
+    const surplus = Math.max(0, totalGross-(wTotal+chosenExtra+totalTaxes));
+
+    // disbursement allocation per account
+    const dDisc = remBals.map((b,i)=> gsR(
+      (effH[i]===1?(B1? b/B1*W1:0):0)+(effH[i]===2?(B2? b/B2*W2:0):0)+(effH[i]===3?(B3? b/B3*W3:0):0)));
+    const D = prevBals.map((b,i)=> gsR(forcedW[i]+dDisc[i]));
+
+    // reinvested RMDs + conversion destinations (basis tracking)
+    const reinvRMD = Math.max(0, totalRMD-fundingReq);
+    const reinvC = Math.round(totalRMD>0? reinvRMD*(rmdC/totalRMD):0);
+    const reinvG = Math.round(totalRMD>0? reinvRMD*(rmdG/totalRMD):0);
+    const cRoth = owner.map((o,i)=>(o===1&&hier[i]===3)?1:0), gRoth = owner.map((o,i)=>(o===2&&hier[i]===3)?1:0);
+    const cTax  = owner.map((o,i)=>(o===1&&hier[i]===1)?1:0), gTax  = owner.map((o,i)=>(o===2&&hier[i]===1)?1:0);
+    const anyTax = hier.map(h=>h===1?1:0);
+    const nSum = m=> m.reduce((s,v)=>s+v,0);
+    const dest = (roth, tax)=> { const rn=nSum(roth), tn=nSum(tax), an=nSum(anyTax);
+      if (rn>0) return roth.map(v=>v/rn); if (tn>0) return tax.map(v=>v/tn); return roth.map(()=>0); };
+    const cConvDest = dest(cRoth,cTax), gConvDest = dest(gRoth,gTax);
+    const reinvDest = (tax)=> { const tn=nSum(tax), an=nSum(anyTax);
+      if (tn>0) return tax.map(v=>v/tn); if (an>0) return anyTax.map(v=>v/an); return tax.map(()=>0); };
+    const cReinvDest = reinvDest(cTax), gReinvDest = reinvDest(gTax);
+    const reinvArr = prevBals.map((_,i)=> cConvDest[i]*convC + gConvDest[i]*convG + cReinvDest[i]*reinvC + gReinvDest[i]*reinvG);
+
+    const basisConsumed = W1*(B1? prevBasis/B1:0);
+    const basisAdded = contribAmt.reduce((s,_,i)=> s + ((hier[i]===1)?(contribAmt[i]+matchAmt[i]+reinvArr[i]):0), 0);
+    const basisNext = Math.max(0, prevBasis-basisConsumed+basisAdded);
+    const basisNextR = gsR(basisNext);   // sheet stores & carries ROUND(var_TaxBasis_Next,0)
+
+    const post = prevBals.map((b,i)=> gsR(b-D[i]+reinvArr[i]+contribAmt[i]+matchAmt[i]));
+    const mid  = prevBals.map((b,i)=> gsR((b+post[i])/2));
+
+    // bear drag (crash params B12-B19)
+    const isBear = String(I.crashType||'').toLowerCase().includes('bear') && yr>=(I.crashStart||0) && yr<((I.crashStart||0)+(I.crashDur||0));
+    const isLate = String(I.lateCrashType||'').toLowerCase().includes('bear') && yr>=(I.lateStart||0) && yr<((I.lateStart||0)+(I.lateDur||0));
+    const ends = mid.map((mv,i)=> {
+      const drag = (isBear?(I.crashDrag||0):0)*(rate[i]>0.03?1:0) + (isLate?(I.lateDrag||0):0)*(rate[i]>0.03?1:0);
+      const growth = gsR(gs15(mv*gs15((rate[i]-drag)*(incYes[i]?1:0))));
+      return gsR(post[i]+growth);
+    });
+
+    // ── Full Master row: all 82 columns, in sheet order (for the web Master grid) ──
+    const _pad = n => String(n).padStart(2,'0');
+    const _sm = (arr,f) => arr.reduce((s,v,i)=> s + (f(i)?v:0), 0);
+    const _startTot=_sm(prevBals,()=>true), _postTot=post.reduce((s,v)=>s+v,0), _midTot=mid.reduce((s,v)=>s+v,0);
+    const _endTot=ends.reduce((s,v)=>s+v,0);
+    const master = [
+      yr, yr+'-'+_pad(pm)+'-'+_pad(pd), craigAge, genaAge,
+      gSal, gSS, gProjSS*((gAlive&&cAlive)?1:0), gPen, gOth, cSal, cSS, cProjSS*((gAlive&&cAlive)?1:0), cPen, cOth, totalGross,
+      craigContrib, craigMatch, genaContrib, genaMatch, totalContrib, stdDed,
+      I.baseLiving, I.inflLiving, rInf, (gHC+cHC), I.inflHC, uInf, vDebt, wTotal,
+      Math.max(0, wTotal-totalGross), surplus, chosenExtra, fundingReq,
+      rmdC, rmdG, totalRMD, convC, convG, totalConv,
+      totalTaxable, baseTaxes+ordTaxActual, stateTax, cgTaxActual, totalTaxes,
+      Math.max(totalRMD, fundingReq), reinvRMD,
+      D[0],D[1],D[2],D[3],D[4],D[5],D[6],D[7],D[8],D[9],D[10],D[11], (D.reduce((s,v)=>s+v,0))/12,
+      ends[0],ends[1],ends[2],ends[3],ends[4],ends[5],ends[6],ends[7],ends[8],ends[9],ends[10],ends[11],
+      _startTot, _sm(prevBals,i=>hier[i]===2), _sm(prevBals,i=>hier[i]===3), _sm(prevBals,i=>hier[i]===1),
+      basisNextR, _sm(prevBals,i=>typeL[i].includes('hsa')), _sm(prevBals,i=>typeL[i].includes('529')),
+      _postTot, _midTot, _endTot-_postTot, _endTot
+    ];
+
+    rows.push({
+      yr, craigAge, genaAge, totalGross: Math.round(totalGross),
+      floorLiving: Math.round(rInf), floorHC: Math.round(uInf), floorDebt: Math.round(vDebt),
+      wTotal: Math.round(wTotal), surplus: Math.round(surplus), chosenExtra: Math.round(chosenExtra),
+      fundingReq: Math.round(fundingReq), totalRMD: Math.round(totalRMD), totalConv: Math.round(totalConv),
+      totalTaxes: Math.round(totalTaxes), totalTaxable: Math.round(totalTaxable),
+      ends: ends.slice(), endTotal: ends.reduce((s,v)=>s+v,0),
+      liquidEnd: ends.reduce((s,v,i)=> s + (typeL[i].includes('liquid')?v:0), 0),
+      basisNext: Math.round(basisNext), master: master
+    });
+    prevBals = ends; prevBasis = basisNextR;
+  }
+  return rows;
+}
+
+function rbpSolveSafeExtra(I){
+  const yOf=d=>d?new Date(d).getFullYear():null;
+  const w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
+  const p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
+  const A=I.accounts, nameL=s=>String(s||'').toLowerCase().trim();
+  const withMask=A.map(a=>{const g=nameL(a.G); return (g===''||g.includes('use')||g.includes('yes')||g.includes('withdraw'))?1:0;});
+  function shortfall(X){
+    const rows=rbpProject(I,{extraOverride:(yr)=>{
+      let ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2;
+      return ph<0?0: X*w[ph]/avg;
+    }});
+    const wd=rows.map(r=> r.ends.reduce((s,v,i)=> s+(withMask[i]?v:0),0));
+    const finalW=wd[wd.length-1], minW=Math.min.apply(null,wd);
+    return Math.min(finalW-(I.legacyB8||0), minW-(I.floorB9||0));
+  }
+  let lo=0, hi=200000;
+  for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
+  return { safeExtra:Math.round(lo), shortfallAtSolve:Math.round(shortfall(lo)) };
+}
+
+/* ── runStress: one crash scenario, fully re-solved, no approximations ──────
+ * params = { drag, dur, start, inflation, lateDrag, lateDur, lateStart, plannedExtra }
+ *   drag        crash drag as a DECIMAL off the growth rate (points/100): -10% return -> 0.17
+ *   start, dur  crash year and length (default this plan's start, 1 yr)
+ *   inflation   living-cost inflation FOR THE STRESS RUN (the panel slider, e.g. 0.03);
+ *               omit to use the saved plan's own inflLiving
+ *   plannedExtra the spend the red line should assume (the committed plan's safe extra);
+ *               omit and the engine solves the calm-weather safe extra itself
+ * returns { ending, hit, crossover, safeExtra, safeExtraBase, depletes, series }
+ *   ending      final-year liquid total (Master col CD / B129)
+ *   hit         ending − legacy goal
+ *   crossover   first year liquid total drops below the legacy goal (null = never)
+ *   safeExtra   max extra STILL safe to add UNDER this crash — honestly re-solved at
+ *               full precision (taxes computed exactly; no $500 rounding, no margin)
+ *   safeExtraBase  the calm-weather safe extra, for reference
+ *   series      [{year, bal}] full liquid trajectory (the red line)            */
+function rbpRunStress(I, params) {
+  params = params || {};
+  const yOf = d => (d ? new Date(d).getFullYear() : null);
+  const start = params.start || yOf(I.planStart);
+  const S = Object.assign({}, I, {
+    crashType: 'bear', crashStart: start, crashDur: (params.dur || 1), crashDrag: (params.drag || 0),
+    lateCrashType: (params.lateDrag ? 'bear' : ''), lateStart: (params.lateStart || 0),
+    lateDur: (params.lateDur || 0), lateDrag: (params.lateDrag || 0)
+  });
+  if (params.inflation != null) S.inflLiving = params.inflation;   // stress-only inflation (B20)
+  if (params.cola      != null) S.inflSS     = params.cola;        // SS COLA override (Test 1 slider) — feeds lines 116-117
+  if (params.spendAdj  != null) S.baseLiving = (I.baseLiving || 0) * (1 + params.spendAdj); // ± floor spending (Test 1 slider)
+  if (params.goal      != null) S.legacyB8   = params.goal;        // legacy-target override (the "leave less" slider)
+
+  // calm-weather safe extra (same regardless of crash) — solved once, reused for the red line
+  const baseSafe = (params.plannedExtra != null) ? params.plannedExtra : rbpSolveSafeExtra(I).safeExtra;
+
+  // project the committed plan THROUGH the crash → the red line
+  const w = [S.w1 || 1, S.w2 || 1, S.w3 || 1], avg = (w[0] + w[1] + w[2]) / 3;
+  const p1s = yOf(S.ph1Start), p1e = yOf(S.ph1End), p2s = yOf(S.ph2Start), p2e = yOf(S.ph2End), p3s = yOf(S.ph3Start), p3e = yOf(S.ph3End);
+  const rows = rbpProject(S, { extraOverride: (yr) => {
+    let ph = -1; if (yr >= p1s && yr <= p1e) ph = 0; else if (yr >= p2s && yr <= p2e) ph = 1; else if (yr >= p3s && yr <= p3e) ph = 2;
+    return ph < 0 ? 0 : baseSafe * w[ph] / avg;
+  }});
+
+  const legacy = S.legacyB8 || 0;
+  const series = rows.map(r => ({ year: r.yr, bal: Math.round(r.endTotal) }));
+  const ending = rows.length ? Math.round(rows[rows.length - 1].endTotal) : 0;
+  const below = series.find(p => p.bal < legacy);
+  const zero = series.find(p => p.bal <= 0);
+  // Floor (survival) signal — same definition the solver enforces: lowest liquid total
+  // vs the safety reserve (B9). floorBreach is the first year it dips below the reserve.
+  const reserve = S.floorB9 || 0;
+  const minLiquid = series.length ? Math.min.apply(null, series.map(p => p.bal)) : 0;
+  const floorPt = series.find(p => p.bal < reserve);
+  // Year-1 spending floor breakdown (essential living + healthcare + debts) and when debts end.
+  const f0 = rows[0] || {};
+  const floorY1 = { living: (f0.floorLiving || 0), healthcare: (f0.floorHC || 0), debt: (f0.floorDebt || 0),
+    total: (f0.floorLiving || 0) + (f0.floorHC || 0) + (f0.floorDebt || 0) };
+  let debtEndYr = null;
+  for (let di = 0; di < rows.length; di++) { if ((rows[di].floorDebt || 0) > 0) debtEndYr = rows[di].yr; }
+  // Per-year cash flow for the withdrawal chart (all exact named fields — no allocation guesswork).
+  // The part of (floor+debt+extra+taxes) above `income` is `withdrawal` (= fundingReq).
+  const cashflow = rows.map(r => ({
+    year: r.yr,
+    floor: (r.floorLiving || 0) + (r.floorHC || 0),
+    debt: (r.floorDebt || 0),
+    extra: (r.chosenExtra || 0),
+    taxes: (r.totalTaxes || 0),
+    income: Math.round(r.totalGross || 0),
+    withdrawal: (r.fundingReq || 0)
+  }));
+
+  // honest re-solve of safe extra UNDER this crash — full precision, exact taxes
+  const crashSafe = rbpSolveSafeExtra(S).safeExtra;
+
+  return {
+    ending: ending,
+    hit: Math.round(ending - legacy),
+    crossover: below ? below.year : null,
+    depletes: zero ? zero.year : null,
+    floorBreach: floorPt ? floorPt.year : null,
+    minLiquid: Math.round(minLiquid),
+    reserve: Math.round(reserve),
+    floorY1: floorY1,
+    debtEndYr: debtEndYr,
+    cashflow: cashflow,
+    goalUsed: Math.round(legacy),
+    safeExtra: crashSafe,
+    safeExtraBase: Math.round(baseSafe),
+    series: series
+  };
+}
+
+/* ── buildI: connector `read` payload → engine input I ──────────────────────
+ * Pages fetch the customer's inputs ONCE (action=read), then run everything
+ * client-side. Per-customer values come from the payload; the fixed 2025
+ * federal tables (brackets, RMD, IRMAA) are baked in here — same for everyone. */
+var RBP_TAX_2025 = {
+  brackets:[0,24800,100800,211400,403550,512450,768700],
+  rates:[0.1,0.12,0.22,0.24,0.32,0.35,0.37],
+  rmdAge:[73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120],
+  rmdDiv:[26.5,25.5,24.6,23.7,22.9,22,21.1,20.2,19.4,18.5,17.7,16.8,16,15.2,14.4,13.7,12.9,12.2,11.5,10.8,10.1,9.5,8.9,8.4,7.8,7.3,6.8,6.4,6,5.6,5.2,4.9,4.6,4.3,4.1,3.9,3.7,3.5,3.4,3.3,3.1,3,2.9,2.8,2.7,2.5,2.3,2],
+  rmdStartC:75, rmdStartG:75,
+  irmaaMFJ:[0,95.7,240.4,385,529.6,578],
+  magiMFJ:[0,218001,274001,342001,410001,750001],
+  magiSingle:[0,109001,137001,171001,205001,500001]
+};
+function rbpBuildI(R, D) {
+  D = D || function(s){ return s ? new Date(s) : null; };
+  if (R && R.accounts && R.taxBrackets) return R;          // already engine-shaped
+  var Y = function(yr){ return yr ? new Date(yr,0,1) : null; }; // phase year-number → Date
+  var p1 = R.people.craig, p2 = R.people.gena, gl = R.global, t = R.tax, sp = R.spending, leg = R.legacy;
+  var T = RBP_TAX_2025;
+  return {
+    planStart:D(gl.planStartYear), name1:p1.name, name2:p2.name,
+    p1_ageStart:p1.age, p1_lifeEnd:p1.deathAge, p2_ageStart:p2.age, p2_lifeEnd:p2.deathAge,
+    p1_salary:p1.salary, p1_salEnd:D(p1.salaryEnd), p2_salary:p2.salary, p2_salEnd:D(p2.salaryEnd),
+    p1_ssMonthly:p1.ssMonthly, p1_ssStart:D(p1.ssStartDate), p2_ssMonthly:p2.ssMonthly, p2_ssStart:D(p2.ssStartDate), inflSS:t.ssCola,
+    p1_pension:p1.pension, p1_penStart:D(p1.pensionStart), p1_penEnd:D(p1.pensionEnd),
+    p1_other:p1.otherIncome, p1_othStart:D(p1.otherStart), p1_othEnd:D(p1.otherEnd),
+    p2_pension:p2.pension, p2_penStart:D(p2.pensionStart), p2_penEnd:D(p2.pensionEnd),
+    p2_other:p2.otherIncome, p2_othStart:D(p2.otherStart), p2_othEnd:D(p2.otherEnd),
+    p1_unlock:D(p1.ssStartDate), p2_unlock:D(p2.ssStartDate),
+    inflLiving:t.inflation, inflStdDed:t.stdDedInflation, inflHC:t.healthcareInflation, stateTax:t.stateRate,
+    baseLiving:sp.baseAnnual, survivorReduce:gl.survivorReduction, filingStatus:gl.filingStatus, assumeExtra:gl.assumeExtraSpend,
+    p1_preMed:p1.healthPreMedicare, p1_medPrem:p1.healthMedicare, p1_medAge:p1.medicareAge,
+    p2_preMed:p2.healthPreMedicare, p2_medPrem:p2.healthMedicare, p2_medAge:p2.medicareAge,
+    taxBrackets:T.brackets, taxRates:T.rates,
+    rmdAge:T.rmdAge, rmdDiv:T.rmdDiv, rmdStartC:T.rmdStartC, rmdStartG:T.rmdStartG,
+    irmaaMFJ:T.irmaaMFJ, irmaaSingle:T.irmaaMFJ, magiMFJ:T.magiMFJ, magiSingle:T.magiSingle, magiThresh:true,
+    convTable:(function(){ var ct={}; (R.rothPlan||[]).forEach(function(row){ if(!row) return; var y=parseInt(row.year,10); if(!y) return; ct[y]={ c:(+row.p1||0), g:(+row.p2||0) }; }); return ct; })(),
+    debts:(R.debts||[]).map(function(d){ return {status:d.inc, amount:d.ann, start:D(d.start), end:D(d.end)}; }),
+    ph1Start:Y(sp.phase1Start), ph1End:Y(sp.phase1End), ph1Spend:((+sp.phase1Override>0)?+sp.phase1Override:(+sp.phase1Extra||0)),
+    ph2Start:Y(sp.phase2Start), ph2End:Y(sp.phase2End), ph2Spend:((+sp.phase2Override>0)?+sp.phase2Override:(+sp.phase2Extra||0)),
+    ph3Start:Y(sp.phase3Start), ph3End:Y(sp.phase3End), ph3Spend:((+sp.phase3Override>0)?+sp.phase3Override:(+sp.phase3Extra||0)),
+    w1:sp.phase1Weight, w2:sp.phase2Weight, w3:sp.phase3Weight,
+    legacyB8:leg.goal, floorB9:leg.safetyFloor,
+    crashType:'', crashStart:0, crashDur:0, crashDrag:0, lateCrashType:'', lateStart:0, lateDur:0, lateDrag:0,
+    committedExtra:sp.safeExtra,   // the saved plan's safe extra — the red line's spend
+    accounts:(R.portfolio.accounts||[]).map(function(a){ return {
+      statusA:a.showInCalc, statusG:a.status, type:a.type, name:a.name, owner:a.owner, start:a.balance,
+      rate:(a.expectedReturn||0)/100, basis:a.costBasis, contrib:a.contrib||0, match:a.match||0,
+      cStart:D(a.contribStart), cEnd:D(a.contribEnd), wStart:D(a.withdrawStart) }; })
+  };
+}
+
+/* ============================================================
+   MONTE CARLO  —  industry-standard retirement simulation.
+
+   Unseeded: every trial draws fresh, like real life. In each of N trials it
+   models, year by year:
+     • a fresh random market return (sequence-of-returns risk) via a fat-tail,
+       historical-bootstrap, or normal model, each with a volatility-drag
+       (geometric) correction so compounding is honest;
+     • a fresh random INFLATION path — spending growth and Social Security COLA
+       share the same annual inflation shock (COLA tracks CPI), so realized
+       inflation runs hot or cold across trials instead of a fixed rate;
+     • Guyton-Klinger spending guardrails.
+   Baseline withdrawals come from your real sheet projection so the MEDIAN trial
+   tracks your plan; the random inflation path floats them above/below.
+   Returns success/percentile stats + per-year balance bands.
+   ============================================================ */
+var MC_HISTORICAL=[43.6,-8.4,-24.9,-43.3,-8.2,53.9,-2.3,52.6,-1.4,-10.1,23.7,18.8,34.2,25.1,-2.8,-12.5,37.6,13.1,19.0,-14.9,31.4,43.8,-2.5,15.4,22.2,-13.0,-9.8,35.5,-0.4,20.7,22.7,4.5,13.1,22.5,-4.4,-2.5,9.5,24.8,-13.8,-24.3,37.1,23.8,-7.2,6.5,18.2,32.4,-4.9,21.4,22.5,6.3,32.2,28.7,21.0,-9.1,-11.9,-22.1,28.7,10.9,4.9,15.8,5.5,-37.0,26.5,15.1,2.1,16.0,32.4,13.7,1.4,12.0,21.8,-4.4,31.5,18.4,28.9,26.8,-19.4,-12.4,-25.2];
+function mcNormal(){ var u1=Math.random(),u2=Math.random(); if(u1<1e-12)u1=1e-12; return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2); }
+function mcPortfolioStats(port){
+  var R_BOND=0.04,R_EQUITY=0.09,VOL_FIXED=0.06,VOL_EQUITY=0.18,wRet=0.07;
+  if(port&&port.accounts&&port.accounts.length){ var tb=0,rb=0; port.accounts.forEach(function(a){ var bal=(a.balance>0)?a.balance:0, r=(a.expectedReturn>0)?a.expectedReturn/100:0; if(bal>0&&r>0){tb+=bal;rb+=bal*r;} }); if(tb>0) wRet=rb/tb; }
+  var eqFrac=Math.max(0,Math.min(1,(wRet-R_BOND)/(R_EQUITY-R_BOND)));
+  var sigma=VOL_FIXED+(VOL_EQUITY-VOL_FIXED)*eqFrac; sigma=Math.max(0.05,Math.min(0.19,sigma));
+  return {meanReturn:wRet,equityFraction:eqFrac,sigma:sigma};
+}
+function mcEssentialFloor(d){
+  var sp=(d&&d.spending)||{}, proj=(d&&d.projections)||{}, by=null;
+  if(proj.byYear&&proj.byYear.length){ var cy=new Date().getFullYear(); for(var k=0;k<proj.byYear.length;k++){ if(proj.byYear[k]&&proj.byYear[k].year===cy){by=proj.byYear[k];break;} } if(!by) by=proj.byYear[0]; }
+  if(by){ var living=+by.baseLiving||0,h=+by.healthcare||0,dbt=+by.debt||0,floor=(+by.totalNeed)||(living+h+dbt); return {living:living,healthcare:h,debt:dbt,floor:floor}; }
+  var fb=sp.baseAnnual||0; return {living:fb,healthcare:0,debt:0,floor:fb};
+}
+function mcRandReturn(model,mu,sigma,z){
+  if(model==='historical'){ return MC_HISTORICAL[Math.floor(Math.random()*MC_HISTORICAL.length)]/100; }
+  else if(model==='fat'){ var driftFat=0.5*sigma*sigma; var base=(mu+driftFat)+sigma*z; if(Math.random()<0.03){ base+=(Math.random()<0.5?-1:1)*sigma*(1+Math.random()*2); } return Math.max(-0.60,Math.min(0.80,base)); }
+  else { var drift=0.5*sigma*sigma; return (mu+drift)+sigma*z; }
+}
+function mcPercentile(a,p){ if(!a||!a.length) return 0; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.floor(p/100*(s.length-1)); return s[i]; }
+function rbpRunMonteCarlo(d,opts){
+  opts=opts||{};
+  var nRuns=opts.runs||5000, model=opts.model||'fat',
+      flexPct=(opts.flex!=null?opts.flex:0.10),
+      fixedYr1=(opts.fixedYr1!=null?opts.fixedYr1:null),
+      inflSigma=(opts.inflSigma!=null?opts.inflSigma:0.015),  // annual inflation volatility (CPI ~1.5%/yr)
+      endAge95=(opts.endAge95!=null?opts.endAge95:true);      // horizon: true = stress last survivor to age 95; false = stop at entered death age
+  if(!d) return null;
+  var port=d.portfolio||{}, sp=d.spending||{}, gl=d.global||{}, leg=d.legacy||{}, proj=d.projections||{};
+  var totalPF=port.total||0; if(totalPF<=0) return null;
+  var useSheetWithdrawals=(proj.withdrawals&&proj.withdrawals.length>5&&proj.endLiquid&&proj.endLiquid.length>5);
+  var pk=Object.keys(d.people||{}); var p1=(d.people&&d.people[pk[0]])||{}, p2=(d.people&&d.people[pk[1]])||{};
+  var floorNow=mcEssentialFloor(d).floor;
+  var chosenExtraNow=(proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))?(+proj.byYear[0].chosenExtra):0;
+  var baseSpend=floorNow+chosenExtraNow;
+  var legacyGoal=leg.goal||0;
+  var inflMean=(gl.inflation||0.03), colaMean=(gl.ssCola||0.025);
+  var ssYear1=((p1.ssYear1||0)+(p2.ssYear1||0)); var pension=(((p1.pension||0)+(p2.pension||0))*12);
+  var curYear=new Date().getFullYear();
+  var GK_TRIGGER=1.20, initialWR=0.04;
+  if(useSheetWithdrawals){ for(var gi=0;gi<proj.withdrawals.length;gi++){ var w=+proj.withdrawals[gi]||0, b=(proj.endLiquid&&+proj.endLiquid[gi])?+proj.endLiquid[gi]:0; if(w>0&&b>0){ initialWR=w/b; break; } } }
+  else if(totalPF>0){ initialWR=Math.max(0,baseSpend-(ssYear1+pension))/totalPF; }
+  initialWR=Math.max(0.02,Math.min(0.10,initialWR));
+  var p1DeathAge=Math.min(p1.deathAge||90,110), p2DeathAge=Math.min(p2.deathAge||90,110);
+  // Horizon: when endAge95 is on, stress-test the last survivor to at least age 95 even if a younger
+  // death age was entered (retirees often outlive their estimate, and outliving the money is the risk
+  // MC exists to measure). When off, the projection stops at the user's own entered death age.
+  var p1HorizonAge=endAge95?Math.max(p1DeathAge,95):p1DeathAge, p2HorizonAge=endAge95?Math.max(p2DeathAge,95):p2DeathAge;
+  var p1HorizonYr=p1.age>0?curYear+(p1HorizonAge-p1.age):curYear+(endAge95?35:30), p2HorizonYr=p2.age>0?curYear+(p2HorizonAge-p2.age):curYear+(endAge95?35:30);
+  var mcSingle=!(p2&&p2.name&&String(p2.name).trim());
+  var endY=mcSingle?p1HorizonYr:Math.max(p1HorizonYr,p2HorizonYr);
+  var yrs=Math.min(endY-curYear+1,100); yrs=Math.max(yrs,20);
+  var mcYears=[]; var origYears=(proj.years&&proj.years.length)?proj.years:null;
+  for(var y0=0;y0<yrs;y0++){ mcYears.push(origYears&&y0<origYears.length?origYears[y0]:curYear+y0); }
+  var ps=mcPortfolioStats(port); var mu=ps.meanReturn, sigma=ps.sigma;
+  var allEnd=[], depleteYears=[], yearlyBals=[]; for(var yy=0;yy<yrs;yy++) yearlyBals.push([]);
+  for(var run=0;run<nRuns;run++){
+    var bal=totalPF, balNX=totalPF, depleted=false;
+    var randCumInfl=1, ssCum=1, detCumInfl=1;   // realized vs deterministic inflation paths
+    for(var i=0;i<yrs;i++){
+      if(yearlyBals[i]) yearlyBals[i].push(Math.round(bal));
+      if(i===0) continue;
+      // ── one inflation shock per year, shared by spending growth and SS COLA ──
+      var zi=mcNormal();
+      var inflYr=Math.max(-0.02,Math.min(0.12, inflMean + inflSigma*zi));
+      var colaYr=Math.max(-0.02,Math.min(0.12, colaMean + inflSigma*zi));
+      randCumInfl*=(1+inflYr); ssCum*=(1+colaYr); detCumInfl*=(1+inflMean);
+      var inflFactor=randCumInfl/detCumInfl;   // 1.0 on average; floats with realized inflation
+      var withdrawal;
+      if(useSheetWithdrawals && i<proj.withdrawals.length){ withdrawal=Math.max(0,(proj.withdrawals[i]||0))*inflFactor; }
+      else { var guaranteed=ssYear1*ssCum+pension; var spend=baseSpend*randCumInfl; withdrawal=Math.max(0,spend-guaranteed); }
+      if(flexPct>0 && bal>0 && (withdrawal/bal)>initialWR*GK_TRIGGER){ withdrawal*=(1-flexPct); }
+      var withdrawalNX;
+      if(useSheetWithdrawals && i<proj.withdrawals.length){ var cx=(proj.byYear[i]&&(+proj.byYear[i].chosenExtra))?(+proj.byYear[i].chosenExtra):0; withdrawalNX=Math.max(0,(proj.withdrawals[i]||0)-cx)*inflFactor; }
+      else { var gNX=ssYear1*ssCum+pension; var sNX=floorNow*randCumInfl; withdrawalNX=Math.max(0,sNX-gNX); }
+      var z=mcNormal();
+      var ret=(i===1&&fixedYr1!==null)?fixedYr1:mcRandReturn(model,mu,sigma,z);
+      var half=Math.sqrt(Math.max(0,1+ret));
+      bal=bal*half; bal=Math.max(0,bal-withdrawal); bal=Math.max(0,bal*half);
+      balNX=balNX*half; balNX=Math.max(0,balNX-withdrawalNX); balNX=Math.max(0,balNX*half);
+      if(balNX<=0 && !depleted){ depleted=true; depleteYears.push(mcYears[i]||(curYear+i)); }
+    }
+    allEnd.push(Math.round(bal));
+  }
+  var succeedGoal=allEnd.filter(function(b){return b>=legacyGoal;}).length;
+  var survivePos=allEnd.filter(function(b){return b>0&&b<legacyGoal;}).length;
+  var depletedFull=allEnd.filter(function(b){return b<=0;}).length;
+  var depletedFloor=depleteYears.length;
+  var avg=allEnd.reduce(function(s,v){return s+v;},0)/(allEnd.length||1);
+  return { runs:nRuns, model:model, mu:mu, sigma:sigma, equityFraction:ps.equityFraction, flex:flexPct,
+    inflMean:inflMean, inflSigma:inflSigma,
+    years:mcYears, yrs:yrs, endAge95:endAge95, legacyGoal:legacyGoal, floor:floorNow,
+    successPct:Math.round(succeedGoal/nRuns*100), survivePct:Math.round(survivePos/nRuns*100),
+    neverRanOutPct:Math.round((nRuns-depletedFloor)/nRuns*100), depletedFloorPct:Math.round(depletedFloor/nRuns*100),
+    depletedFullPct:Math.round(depletedFull/nRuns*100),
+    median:mcPercentile(allEnd,50), average:Math.round(avg),
+    p10:mcPercentile(allEnd,10), p90:mcPercentile(allEnd,90), yearlyBals:yearlyBals };
+}
+
+/* ── UMD: browser global `RBP` + CommonJS for node validation ───────────────
+   Extends an existing window.RBP (e.g. a page's connector loader RBP.load/
+   loadCached) rather than replacing it, so engine + loader coexist in any order. */
+(function (root) {
+  var api = { project: rbpProject, solveSafeExtra: rbpSolveSafeExtra, runStress: rbpRunStress, buildI: rbpBuildI, runMonteCarlo: rbpRunMonteCarlo };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  if (root.RBP && typeof root.RBP === 'object') { for (var k in api) root.RBP[k] = api[k]; }
+  else root.RBP = api;
+})(typeof self !== 'undefined' ? self : this);
+
+</script>
+<script>
+(function(){
+  var RBP=window.RBP;
+  var I=null, START=new Date().getFullYear(), COMMITTED=0, baseR=null, REP=6.5, gotPlan=false;
+  var SAMPLE_RAW={people:{a:{name:'Craig',age:64,deathAge:92,salary:0,salaryEnd:'',ssMonthly:3000,ssStartDate:'2027-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65},b:{name:'Gena',age:62,deathAge:94,salary:0,salaryEnd:'',ssMonthly:2400,ssStartDate:'2029-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65}},global:{planStartYear:'2026-01-01',survivorReduction:0.25,filingStatus:'MFJ',assumeExtraSpend:false},tax:{ssCola:0.025,inflation:0.03,stdDedInflation:0.02,healthcareInflation:0.045,stateRate:0.05},spending:{baseAnnual:84000,phase1Start:2026,phase1End:2035,phase1Extra:30000,phase1Weight:1,phase2Start:2036,phase2End:2045,phase2Extra:25000,phase2Weight:0.85,phase3Start:2046,phase3End:2060,phase3Extra:20000,phase3Weight:0.75,safeExtra:30000},legacy:{goal:1000000,safetyFloor:150000},rothPlan:[],debts:[{inc:'Yes',ann:18000,start:'2026-01-01',end:'2032-12-31'}],portfolio:{accounts:[{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'C',owner:'Craig',balance:1071000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'G',owner:'Gena',balance:714000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Taxable',name:'J',owner:'Joint',balance:510000,expectedReturn:5.5,costBasis:306000},{showInCalc:'Yes',status:'Use',type:'Roth',name:'R',owner:'Craig',balance:255000,expectedReturn:6.5,costBasis:0}]}};
+
+  var $=function(id){return document.getElementById(id)};
+  function fmtK(n){return '$'+Math.round(n/1000)+'K';}
+  function fmtM(n){return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n/1000)+'K';}
+  function sev(r){ if(r>=5)return '#0E9CA6'; if(r>=0)return '#16AEB6'; if(r>=-10)return '#E0A33A'; if(r>=-20)return '#D9822A'; if(r>=-35)return '#CF5A35'; return '#B5301F'; }
+
+  function knobs(extra,goalOverride){
+    var yr1=+$('yr1').value,yrs=+$('yrs').value;
+    var p={start:START,drag:(REP-yr1)/100,dur:Math.max(1,yrs),inflation:(+$('inf').value)/100,cola:(+$('cola').value)/100,spendAdj:(+$('spendadj').value)/100,plannedExtra:(extra!=null?extra:COMMITTED)};
+    if($('lateSw').classList.contains('on')){var ls=parseInt($('lt-start').value,10),lr=+$('lt-ret').value,ly=+$('lt-yrs').value; if(ls&&!isNaN(lr)&&ly>0){p.lateStart=ls;p.lateDrag=(7-lr)/100;p.lateDur=Math.max(1,ly);}}
+    if(goalOverride!=null)p.goal=goalOverride;
+    return p;
+  }
+  function crashYears(){
+    var out={}; var yr1=+$('yr1').value;
+    if(Math.abs(yr1-REP)>=1){ for(var k=0;k<Math.max(1,+$('yrs').value);k++) out[START+k]=yr1; }
+    if($('lateSw').classList.contains('on')){var ls=parseInt($('lt-start').value,10),lr=+$('lt-ret').value; if(ls)for(var j=0;j<Math.max(1,+$('lt-yrs').value);j++) out[ls+j]=lr;}
+    return out;
+  }
+
+  function setup(c,h){var dpr=window.devicePixelRatio||1,W=c.clientWidth;c.width=W*dpr;c.height=h*dpr;var g=c.getContext('2d');g.scale(dpr,dpr);g.clearRect(0,0,W,h);return {g:g,W:W,H:h};}
+
+  function drawLine(stressR){
+    var c=$('chart'),s=setup(c,240),g=s.g,W=s.W,H=s.H;
+    var base=baseR.series,str=stressR.series; if(!base.length)return;
+    var y0=base[0].year,y1=base[base.length-1].year,goal=I.legacyB8;
+    var maxBal=Math.max(goal,Math.max.apply(null,base.concat(str).map(function(p){return p.bal;})))*1.08;
+    var minBal=Math.min(0,Math.min.apply(null,str.map(function(p){return p.bal;})));
+    var padL=52,padR=12,padT=10,padB=22,pw=W-padL-padR,ph=H-padT-padB;
+    var X=function(yr){return padL+(yr-y0)/(y1-y0)*pw;},Y=function(v){return padT+(1-(v-minBal)/(maxBal-minBal))*ph;};
+    var cy=crashYears();
+    g.fillStyle='rgba(192,57,43,.12)'; Object.keys(cy).forEach(function(yr){yr=+yr; if(yr>=y0&&yr<=y1&&cy[yr]<REP){var x=X(yr),xn=X(Math.min(y1,yr+1)); g.fillRect(x,padT,Math.max(2,xn-x),ph);}});
+    g.strokeStyle='#ECEFF1';g.fillStyle='#41576A';g.font='11px -apple-system,sans-serif';g.textAlign='right';g.textBaseline='middle';
+    for(var k=0;k<=3;k++){var v=minBal+(maxBal-minBal)*k/3,yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText(v>=1e6?('$'+(v/1e6).toFixed(1)+'M'):('$'+Math.round(v/1000)+'K'),padL-7,yy);}
+    g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr),H-padB+5);
+    g.strokeStyle='#E0A33A';g.setLineDash([6,4]);g.lineWidth=2;g.beginPath();g.moveTo(padL,Y(goal));g.lineTo(W-padR,Y(goal));g.stroke();g.setLineDash([]);if(I.floorB9>0&&I.floorB9>=minBal&&I.floorB9<=maxBal){g.strokeStyle='#8499A8';g.setLineDash([2,3]);g.lineWidth=1.7;g.beginPath();g.moveTo(padL,Y(I.floorB9));g.lineTo(W-padR,Y(I.floorB9));g.stroke();g.setLineDash([]);}
+    function ln(ser,col,w){g.strokeStyle=col;g.lineWidth=w;g.beginPath();ser.forEach(function(p,i){var x=X(p.year),yy=Y(p.bal);i?g.lineTo(x,yy):g.moveTo(x,yy);});g.stroke();}
+    ln(base,'#16AEB6',2.7); ln(str,'#E8745E',3.2);
+  }
+
+  function drawReturns(){
+    var c=$('rchart'),s=setup(c,150),g=s.g,W=s.W,H=s.H;
+    var y0=baseR.series[0].year,y1=baseR.series[baseR.series.length-1].year,cy=crashYears();
+    var rets=[]; for(var yr=y0;yr<=y1;yr++){ rets.push({yr:yr, r:(cy[yr]!=null?cy[yr]:REP)}); }
+    var lo=Math.min(-50,Math.min.apply(null,rets.map(function(x){return x.r;}))-2), hi=Math.max(10,REP+3);
+    var padL=42,padR=10,padT=8,padB=20,pw=W-padL-padR,ph=H-padT-padB;
+    var X=function(yr){return padL+(yr-y0)/(y1-y0+1)*pw;},Y=function(v){return padT+(1-(v-lo)/(hi-lo))*ph;};
+    var bw=Math.max(2,pw/(y1-y0+1)*0.7);
+    g.strokeStyle='#ECEFF1';g.fillStyle='#41576A';g.font='10px -apple-system,sans-serif';g.textAlign='right';g.textBaseline='middle';
+    [hi,0,lo].forEach(function(v){var yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText(Math.round(v)+'%',padL-6,yy);});
+    var zero=Y(0);
+    rets.forEach(function(d){var x=X(d.yr)+ (pw/(y1-y0+1)-bw)/2, yy=Y(d.r); g.fillStyle=sev(d.r); if(d.r>=0)g.fillRect(x,yy,bw,zero-yy); else g.fillRect(x,zero,bw,yy-zero);});
+    g.fillStyle='#41576A';g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr)+bw/2,H-padB+4);
+  }
+
+  function paintFacts(r){
+    var f=r.floorY1||{total:0,living:0,healthcare:0,debt:0};
+    $('factFloor').innerHTML=fmtK(f.total)+'<small>/yr</small>';
+    $('factFloorBreak').textContent='living '+fmtK(f.living)+' · healthcare '+fmtK(f.healthcare)+(f.debt>0?(' · debt '+fmtK(f.debt)):'');
+    $('factReserve').textContent=fmtM(r.reserve||I.floorB9);
+    $('factLegacy').textContent=fmtM(I.legacyB8);
+    var dn=$('debtNote');
+    if(f.debt>0&&r.debtEndYr){ dn.innerHTML="Your essentials <b>include your debt payments</b> \u2014 what you must cover before any extras. Debt runs through <b>"+r.debtEndYr+"</b>, then your essentials drop by "+fmtK(f.debt)+"/yr."; }
+    else { dn.innerHTML="Your essentials are what you <b>must cover every year</b> before any extras \u2014 basic living plus healthcare."; }
+  }
+  function drawSafety(cf, sf){
+    var c=$('wchart'),st=setup(c,160),g=st.g,W=st.W,H=st.H;
+    if(!cf||!cf.length)return;
+    var y0=cf[0].year,y1=cf[cf.length-1].year;
+    var ess=cf.map(function(d){return d.floor+d.debt;});
+    var your=cf.map(function(d,i){return ess[i]+d.extra;});
+    var safe=cf.map(function(d,i){return ess[i]+((sf&&sf[i])?sf[i].extra:0);});
+    var maxV=Math.max(Math.max.apply(null,your),Math.max.apply(null,safe))*1.12||1;
+    var padL=46,padR=10,padT=10,padB=20,pw=W-padL-padR,ph=H-padT-padB;
+    var X=function(yr){return padL+(yr-y0)/(y1-y0)*pw;},Y=function(v){return padT+(1-v/maxV)*ph;};
+    // gridlines
+    g.strokeStyle='#ECEFF1';g.fillStyle='#41576A';g.font='10px sans-serif';g.textAlign='right';g.textBaseline='middle';
+    for(var q=0;q<=2;q++){var v=maxV*q/2,yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText('$'+Math.round(v/1000)+'K',padL-6,yy);}
+    // essentials area
+    g.fillStyle='rgba(14,124,132,.26)';g.beginPath();
+    cf.forEach(function(d,i){var x=X(d.year),yy=Y(ess[i]);i?g.lineTo(x,yy):g.moveTo(x,yy);});
+    g.lineTo(X(y1),Y(0));g.lineTo(X(y0),Y(0));g.closePath();g.fill();
+    // room/overspend fill between your & safe, per segment
+    for(var i=0;i<cf.length-1;i++){
+      var safeUp=(safe[i]+safe[i+1])>=(your[i]+your[i+1]);
+      g.fillStyle=safeUp?'rgba(70,200,150,.38)':'rgba(192,57,43,.34)';
+      g.beginPath();
+      g.moveTo(X(cf[i].year),Y(your[i]));g.lineTo(X(cf[i+1].year),Y(your[i+1]));
+      g.lineTo(X(cf[i+1].year),Y(safe[i+1]));g.lineTo(X(cf[i].year),Y(safe[i]));
+      g.closePath();g.fill();
+    }
+    // safe ceiling (dashed) + your spending (solid)
+    g.strokeStyle='#0A7E84';g.setLineDash([6,4]);g.lineWidth=2.2;g.beginPath();
+    cf.forEach(function(d,i){var x=X(d.year),yy=Y(safe[i]);i?g.lineTo(x,yy):g.moveTo(x,yy);});g.stroke();g.setLineDash([]);
+    g.strokeStyle='#041E2F';g.lineWidth=2.8;g.beginPath();
+    cf.forEach(function(d,i){var x=X(d.year),yy=Y(your[i]);i?g.lineTo(x,yy):g.moveTo(x,yy);});g.stroke();
+    // x labels
+    g.fillStyle='#41576A';g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr),H-padB+4);
+    // callout: biggest overspend gap (a real number)
+    var worst=0,worstYr=null;
+    for(var m=0;m<cf.length;m++){var gap=your[m]-safe[m];if(gap>worst){worst=gap;worstYr=cf[m].year;}}
+    if(worst>1000){g.fillStyle='#C0392B';g.font='bold 11px sans-serif';g.textAlign='left';g.textBaseline='top';
+      g.fillText('\u25BC over by $'+Math.round(worst/1000)+'K/yr by '+worstYr, padL+4, padT+2);}
+  }
+  function recompute(){
+    $('v-yr1').textContent=(+$('yr1').value>0?'+':'')+$('yr1').value+'%';
+    $('v-yrs').textContent=$('yrs').value+(+$('yrs').value>1?' yrs':' yr');
+    $('v-inf').textContent=(+$('inf').value).toFixed(1)+'%';
+    $('v-cola').textContent=(+$('cola').value).toFixed(1)+'%';
+    $('v-spend').textContent=(+$('spendadj').value>0?'+':'')+$('spendadj').value+'%';
+    $('v-ltret').textContent=(+$('lt-ret').value>0?'+':'')+$('lt-ret').value+'%';
+    $('v-ltyrs').textContent=$('lt-yrs').value+(+$('lt-yrs').value>1?' yrs':' yr');
+    $('leg-stress').style.background='#E8745E';
+    var r=RBP.runStress(I,knobs(COMMITTED));
+    $('spend').value=Math.round(r.safeExtra/1000);
+    $('goal').value=100;
+    paintFacts(r); paintSafe(r); paintSpend(); paintGoal(); drawReturns(); var rSafe=RBP.runStress(I,knobs(r.safeExtra)); drawSafety(r.cashflow, rSafe.cashflow);
+  }
+  function paintSafe(r){
+    var safe=r.safeExtra,brk=(safe<=0&&r.floorBreach);
+    $('safeAmt').innerHTML='$'+Math.round(safe/1000)+'<small>K/yr</small>';
+    $('safeNote').textContent=safe>0?'and still leave your full legacy':'— protect the floor first';
+    var v=$('verdict'),yr1=+$('yr1').value,nm=(yr1>=0?('a +'+yr1+'% year'):('a '+yr1+'% year'));
+    if(brk){v.className='verdict bad';v.innerHTML="<b class='coral'>Survival at risk.</b> Even spending only the floor, "+nm+" pushes the balance below your floor around <b>"+r.floorBreach+"</b>. Guilt-free extra is <b>$0</b> — the sliders show what each cut buys back.";}
+    else{v.className='verdict';v.innerHTML="With "+nm+", your account stays above its floor every year. You can safely spend <b class='gold'>"+fmtK(safe)+"/yr</b> extra and still leave <b class='green'>"+fmtM(I.legacyB8)+"</b>.";}
+  }
+  function paintSpend(){
+    var spend=(+$('spend').value)*1000,r=RBP.runStress(I,knobs(spend));
+    $('spendVal').textContent=fmtK(spend)+'/yr';
+    var safeK=Math.round(RBP.runStress(I,knobs(COMMITTED)).safeExtra/1000),diff=(+$('spend').value)-safeK;
+    $('spendNote').innerHTML=diff===0?"you're right at the safe line":diff>0?("<b class='coral'>$"+diff+"K over</b> the safe line"):("$"+(-diff)+"K under — room to spare");
+    var reserve=r.reserve||I.floorB9,minL=r.minLiquid,breaks=!!r.floorBreach,frac=Math.max(0,Math.min(1,minL/(reserve*3)));
+    var ff=$('ffill');ff.style.width=(breaks?100:(15+frac*85))+'%';ff.style.background=breaks?'var(--coral)':'var(--teal)';
+    $('floorChip').className='chip '+(breaks?'no':'ok');$('floorChip').textContent=breaks?('Drops below '+r.floorBreach):'Stays above';
+    $('fcap').innerHTML=breaks?"<span class='coral'>balance drops below your floor before it recovers</span>":"lowest balance "+fmtK(minL)+" \u2014 above your "+fmtK(reserve)+" floor";
+    var ending=Math.max(0,r.ending),BARMAX=I.legacyB8*2.5;
+    $('legFill').style.width=Math.max(2,Math.min(100,ending/BARMAX*100))+'%';
+    var gap=ending-I.legacyB8;$('legFill').style.background=gap>=0?'var(--teal)':'var(--coral)';
+    $('legR').textContent=fmtM(ending);$('goalMark').style.left=Math.min(96,I.legacyB8/BARMAX*100)+'%';$('goalMark').setAttribute('data-l','goal '+fmtM(I.legacyB8));
+    var cc=$('legCap');
+    if(Math.abs(gap)<2000){cc.className='barcap mut';cc.textContent='right on your goal';}
+    else if(gap>0){cc.className='barcap green';cc.innerHTML='+'+fmtM(gap)+' cushion above your goal';}
+    else{cc.className='barcap coral';cc.innerHTML=fmtM(-gap)+' below your goal — your choice to make';}
+    drawLine(r);
+  }
+  function paintGoal(){var g=I.legacyB8*(+$('goal').value)/100;$('goalVal').textContent=fmtM(g);var r=RBP.runStress(I,knobs(COMMITTED,g));$('safeAtGoal').textContent=fmtK(r.safeExtra)+'/yr';}
+
+  var PRE={custom:{yr1:0,yrs:1,inf:2.5,cola:2.5,spend:0},c2008:{yr1:-37,yrs:2,inf:2,cola:2.5,spend:0},dotcom:{yr1:-25,yrs:3,inf:2.5,cola:2.5,spend:0},covid:{yr1:-20,yrs:1,inf:3,cola:2.5,spend:0},stag:{yr1:-15,yrs:4,inf:8,cola:4,spend:0},bull:{yr1:18,yrs:1,inf:2.5,cola:2.5,spend:0}};
+  document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});b.classList.add('on');var p=PRE[b.dataset.p];$('yr1').value=p.yr1;$('yrs').value=p.yrs;$('inf').value=p.inf;$('cola').value=p.cola;$('spendadj').value=p.spend;$('lateSw').classList.remove('on');$('lateBody').classList.add('hide');recompute();});});
+  function mark(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});document.querySelector('[data-p=custom]').classList.add('on');}
+  ['yr1','yrs','inf','cola','spendadj','lt-ret','lt-yrs'].forEach(function(id){$(id).addEventListener('input',function(){mark();recompute();});});
+  $('lt-start').addEventListener('input',function(){mark();recompute();});
+  $('lateTog').addEventListener('click',function(){var sw=$('lateSw');sw.classList.toggle('on');$('lateBody').classList.toggle('hide',!sw.classList.contains('on'));mark();recompute();});
+  $('spend').addEventListener('input',paintSpend);
+  $('goal').addEventListener('input',paintGoal);
+  function postHeight(){ try{ parent.postMessage({type:'rbpT1Height', h:Math.ceil(document.body.scrollHeight)}, '*'); }catch(e){} }
+  function applyPlan(plan, isSample){
+    if(!plan){ return; }
+    I=plan;
+    START=(I.planStart?(new Date(I.planStart).getFullYear()||new Date().getFullYear()):new Date().getFullYear());
+    COMMITTED=(I.committedExtra!=null?I.committedExtra:0);
+    REP=(function(){var s=0,w=0;(I.accounts||[]).forEach(function(a){s+=(a.rate||0)*(a.start||0);w+=(a.start||0);});return w?s/w*100:6.5;})();
+    try{ baseR=RBP.runStress(I,{start:START,plannedExtra:COMMITTED}); }
+    catch(e){ var L=$('loading'); if(L){L.innerHTML='Couldn\u2019t read your plan \u2014 hit <b>Reload</b> at the top of the page.';} return; }
+    var smax=Math.max(80, Math.round((baseR.safeExtra||0)/1000*1.6)); $('spend').max=smax;
+    $('spendScale').innerHTML='<span>$0</span><span>$'+Math.round(smax/2)+'K</span><span>$'+smax+'K</span>';
+    $('goalScale').innerHTML='<span>'+fmtM(I.legacyB8*0.5)+'</span><span>'+fmtM(I.legacyB8)+'</span><span>'+fmtM(I.legacyB8*1.5)+'</span>';
+    $('yr1').value=Math.round(REP);
+    $('inf').value=Math.max(1,Math.min(10,(I.inflLiving!=null?I.inflLiving:0.025)*100)).toFixed(1);
+    $('cola').value=Math.max(0,Math.min(5,(I.inflSS!=null?I.inflSS:0.025)*100)).toFixed(1);
+    $('loading').style.display='none'; $('t1body').style.display='';
+    var hs=$('heroSub'); if(hs) hs.innerHTML=isSample?'PREVIEW \u00b7 sample data<br>your real numbers load on the live site':'your saved plan<br>real engine \u00b7 instant';
+    recompute(); postHeight(); setTimeout(postHeight,80);
+  }
+  window.addEventListener('message',function(ev){ if(ev.data&&ev.data.type==='rbpPlan'){ gotPlan=true; applyPlan(ev.data.I); } });
+  window.addEventListener('resize',function(){ if(I){ recompute(); postHeight(); } });
+  try{ parent.postMessage({type:'rbpT1Ready'}, '*'); }catch(e){}
+  try{ applyPlan(RBP.buildI(SAMPLE_RAW), true); }catch(e){ var L=$('loading'); if(L) L.textContent='Preview unavailable.'; }
+  postHeight();
+})();
+</script>
+</body>
+</html>

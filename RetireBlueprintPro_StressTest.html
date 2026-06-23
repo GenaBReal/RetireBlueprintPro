@@ -483,7 +483,7 @@ window.addEventListener('storage', function(e) {
 <div class="shell">
   <div id="loading" style="padding:48px 16px;text-align:center;color:#5F6368;font-size:13px">Loading your saved plan\u2026<br><span style="font-size:11px;color:#90A4AE">If this stays, hit <b>Reload</b> at the top of the page.</span></div>
   <div id="t1body" style="display:none">
-  <div class="hero"><div class="tg">Test 1 · Crash Test</div><h1>Dial in a downturn — see it the same second</h1><div class="sub">your saved plan<br>real engine · instant</div></div>
+  <div class="hero"><div class="tg">Test 1 · Crash Test</div><h1>Dial in a downturn — see it the same second</h1><div class="sub" id="heroSub">your saved plan<br>real engine · instant</div></div>
 
   <div class="grid">
     <!-- LEFT -->
@@ -510,12 +510,12 @@ window.addEventListener('storage', function(e) {
       </div>
       <div class="sg">
         <div class="sl-lab"><span>Inflation</span><span class="v" id="v-inf">2.5%</span></div>
-        <input type="range" id="inf" min="1" max="10" step="0.5" value="2.5">
+        <input type="range" id="inf" min="1" max="10" step="0.1" value="2.5">
         <div class="sl-range"><span>1%</span><span>5%</span><span>10%</span></div>
       </div>
       <div class="sg">
         <div class="sl-lab"><span>Social Security COLA</span><span class="v" id="v-cola">2.5%</span></div>
-        <input type="range" id="cola" min="0" max="5" step="0.5" value="2.5">
+        <input type="range" id="cola" min="0" max="5" step="0.1" value="2.5">
         <div class="sl-range"><span>0%</span><span>2.5%</span><span>5%</span></div>
         <div class="sl-desc">0% models a worst-case Social Security reform.</div>
       </div>
@@ -540,7 +540,7 @@ window.addEventListener('storage', function(e) {
         <div class="chart-sub">every year through the plan, with the legacy goal marked</div>
         <canvas id="chart"></canvas>
         <div class="legend">
-          <i><span class="swatch" style="background:#23425C"></span>Base plan</i>
+          <i><span class="swatch" style="background:#16AEB6"></span>Base plan</i>
           <i><span class="swatch" id="leg-stress" style="background:var(--salmon)"></span>This scenario</i>
           <i><span class="swatch dash"></span>Legacy goal</i>
           <i><span class="swatch" style="height:0;border-top:2px dotted #8499A8;width:15px"></span>Account floor</i>
@@ -1228,23 +1228,24 @@ function rbpRunMonteCarlo(d,opts){
 <script>
 (function(){
   var RBP=window.RBP;
-  var I=null, START=new Date().getFullYear(), COMMITTED=0, baseR=null, REP=6.5;
+  var I=null, START=new Date().getFullYear(), COMMITTED=0, baseR=null, REP=6.5, gotPlan=false;
+  var SAMPLE_RAW={people:{a:{name:'Craig',age:64,deathAge:92,salary:0,salaryEnd:'',ssMonthly:3000,ssStartDate:'2027-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65},b:{name:'Gena',age:62,deathAge:94,salary:0,salaryEnd:'',ssMonthly:2400,ssStartDate:'2029-01-01',pension:0,pensionStart:'',pensionEnd:'',otherIncome:0,otherStart:'',otherEnd:'',healthPreMedicare:8000,healthMedicare:4000,medicareAge:65}},global:{planStartYear:'2026-01-01',survivorReduction:0.25,filingStatus:'MFJ',assumeExtraSpend:false},tax:{ssCola:0.025,inflation:0.03,stdDedInflation:0.02,healthcareInflation:0.045,stateRate:0.05},spending:{baseAnnual:84000,phase1Start:2026,phase1End:2035,phase1Extra:30000,phase1Weight:1,phase2Start:2036,phase2End:2045,phase2Extra:25000,phase2Weight:0.85,phase3Start:2046,phase3End:2060,phase3Extra:20000,phase3Weight:0.75,safeExtra:30000},legacy:{goal:1000000,safetyFloor:150000},rothPlan:[],debts:[{inc:'Yes',ann:18000,start:'2026-01-01',end:'2032-12-31'}],portfolio:{accounts:[{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'C',owner:'Craig',balance:1071000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Pre-Tax',name:'G',owner:'Gena',balance:714000,expectedReturn:6.5,costBasis:0},{showInCalc:'Yes',status:'Use',type:'Taxable',name:'J',owner:'Joint',balance:510000,expectedReturn:5.5,costBasis:306000},{showInCalc:'Yes',status:'Use',type:'Roth',name:'R',owner:'Craig',balance:255000,expectedReturn:6.5,costBasis:0}]}};
 
   var $=function(id){return document.getElementById(id)};
   function fmtK(n){return '$'+Math.round(n/1000)+'K';}
   function fmtM(n){return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n/1000)+'K';}
-  function sev(r){ if(r>=5)return '#0E9CA6'; if(r>=0)return '#1FA08C'; if(r>=-10)return '#E0A33A'; if(r>=-20)return '#D9822A'; if(r>=-35)return '#CF5A35'; return '#B5301F'; }
+  function sev(r){ if(r>=5)return '#0E9CA6'; if(r>=0)return '#16AEB6'; if(r>=-10)return '#E0A33A'; if(r>=-20)return '#D9822A'; if(r>=-35)return '#CF5A35'; return '#B5301F'; }
 
   function knobs(extra,goalOverride){
     var yr1=+$('yr1').value,yrs=+$('yrs').value;
-    var p={start:START,drag:(7-yr1)/100,dur:Math.max(1,yrs),inflation:(+$('inf').value)/100,cola:(+$('cola').value)/100,spendAdj:(+$('spendadj').value)/100,plannedExtra:(extra!=null?extra:COMMITTED)};
+    var p={start:START,drag:(REP-yr1)/100,dur:Math.max(1,yrs),inflation:(+$('inf').value)/100,cola:(+$('cola').value)/100,spendAdj:(+$('spendadj').value)/100,plannedExtra:(extra!=null?extra:COMMITTED)};
     if($('lateSw').classList.contains('on')){var ls=parseInt($('lt-start').value,10),lr=+$('lt-ret').value,ly=+$('lt-yrs').value; if(ls&&!isNaN(lr)&&ly>0){p.lateStart=ls;p.lateDrag=(7-lr)/100;p.lateDur=Math.max(1,ly);}}
     if(goalOverride!=null)p.goal=goalOverride;
     return p;
   }
   function crashYears(){
     var out={}; var yr1=+$('yr1').value;
-    if(yr1!==0){ for(var k=0;k<Math.max(1,+$('yrs').value);k++) out[START+k]=yr1; }
+    if(Math.abs(yr1-REP)>=1){ for(var k=0;k<Math.max(1,+$('yrs').value);k++) out[START+k]=yr1; }
     if($('lateSw').classList.contains('on')){var ls=parseInt($('lt-start').value,10),lr=+$('lt-ret').value; if(ls)for(var j=0;j<Math.max(1,+$('lt-yrs').value);j++) out[ls+j]=lr;}
     return out;
   }
@@ -1260,13 +1261,13 @@ function rbpRunMonteCarlo(d,opts){
     var padL=52,padR=12,padT=10,padB=22,pw=W-padL-padR,ph=H-padT-padB;
     var X=function(yr){return padL+(yr-y0)/(y1-y0)*pw;},Y=function(v){return padT+(1-(v-minBal)/(maxBal-minBal))*ph;};
     var cy=crashYears();
-    g.fillStyle='rgba(192,57,43,.12)'; Object.keys(cy).forEach(function(yr){yr=+yr; if(yr>=y0&&yr<=y1){var x=X(yr),xn=X(Math.min(y1,yr+1)); g.fillRect(x,padT,Math.max(2,xn-x),ph);}});
+    g.fillStyle='rgba(192,57,43,.12)'; Object.keys(cy).forEach(function(yr){yr=+yr; if(yr>=y0&&yr<=y1&&cy[yr]<REP){var x=X(yr),xn=X(Math.min(y1,yr+1)); g.fillRect(x,padT,Math.max(2,xn-x),ph);}});
     g.strokeStyle='#ECEFF1';g.fillStyle='#41576A';g.font='11px -apple-system,sans-serif';g.textAlign='right';g.textBaseline='middle';
     for(var k=0;k<=3;k++){var v=minBal+(maxBal-minBal)*k/3,yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText(v>=1e6?('$'+(v/1e6).toFixed(1)+'M'):('$'+Math.round(v/1000)+'K'),padL-7,yy);}
     g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr),H-padB+5);
     g.strokeStyle='#E0A33A';g.setLineDash([6,4]);g.lineWidth=2;g.beginPath();g.moveTo(padL,Y(goal));g.lineTo(W-padR,Y(goal));g.stroke();g.setLineDash([]);if(I.floorB9>0&&I.floorB9>=minBal&&I.floorB9<=maxBal){g.strokeStyle='#8499A8';g.setLineDash([2,3]);g.lineWidth=1.7;g.beginPath();g.moveTo(padL,Y(I.floorB9));g.lineTo(W-padR,Y(I.floorB9));g.stroke();g.setLineDash([]);}
     function ln(ser,col,w){g.strokeStyle=col;g.lineWidth=w;g.beginPath();ser.forEach(function(p,i){var x=X(p.year),yy=Y(p.bal);i?g.lineTo(x,yy):g.moveTo(x,yy);});g.stroke();}
-    ln(base,'#23425C',2.7); ln(str,sev(+$('yr1').value),3.2);
+    ln(base,'#16AEB6',2.7); ln(str,'#E8745E',3.2);
   }
 
   function drawReturns(){
@@ -1341,7 +1342,7 @@ function rbpRunMonteCarlo(d,opts){
     $('v-spend').textContent=(+$('spendadj').value>0?'+':'')+$('spendadj').value+'%';
     $('v-ltret').textContent=(+$('lt-ret').value>0?'+':'')+$('lt-ret').value+'%';
     $('v-ltyrs').textContent=$('lt-yrs').value+(+$('lt-yrs').value>1?' yrs':' yr');
-    $('leg-stress').style.background=sev(+$('yr1').value);
+    $('leg-stress').style.background='#E8745E';
     var r=RBP.runStress(I,knobs(COMMITTED));
     $('spend').value=Math.round(r.safeExtra/1000);
     $('goal').value=100;
@@ -1385,7 +1386,7 @@ function rbpRunMonteCarlo(d,opts){
   $('spend').addEventListener('input',paintSpend);
   $('goal').addEventListener('input',paintGoal);
   function postHeight(){ try{ parent.postMessage({type:'rbpT1Height', h:Math.ceil(document.body.scrollHeight)}, '*'); }catch(e){} }
-  function applyPlan(plan){
+  function applyPlan(plan, isSample){
     if(!plan){ return; }
     I=plan;
     START=(I.planStart?(new Date(I.planStart).getFullYear()||new Date().getFullYear()):new Date().getFullYear());
@@ -1396,12 +1397,17 @@ function rbpRunMonteCarlo(d,opts){
     var smax=Math.max(80, Math.round((baseR.safeExtra||0)/1000*1.6)); $('spend').max=smax;
     $('spendScale').innerHTML='<span>$0</span><span>$'+Math.round(smax/2)+'K</span><span>$'+smax+'K</span>';
     $('goalScale').innerHTML='<span>'+fmtM(I.legacyB8*0.5)+'</span><span>'+fmtM(I.legacyB8)+'</span><span>'+fmtM(I.legacyB8*1.5)+'</span>';
+    $('yr1').value=Math.round(REP);
+    $('inf').value=Math.max(1,Math.min(10,(I.inflLiving!=null?I.inflLiving:0.025)*100)).toFixed(1);
+    $('cola').value=Math.max(0,Math.min(5,(I.inflSS!=null?I.inflSS:0.025)*100)).toFixed(1);
     $('loading').style.display='none'; $('t1body').style.display='';
+    var hs=$('heroSub'); if(hs) hs.innerHTML=isSample?'PREVIEW \u00b7 sample data<br>your real numbers load on the live site':'your saved plan<br>real engine \u00b7 instant';
     recompute(); postHeight(); setTimeout(postHeight,80);
   }
-  window.addEventListener('message',function(ev){ if(ev.data&&ev.data.type==='rbpPlan'){ applyPlan(ev.data.I); } });
+  window.addEventListener('message',function(ev){ if(ev.data&&ev.data.type==='rbpPlan'){ gotPlan=true; applyPlan(ev.data.I); } });
   window.addEventListener('resize',function(){ if(I){ recompute(); postHeight(); } });
   try{ parent.postMessage({type:'rbpT1Ready'}, '*'); }catch(e){}
+  setTimeout(function(){ if(!gotPlan){ try{ applyPlan(RBP.buildI(SAMPLE_RAW), true); }catch(e){ var L=$('loading'); if(L) L.textContent='Preview unavailable.'; } } }, 4000);
   postHeight();
 })();
 <\/script>
