@@ -26,7 +26,9 @@
   .hero h1{color:#fff;font-size:17px;font-weight:800;letter-spacing:.2px}
   .hero .sub{color:#8a9ab0;font-size:11px;font-weight:600;margin-left:auto;text-align:right}
   .grid{display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start;margin-top:14px}
-  @media(max-width:780px){ .grid{grid-template-columns:1fr} body{padding:11px} }
+  .decision-full{grid-column:1 / -1}
+  .whatif{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:2px}
+  @media(max-width:780px){ .grid{grid-template-columns:1fr} body{padding:11px} .whatif{grid-template-columns:1fr} }
 
   .card{background:#fff;border:1px solid var(--border);border-top:3px solid var(--navy);border-radius:7px;
     padding:15px;box-shadow:0 1px 3px rgba(15,40,60,.05)}
@@ -47,10 +49,11 @@
   .sl-lab{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink);font-weight:600;margin-bottom:3px}
   .sl-lab .v{font-size:14px;font-weight:800;color:#0E8E96}
   .sl-desc{font-size:10px;color:var(--faint);line-height:1.45;margin-top:4px}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:5px;background:#DCE3E8;outline:none;margin:8px 0 2px}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:var(--gold);border:3px solid #fff;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-  input[type=range].teal::-webkit-slider-thumb{background:var(--teal)}
-  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);border:3px solid #fff;cursor:pointer}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:7px;border-radius:6px;background:#CBD5DC;outline:none;margin:8px 0 2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#E0A33A;border:3px solid #fff;cursor:pointer;box-shadow:0 1px 5px rgba(4,30,47,.35)}
+  input[type=range].teal::-webkit-slider-thumb{background:#0E9CA6}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#E0A33A;border:3px solid #fff;cursor:pointer}
+  input[type=range].teal::-moz-range-thumb{background:#0E9CA6}
   .sl-range{display:flex;justify-content:space-between;font-size:9px;color:#90A4AE}
 
   .late-toggle{display:flex;align-items:center;gap:9px;margin-top:6px;padding-top:13px;border-top:1px solid var(--border);font-size:12px;color:var(--ink);font-weight:600;cursor:pointer;user-select:none}
@@ -122,8 +125,9 @@
   .d-extra{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:11px 12px;margin-bottom:13px}
   .d-extra-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:#cdd9e3;font-weight:600;margin-bottom:1px}
   .d-extra-h b{font-size:15px;font-weight:800;color:#f4b86a}
-  .d-extra input[type=range]{background:#072636;margin:9px 0 4px}
-  .d-extra input[type=range]::-webkit-slider-thumb{background:var(--gold)}
+  .d-extra input[type=range]{background:#0c3346;margin:9px 0 4px}
+  .d-extra input[type=range]::-webkit-slider-thumb{background:#E0A33A}
+  .d-extra input[type=range]::-moz-range-thumb{background:#E0A33A}
   .d-extra-n{font-size:9.5px;color:#9fc1d6;line-height:1.4}
   .d-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:13px}
   .d-kpi{background:rgba(255,255,255,.05);border-radius:7px;padding:9px 6px;text-align:center}
@@ -252,7 +256,9 @@
         </div>
       </div>
 
-      <div class="card">
+    </div><!-- /RIGHT col (charts) -->
+
+    <div class="card decision-full">
         <div class="seclbl">Your plan — what everything is measured against</div>
         <div class="planfacts" style="margin-top:11px">
           <div class="pf"><div class="pf-k">Essentials · every year</div><div class="pf-v" id="factFloor">$118K<small>/yr</small></div><div class="pf-s" id="factFloorBreak">living · healthcare · debt</div></div>
@@ -275,6 +281,7 @@
           <div class="track"><div class="fill" id="legFill"></div><div class="goalmark" id="goalMark" data-l="goal" style="left:40%"></div></div>
           <div class="barcap" id="legCap">right on your goal</div>
         </div>
+        <div class="whatif">
         <div class="ctrl">
           <div class="ctrlhead"><span class="k">If you spent this much extra…</span><span class="v gold" id="spendVal">$30K/yr</span></div>
           <input type="range" id="spend" min="0" max="120" step="1" value="30">
@@ -287,8 +294,8 @@
           <div class="sl-range" id="goalScale"><span>$0.5M</span><span>$1.0M</span><span>$1.5M</span></div>
           <div class="fcap" id="goalNote" style="margin-top:8px">guilt-free extra becomes <b class="gold" id="safeAtGoal">$30K/yr</b></div>
         </div>
-      </div>
-    </div>
+        </div><!-- /whatif -->
+      </div><!-- /decision card -->
   </div>
   <p class="foot">Every figure is computed live from your saved plan \u2014 taxes, RMDs, and Social Security timing included. Nothing here changes your saved data.</p>
   </div>
@@ -1046,8 +1053,10 @@ function rbpRunMonteCarlo(d,opts){
     if(brk){v.className='verdict bad';v.innerHTML="<b class='coral'>Survival at risk.</b> Even spending only the floor, "+nm+" pushes the balance below your floor around <b>"+r.floorBreach+"</b>. Guilt-free extra is <b>$0</b> — the sliders show what each cut buys back.";}
     else{v.className='verdict';v.innerHTML="With "+nm+", your account stays above its safety floor every year. You can safely spend <b class='gold'>"+fmtK(safe)+"/yr</b> extra and still leave <b class='green'>"+fmtM(I.legacyB8)+"</b>.";}
   }
+  function fillSlider(el,col){ if(!el)return; var mn=+el.min,mx=+el.max,v=+el.value,p=mx>mn?((v-mn)/(mx-mn)*100):0; el.style.background='linear-gradient(to right,'+col+' 0%,'+col+' '+p+'%,#CBD5DC '+p+'%,#CBD5DC 100%)'; }
   function paintSpend(){
     var spend=(+$('spend').value)*1000,r=RBP.runStress(I,knobs(spend));
+    fillSlider($('spend'),'#E0A33A');
     $('spendVal').textContent=fmtK(spend)+'/yr';
     var safeK=Math.round(RBP.runStress(I,knobs(COMMITTED)).safeExtra/1000),diff=(+$('spend').value)-safeK;
     $('spendNote').innerHTML=diff===0?"you're right at the safe line":diff>0?("<b class='coral'>$"+diff+"K over</b> the safe line"):("$"+(-diff)+"K under — room to spare");
@@ -1065,7 +1074,7 @@ function rbpRunMonteCarlo(d,opts){
     else{cc.className='barcap coral';cc.innerHTML=fmtM(-gap)+' below your goal — your choice to make';}
     drawLine(r);
   }
-  function paintGoal(){var g=I.legacyB8*(+$('goal').value)/100;$('goalVal').textContent=fmtM(g);var r=RBP.runStress(I,knobs(COMMITTED,g));$('safeAtGoal').textContent=fmtK(r.safeExtra)+'/yr';}
+  function paintGoal(){fillSlider($('goal'),'#0E9CA6');var g=I.legacyB8*(+$('goal').value)/100;$('goalVal').textContent=fmtM(g);var r=RBP.runStress(I,knobs(COMMITTED,g));$('safeAtGoal').textContent=fmtK(r.safeExtra)+'/yr';}
 
   function paintDecision(){
     if(!I)return;
@@ -2305,6 +2314,34 @@ function rbpRunMonteCarlo(d,opts){
         </div>
       </div>
     </div>
+
+    <!-- ── methodology + credit ── -->
+    <details class="methods" style="margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;">
+      <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:11px;padding:15px 18px;background:linear-gradient(135deg,#06243a,#0A3145);color:#eaf3f8;font-size:13px;font-weight:800;">
+        <span style="background:var(--gold);color:#041E2F;font-size:9px;font-weight:900;letter-spacing:.6px;padding:3px 9px;border-radius:20px;white-space:nowrap;">METHODOLOGY</span>
+        How this compares to the industry standard &mdash; and where it goes further
+      </summary>
+      <div style="padding:18px 20px;font-size:12.5px;line-height:1.7;color:var(--ink);">
+        <p style="margin:0 0 14px;">Monte Carlo is the method the major retirement planners use to answer one question: <b>how often does your plan actually work?</b> Here is how the established tools do it &mdash; and exactly where this one matches them and where it goes further.</p>
+
+        <div style="font-size:11px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:var(--good);margin:0 0 7px;">The standard &mdash; and where we meet it</div>
+        <ul style="margin:0 0 15px;padding-left:18px;">
+          <li style="margin-bottom:7px;"><b>Thousands of runs.</b> Empower runs 5,000 scenarios; Boldin and T.&nbsp;Rowe Price run 1,000. <b style="color:var(--good);">This tool runs up to 5,000</b> &mdash; Empower&rsquo;s number.</li>
+          <li style="margin-bottom:7px;"><b>A fresh random return every year.</b> That is what captures sequence-of-returns risk &mdash; a bad market early in retirement. <b style="color:var(--good);">We do this</b>, and report it the same way they do: the share of futures that finish with money left, plus the 10th / 50th / 90th percentile bands.</li>
+          <li><b>Volatility matched to your real mix.</b> A balanced portfolio swings less than an all-stock one. <b style="color:var(--good);">We scale it from 6% (all bonds) up to 18% (all stocks)</b> based on your actual allocation &mdash; the same allocation-based approach Empower uses, not a one-size number.</li>
+        </ul>
+
+        <div style="font-size:11px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:#b07d1f;margin:0 0 7px;">Where this goes further than the typical tool</div>
+        <ul style="margin:0 0 15px;padding-left:18px;">
+          <li style="margin-bottom:7px;"><b>Fat-tailed returns.</b> A plain bell-curve model under-counts real crashes; this one injects rare, severe down years on purpose.</li>
+          <li style="margin-bottom:7px;"><b>Volatility-drag correction.</b> A geometric adjustment so compounding is honest, never flattered.</li>
+          <li style="margin-bottom:7px;"><b>Variable inflation every run.</b> Spending and Social Security COLA float with a random inflation path instead of a fixed rate &mdash; the differentiator the newest tools added.</li>
+          <li><b>Guyton-Klinger spending guardrails.</b> The dynamic-spending rule that trims discretionary spending when your withdrawal rate runs hot &mdash; what real retirees and advisors actually do.</li>
+        </ul>
+
+        <p style="margin:0;padding-top:13px;border-top:1px solid var(--line);font-size:11px;color:var(--mut);line-height:1.65;">Credit where it is due: the simulation standard is set by tools like <b>Empower</b>, <b>Boldin</b>, and <b>T.&nbsp;Rowe Price</b>; the spending-guardrails rule is the work of financial-planning researchers <b>Jonathan Guyton</b> and <b>William Klinger</b> (2006). This tool follows that standard and adds the extra rigor above.</p>
+      </div>
+    </details>
   </div>
 </div>
 
