@@ -944,7 +944,7 @@ function rbpRunMonteCarlo(d,opts){
   function setup(c,h){var dpr=window.devicePixelRatio||1,W=c.clientWidth;c.width=W*dpr;c.height=h*dpr;var g=c.getContext('2d');g.scale(dpr,dpr);g.clearRect(0,0,W,h);return {g:g,W:W,H:h};}
 
   function drawLine(stressR){
-    var c=$('chart'),s=setup(c,240),g=s.g,W=s.W,H=s.H;
+    var c=$("chart"),s=setup(c,300),g=s.g,W=s.W,H=s.H;
     var base=baseR.series,str=stressR.series; if(!base.length)return;
     var y0=base[0].year,y1=base[base.length-1].year,goal=I.legacyB8;
     var maxBal=Math.max(goal,Math.max.apply(null,base.concat(str).map(function(p){return p.bal;})))*1.08;
@@ -962,7 +962,7 @@ function rbpRunMonteCarlo(d,opts){
   }
 
   function drawReturns(){
-    var c=$('rchart'),s=setup(c,150),g=s.g,W=s.W,H=s.H;
+    var c=$("rchart"),s=setup(c,200),g=s.g,W=s.W,H=s.H;
     var y0=baseR.series[0].year,y1=baseR.series[baseR.series.length-1].year,cy=crashYears();
     var rets=[]; for(var yr=y0;yr<=y1;yr++){ rets.push({yr:yr, r:(cy[yr]!=null?cy[yr]:REP)}); }
     var lo=Math.min(-50,Math.min.apply(null,rets.map(function(x){return x.r;}))-2), hi=Math.max(10,REP+3);
@@ -987,7 +987,7 @@ function rbpRunMonteCarlo(d,opts){
     else { dn.innerHTML="Your essentials are what you <b>must cover every year</b> before any extras \u2014 basic living plus healthcare."; }
   }
   function drawSafety(cf, sf){
-    var c=$('wchart'),st=setup(c,160),g=st.g,W=st.W,H=st.H;
+    var c=$("wchart"),st=setup(c,215),g=st.g,W=st.W,H=st.H;
     if(!cf||!cf.length)return;
     var y0=cf[0].year,y1=cf[cf.length-1].year;
     var ess=cf.map(function(d){return d.floor+d.debt;});
@@ -3156,6 +3156,7 @@ function rbpRunMonteCarlo(d,opts){
 
   window.addEventListener('message', function(ev){ if(ev&&ev.data&&ev.data.type==='rbpPlan'){ applyPlan(ev.data.I); } });
   window.addEventListener('resize', function(){ if(ran&&lastRes){ drawFan(lastRes); } postHeight(); });
+  var _md=document.querySelector('details.methods'); if(_md){ _md.addEventListener('toggle', function(){ postHeight(); setTimeout(postHeight,80); setTimeout(postHeight,260); }); }
   try{ parent.postMessage({type:'rbpMCReady'}, '*'); }catch(e){}
   postHeight();
 })();
