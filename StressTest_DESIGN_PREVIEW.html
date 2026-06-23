@@ -2251,18 +2251,30 @@ function rbpRunMonteCarlo(d,opts){
     </div>
 
     <div id="results">
+      <!-- what the simulation is using (context) -->
+      <div id="r-context" style="display:none;background:linear-gradient(135deg,var(--navy2),var(--navy));border-radius:14px;padding:18px 20px;color:#dceaf5;margin-bottom:14px;box-shadow:0 8px 24px rgba(5,22,40,.16);">
+        <div style="font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">What this simulation is using</div>
+        <div id="r-spend" style="font-size:12.5px;line-height:1.65;">&mdash;</div>
+        <div id="r-horizon" style="font-size:11.5px;line-height:1.55;color:#9fc1d6;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.1);">&mdash;</div>
+        <div style="font-size:11px;line-height:1.55;color:#9fc1d6;margin-top:9px;">Monte Carlo replays your plan through thousands of random market histories (calm years, crashes, long flat stretches) and counts how it turns out &mdash; using the inflation and returns from your saved plan. It answers <b style="color:#fff;">&ldquo;how often does my plan work?&rdquo;</b> rather than &ldquo;what if returns are exactly average?&rdquo;</div>
+      </div>
+
       <div class="head">
         <div class="big" id="r-never">&mdash;</div>
-        <div class="bigsub">of the time, your plan <b>never runs out of money</b></div>
+        <div class="bigsub">of the time, your plan <b>never runs out of money</b> &mdash; if you trim the discretionary extras in the worst years, like most retirees do</div>
         <div class="ctx" id="r-never-ctx">&mdash;</div>
         <div class="two">
+          <div>
+            <div class="n" id="r-fullout" style="color:#7fe3e9;">&mdash;</div>
+            <div class="nlab">never run out even at full spending (no trimming)</div>
+          </div>
           <div>
             <div class="n" id="r-legacy" style="color:var(--gold);">&mdash;</div>
             <div class="nlab">leave at least your full legacy goal behind</div>
           </div>
           <div>
-            <div class="n" id="r-median" style="color:#7fe3e9;">&mdash;</div>
-            <div class="nlab">typical (middle) amount left at the end</div>
+            <div class="n" id="r-median" style="color:#cfe3ef;">&mdash;</div>
+            <div class="nlab">typical amount left at the end</div>
           </div>
         </div>
       </div>
@@ -2936,7 +2948,7 @@ function rbpRunMonteCarlo(d,opts){
 
   function runBatched(opts, onDone){
     var total=opts.runs, nB = total>=2000?10:(total>=1000?5:2), per=Math.ceil(total/nB);
-    var done=0, agg=null, sSucc=0, sSurv=0, sMed=0, sP10=0, sP90=0;
+    var done=0, agg=null, sSucc=0, sSurv=0, sMed=0, sP10=0, sP90=0, sFloor=0;
     var realRandom=Math.random; Math.random=mulberry32(0x5eed1234);  // one seed for the whole run
     $('prog').style.display='block'; $('prog-fill').style.width='0%';
 
@@ -2950,8 +2962,9 @@ function rbpRunMonteCarlo(d,opts){
       // concatenate per-year balances for the fan chart
       for(var y=0;y<r.yrs;y++){ var src=r.yearlyBals[y]||[]; for(var k=0;k<src.length;k++) agg.yearlyBals[y].push(src[k]); }
       // accumulate the engine's own stats, weighted by this batch's size
-      sSucc += (r.successPct||0)*thisN;   // reached legacy goal
-      sSurv += (r.survivePct||0)*thisN;   // survived but under goal
+      sSucc += (r.successPct||0)*thisN;   // reached legacy goal (full spending)
+      sSurv += (r.survivePct||0)*thisN;   // survived but under goal (full spending)
+      sFloor+= (r.neverRanOutPct||0)*thisN; // essentials-only: never ran out IF discretionary trimmed in down years
       sMed  += (r.median||0)*thisN; sP10 += (r.p10||0)*thisN; sP90 += (r.p90||0)*thisN;
       done+=thisN;
       $('prog-fill').style.width=Math.round(done/total*100)+'%';
@@ -2961,10 +2974,11 @@ function rbpRunMonteCarlo(d,opts){
     function finish(){
       Math.random=realRandom;
       var legacyPct=Math.round(sSucc/total);
-      var neverOutPct=Math.round((sSucc+sSurv)/total);   // reached goal OR survived under it = never ran out
+      var fullOutPct=Math.round((sSucc+sSurv)/total);   // never ran out at FULL spending (no trimming)
+      var floorPct=Math.round(sFloor/total);            // never ran out IF discretionary trimmed in down years
       onDone({
         yrs:agg.yrs, years:agg.years, legacyGoal:agg.legacyGoal||0, model:agg.model, flex:agg.flex, yearlyBals:agg.yearlyBals,
-        neverOutPct:Math.min(100,neverOutPct), legacyPct:legacyPct,
+        floorPct:Math.min(100,floorPct), fullOutPct:Math.min(100,fullOutPct), legacyPct:legacyPct,
         median:Math.round(sMed/total), p10:Math.round(sP10/total), p90:Math.round(sP90/total)
       });
     }
@@ -2973,20 +2987,21 @@ function rbpRunMonteCarlo(d,opts){
 
   function paint(res, opts){
     lastRes=res;
-    var nv=res.neverOutPct, lg=res.legacyPct;
-    $('r-never').textContent=nv+'%';
-    $('r-never').style.color = nv>=90?'#7fe3a0':nv>=75?'var(--gold)':'#ff9b7e';
+    var fl=res.floorPct, full=res.fullOutPct, lg=res.legacyPct;
+    $('r-never').textContent=fl+'%';
+    $('r-never').style.color = fl>=85?'#7fe3a0':fl>=60?'var(--gold)':'#ff9b7e';
+    $('r-fullout').textContent=full+'%';
     $('r-legacy').textContent=lg+'%';
     $('r-median').textContent=fmt(res.median);
-    var flexTxt = res.flex>0 ? 'trimming discretionary spending '+Math.round(res.flex*100)+'% in strained markets' : 'never adjusting spending';
+    var flexTxt = res.flex>0 ? 'trimming the discretionary extras by '+Math.round(res.flex*100)+'% in down markets' : 'with no spending adjustments';
     var modelTxt = res.model==='historical'?'real historical US returns':res.model==='fat'?'a fat-tailed model (realistic crash risk)':'a classic bell-curve model';
     $('r-never-ctx').textContent='Across '+opts.runs.toLocaleString()+' randomized futures using '+modelTxt+', '+flexTxt+'.';
 
     var goalTxt = res.legacyGoal>0 ? 'Your legacy goal is <b>'+fmt(res.legacyGoal)+'</b>. ' : '';
-    var verdict = nv>=90 ? 'This is a strong, resilient plan.' :
-                  nv>=75 ? 'This plan holds up in most futures, with some risk in the worst ones.' :
-                  nv>=50 ? 'This plan is vulnerable &mdash; a meaningful share of futures run short.' :
-                           'This plan runs out of money in most futures and needs attention.';
+    var verdict = fl>=85 ? 'This is a strong, resilient plan.' :
+                  fl>=70 ? 'This plan holds up in most futures once you flex spending in downturns.' :
+                  fl>=50 ? 'This plan is workable but tight &mdash; trimming in bad years matters a lot here.' :
+                           'This plan runs short in most futures even with trimming, and needs attention.';
     $('r-readout').innerHTML=goalTxt+'In the toughest 10% of markets your plan still ends with about <b>'+fmt(res.p10)+'</b>; '+
       'in a typical future, <b>'+fmt(res.median)+'</b>. <b>'+verdict+'</b>';
 
@@ -2994,6 +3009,30 @@ function rbpRunMonteCarlo(d,opts){
     $('t-p50').textContent=fmt(res.median);
     $('t-p90').textContent=fmt(res.p90);
     $('t-p10').style.color = res.p10<=0?'var(--bad)':'var(--warn)';
+
+    // ── context: what the simulation spends + horizon ──
+    try{
+      var sp=(d&&d.spending)||{}, proj=(d&&d.projections)||{}, by=proj.byYear||[];
+      var floorAmt=0, extraAmt=0;
+      if(by.length){
+        var b0=by[0]||{};
+        floorAmt=(+b0.totalNeed)||((+b0.baseLiving||0)+(+b0.healthcare||0)+(+b0.debt||0));
+        for(var bi=0;bi<by.length;bi++){ var ce=+(by[bi]&&by[bi].chosenExtra)||0; if(ce>extraAmt) extraAmt=ce; }
+      }
+      if(!floorAmt) floorAmt=(+sp.baseAnnual)||0;
+      if(!extraAmt) extraAmt=(+sp.safeExtra)||(+sp.phase1Extra)||0;
+      var spendTxt;
+      if(extraAmt>0){
+        spendTxt='Each year it covers your <b>essentials</b> &mdash; about <b style="color:#fff;">'+fmt(floorAmt)+'/yr</b> of must-pay living, healthcare and debt &mdash; plus up to <b style="color:var(--gold);">'+fmt(extraAmt)+'/yr</b> of discretionary extras, all pulled from your saved plan. When markets fall it <b>trims the extras first</b> to protect the essentials &mdash; that realistic behaviour is what the headline number below is based on.';
+      } else {
+        spendTxt='Each year it covers your <b>essentials</b> &mdash; about <b style="color:#fff;">'+fmt(floorAmt)+'/yr</b> of must-pay living, healthcare and debt &mdash; pulled from your saved plan. No discretionary extra is switched on, so there is nothing to trim in down years.';
+      }
+      $('r-spend').innerHTML=spendTxt;
+      var hz = opts.endAge95 ? 'Testing every future <b style="color:#fff;">through age 95</b> &mdash; a longevity stress test that assumes a long life.' :
+                               'Testing every future <b style="color:#fff;">through the plan age you entered</b> for each of you.';
+      $('r-horizon').innerHTML=hz;
+      $('r-context').style.display='';
+    }catch(e){ var C=$('r-context'); if(C) C.style.display='none'; }
 
     $('results').style.display='block';
     // transparency: show the withdrawal the simulation actually used across retirement, not just year 1
