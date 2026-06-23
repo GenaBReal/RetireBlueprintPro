@@ -540,10 +540,10 @@ window.addEventListener('storage', function(e) {
         <div class="chart-sub">every year through the plan, with the legacy goal marked</div>
         <canvas id="chart"></canvas>
         <div class="legend">
-          <i><span class="swatch" style="background:var(--teal)"></span>Base plan</i>
+          <i><span class="swatch" style="background:#23425C"></span>Base plan</i>
           <i><span class="swatch" id="leg-stress" style="background:var(--salmon)"></span>This scenario</i>
           <i><span class="swatch dash"></span>Legacy goal</i>
-          <i><span class="swatch" style="height:0;border-top:2px dotted var(--teal);width:15px"></span>Account floor</i>
+          <i><span class="swatch" style="height:0;border-top:2px dotted #8499A8;width:15px"></span>Account floor</i>
           <i><span class="swatch band"></span>Crash years</i>
         </div>
       </div>
@@ -1233,7 +1233,7 @@ function rbpRunMonteCarlo(d,opts){
   var $=function(id){return document.getElementById(id)};
   function fmtK(n){return '$'+Math.round(n/1000)+'K';}
   function fmtM(n){return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n/1000)+'K';}
-  function sev(r){ if(r>=5)return '#1CC7D0'; if(r>=0)return '#34B8A6'; if(r>=-10)return '#F4B86A'; if(r>=-20)return '#EC9A4E'; if(r>=-35)return '#E07B5A'; return '#C0392B'; }
+  function sev(r){ if(r>=5)return '#0E9CA6'; if(r>=0)return '#1FA08C'; if(r>=-10)return '#E0A33A'; if(r>=-20)return '#D9822A'; if(r>=-35)return '#CF5A35'; return '#B5301F'; }
 
   function knobs(extra,goalOverride){
     var yr1=+$('yr1').value,yrs=+$('yrs').value;
@@ -1261,12 +1261,12 @@ function rbpRunMonteCarlo(d,opts){
     var X=function(yr){return padL+(yr-y0)/(y1-y0)*pw;},Y=function(v){return padT+(1-(v-minBal)/(maxBal-minBal))*ph;};
     var cy=crashYears();
     g.fillStyle='rgba(192,57,43,.12)'; Object.keys(cy).forEach(function(yr){yr=+yr; if(yr>=y0&&yr<=y1){var x=X(yr),xn=X(Math.min(y1,yr+1)); g.fillRect(x,padT,Math.max(2,xn-x),ph);}});
-    g.strokeStyle='#ECEFF1';g.fillStyle='#5F6368';g.font='11px -apple-system,sans-serif';g.textAlign='right';g.textBaseline='middle';
+    g.strokeStyle='#ECEFF1';g.fillStyle='#41576A';g.font='11px -apple-system,sans-serif';g.textAlign='right';g.textBaseline='middle';
     for(var k=0;k<=3;k++){var v=minBal+(maxBal-minBal)*k/3,yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText(v>=1e6?('$'+(v/1e6).toFixed(1)+'M'):('$'+Math.round(v/1000)+'K'),padL-7,yy);}
     g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr),H-padB+5);
-    g.strokeStyle='#f4b86a';g.setLineDash([5,4]);g.lineWidth=1.5;g.beginPath();g.moveTo(padL,Y(goal));g.lineTo(W-padR,Y(goal));g.stroke();g.setLineDash([]);if(I.floorB9>0&&I.floorB9>=minBal&&I.floorB9<=maxBal){g.strokeStyle='#1CC7D0';g.setLineDash([2,3]);g.lineWidth=1.3;g.beginPath();g.moveTo(padL,Y(I.floorB9));g.lineTo(W-padR,Y(I.floorB9));g.stroke();g.setLineDash([]);}
+    g.strokeStyle='#E0A33A';g.setLineDash([6,4]);g.lineWidth=2;g.beginPath();g.moveTo(padL,Y(goal));g.lineTo(W-padR,Y(goal));g.stroke();g.setLineDash([]);if(I.floorB9>0&&I.floorB9>=minBal&&I.floorB9<=maxBal){g.strokeStyle='#8499A8';g.setLineDash([2,3]);g.lineWidth=1.7;g.beginPath();g.moveTo(padL,Y(I.floorB9));g.lineTo(W-padR,Y(I.floorB9));g.stroke();g.setLineDash([]);}
     function ln(ser,col,w){g.strokeStyle=col;g.lineWidth=w;g.beginPath();ser.forEach(function(p,i){var x=X(p.year),yy=Y(p.bal);i?g.lineTo(x,yy):g.moveTo(x,yy);});g.stroke();}
-    ln(base,'#1CC7D0',2); ln(str,sev(+$('yr1').value),2.4);
+    ln(base,'#23425C',2.7); ln(str,sev(+$('yr1').value),3.2);
   }
 
   function drawReturns(){
@@ -1277,11 +1277,11 @@ function rbpRunMonteCarlo(d,opts){
     var padL=42,padR=10,padT=8,padB=20,pw=W-padL-padR,ph=H-padT-padB;
     var X=function(yr){return padL+(yr-y0)/(y1-y0+1)*pw;},Y=function(v){return padT+(1-(v-lo)/(hi-lo))*ph;};
     var bw=Math.max(2,pw/(y1-y0+1)*0.7);
-    g.strokeStyle='#ECEFF1';g.fillStyle='#5F6368';g.font='10px -apple-system,sans-serif';g.textAlign='right';g.textBaseline='middle';
+    g.strokeStyle='#ECEFF1';g.fillStyle='#41576A';g.font='10px -apple-system,sans-serif';g.textAlign='right';g.textBaseline='middle';
     [hi,0,lo].forEach(function(v){var yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText(Math.round(v)+'%',padL-6,yy);});
     var zero=Y(0);
     rets.forEach(function(d){var x=X(d.yr)+ (pw/(y1-y0+1)-bw)/2, yy=Y(d.r); g.fillStyle=sev(d.r); if(d.r>=0)g.fillRect(x,yy,bw,zero-yy); else g.fillRect(x,zero,bw,yy-zero);});
-    g.fillStyle='#5F6368';g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr)+bw/2,H-padB+4);
+    g.fillStyle='#41576A';g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr)+bw/2,H-padB+4);
   }
 
   function paintFacts(r){
@@ -1305,10 +1305,10 @@ function rbpRunMonteCarlo(d,opts){
     var padL=46,padR=10,padT=10,padB=20,pw=W-padL-padR,ph=H-padT-padB;
     var X=function(yr){return padL+(yr-y0)/(y1-y0)*pw;},Y=function(v){return padT+(1-v/maxV)*ph;};
     // gridlines
-    g.strokeStyle='#ECEFF1';g.fillStyle='#5F6368';g.font='10px sans-serif';g.textAlign='right';g.textBaseline='middle';
+    g.strokeStyle='#ECEFF1';g.fillStyle='#41576A';g.font='10px sans-serif';g.textAlign='right';g.textBaseline='middle';
     for(var q=0;q<=2;q++){var v=maxV*q/2,yy=Y(v);g.beginPath();g.moveTo(padL,yy);g.lineTo(W-padR,yy);g.stroke();g.fillText('$'+Math.round(v/1000)+'K',padL-6,yy);}
     // essentials area
-    g.fillStyle='rgba(28,199,208,.28)';g.beginPath();
+    g.fillStyle='rgba(14,124,132,.26)';g.beginPath();
     cf.forEach(function(d,i){var x=X(d.year),yy=Y(ess[i]);i?g.lineTo(x,yy):g.moveTo(x,yy);});
     g.lineTo(X(y1),Y(0));g.lineTo(X(y0),Y(0));g.closePath();g.fill();
     // room/overspend fill between your & safe, per segment
@@ -1321,12 +1321,12 @@ function rbpRunMonteCarlo(d,opts){
       g.closePath();g.fill();
     }
     // safe ceiling (dashed) + your spending (solid)
-    g.strokeStyle='#0A7E84';g.setLineDash([5,4]);g.lineWidth=1.8;g.beginPath();
+    g.strokeStyle='#0A7E84';g.setLineDash([6,4]);g.lineWidth=2.2;g.beginPath();
     cf.forEach(function(d,i){var x=X(d.year),yy=Y(safe[i]);i?g.lineTo(x,yy):g.moveTo(x,yy);});g.stroke();g.setLineDash([]);
-    g.strokeStyle='#041E2F';g.lineWidth=2.2;g.beginPath();
+    g.strokeStyle='#041E2F';g.lineWidth=2.8;g.beginPath();
     cf.forEach(function(d,i){var x=X(d.year),yy=Y(your[i]);i?g.lineTo(x,yy):g.moveTo(x,yy);});g.stroke();
     // x labels
-    g.fillStyle='#5F6368';g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr),H-padB+4);
+    g.fillStyle='#41576A';g.textAlign='center';g.textBaseline='top';for(var yr=y0;yr<=y1;yr+=Math.ceil((y1-y0)/5))g.fillText(yr,X(yr),H-padB+4);
     // callout: biggest overspend gap (a real number)
     var worst=0,worstYr=null;
     for(var m=0;m<cf.length;m++){var gap=your[m]-safe[m];if(gap>worst){worst=gap;worstYr=cf[m].year;}}
@@ -1422,7 +1422,6 @@ function rbpRunMonteCarlo(d,opts){
     });
   })();
   </script>
-  <!-- old Test 1 kept in the DOM (hidden) so existing code that references it never breaks -->
   <div id="rbpT1Old" style="display:none" aria-hidden="true">
 
   <!-- All tests run locally and instantly now; reassurance that the saved plan is never changed -->
@@ -1629,10 +1628,9 @@ function rbpRunMonteCarlo(d,opts){
     </div>
     <div id="es-slots" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
   </div>
+  </div>
+  <!-- /old Test 1 (hidden) -->
 </div>
-
-</div>
-  <!-- /old Test 1 -->
 
 <!-- ════════ Test 2 divider — REAL CRASHES FROM HISTORY ════════ -->
   <div style="margin:30px 0 16px;display:flex;align-items:center;gap:14px;">
