@@ -3806,9 +3806,25 @@ function rbpPlanEndYear(){
   var end=0;
   Object.keys(people).forEach(function(k){
     var p=people[k]||{};
-    if(p.age){ var dy=cur+((p.deathAge||90)-(p.age||60)); if(dy>end) end=dy; }
+    if(p.age){ var da=Math.min((p.deathAge||90),110); var dy=cur+(da-(p.age||60)); if(dy>end) end=dy; }   // cap any age at 110
   });
-  return end; // later of the two partners' death years
+  return end; // later of the two partners' death years (capped at age 110)
+}
+// Trim the loaded projection so EVERYTHING downstream stops at the real death year (age capped at 110),
+// dropping any padded filler years the sheet tacks on. One source of truth for the plan horizon.
+function rbpTrimProjToDeath(){
+  try{
+    if(!planData || !planData.projections) return;
+    var planEnd=rbpPlanEndYear(); if(!planEnd) return;
+    var proj=planData.projections, yrs=proj.years||[];
+    if(!yrs.length) return;
+    var lastIdx=-1; for(var i=0;i<yrs.length;i++){ if(yrs[i]<=planEnd) lastIdx=i; }
+    if(lastIdx<0 || lastIdx>=yrs.length-1) return;   // nothing past the death year
+    var cut=lastIdx+1;
+    Object.keys(proj).forEach(function(key){
+      if(Array.isArray(proj[key]) && proj[key].length>cut) proj[key]=proj[key].slice(0,cut);
+    });
+  }catch(e){}
 }
 var RCS = [
   { name:'COVID 2020',          sev:'+18% (recovered)',           eDrag:-11, eDur:1, lOff:0, lDrag:0,  lDur:0, infl:1.5 },
@@ -3911,6 +3927,7 @@ function loadData() {
       try { if (typeof rbpApplyEngine==='function' && window.RBP && window.RBP.buildI) { var _engD=JSON.parse(JSON.stringify(d)); rbpApplyEngine(_engD); if(_engD&&_engD.projections) planData.projections=_engD.projections; } } catch(_e){}
       // One-time: turn the loaded inputs into the engine's input I (single source of truth).
       try { window.RBP_I = (window.RBP && RBP.buildI) ? RBP.buildI(d) : null; } catch(e){ window.RBP_I = null; }
+      rbpTrimProjToDeath();   // drop any padded years past the real death year (age capped at 110) — one source of truth
       document.getElementById('loading-msg').style.display='none';
       document.getElementById('stress-content').style.display='block';
       var sn=document.getElementById('sample-notice');if(sn)sn.style.display='none';
