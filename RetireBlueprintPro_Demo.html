@@ -87,8 +87,8 @@
   .chart-area { height:180px; position:relative; }
 
   /* CONTROLS */
-  .controls { background:#fff; border-radius:8px; padding:16px; margin-bottom:16px; border:1px solid #e8eaed; border-left:4px solid var(--orange); box-shadow:0 1px 3px rgba(5,22,40,.06); }
-  .controls-title { font-size:11px; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+  .controls { background:#fff; border-radius:8px; padding:16px; margin-bottom:16px; border:1px solid #e8eaed; border-top:3px solid #041E2F; box-shadow:0 1px 3px rgba(5,22,40,.06); }
+  .controls-title { font-size:11px; font-weight:800; color:#041E2F; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
   .ctrl-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .ctrl-item label { font-size:9px; color:#5b7383; text-transform:uppercase; letter-spacing:0.8px; display:block; margin-bottom:4px; }
   .ctrl-item input[type=range] { width:100%; accent-color:var(--teal); }
@@ -238,7 +238,7 @@ window.addEventListener('storage', function(e) {
     <div class="ctrl-grid">
       <div class="ctrl-item">
         <label>Annual Spending ($)</label>
-        <input type="range" id="ctrl-spend" min="30000" max="200000" step="5000" value="87000" oninput="recalc()">
+        <input type="range" id="ctrl-spend" min="30000" max="200000" step="1000" value="87000" oninput="recalc()">
         <div class="ctrl-val" id="ctrl-spend-val">$87,000</div>
       </div>
       <div class="ctrl-item">
@@ -276,7 +276,7 @@ window.addEventListener('storage', function(e) {
       <div class="sub" id="d-extra-sub">more per year, goal still met</div>
     </div>
     <div class="card">
-      <div class="card-title">Legacy Goal</div>
+      <div class="card-title">Projected Legacy</div>
       <div class="big-num" id="d-goal">—</div>
       <div class="sub" id="d-goal-sub">on track to leave —</div>
     </div>
@@ -336,7 +336,7 @@ window.addEventListener('storage', function(e) {
   <!-- LIVE CRASH STRESS TEST -->
   <div class="crash-card">
     <div class="card-title" style="color:#f4b86a;font-size:11px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(244,184,106,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f4b86a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span>Live Stress Test — Could This Plan Survive a Crash?</div>
-    <div style="font-size:12px;color:#b8dde6;line-height:1.6;">Drop a real market crash on the <b>worst possible year — the year this plan retires</b> — and watch it react. These are the same scenarios in the full Stress Test, built from actual S&amp;P 500 losses.</div>
+    <div style="font-size:12px;color:#b8dde6;line-height:1.6;">Drop a real market crash on the <b>worst possible year — the year this plan retires</b> — and watch what it does to their <b style="color:#f4b86a;">safe extra spending</b>. Same scenarios as the full Stress Test, built from actual S&amp;P 500 losses.</div>
     <div class="crash-presets" id="crash-presets">
       <button class="crashbtn on" data-crash="none">No Crash</button>
       <button class="crashbtn" data-crash="c2008">2008 Crisis &minus;37%</button>
@@ -348,7 +348,7 @@ window.addEventListener('storage', function(e) {
     <div class="crash-stats">
       <div class="crash-stat"><div class="l">Lowest Point</div><div class="v" id="crash-low" style="color:#ff6b6b;">&mdash;</div></div>
       <div class="crash-stat"><div class="l">Ending Balance</div><div class="v" id="crash-end" style="color:#1CC7D0;">&mdash;</div></div>
-      <div class="crash-stat"><div class="l">vs No-Crash Plan</div><div class="v" id="crash-vs" style="color:#f4b86a;">&mdash;</div></div>
+      <div class="crash-stat"><div class="l">Safe Extra / Cut</div><div class="v" id="crash-vs" style="color:#f4b86a;">&mdash;</div></div>
     </div>
     <div class="crash-verdict" id="crash-verdict">Pick a crash above to see how this plan holds up when the market drops at the worst possible time.</div>
   </div>
@@ -367,6 +367,8 @@ window.addEventListener('storage', function(e) {
       <div class="feature-item">✅ SS survivor benefit modeling</div>
       <div class="feature-item">✅ Medicare IRMAA planning</div>
       <div class="feature-item">✅ Sequence of returns stress test</div>
+      <div class="feature-item">✅ Monte Carlo success simulations</div>
+      <div class="feature-item">✅ Safe extra spending vs. your legacy goal</div>
       <div class="feature-item">✅ FIRE metrics (SWR, FI Date, Coast)</div>
       <div class="feature-item">✅ Print-ready PDF summary</div>
       <div class="feature-item">✅ Annual update guide with links</div>
@@ -466,18 +468,19 @@ function projectPortfolio(p, seq) {
   return {port:port, pre:preA, roth:rothA, tax:taxA};
 }
 
-// Largest extra annual spend that still ends >= legacy goal and never depletes.
+// Largest signed change to base spend that still ends >= legacy goal and never
+// depletes, under an optional crash sequence. Positive = safe extra you could
+// spend; negative = cut you'd need to make to stay on track.
 function projSpend(p, spend, seq){ var q=Object.assign({}, p); q.spend=spend; return projectPortfolio(q, seq).port; }
-function safeExtraSpend(p){
-  var base = projectPortfolio(p, []).port;
-  if (base[base.length-1] < p.legacyGoal) return 0;
-  var lo=0, hi=150000;
-  for (var k=0; k<24; k++){
-    var mid=(lo+hi)/2, v=projSpend(p, p.spend+mid, []);
+function safeAdjust(p, seq){
+  var lo=-p.spend*0.8, hi=150000;
+  for (var k=0; k<28; k++){
+    var mid=(lo+hi)/2, v=projSpend(p, p.spend+mid, seq);
     if (Math.min.apply(null,v)>0 && v[v.length-1]>=p.legacyGoal) lo=mid; else hi=mid;
   }
   return Math.round(lo/500)*500;
 }
+function safeExtraSpend(p){ return Math.max(0, safeAdjust(p, [])); }
 // Seeded RNG so the Monte Carlo result is stable as sliders move (no flicker).
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
 function monteCarlo(p){
@@ -534,30 +537,41 @@ function drawCrash() {
   var endEl = document.getElementById('crash-end');
   endEl.textContent = fmt(endC);
   endEl.style.color = endC >= p.legacyGoal ? '#1CC7D0' : '#f4b86a';
-  var diff = endC - endB;
-  document.getElementById('crash-vs').textContent = crashKey==='none' ? '—' : (diff>=0?'+':'–')+fmt(Math.abs(diff));
+
+  // Safe extra spending — base vs under this crash (the headline metric)
+  var baseAdj = safeAdjust(p, []);
+  var crashAdj = safeAdjust(p, sc.seq);
+  function adjTxt(n){ var a=Math.abs(n); return a>=1000 ? '$'+Math.round(a/1000)+'K' : '$'+a; }
+  var vsEl = document.getElementById('crash-vs');
+  var shownAdj = (crashKey==='none') ? baseAdj : crashAdj;
+  vsEl.textContent = (shownAdj>=0?'+':'\u2212')+adjTxt(shownAdj)+'/yr';
+  vsEl.style.color = shownAdj>=0 ? '#1CC7D0' : '#ff6b6b';
 
   var guaranteed = p.ss + p.pension;
   var floor = p.spend > 0 ? guaranteed / p.spend : 0;
   var goal = p.legacyGoal;
+  var lastAge = p.p1age + 30;
+  var gold = function(t){ return '<b style="color:#f4b86a;">'+t+'</b>'; };
+  var red  = function(t){ return '<b style="color:#ff6b6b;">'+t+'</b>'; };
+  var swing = (crashAdj >= 0)
+    ? ' Their safe extra spending drops from '+gold('+'+adjTxt(baseAdj)+'/yr')+' to '+gold('+'+adjTxt(crashAdj)+'/yr')+' — a smaller cushion, but still a cushion.'
+    : ' It turns '+gold('+'+adjTxt(baseAdj)+'/yr')+' of safe extra spending into a '+red('\u2212'+adjTxt(crashAdj)+'/yr')+' cut they\u2019d need to make to stay on track.';
   var v = document.getElementById('crash-verdict');
   if (crashKey === 'none') {
-    v.innerHTML = 'This is the plan with <b>smooth average returns</b> — no crash. Tap a crash above to drop it on the <b>year they retire</b> (the worst possible timing) and watch the plan react.';
+    v.innerHTML = 'At today\u2019s spending the money <b>lasts the full 30 years</b> (through age '+lastAge+') and still leaves '+gold(fmt(endB))+'. On top of that there\u2019s about '+gold('+'+adjTxt(baseAdj)+'/yr')+' of safe extra they don\u2019t have to use. Tap a crash to see how much of that cushion survives the <b>worst possible timing</b>.';
   } else if (low <= 0) {
     if (floor >= 0.5) {
-      var cut = Math.round((p.spend - guaranteed)/1000)*1000;
-      v.innerHTML = 'With <b>'+sc.label+'</b> right at retirement, their savings eventually <b style="color:#ff6b6b;">run dry</b> — but Social Security still covers about <b>'+Math.round(floor*100)+'%</b> of their spending (<b>'+fmt(guaranteed)+'/yr</b>). They wouldn\u2019t be broke, but they\u2019d need to trim roughly <b>'+fmt(cut)+'/yr</b> or earn a little on the side. That\u2019s the early-crash risk worth planning for.';
+      v.innerHTML = 'With <b>'+sc.label+'</b> right at retirement, their savings eventually '+red('run dry')+' — but Social Security still covers about <b>'+Math.round(floor*100)+'%</b> of spending ('+fmt(guaranteed)+'/yr), so they\u2019re not broke.'+swing;
     } else {
-      v.innerHTML = 'With <b>'+sc.label+'</b> right at retirement — and <b>no Social Security yet</b> to fall back on — this plan <b style="color:#ff6b6b;">runs out of money</b> before the end. That\u2019s sequence-of-returns risk at its worst, and exactly why early retirees test it before they leap.';
+      v.innerHTML = 'With <b>'+sc.label+'</b> right at retirement — and <b>no Social Security yet</b> — this plan '+red('runs out of money')+' before the end. Sequence-of-returns risk at its worst.'+swing;
     }
   } else if (goal > 0 && endC < goal) {
-    v.innerHTML = 'With <b>'+sc.label+'</b> at retirement, the plan <b style="color:#f4b86a;">survives but limps</b> — ending around <b>'+fmt(endC)+'</b>, under their '+fmt(goal)+' legacy goal. In the full tool you\u2019d trim spending a little to rebuild the cushion.';
+    v.innerHTML = 'With <b>'+sc.label+'</b> at retirement, the plan '+gold('survives but limps')+' — ending '+fmt(endC)+', under their '+fmt(goal)+' goal.'+swing;
   } else {
-    var tail = (goal > 0) ? ' — still <b>'+Math.round(endC/goal*100)+'%</b> of their '+fmt(goal)+' legacy goal.' : ', with money to spare.';
     var lead = (floor >= 0.5)
-      ? 'Even with <b>'+sc.label+'</b> the year they retire, Social Security carries most of the load and the plan <b style="color:#1CC7D0;">never runs dry</b> — ending around <b style="color:#1CC7D0;">'+fmt(endC)+'</b>'
-      : 'Even with <b>'+sc.label+'</b> the year they retire, the plan <b style="color:#1CC7D0;">holds</b> — ending around <b style="color:#1CC7D0;">'+fmt(endC)+'</b>';
-    v.innerHTML = lead + tail + ' Sequence-of-returns risk, survived.';
+      ? 'Even with <b>'+sc.label+'</b> the year they retire, Social Security carries the load and the plan '+gold('never runs dry')+' — ending '+fmt(endC)+'.'
+      : 'Even with <b>'+sc.label+'</b> the year they retire, the plan '+gold('holds')+' — ending '+fmt(endC)+'.';
+    v.innerHTML = lead + swing;
   }
 }
 
@@ -605,7 +619,7 @@ function recalc() {
   var mcEl = document.getElementById('d-mc');
   mcEl.textContent = mcPct+'%';
   mcEl.style.color = mcPct>=85?'#1CC7D0':mcPct>=70?'#f4b86a':'#ff6b6b';
-  document.getElementById('d-mc-sub').textContent = '500 market simulations · money lasts';
+  document.getElementById('d-mc-sub').textContent = '500 sims · money lasts all 30 yrs';
   var mcb = document.getElementById('d-mc-badge');
   mcb.textContent = mcPct>=85?'✅ STRONG':mcPct>=70?'⚠️ WATCH':'⛔ FRAGILE';
   mcb.className = mcPct>=85?'badge-green':'badge-orange';
@@ -614,23 +628,26 @@ function recalc() {
   document.getElementById('d-extra').textContent = extra>0 ? extraTxt+'/yr' : '$0';
   document.getElementById('d-extra-sub').textContent = extra>0 ? 'more per year, '+(goal>0?'goal still met':'money still lasts') : (met?'spending is near the safe limit':'already above the safe limit');
 
-  // Legacy Goal KPI
-  document.getElementById('d-goal').textContent = goal>0 ? fmt(goal) : 'None set';
+  // Projected Legacy KPI — what they actually leave, vs the goal
+  var glEl = document.getElementById('d-goal');
+  glEl.textContent = fmt(endBal);
+  glEl.style.color = (goal>0 && !met) ? '#f4b86a' : '#041E2F';
   document.getElementById('d-goal-sub').innerHTML = goal>0
-    ? (met ? '✅ on track to leave '+fmt(endBal) : '⚠️ projected '+fmt(endBal)+' — short')
-    : 'on track to leave '+fmt(endBal);
+    ? (met ? '✅ above your '+fmt(goal)+' goal' : '⚠️ below your '+fmt(goal)+' goal')
+    : 'no legacy goal set';
 
   // Total Portfolio
   document.getElementById('d-portfolio').textContent = fmt(p.portfolio);
 
-  // Headline callout — ties extra spend to the legacy goal
+  // Headline callout — money lasts the full time; extra spend is optional headroom
+  var lastAge = p.p1age + 30;
   var hc = document.getElementById('headline');
   if (goal>0) {
     hc.innerHTML = met
-      ? 'With <b>'+fmt(p.portfolio)+'</b> saved, this plan is on track to leave <span class="gold">'+fmt(endBal)+'</span> — the <b>'+fmt(goal)+'</b> legacy goal, <b>met</b> — with room to spend about <span class="gold">'+extraTxt+'/yr more</span> and still leave it.'
-      : 'With <b>'+fmt(p.portfolio)+'</b> saved, this plan is projected to leave <span class="gold">'+fmt(endBal)+'</span>, short of the <b>'+fmt(goal)+'</b> legacy goal. Trimming spending rebuilds the cushion — the full tool finds the exact safe number.';
+      ? 'At <b>'+fmt(p.spend)+'/yr</b>, the money <b>lasts the full 30 years</b> (through age '+lastAge+') and still leaves <span class="gold">'+fmt(endBal)+'</span> — the <b>'+fmt(goal)+'</b> legacy goal, <b>met</b>. You never have to touch it — but there\u2019s room for about <span class="gold">'+extraTxt+'/yr more</span> on top.'
+      : 'At <b>'+fmt(p.spend)+'/yr</b> the plan is projected to leave <span class="gold">'+fmt(endBal)+'</span>, short of the <b>'+fmt(goal)+'</b> legacy goal. A small spending trim rebuilds the cushion — the full tool finds the exact safe number.';
   } else {
-    hc.innerHTML = 'With <b>'+fmt(p.portfolio)+'</b> saved and Social Security underneath, this plan keeps the money lasting and could absorb about <span class="gold">'+extraTxt+'/yr more</span> in spending before it gets tight.';
+    hc.innerHTML = 'At <b>'+fmt(p.spend)+'/yr</b>, the money <b>lasts the full 30 years</b> (through age '+lastAge+') with Social Security underneath — and there\u2019s room for about <span class="gold">'+extraTxt+'/yr more</span> before it gets tight.';
   }
 
   // FIRE METRICS 
