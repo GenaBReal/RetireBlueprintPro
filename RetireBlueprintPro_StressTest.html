@@ -74,7 +74,7 @@ function rbpApplyEngine(d){
 
   // ── extend to 100 years from plan start (flat growth, no income/withdrawals) ──
   if(P.years.length){
-    var firstYr=P.years[0], lastYr=P.years[P.years.length-1], targetEnd=firstYr+99, baseReturn=0.07;
+    var firstYr=P.years[0], lastYr=P.years[P.years.length-1], targetEnd=(function(){ try{ var py=firstYr,dy=0,pp=d.people||{}; Object.keys(pp).forEach(function(k){ var pr=pp[k]||{}; if(!pr.age)return; var capYr=py+(110-pr.age); var y=pr.projectedDeathYear||(py+((Math.min(pr.deathAge||90,110))-pr.age)); if(y>capYr)y=capYr; if(y>dy)dy=y; }); return dy>0?dy:lastYr; }catch(e){ return lastYr; } })(), baseReturn=0.07;
     try{ var accs=(d.portfolio&&d.portfolio.accounts)||[], rs=0,rc=0;
       accs.forEach(function(a){ if((a.expectedReturn||0)>0){ rs+=a.expectedReturn/100; rc++; } });
       if(rc>0) baseReturn=rs/rc; }catch(e){}
@@ -406,7 +406,8 @@ window.addEventListener('storage', function(e) {
   .seclbl::before{content:'';width:3px;height:12px;border-radius:2px;background:var(--teal)}
   .secsub{font-size:10.5px;color:var(--faint);margin:0 0 10px 9px}
 
-  .presets{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0 15px}
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0 13px}
+  .preset-lbl{font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#6b8294;margin-top:8px}
   .preset{font-size:11px;padding:6px 10px;border-radius:5px;background:#F1F4F6;border:1px solid var(--border);
     color:var(--body);cursor:pointer;user-select:none;font-weight:600}
   .preset.on{border-color:var(--teal);color:var(--navy);background:#e6f8f9}
@@ -525,13 +526,22 @@ window.addEventListener('storage', function(e) {
     <div class="leftcol">
     <div class="card">
       <div class="seclbl">Pick a crash to test</div>
+      <div class="preset-lbl">Real crashes from history</div>
       <div class="presets" id="presets">
-        <div class="preset on" data-p="custom">Custom</div>
-        <div class="preset" data-p="c2008">2008</div>
+        <div class="preset on" data-p="c2008">2008 Crisis</div>
         <div class="preset" data-p="dotcom">Dot-Com</div>
         <div class="preset" data-p="covid">COVID</div>
-        <div class="preset" data-p="stag">1970s</div>
-        <div class="preset" data-p="bull">Bull</div>
+        <div class="preset" data-p="stag">1970s Stagflation</div>
+        <div class="preset" data-p="blackmon">Black Monday ’87</div>
+        <div class="preset" data-p="depression">Great Depression</div>
+      </div>
+      <div class="preset-lbl">…or a what-if scenario</div>
+      <div class="presets">
+        <div class="preset" data-p="mild">Mild Recession</div>
+        <div class="preset" data-p="severe">Severe Bear</div>
+        <div class="preset" data-p="lost">Lost Decade</div>
+        <div class="preset" data-p="bull">Strong Bull</div>
+        <div class="preset" data-p="custom">Build my own</div>
       </div>
       <div class="sg">
         <div class="sl-lab"><span>Early crash — year-1 return</span><span class="v" id="v-yr1">0%</span></div>
@@ -541,8 +551,8 @@ window.addEventListener('storage', function(e) {
       </div>
       <div class="sg">
         <div class="sl-lab"><span>…lasting</span><span class="v" id="v-yrs">1 yr</span></div>
-        <input type="range" id="yrs" min="1" max="5" step="1" value="1">
-        <div class="sl-range"><span>1 yr</span><span>3 yrs</span><span>5 yrs</span></div>
+        <input type="range" id="yrs" min="1" max="10" step="1" value="1">
+        <div class="sl-range"><span>1 yr</span><span>5 yrs</span><span>10 yrs</span></div>
       </div>
       <div class="sg">
         <div class="sl-lab"><span>Inflation</span><span class="v" id="v-inf">2.5%</span></div>
@@ -1466,7 +1476,7 @@ function rbpRunMonteCarlo(d,opts){
     else { v.className='d-verdict'; v.innerHTML="You can spend <b style='color:#f4b86a'>"+fmtK(extra)+"/yr</b> extra and still survive, but legacy lands at <b style='color:#ff7a5e'>"+fmtM(ending)+"</b> — "+fmtM(-gap)+" under your goal. Your call: spend now, or pull back to protect it."; }
   }
 
-  var PRE={custom:{yr1:0,yrs:1,inf:2.5,cola:2.5,spend:0},c2008:{yr1:-37,yrs:1,inf:2.5,cola:2.5,spend:0},dotcom:{yr1:-25,yrs:3,inf:2.5,cola:2.5,spend:0},covid:{yr1:-20,yrs:1,inf:3,cola:2.5,spend:0},stag:{yr1:-15,yrs:4,inf:8,cola:4,spend:0},bull:{yr1:18,yrs:1,inf:2.5,cola:2.5,spend:0}};
+  var PRE={custom:{yr1:0,yrs:1,inf:2.5,cola:2.5,spend:0},c2008:{yr1:-37,yrs:1,inf:2.5,cola:2.5,spend:0},dotcom:{yr1:-25,yrs:3,inf:2.5,cola:2.5,spend:0},covid:{yr1:-20,yrs:1,inf:3,cola:2.5,spend:0},stag:{yr1:-15,yrs:4,inf:8,cola:4,spend:0},bull:{yr1:18,yrs:1,inf:2.5,cola:2.5,spend:0},blackmon:{yr1:-22,yrs:1,inf:3.5,cola:3.5,spend:0},depression:{yr1:-30,yrs:4,inf:1,cola:1,spend:0},mild:{yr1:-15,yrs:1,inf:2.5,cola:2.5,spend:0},severe:{yr1:-35,yrs:1,inf:2.5,cola:2.5,spend:0},lost:{yr1:1,yrs:10,inf:2.5,cola:2.5,spend:0}};
   document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});b.classList.add('on');var p=PRE[b.dataset.p];$('yr1').value=p.yr1;$('yrs').value=p.yrs;$('inf').value=p.inf;$('cola').value=p.cola;$('spendadj').value=p.spend;$('lateSw').classList.remove('on');$('lateBody').classList.add('hide');recompute();});});
   function mark(){document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('on')});document.querySelector('[data-p=custom]').classList.add('on');}
   ['yr1','yrs','inf','cola','spendadj','lt-ret','lt-yrs'].forEach(function(id){$(id).addEventListener('input',function(){mark();recompute();});});
@@ -3781,12 +3791,8 @@ function rbpRunStressLocal(params, onResult, onError) {
   try {
     if (!(window.RBP && window.RBP_I && RBP.runStress)) { return onError && onError(); }
     var I = window.RBP_I;
-    // the plan's committed (chosen) extra, so each crash hits the plan as-saved
-    var committed = 0;
-    try {
-      var by = (window.planData && planData.projections && planData.projections.byYear) || [];
-      for (var bi = 0; bi < by.length; bi++) { var ce = +(by[bi] && by[bi].chosenExtra) || 0; if (ce > committed) committed = ce; }
-    } catch (_e) {}
+    // the plan's committed (chosen) extra — SAME source Tests 1 & 3 use, so they can't disagree
+    var committed = (I && I.committedExtra != null) ? I.committedExtra : 0;
     var k = {
       start: params.eStart,
       dur: params.eDur || 1,
@@ -3845,8 +3851,8 @@ function rcsCtx(){
     var p1=phases[0]||0; if(p1>0) ratios=phases.map(function(a){ return a/p1; });
   } catch(e){}
   var base=(typeof esBaseNumbers==='function')?(esBaseNumbers()||{}):{};
-  var legGoal=Math.round(base.legacyGoal||0);
-  var baseSafe=Math.round(base.safeExtra||0);
+  var legGoal=Math.round(base.legacyGoal || (planData&&planData.legacy&&planData.legacy.goal) || 0);
+  var baseSafe=Math.round(base.safeExtra || (window.RBP_I&&RBP_I.safeExtra) || 0);
   var proj=(planData&&planData.projections)||{};
   var startYr=(proj.years&&proj.years.length)?proj.years[0]:new Date().getFullYear();
   var baseSeries=[]; if(proj.years&&proj.endLiquid){ for(var k=0;k<proj.years.length;k++){ baseSeries.push({year:proj.years[k],bal:proj.endLiquid[k]}); } }

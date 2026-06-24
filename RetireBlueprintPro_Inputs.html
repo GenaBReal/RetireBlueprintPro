@@ -78,7 +78,7 @@ function rbpApplyEngine(d){
 
   // ── extend to 100 years from plan start (flat growth, no income/withdrawals) ──
   if(P.years.length){
-    var firstYr=P.years[0], lastYr=P.years[P.years.length-1], targetEnd=firstYr+99, baseReturn=0.07;
+    var firstYr=P.years[0], lastYr=P.years[P.years.length-1], targetEnd=(function(){ try{ var py=firstYr,dy=0,pp=d.people||{}; Object.keys(pp).forEach(function(k){ var pr=pp[k]||{}; if(!pr.age)return; var capYr=py+(110-pr.age); var y=pr.projectedDeathYear||(py+((Math.min(pr.deathAge||90,110))-pr.age)); if(y>capYr)y=capYr; if(y>dy)dy=y; }); return dy>0?dy:lastYr; }catch(e){ return lastYr; } })(), baseReturn=0.07;
     try{ var accs=(d.portfolio&&d.portfolio.accounts)||[], rs=0,rc=0;
       accs.forEach(function(a){ if((a.expectedReturn||0)>0){ rs+=a.expectedReturn/100; rc++; } });
       if(rc>0) baseReturn=rs/rc; }catch(e){}
