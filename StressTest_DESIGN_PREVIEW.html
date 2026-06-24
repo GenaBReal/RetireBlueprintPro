@@ -3000,7 +3000,7 @@ function rbpRunMonteCarlo(d,opts){
       var r; try{ r=RBP.runMonteCarlo(d, {runs:thisN, model:opts.model, flex:opts.flex, fixedYr1:opts.fixedYr1, endAge95:opts.endAge95}); }
       catch(e){ Math.random=realRandom; onDone(null); return; }
       if(!r){ Math.random=realRandom; onDone(null); return; }
-      if(!agg){ agg={ yrs:r.yrs, years:r.years, legacyGoal:r.legacyGoal, model:r.model, flex:r.flex, yearlyBals:[] };
+      if(!agg){ agg={ yrs:r.yrs, years:r.years, legacyGoal:r.legacyGoal, model:r.model, flex:r.flex, mu:r.mu, sigma:r.sigma, equityFraction:r.equityFraction, yearlyBals:[] };
                  for(var y0=0;y0<r.yrs;y0++) agg.yearlyBals.push([]); }
       // concatenate per-year balances for the fan chart
       for(var y=0;y<r.yrs;y++){ var src=r.yearlyBals[y]||[]; for(var k=0;k<src.length;k++) agg.yearlyBals[y].push(src[k]); }
@@ -3021,6 +3021,7 @@ function rbpRunMonteCarlo(d,opts){
       var floorPct=Math.round(sFloor/total);            // never ran out IF discretionary trimmed in down years
       onDone({
         yrs:agg.yrs, years:agg.years, legacyGoal:agg.legacyGoal||0, model:agg.model, flex:agg.flex, yearlyBals:agg.yearlyBals,
+        mu:agg.mu, sigma:agg.sigma, equityFraction:agg.equityFraction,
         floorPct:Math.min(100,floorPct), fullOutPct:Math.min(100,fullOutPct), legacyPct:legacyPct,
         median:Math.round(sMed/total), p10:Math.round(sP10/total), p90:Math.round(sP90/total)
       });
@@ -3081,7 +3082,10 @@ function rbpRunMonteCarlo(d,opts){
     try{
       var mu=res.mu, sigma=res.sigma;
       var g=(d&&d.global)||{}, sp2=(d&&d.spending)||{}, pr2=(d&&d.projections)||{}, by2=pr2.byYear||[];
-      var infl=(+g.inflation)||0, fl2=0, ex2=0;
+      var infl=(+g.inflation)||(+g.inflLiving)||(+g.inflationRate)||0;
+      // derive from the plan's own living-cost growth if the global field isn't populated
+      if(!infl && by2.length>1){ var L0=+(by2[0]&&by2[0].baseLiving)||0, L1=+(by2[1]&&by2[1].baseLiving)||0; if(L0>0&&L1>0) infl=L1/L0-1; }
+      var fl2=0, ex2=0;
       if(by2.length){var bb=by2[0]||{}; fl2=(+bb.totalNeed)||((+bb.baseLiving||0)+(+bb.healthcare||0)+(+bb.debt||0)); for(var bj=0;bj<by2.length;bj++){var c2=+(by2[bj]&&by2[bj].chosenExtra)||0; if(c2>ex2)ex2=c2;}}
       if(!fl2)fl2=(+sp2.baseAnnual)||0; if(!ex2)ex2=(+sp2.safeExtra)||(+sp2.phase1Extra)||0;
       var modelName=res.model==='historical'?'US historical (1928\u20132024)':res.model==='fat'?'Fat-tailed (realistic crashes)':'Normal bell curve';
