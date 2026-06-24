@@ -358,7 +358,7 @@ function renderSolverCard(d){
   var goal=Math.round(leg.goal||0);
   var _eg=(d&&d.projections&&d.projections.masterGrid)||null;
   var ending=(_eg&&_eg.length)?Math.round(Number(_eg[_eg.length-1][81])||0):Math.round(leg.projectedEnding||0);
-  var surplus=Math.round((sp.surplus!=null?sp.surplus:(ending-goal))||0);
+  var surplus=ending-goal; // must match the SAME ending & goal shown in this card (was reading the sheet's separate B120 surplus cell, which drifted from the displayed grid ending and could show a cushion while actually short of goal)
   var safe=Math.round(sp.safeExtra||0), base=Math.round(sp.baseAnnual||0);
   if(!(safe>0) && !(ending>0)){ el.style.display='none'; return; } // nothing solved yet
   var onTrack=/go|track|on\s*track|\u2705/i.test(status);
@@ -381,7 +381,7 @@ function renderSolverCard(d){
       +'<div style="font-size:16px;font-weight:800;letter-spacing:.3px;">Safe-Spend Solver</div>'
       +(status?'<div style="font-size:15px;font-weight:800;color:'+(onTrack?'var(--teal)':'var(--gold)')+';">'+status+'</div>':'')
       +'<div style="margin-left:auto;font-size:14px;color:#cfe;opacity:.9;">Ends at <b style="color:#fff;">'+money(ending)+'</b> vs <b style="color:#fff;">'+money(goal)+'</b> goal'
-        +(surplus>=0?' \u00b7 <span style="color:var(--teal);">+'+money(surplus)+' cushion</span>':' \u00b7 <span style="color:#ffb4a0;">'+money(surplus)+' short</span>')+'</div>'
+        +(surplus>=0?' \u00b7 <span style="color:var(--teal);">+'+money(surplus)+' cushion</span>':' \u00b7 <span style="color:#ffb4a0;">'+money(Math.abs(surplus))+' shortfall</span>')+'</div>'
     +'</div>'
     +'<div style="font-size:14px;color:#cfe;opacity:.92;margin-bottom:11px;">On top of your '+money(base)+' base spending, your plan can safely spend this much <b>extra</b> each phase and still land on your legacy goal:</div>'
     +'<div style="display:flex;gap:10px;flex-wrap:wrap;">'+chips+'</div>'
