@@ -48,7 +48,7 @@
     --red:#ff6b6b; --mid:#0A3145; --light:#f8f9fa;
   }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:'Segoe UI',system-ui,sans-serif; background:#F8F9FA; color:#fff; min-height:100vh; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#F8F9FA; color:#0d2a3a; min-height:100vh; }
 
   /* HEADER */
   
@@ -57,12 +57,12 @@
   .buy-btn { background:var(--teal); color:var(--navy); font-weight:800; padding:10px 20px; border-radius:6px; text-decoration:none; font-size:12px; white-space:nowrap; }
 
   /* HERO */
-  .demo-hero { background:linear-gradient(135deg,#041E2F,#0d2d44); padding:30px 24px; text-align:center; border-bottom:1px solid #1a3a52; }
-  .demo-hero h1 { font-size:26px; font-weight:900; margin-bottom:8px; }
+  .demo-hero { background:#fff; padding:28px 24px; text-align:center; border-bottom:1px solid #e8eaed; }
+  .demo-hero h1 { font-size:26px; font-weight:900; margin-bottom:8px; color:#0d2a3a; }
   .demo-hero h1 span { color:var(--teal); }
-  .demo-hero p { font-size:13px; color:#8aaabb; max-width:600px; margin:0 auto 20px; line-height:1.7; }
+  .demo-hero p { font-size:13px; color:#5b7383; max-width:600px; margin:0 auto 20px; line-height:1.7; }
   .persona-tabs { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-  .persona-btn { padding:10px 20px; border-radius:8px; border:2px solid #1a3a52; background:transparent; color:#8aaabb; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .persona-btn { padding:10px 18px; border-radius:8px; border:2px solid #d3dde3; background:#fff; color:#3a5663; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; }
   .persona-btn:hover { border-color:var(--teal); color:var(--teal); }
   .persona-btn.active { background:var(--teal); border-color:var(--teal); color:var(--navy); }
 
@@ -73,13 +73,13 @@
   .demo-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
 
   /* CARDS */
-  .card { background:#0A3145; border-radius:10px; padding:16px; border:1px solid #1a3a52; }
-  .card-title { font-size:10px; font-weight:800; color:var(--teal); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
-  .big-num { font-size:28px; font-weight:900; color:#fff; line-height:1; }
+  .card { background:#fff; border-radius:8px; padding:16px; border:1px solid #e8eaed; border-top:3px solid #041E2F; box-shadow:0 1px 3px rgba(5,22,40,.06); }
+  .card-title { font-size:10px; font-weight:800; color:#041E2F; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+  .big-num { font-size:28px; font-weight:900; color:#041E2F; line-height:1; }
   .big-num.teal { color:var(--teal); }
   .big-num.orange { color:var(--orange); }
   .big-num.green { color:var(--teal); }
-  .sub { font-size:10px; color:#8aaabb; margin-top:4px; }
+  .sub { font-size:10px; color:#5b7383; margin-top:4px; }
   .badge-green { background:rgba(76,175,80,0.2); color:#1CC7D0; font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
   .badge-orange { background:rgba(244,184,106,0.2); color:var(--orange); font-size:10px; font-weight:700; padding:3px 10px; border-radius:4px; }
 
@@ -87,17 +87,17 @@
   .chart-area { height:180px; position:relative; }
 
   /* CONTROLS */
-  .controls { background:#061620; border-radius:10px; padding:16px; margin-bottom:16px; border:2px solid var(--orange); }
+  .controls { background:#fff; border-radius:8px; padding:16px; margin-bottom:16px; border:1px solid #e8eaed; border-left:4px solid var(--orange); box-shadow:0 1px 3px rgba(5,22,40,.06); }
   .controls-title { font-size:11px; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
   .ctrl-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-  .ctrl-item label { font-size:9px; color:#8aaabb; text-transform:uppercase; letter-spacing:0.8px; display:block; margin-bottom:4px; }
+  .ctrl-item label { font-size:9px; color:#5b7383; text-transform:uppercase; letter-spacing:0.8px; display:block; margin-bottom:4px; }
   .ctrl-item input[type=range] { width:100%; accent-color:var(--teal); }
   .ctrl-val { font-size:14px; font-weight:700; color:var(--teal); margin-top:2px; }
 
   /* FIRE PANEL */
   .fire-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-  .fire-box { background:rgba(0,0,0,0.3); border-radius:8px; padding:10px; text-align:center; }
-  .fire-label { font-size:8px; color:#8aaabb; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+  .fire-box { background:#f3f7f9; border-radius:8px; padding:10px; text-align:center; }
+  .fire-label { font-size:8px; color:#5b7383; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
   .fire-val { font-size:18px; font-weight:800; }
 
   /* CTA */
@@ -121,6 +121,10 @@
   }
 input[type=range],input[type="range"]{touch-action:none;}
   /* LIVE CRASH STRESS TEST */
+  .headline-callout{background:linear-gradient(135deg,#041E2F,#0A3145);border-radius:8px;padding:16px 20px;margin-bottom:16px;color:#e8f3f6;font-size:15px;line-height:1.65;font-weight:600;border-left:5px solid #f4b86a;box-shadow:0 1px 3px rgba(5,22,40,.12);}
+  .headline-callout b{color:#fff;}
+  .headline-callout .gold{color:#f4b86a;font-weight:900;}
+  .kpi-accent-gold{border-top-color:#f4b86a !important;}
   .crash-card{background:linear-gradient(135deg,#041E2F,#0d2d44);border:2px solid #f4b86a;border-radius:12px;padding:18px;margin-bottom:16px;}
   .crash-presets{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
   .crashbtn{padding:9px 15px;border-radius:20px;border:2px solid #1a3a52;background:transparent;color:#8aaabb;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;}
@@ -219,10 +223,10 @@ window.addEventListener('storage', function(e) {
   <h1>See Your Retirement Plan <span>Come to Life</span></h1>
   <p>This is a live interactive demo using sample data. Drag the sliders to see how your plan changes in real-time. Your real plan connects to your own Google Sheet.</p>
   <div class="persona-tabs">
-    <button class="persona-btn active" onclick="loadPersona('traditional')">Traditional Retiree<br><span style="font-size:9px;font-weight:400;">Age 63/55 · SS + 401k</span></button>
-    <button class="persona-btn" onclick="loadPersona('fire')">Early FIRE Retiree<br><span style="font-size:9px;font-weight:400;">Age 45/42 · Retiring Now</span></button>
-    <button class="persona-btn" onclick="loadPersona('single')">Single Retiree<br><span style="font-size:9px;font-weight:400;">Age 60 · Pension + IRA</span></button>
-    <button class="persona-btn" onclick="loadPersona('fatfire')">Fat FIRE<br><span style="font-size:9px;font-weight:400;">Age 55/52 · $4M Portfolio</span></button>
+    <button class="persona-btn active" onclick="loadPersona('henderson')">Social Security Couple<br><span style="font-size:9px;font-weight:400;">Age 64/62 · $640K saved</span></button>
+    <button class="persona-btn" onclick="loadPersona('carter')">Catching Up at 60<br><span style="font-size:9px;font-weight:400;">Age 61/60 · $420K saved</span></button>
+    <button class="persona-btn" onclick="loadPersona('donna')">Single &amp; Steady<br><span style="font-size:9px;font-weight:400;">Age 66 · $580K saved</span></button>
+    <button class="persona-btn" onclick="loadPersona('fire')">Early FIRE<br><span style="font-size:9px;font-weight:400;">Age 47/45 · No SS yet</span></button>
   </div>
 </div>
 
@@ -255,28 +259,31 @@ window.addEventListener('storage', function(e) {
     </div>
   </div>
 
+  <!-- HEADLINE: extra-spend vs legacy goal -->
+  <div class="headline-callout" id="headline">—</div>
+
   <!-- KPI ROW -->
   <div class="demo-grid-4">
     <div class="card">
-      <div class="card-title">Plan Confidence</div>
-      <div class="big-num green" id="d-confidence">100%</div>
-      <div class="sub" id="d-confidence-sub">Legacy goal fully funded</div>
-      <div style="margin-top:8px;"><span class="badge-green" id="d-status">✅ ON TRACK</span></div>
+      <div class="card-title">Monte Carlo Success</div>
+      <div class="big-num" id="d-mc">—</div>
+      <div class="sub" id="d-mc-sub">500 market simulations</div>
+      <div style="margin-top:8px;"><span class="badge-green" id="d-mc-badge">—</span></div>
+    </div>
+    <div class="card kpi-accent-gold">
+      <div class="card-title" style="color:#b9791f;">Safe Extra Spending</div>
+      <div class="big-num orange" id="d-extra">—</div>
+      <div class="sub" id="d-extra-sub">more per year, goal still met</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Legacy Goal</div>
+      <div class="big-num" id="d-goal">—</div>
+      <div class="sub" id="d-goal-sub">on track to leave —</div>
     </div>
     <div class="card">
       <div class="card-title">Total Portfolio</div>
-      <div class="big-num teal" id="d-portfolio">$925K</div>
+      <div class="big-num" id="d-portfolio">$925K</div>
       <div class="sub">Starting value · all accounts</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Safe Annual Spending</div>
-      <div class="big-num orange" id="d-spending">$87K</div>
-      <div class="sub" id="d-spending-sub">Solver-optimized</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Projected Ending Balance</div>
-      <div class="big-num green" id="d-ending">$250K</div>
-      <div class="sub" id="d-ending-sub">At end of plan · legacy goal</div>
     </div>
   </div>
 
@@ -285,17 +292,17 @@ window.addEventListener('storage', function(e) {
     <div class="card">
       <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="10" width="3.2" height="7" rx="0.6"/><rect x="10.4" y="6" width="3.2" height="11" rx="0.6"/><rect x="14.8" y="13" width="3.2" height="4" rx="0.6"/></svg></span>Portfolio Sustainability</div>
       <div class="chart-area"><canvas id="chart-portfolio"></canvas></div>
-      <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;" id="chart-portfolio-note">—</div>
+      <div style="font-size:9px;color:#5b7383;margin-top:6px;text-align:center;" id="chart-portfolio-note">—</div>
     </div>
     <div class="card">
       <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>Tax Bucket Evolution</div>
       <div class="chart-area"><canvas id="chart-buckets"></canvas></div>
-      <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;">Pre-Tax heavy → Roth grows via conversions</div>
+      <div style="font-size:9px;color:#5b7383;margin-top:6px;text-align:center;">Pre-Tax heavy → Roth grows via conversions</div>
     </div>
     <div class="card">
       <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1.5" x2="12" y2="22.5"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Income Bridge</div>
       <div class="chart-area"><canvas id="chart-income"></canvas></div>
-      <div style="font-size:9px;color:#8aaabb;margin-top:6px;text-align:center;" id="chart-income-note">—</div>
+      <div style="font-size:9px;color:#5b7383;margin-top:6px;text-align:center;" id="chart-income-note">—</div>
     </div>
   </div>
 
@@ -306,22 +313,22 @@ window.addEventListener('storage', function(e) {
       <div class="fire-box">
         <div class="fire-label">Safe Withdrawal Rate</div>
         <div class="fire-val" id="d-swr" style="color:var(--teal);">—</div>
-        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-swr-note">—</div>
+        <div style="font-size:9px;color:#5b7383;margin-top:3px;" id="d-swr-note">—</div>
       </div>
       <div class="fire-box">
         <div class="fire-label">FI Date</div>
         <div class="fire-val" id="d-fi-date" style="color:var(--orange);">—</div>
-        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-fi-note">—</div>
+        <div style="font-size:9px;color:#5b7383;margin-top:3px;" id="d-fi-note">—</div>
       </div>
       <div class="fire-box">
         <div class="fire-label">FIRE Type</div>
         <div class="fire-val" id="d-fire-type" style="color:var(--teal);">—</div>
-        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-fire-type-note">—</div>
+        <div style="font-size:9px;color:#5b7383;margin-top:3px;" id="d-fire-type-note">—</div>
       </div>
       <div class="fire-box">
         <div class="fire-label">Coast FIRE Number</div>
         <div class="fire-val" id="d-coast" style="color:var(--orange);">—</div>
-        <div style="font-size:9px;color:#8aaabb;margin-top:3px;" id="d-coast-note">—</div>
+        <div style="font-size:9px;color:#5b7383;margin-top:3px;" id="d-coast-note">—</div>
       </div>
     </div>
   </div>
@@ -375,33 +382,33 @@ window.addEventListener('storage', function(e) {
 <script>
 // PERSONAS 
 var PERSONAS = {
-  traditional: {
-    name:'Alex & Jordan', p1age:63, p2age:55, portfolio:925000,
-    spend:87000, ss:60000, pension:4000, retAge:63,
-    pretax:793000, roth:32000, taxable:100000,
-    legacyGoal:250000, ret:0.07, inflation:0.03, label:'Traditional Retiree'
+  henderson: {
+    name:'The Hendersons', p1age:64, p2age:62, portfolio:640000,
+    spend:66000, ss:46000, pension:0, retAge:64,
+    pretax:470000, roth:70000, taxable:100000,
+    legacyGoal:50000, ret:0.065, inflation:0.03, label:'Social Security Couple'
+  },
+  carter: {
+    name:'The Carters', p1age:61, p2age:60, portfolio:420000,
+    spend:62000, ss:48000, pension:0, retAge:62,
+    pretax:320000, roth:40000, taxable:60000,
+    legacyGoal:0, ret:0.065, inflation:0.03, label:'Catching Up at 60'
+  },
+  donna: {
+    name:'Donna', p1age:66, p2age:66, portfolio:580000,
+    spend:44000, ss:28000, pension:0, retAge:66,
+    pretax:420000, roth:90000, taxable:70000,
+    legacyGoal:25000, ret:0.06, inflation:0.03, label:'Single & Steady'
   },
   fire: {
-    name:'Sam & Casey', p1age:45, p2age:42, portfolio:1800000,
-    spend:72000, ss:0, pension:0, retAge:45,
-    pretax:900000, roth:600000, taxable:300000,
-    legacyGoal:500000, ret:0.07, inflation:0.03, label:'Early FIRE'
-  },
-  single: {
-    name:'Morgan', p1age:60, p2age:60, portfolio:650000,
-    spend:55000, ss:24000, pension:18000, retAge:62,
-    pretax:500000, roth:80000, taxable:70000,
-    legacyGoal:100000, ret:0.065, inflation:0.03, label:'Single Retiree'
-  },
-  fatfire: {
-    name:'Riley & Quinn', p1age:55, p2age:52, portfolio:4000000,
-    spend:160000, ss:0, pension:0, retAge:55,
-    pretax:2200000, roth:1000000, taxable:800000,
-    legacyGoal:1000000, ret:0.07, inflation:0.03, label:'Fat FIRE'
+    name:'Sam & Casey', p1age:47, p2age:45, portfolio:1620000,
+    spend:64000, ss:0, pension:0, retAge:47,
+    pretax:780000, roth:520000, taxable:320000,
+    legacyGoal:300000, ret:0.07, inflation:0.03, label:'Early FIRE'
   }
 };
 
-var current = 'traditional';
+var current = 'henderson';
 var charts = {};
 
 function fmt(n) {
@@ -414,7 +421,7 @@ function fmt(n) {
 function loadPersona(key) {
   current = key;
   document.querySelectorAll('.persona-btn').forEach(function(b,i){
-    b.classList.toggle('active', ['traditional','fire','single','fatfire'][i]===key);
+    b.classList.toggle('active', ['henderson','carter','donna','fire'][i]===key);
   });
   var p = PERSONAS[key];
   document.getElementById('ctrl-spend').value = p.spend;
@@ -459,6 +466,39 @@ function projectPortfolio(p, seq) {
   return {port:port, pre:preA, roth:rothA, tax:taxA};
 }
 
+// Largest extra annual spend that still ends >= legacy goal and never depletes.
+function projSpend(p, spend, seq){ var q=Object.assign({}, p); q.spend=spend; return projectPortfolio(q, seq).port; }
+function safeExtraSpend(p){
+  var base = projectPortfolio(p, []).port;
+  if (base[base.length-1] < p.legacyGoal) return 0;
+  var lo=0, hi=150000;
+  for (var k=0; k<24; k++){
+    var mid=(lo+hi)/2, v=projSpend(p, p.spend+mid, []);
+    if (Math.min.apply(null,v)>0 && v[v.length-1]>=p.legacyGoal) lo=mid; else hi=mid;
+  }
+  return Math.round(lo/500)*500;
+}
+// Seeded RNG so the Monte Carlo result is stable as sliders move (no flicker).
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function monteCarlo(p){
+  var trials=500, vol=0.12, realRet=p.ret-p.inflation, draw=Math.max(0,p.spend-(p.ss+p.pension)), succ=0;
+  var rng=mulberry32(987654321);
+  for (var t=0; t<trials; t++){
+    var pre=p.pretax, roth=p.roth, tax=p.taxable, ok=true;
+    for (var i=0; i<30; i++){
+      var ft=Math.min(draw,tax); tax-=ft; var fp=Math.min(draw-ft,pre); pre-=fp; var fr=Math.min(draw-ft-fp,roth); roth-=fr;
+      var u1=rng()||1e-9, u2=rng();
+      var z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+      var r=realRet+vol*z;
+      pre=Math.max(0,pre*(1+r)); roth=Math.max(0,roth*(1+r)); tax=Math.max(0,tax*(1+r));
+      if (i<15 && pre>0){ var conv=Math.min(pre*0.05,30000); pre-=conv; roth+=conv*0.85; }
+      if (pre+roth+tax<=0){ ok=false; break; }
+    }
+    if (ok && (pre+roth+tax)>=p.legacyGoal) succ++;
+  }
+  return Math.round(succ/trials*100);
+}
+
 function drawCrash() {
   var p = window.__demoP; if (!p) return;
   document.querySelectorAll('#crash-presets .crashbtn').forEach(function(b){
@@ -497,16 +537,27 @@ function drawCrash() {
   var diff = endC - endB;
   document.getElementById('crash-vs').textContent = crashKey==='none' ? '—' : (diff>=0?'+':'–')+fmt(Math.abs(diff));
 
-  var pct = p.legacyGoal>0 ? Math.round(endC/p.legacyGoal*100) : 100;
+  var guaranteed = p.ss + p.pension;
+  var floor = p.spend > 0 ? guaranteed / p.spend : 0;
+  var goal = p.legacyGoal;
   var v = document.getElementById('crash-verdict');
   if (crashKey === 'none') {
-    v.innerHTML = 'This is the plan with <b>smooth average returns</b>. Pick a crash above to drop it on the year this plan retires — the worst possible timing — and see if it still holds.';
+    v.innerHTML = 'This is the plan with <b>smooth average returns</b> — no crash. Tap a crash above to drop it on the <b>year they retire</b> (the worst possible timing) and watch the plan react.';
   } else if (low <= 0) {
-    v.innerHTML = 'With <b>'+sc.label+'</b> hitting right at retirement, this sample plan <b style="color:#ff6b6b;">runs out of money</b> before the end. In the real tool, the Stress Test finds the exact spending level that survives it.';
-  } else if (endC >= p.legacyGoal) {
-    v.innerHTML = 'Even with <b>'+sc.label+'</b> the year this plan retires, it never runs dry and still ends at <b style="color:#1CC7D0;">'+fmt(endC)+'</b> — <b>'+pct+'% of the legacy goal</b>. That\u2019s sequence-of-returns risk, survived.';
+    if (floor >= 0.5) {
+      var cut = Math.round((p.spend - guaranteed)/1000)*1000;
+      v.innerHTML = 'With <b>'+sc.label+'</b> right at retirement, their savings eventually <b style="color:#ff6b6b;">run dry</b> — but Social Security still covers about <b>'+Math.round(floor*100)+'%</b> of their spending (<b>'+fmt(guaranteed)+'/yr</b>). They wouldn\u2019t be broke, but they\u2019d need to trim roughly <b>'+fmt(cut)+'/yr</b> or earn a little on the side. That\u2019s the early-crash risk worth planning for.';
+    } else {
+      v.innerHTML = 'With <b>'+sc.label+'</b> right at retirement — and <b>no Social Security yet</b> to fall back on — this plan <b style="color:#ff6b6b;">runs out of money</b> before the end. That\u2019s sequence-of-returns risk at its worst, and exactly why early retirees test it before they leap.';
+    }
+  } else if (goal > 0 && endC < goal) {
+    v.innerHTML = 'With <b>'+sc.label+'</b> at retirement, the plan <b style="color:#f4b86a;">survives but limps</b> — ending around <b>'+fmt(endC)+'</b>, under their '+fmt(goal)+' legacy goal. In the full tool you\u2019d trim spending a little to rebuild the cushion.';
   } else {
-    v.innerHTML = 'With <b>'+sc.label+'</b> at retirement, the plan survives but ends at <b style="color:#f4b86a;">'+fmt(endC)+'</b> ('+pct+'% of goal). In the full tool you\u2019d trim spending slightly to close that gap.';
+    var tail = (goal > 0) ? ' — still <b>'+Math.round(endC/goal*100)+'%</b> of their '+fmt(goal)+' legacy goal.' : ', with money to spare.';
+    var lead = (floor >= 0.5)
+      ? 'Even with <b>'+sc.label+'</b> the year they retire, Social Security carries most of the load and the plan <b style="color:#1CC7D0;">never runs dry</b> — ending around <b style="color:#1CC7D0;">'+fmt(endC)+'</b>'
+      : 'Even with <b>'+sc.label+'</b> the year they retire, the plan <b style="color:#1CC7D0;">holds</b> — ending around <b style="color:#1CC7D0;">'+fmt(endC)+'</b>';
+    v.innerHTML = lead + tail + ' Sequence-of-returns risk, survived.';
   }
 }
 
@@ -544,17 +595,43 @@ function recalc() {
   var conf = p.legacyGoal > 0 ? Math.min(100, Math.round(endBal/p.legacyGoal*100)) : 100;
 
   // KPIs 
-  document.getElementById('d-confidence').textContent = conf+'%';
-  document.getElementById('d-confidence').style.color = conf>=100?'#1CC7D0':conf>=80?'#f4b86a':'#ff6b6b';
-  document.getElementById('d-confidence-sub').textContent = conf>=100?'Legacy goal fully funded':conf+'% of legacy goal funded';
-  document.getElementById('d-status').textContent = conf>=100?'✅ ON TRACK':conf>=80?'⚠️ REVIEW':'⛔ AT RISK';
-  document.getElementById('d-status').className = conf>=100?'badge-green':'badge-orange';
+  var goal = p.legacyGoal;
+  var extra = safeExtraSpend(p);
+  var mcPct = monteCarlo(p);
+  var met = endBal >= goal;
+  var extraTxt = extra >= 1000 ? '$'+Math.round(extra/1000)+'K' : '$'+extra;
+
+  // Monte Carlo KPI
+  var mcEl = document.getElementById('d-mc');
+  mcEl.textContent = mcPct+'%';
+  mcEl.style.color = mcPct>=85?'#1CC7D0':mcPct>=70?'#f4b86a':'#ff6b6b';
+  document.getElementById('d-mc-sub').textContent = '500 market simulations · money lasts';
+  var mcb = document.getElementById('d-mc-badge');
+  mcb.textContent = mcPct>=85?'✅ STRONG':mcPct>=70?'⚠️ WATCH':'⛔ FRAGILE';
+  mcb.className = mcPct>=85?'badge-green':'badge-orange';
+
+  // Safe Extra Spending KPI (the star)
+  document.getElementById('d-extra').textContent = extra>0 ? extraTxt+'/yr' : '$0';
+  document.getElementById('d-extra-sub').textContent = extra>0 ? 'more per year, '+(goal>0?'goal still met':'money still lasts') : (met?'spending is near the safe limit':'already above the safe limit');
+
+  // Legacy Goal KPI
+  document.getElementById('d-goal').textContent = goal>0 ? fmt(goal) : 'None set';
+  document.getElementById('d-goal-sub').innerHTML = goal>0
+    ? (met ? '✅ on track to leave '+fmt(endBal) : '⚠️ projected '+fmt(endBal)+' — short')
+    : 'on track to leave '+fmt(endBal);
+
+  // Total Portfolio
   document.getElementById('d-portfolio').textContent = fmt(p.portfolio);
-  document.getElementById('d-spending').textContent = fmt(p.spend);
-  document.getElementById('d-spending-sub').textContent = '$'+Math.round(p.spend/12/1000)+'K/mo equivalent';
-  document.getElementById('d-ending').textContent = fmt(endBal);
-  document.getElementById('d-ending').style.color = endBal >= p.legacyGoal ? '#1CC7D0' : '#f4b86a';
-  document.getElementById('d-ending-sub').textContent = endBal>=p.legacyGoal ? '✅ Legacy goal met' : '⚠️ '+fmt(p.legacyGoal)+' goal';
+
+  // Headline callout — ties extra spend to the legacy goal
+  var hc = document.getElementById('headline');
+  if (goal>0) {
+    hc.innerHTML = met
+      ? 'With <b>'+fmt(p.portfolio)+'</b> saved, this plan is on track to leave <span class="gold">'+fmt(endBal)+'</span> — the <b>'+fmt(goal)+'</b> legacy goal, <b>met</b> — with room to spend about <span class="gold">'+extraTxt+'/yr more</span> and still leave it.'
+      : 'With <b>'+fmt(p.portfolio)+'</b> saved, this plan is projected to leave <span class="gold">'+fmt(endBal)+'</span>, short of the <b>'+fmt(goal)+'</b> legacy goal. Trimming spending rebuilds the cushion — the full tool finds the exact safe number.';
+  } else {
+    hc.innerHTML = 'With <b>'+fmt(p.portfolio)+'</b> saved and Social Security underneath, this plan keeps the money lasting and could absorb about <span class="gold">'+extraTxt+'/yr more</span> in spending before it gets tight.';
+  }
 
   // FIRE METRICS 
   var gap = Math.max(0, p.spend - (p.ss + p.pension));
@@ -603,10 +680,10 @@ function recalc() {
     charts[id] = new Chart(ctx, {
       type:'line', data:{labels:labels,datasets:datasets},
       options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:10}}},
+        plugins:{legend:{display:true,labels:{font:{size:10},color:'#5b7383',boxWidth:10}}},
         scales:{
-          x:{ticks:{font:{size:9},color:'#8aaabb'},grid:{display:false}},
-          y:{ticks:{font:{size:9},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.05)'}}
+          x:{ticks:{font:{size:9},color:'#5b7383'},grid:{display:false}},
+          y:{ticks:{font:{size:9},color:'#5b7383',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(5,22,40,0.06)'}}
         }
       }
     });
@@ -626,30 +703,49 @@ function recalc() {
     charts['chart-buckets'] = new Chart(bcCtx, {
       type:'bar',
       data:{labels:dispYrs,datasets:[
-        {label:'Pre-Tax',data:dispIdx.map(function(i){return preTaxVals[i];}),backgroundColor:'#5b8fa8',stack:'s'},
+        {label:'Pre-Tax',data:dispIdx.map(function(i){return preTaxVals[i];}),backgroundColor:'#2f5d72',stack:'s'},
         {label:'Roth',data:dispIdx.map(function(i){return rothVals[i];}),backgroundColor:'#1CC7D0',stack:'s'},
         {label:'Taxable',data:dispIdx.map(function(i){return taxableVals[i];}),backgroundColor:'#f4b86a',stack:'s'},
       ]},
       options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,labels:{font:{size:10},color:'#8aaabb',boxWidth:10}}},
-        scales:{x:{stacked:true,ticks:{font:{size:9},color:'#8aaabb'},grid:{display:false}},y:{stacked:true,ticks:{font:{size:9},color:'#8aaabb',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(255,255,255,0.05)'}}}
+        plugins:{legend:{display:true,labels:{font:{size:10},color:'#5b7383',boxWidth:10}}},
+        scales:{x:{stacked:true,ticks:{font:{size:9},color:'#5b7383'},grid:{display:false}},y:{stacked:true,ticks:{font:{size:9},color:'#5b7383',callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}},grid:{color:'rgba(5,22,40,0.06)'}}}
       }
     });
   }
 
-  // Income bridge (today's dollars — level guaranteed income vs level spending)
-  var incomeData = dispIdx.map(function(){ return Math.round(p.ss + p.pension); });
-  var spendData = dispIdx.map(function(){ return Math.round(p.spend); });
-  mkLine('chart-income', dispYrs, [
-    {label:'Guaranteed Income',data:incomeData,borderColor:'#1CC7D0',backgroundColor:'rgba(76,175,80,0.1)',fill:true,tension:0.3,pointRadius:2,borderWidth:2},
-    {label:'Total Expenses',data:spendData,borderColor:'#ff6b6b',borderDash:[4,2],fill:false,tension:0.3,pointRadius:0,borderWidth:1.5}
-  ]);
-  var yr1gap = p.spend - (p.ss + p.pension);
-  document.getElementById('chart-income-note').textContent = yr1gap > 0 ? 'Year 1 gap: '+fmt(yr1gap)+' funded by portfolio' : 'Income covers all expenses ✅';
+  // Income bridge — stacked bar: Social Security floor + the gap the portfolio bridges
+  var gtdInc = Math.round(p.ss + p.pension);
+  var gapInc = Math.max(0, Math.round(p.spend - gtdInc));
+  var ssArr  = dispIdx.map(function(){ return gtdInc; });
+  var gapArr = dispIdx.map(function(){ return gapInc; });
+  if (charts['chart-income']) charts['chart-income'].destroy();
+  var icx = document.getElementById('chart-income');
+  if (icx) charts['chart-income'] = new Chart(icx, {
+    type:'bar',
+    data:{ labels:dispYrs, datasets:[
+      {label:'Social Security', data:ssArr, backgroundColor:'#1CC7D0', stack:'inc', borderRadius:2, categoryPercentage:0.78, barPercentage:0.9},
+      {label:'Portfolio fills the gap', data:gapArr, backgroundColor:'#f4b86a', stack:'inc', borderRadius:2, categoryPercentage:0.78, barPercentage:0.9}
+    ]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:true, labels:{font:{size:10}, color:'#3a5663', boxWidth:11}},
+        tooltip:{callbacks:{footer:function(items){ var t=items.reduce(function(a,b){return a+(b.parsed.y||0);},0); return 'Total spending: '+fmt(t); }}}
+      },
+      scales:{
+        x:{stacked:true, ticks:{font:{size:9}, color:'#5b7383'}, grid:{display:false}},
+        y:{stacked:true, beginAtZero:true, ticks:{font:{size:9}, color:'#5b7383', callback:function(v){return '$'+Math.round(v/1000)+'K';}}, grid:{color:'rgba(5,22,40,0.06)'}}
+      }
+    }
+  });
+  var yr1gap = p.spend - gtdInc;
+  document.getElementById('chart-income-note').textContent = yr1gap > 0
+    ? 'Social Security covers '+fmt(gtdInc)+'/yr · the portfolio bridges the '+fmt(yr1gap)+' gap'
+    : 'Social Security alone covers all spending ✅';
 }
 
 // INIT 
-loadPersona('traditional');
+loadPersona('henderson');
 </script>
 
 <div style="text-align:center;padding:8px 0;"><a href="https://retireblueprintpro.com/RetireBlueprintPro_Changelog.html" style="font-size:11px;color:#6a8a9a;text-decoration:none;">What's New</a></div>
