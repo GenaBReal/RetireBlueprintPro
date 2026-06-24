@@ -2564,6 +2564,7 @@ var EXPENSE_DEFAULTS = {58:'Verizon Wireless',59:'PG&E (Electric/Gas)',60:'Garba
 
 function populateFromData(d) {
   if (!d) return;
+  try { window._rbpD = d; } catch(e){}   // keep the loaded plan reachable for instant post-save recompute
   // ── single-source: rebuild the projection with the shared engine so the Roth Conversion
   //    Solver and tax estimates use the exact same numbers as every other page. Built on a copy
   //    so the sheet-sourced Safe Spend KPIs (spending/legacy) are left untouched. ──
@@ -3301,6 +3302,25 @@ function saveAll() {
     localStorage.setItem('rbp_last_saved', Date.now().toString());
     rbpClearDraft();
     var want=(parseFloat(_rbpNorm(payload.global.B8))||0);
+    // ── instant update: the goal & floor you just saved echo to screen now, and your
+    //    Plan Status recomputes against the engine's already-loaded ending — no round-trip
+    //    wait. (A goal/floor edit doesn't change the ending, only whether you're on track.)
+    try {
+      var _usd=function(n){ n=Math.round(n||0); return Math.abs(n)>=1e6?('$'+(n/1e6).toFixed(2)+'M'):('$'+n.toLocaleString()); };
+      var _floor=(parseFloat(_rbpNorm(payload.global.B9))||0);
+      var _D=window._rbpD||{}, _leg=_D.legacy||{};
+      var _end=(+_leg.projectedEnding)||0;
+      var _set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+      _set('hdr-goal', _usd(want));
+      _set('s-leg-goal', _usd(want));
+      if(_D.legacy){ _D.legacy.goal=want; if(_floor) _D.legacy.safetyFloor=_floor; }
+      if(_end>0){
+        var _onTrack=_end>=want;
+        _set('hdr-status', _onTrack?'ON TRACK':'REVIEW');
+        var _ss=document.getElementById('s-status'); if(_ss){ _ss.textContent=_onTrack?'ON TRACK ✅':'REVIEW'; _ss.className=_onTrack?'badge-go':'badge-watch'; }
+        var _d2=_end-want; _set('s-surplus', (_d2>=0?'+':'')+_usd(_d2));
+      }
+    } catch(_ie){}
     setStatus('✅ Saved. Confirming with your sheet…', 'success');
     setTimeout(function(){
       var cbName='rbpVerify_'+Date.now(), done=false;
@@ -3317,6 +3337,20 @@ function saveAll() {
       window[cbName]=function(d){
         clearTimeout(giveUp);
         var leg=(d&&d.legacy)||{}, gl=(d&&d.global)||{};
+        // bring the ending balance & status up to the sheet's freshly-recomputed numbers
+        try {
+          window._rbpD=d;
+          var _usd2=function(n){ n=Math.round(n||0); return Math.abs(n)>=1e6?('$'+(n/1e6).toFixed(2)+'M'):('$'+n.toLocaleString()); };
+          var _end2=(+leg.projectedEnding)||0, _goal2=(+leg.goal)||0;
+          var _s=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+          if(_end2>0){ _s('hdr-ending',_usd2(_end2)); _s('s-ending',_usd2(_end2)); }
+          if(_end2>0 && _goal2>0){
+            var _ot=_end2>=_goal2;
+            _s('hdr-status', _ot?'ON TRACK':'REVIEW');
+            var _ss2=document.getElementById('s-status'); if(_ss2){ _ss2.textContent=_ot?'ON TRACK ✅':'REVIEW'; _ss2.className=_ot?'badge-go':'badge-watch'; }
+            var _sp2=document.getElementById('s-surplus'); if(_sp2){ var _df=_end2-_goal2; _sp2.textContent=(_df>=0?'+':'')+_usd2(_df); }
+          }
+        } catch(_re){}
         var goalOK=_rbpNorm(leg.goal)===_rbpNorm(payload.global.B8);
         var yearOK=_rbpYr(gl.planYear!=null?gl.planYear:gl.planStartYear)===_rbpYr(payload.global.B6);
         finish(goalOK && yearOK);
