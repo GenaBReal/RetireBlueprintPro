@@ -2573,6 +2573,14 @@ function populateFromData(d) {
       var _engD = JSON.parse(JSON.stringify(d));
       rbpApplyEngine(_engD);
       if (_engD && _engD.projections) d.projections = _engD.projections;
+      // Ending balance = the projection grid's last live row (what rbpApplyEngine computed),
+      // the SAME source Master/Dashboard/Check-In and your sheet's grid use — so every page
+      // agrees to the dollar. (Was left as connector cell B133, which rounds a few $ off.)
+      if (_engD && _engD.legacy && _engD.legacy.projectedEnding != null) {
+        d.legacy = d.legacy || {};
+        d.legacy.projectedEnding = _engD.legacy.projectedEnding;
+        if (d.legacy.goal != null) d.legacy.variance = _engD.legacy.projectedEnding - d.legacy.goal;
+      }
     }
   } catch(_e){}
   var gl = d.global || {};
@@ -3340,8 +3348,18 @@ function saveAll() {
         // bring the ending balance & status up to the sheet's freshly-recomputed numbers
         try {
           window._rbpD=d;
+          // derive the ending the SAME way the page does on load — the projection grid's last
+          // live row (via the engine), NOT the connector's B133 summary cell (rounds a few $ off)
+          var _end2=0;
+          try {
+            if (typeof rbpApplyEngine==='function' && window.RBP && window.RBP.buildI) {
+              var _e=JSON.parse(JSON.stringify(d)); rbpApplyEngine(_e);
+              if(_e && _e.legacy && _e.legacy.projectedEnding!=null) _end2=(+_e.legacy.projectedEnding)||0;
+            }
+          } catch(_ae){}
+          if(!_end2) _end2=(+leg.projectedEnding)||0;   // fallback to connector value if grid absent
+          var _goal2=(+leg.goal)||0;
           var _usd2=function(n){ n=Math.round(n||0); return Math.abs(n)>=1e6?('$'+(n/1e6).toFixed(2)+'M'):('$'+n.toLocaleString()); };
-          var _end2=(+leg.projectedEnding)||0, _goal2=(+leg.goal)||0;
           var _s=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
           if(_end2>0){ _s('hdr-ending',_usd2(_end2)); _s('s-ending',_usd2(_end2)); }
           if(_end2>0 && _goal2>0){
