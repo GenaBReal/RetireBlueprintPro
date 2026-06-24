@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* ── Always load the latest version (auto cache-bust) ──
+   On the LIVE site, reload once through a unique URL on open so the browser fetches the
+   freshest copy instead of a cached one — no manual hard-refresh. Skipped in previews/local
+   so the page still renders for review. Existing params are kept; the cb check stops loops. */
+(function(){
+  try{
+    var h = window.location.hostname || '';
+    if (window.location.protocol==='file:' || h==='' || h==='localhost' || h.indexOf('claude.ai')>=0) return;
+    var s = window.location.search || '';
+    if (s.indexOf('cb=') === -1) {
+      var sep = s ? '&' : '?';
+      window.location.replace(window.location.pathname + s + sep + 'cb=' + Date.now() + (window.location.hash || ''));
+    }
+  }catch(e){}
+})();
+</script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -651,9 +668,28 @@ function saveCheckIn() {
     body: 'action=saveCheckIn&enc=b64&sheetId=' + encodeURIComponent(_sid2) + '&data=' + encodeURIComponent(_enc)
   }).then(function() {
     rbpCacheClear(); // saved data changed — drop the cached snapshot so the next read is fresh
-    document.getElementById('save-msg').textContent = '✅ Saved! Your Annual Check-In is updated.';
-    document.getElementById('save-msg').className = 'save-msg ok';
+    var _sm=document.getElementById('save-msg');
+    if(_sm){ _sm.textContent='✅ Saved! Pulling your updated numbers from the sheet…'; _sm.className='save-msg ok'; }
     document.getElementById('save-btn').disabled = false;
+    // The actuals you just saved change the projection, so we wait for the sheet to recompute,
+    // then auto-refresh Projected End Balance + Plan Status with the REAL recomputed values —
+    // no manual Refresh needed, and nothing faked.
+    setTimeout(function(){
+      RBP.load(function(d){
+        try {
+          rbpCachePut(d);
+          if (typeof rbpApplyEngine==='function' && window.RBP && window.RBP.buildI && d) {
+            var _e=JSON.parse(JSON.stringify(d)); rbpApplyEngine(_e); if(_e&&_e.projections) d.projections=_e.projections;
+          }
+          var leg=(d&&d.legacy)||{}, end=+leg.projectedEnding||0, goal=+leg.goal||0;
+          if(end>0){ var ke=document.getElementById('k-end'); if(ke) ke.textContent=fmt(end); }
+          if(end>0 && goal>0){ var hs=document.getElementById('hdr-status'); if(hs) hs.textContent=(end>=goal?'ON TRACK':'REVIEW'); }
+          var sm2=document.getElementById('save-msg'); if(sm2){ sm2.textContent='✅ Saved & updated — Projected End Balance and Plan Status above now reflect your check-in.'; sm2.className='save-msg ok'; }
+        } catch(_e){}
+      }, function(){
+        var sm3=document.getElementById('save-msg'); if(sm3){ sm3.textContent='✅ Saved. Tap Refresh in a moment to see your updated numbers.'; sm3.className='save-msg ok'; }
+      });
+    }, 6500);
   }).catch(function(err) {
     document.getElementById('save-msg').textContent = '❌ Save failed: check your connection and try again.';
     document.getElementById('save-btn').disabled = false;

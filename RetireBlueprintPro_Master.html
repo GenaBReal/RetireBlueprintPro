@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* ── Always load the latest version (auto cache-bust) ──
+   On the LIVE site, reload once through a unique URL on open so the browser fetches the
+   freshest copy instead of a cached one — no manual hard-refresh. Skipped in previews/local
+   so the page still renders for review. Existing params are kept; the cb check stops loops. */
+(function(){
+  try{
+    var h = window.location.hostname || '';
+    if (window.location.protocol==='file:' || h==='' || h==='localhost' || h.indexOf('claude.ai')>=0) return;
+    var s = window.location.search || '';
+    if (s.indexOf('cb=') === -1) {
+      var sep = s ? '&' : '?';
+      window.location.replace(window.location.pathname + s + sep + 'cb=' + Date.now() + (window.location.hash || ''));
+    }
+  }catch(e){}
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
