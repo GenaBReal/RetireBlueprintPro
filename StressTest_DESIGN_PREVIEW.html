@@ -1179,18 +1179,18 @@ function rbpRunMonteCarlo(d,opts){
 <div id="rc">
   <div id="load">Waiting for your saved plan&hellip;<br><span style="font-size:11px;color:#90A4AE">This fills in with your real numbers on the live site. Hit <b>Reload</b> at the top if needed.</span></div>
   <div id="main" style="display:none">
-    <div class="hero"><div class="tg">Test 2 &middot; Real Crashes</div><h1>Your plan through the downturns that actually happened</h1><div class="sub" id="heroSub">your saved plan<br>exact sheet math</div></div>
+    <div class="hero"><div class="tg">Test 2 &middot; Real Crashes</div><h1>Your plan through the downturns that actually happened</h1><div class="sub" id="heroSub">your saved plan<br>validated engine</div></div>
     <div class="wrap">
       <div id="runzone">
         <div class="card">
           <div class="ttl">Real bear markets, run on your real sheet</div>
-          <div class="sub2">each scenario replays an actual historical downturn &mdash; the true S&amp;P 500 losses and their order &mdash; against your saved plan, and reads the result back from your sheet. No approximations.</div>
+          <div class="sub2">each scenario replays an actual historical downturn &mdash; the true S&amp;P 500 losses and their order &mdash; against your saved plan, using the same validated engine that matches your sheet. No approximations.</div>
           <button class="btn" id="runbtn">&#9654; Run real crashes</button>
-          <div style="font-size:11px;color:#90A4AE;margin-top:9px;">Runs through your sheet for exact numbers, so it takes a couple of minutes (about 25s per crash). Grab a coffee.</div>
+          <div style="font-size:11px;color:#90A4AE;margin-top:9px;">Runs instantly in your browser using the same engine as your dashboard.</div>
         </div>
       </div>
       <div id="prog" class="head" style="display:none">
-        <b id="progmsg">Running on your sheet&hellip;</b>
+        <b id="progmsg">Running&hellip;</b>
         <div class="bar"><div id="progbar"></div></div>
       </div>
       <div id="results" style="display:none">
@@ -1211,7 +1211,7 @@ function rbpRunMonteCarlo(d,opts){
           <table><thead><tr><th>Crash</th><th>What happened</th><th style="text-align:right">Legacy at end</th><th style="text-align:right">Safe spend/yr</th><th style="text-align:right">Outcome</th></tr></thead>
           <tbody id="rows"></tbody></table>
         </div>
-        <p class="foot">Exact numbers from your sheet &mdash; each crash is applied to your real Master, recalculated, and read back. Nothing here changes your saved data. <button class="btn" id="rerun" style="font-size:11px;padding:7px 14px;margin-top:8px;background:#5F6368">&#8635; Re-run</button></p>
+        <p class="foot">Exact numbers &mdash; each crash is run through the same validated engine as your dashboard (matched to your sheet). Nothing here changes your saved data. <button class="btn" id="rerun" style="font-size:11px;padding:7px 14px;margin-top:8px;background:#5F6368">&#8635; Re-run</button></p>
       </div>
     </div>
   </div>
@@ -1285,7 +1285,7 @@ function rbpRunMonteCarlo(d,opts){
     var m=ev.data; if(!m) return;
     if(m.type==='rbpRCready'){ $('load').style.display='none'; $('main').style.display=''; postHeight(); }
     else if(m.type==='rbpRCctx'){ GOAL=m.goal||0; total=m.total||6; }
-    else if(m.type==='rbpRCprogress'){ $('progmsg').textContent='Running on your sheet\u2026 '+m.n+' of '+m.total+'  ('+m.name+')'; $('progbar').style.width=Math.round((m.n-1)/m.total*100)+'%'; postHeight(); }
+    else if(m.type==='rbpRCprogress'){ $('progmsg').textContent='Running\u2026 '+m.n+' of '+m.total+'  ('+m.name+')'; $('progbar').style.width=Math.round((m.n-1)/m.total*100)+'%'; postHeight(); }
     else if(m.type==='rbpRCresult'){ results[m.i]=m.r; }
     else if(m.type==='rbpRCdone'){ $('prog').style.display='none'; $('results').style.display=''; var rb=$('rerun'); draw(); paint(); postHeight(); setTimeout(postHeight,80); }
   });
