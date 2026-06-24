@@ -2846,10 +2846,16 @@ function rbpRunMonteCarlo(d,opts){
           <span><i style="background:#f4b86a;height:3px;border-radius:2px;"></i>legacy goal</span>
         </div>
       </div>
+
+      <!-- exactly what this run was built on (client-specific) -->
+      <div id="r-assumptions" style="display:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:14px;">
+        <div style="font-size:11px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px;">What this run was built on &mdash; your numbers</div>
+        <div id="r-assumptions-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0 26px;font-size:12.5px;"></div>
+      </div>
     </div>
 
     <!-- ── methodology + credit ── -->
-    <details class="methods" style="margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;">
+    <details class="methods" open style="margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;">
       <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:11px;padding:15px 18px;background:linear-gradient(135deg,#06243a,#0A3145);color:#eaf3f8;font-size:13px;font-weight:800;">
         <span style="background:var(--gold);color:#041E2F;font-size:9px;font-weight:900;letter-spacing:.6px;padding:3px 9px;border-radius:20px;white-space:nowrap;">METHODOLOGY</span>
         How this compares to the industry standard &mdash; and where it goes further
@@ -3604,6 +3610,31 @@ function rbpRunMonteCarlo(d,opts){
       $('r-context').style.display='';
     }catch(e){ var C=$('r-context'); if(C) C.style.display='none'; }
 
+    // detailed assumptions table — exactly what this run was built on
+    try{
+      var mu=res.mu, sigma=res.sigma;
+      var g=(d&&d.global)||{}, sp2=(d&&d.spending)||{}, pr2=(d&&d.projections)||{}, by2=pr2.byYear||[];
+      var infl=(+g.inflation)||0, fl2=0, ex2=0;
+      if(by2.length){var bb=by2[0]||{}; fl2=(+bb.totalNeed)||((+bb.baseLiving||0)+(+bb.healthcare||0)+(+bb.debt||0)); for(var bj=0;bj<by2.length;bj++){var c2=+(by2[bj]&&by2[bj].chosenExtra)||0; if(c2>ex2)ex2=c2;}}
+      if(!fl2)fl2=(+sp2.baseAnnual)||0; if(!ex2)ex2=(+sp2.safeExtra)||(+sp2.phase1Extra)||0;
+      var modelName=res.model==='historical'?'US historical (1928\u20132024)':res.model==='fat'?'Fat-tailed (realistic crashes)':'Normal bell curve';
+      var flexName=res.flex>0?('Trim '+Math.round(res.flex*100)+'% in down markets'):'Rigid \u2014 no cuts';
+      var hzName=opts.endAge95?'Through age 95':'Through your plan age';
+      var R=function(k,v){return '<div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);"><span style="color:var(--mut);">'+k+'</span><span style="color:var(--ink);font-weight:700;text-align:right;">'+v+'</span></div>';};
+      $('r-assumptions-grid').innerHTML =
+        R('Expected return',(mu*100).toFixed(1)+'% / yr avg')+
+        R('Market volatility',(sigma*100).toFixed(0)+'% std dev')+
+        R('Inflation',(infl*100).toFixed(1)+'% / yr')+
+        R('Return model',modelName)+
+        R('Spending flexibility',flexName)+
+        R('Essentials floor',fmt(fl2)+' / yr')+
+        R('Discretionary extra',ex2>0?(fmt(ex2)+' / yr'):'Off')+
+        R('Legacy goal',res.legacyGoal>0?fmt(res.legacyGoal):'Not set')+
+        R('Horizon',hzName)+
+        R('Simulations',opts.runs.toLocaleString()+' futures');
+      $('r-assumptions').style.display='';
+    }catch(e){ var AA=$('r-assumptions'); if(AA) AA.style.display='none'; }
+
     $('results').style.display='block';
     // transparency: portfolio draws over retirement, using a meaningful early-retirement rate (not the end-of-life depletion spike)
     try{
@@ -3865,6 +3896,28 @@ function loadData() {
       if(nameEl)nameEl.textContent=(p1.name||'Partner 1')+(p2.name?' & '+p2.name:'');
       var portEl=document.getElementById('loaded-portfolio');
       if(portEl&&d.portfolio)portEl.textContent='$'+Math.round((d.portfolio.total||0)/1000)+'K portfolio';
+
+      // ── populate + reveal the top Plan Fingerprint KPI row (real saved-plan numbers) ──
+      try {
+        var fpK=function(n){n=Math.round(n||0);return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n/1000)+'K';};
+        var fp=document.getElementById('plan-fingerprint');
+        if(fp){
+          var proj=d.projections||{}, by=proj.byYear||[], el=proj.endLiquid||[], yrs=proj.years||[];
+          var port=(d.portfolio&&d.portfolio.total)||0;
+          var legacy=(d.legacy&&d.legacy.goal)||0;
+          var floor=0; if(by.length){var b0=by[0]||{}; floor=(+b0.totalNeed)||((+b0.baseLiving||0)+(+b0.healthcare||0)+(+b0.debt||0));}
+          if(!floor) floor=(d.spending&&d.spending.baseAnnual)||0;
+          var ending=0; for(var fi=el.length-1;fi>=0;fi--){ if(el[fi]>0){ending=el[fi];break;} } if(!ending&&el.length)ending=el[el.length-1];
+          var endYear=yrs.length?yrs[yrs.length-1]:'';
+          var set=function(id,v,c){var e=document.getElementById(id); if(e){e.textContent=v; if(c)e.style.color=c;}};
+          set('fp-portfolio',fpK(port));
+          set('fp-legacy',fpK(legacy));
+          set('fp-ending',fpK(ending), ending>=legacy ? '#7fe3a0' : '#ffcf9f');
+          set('fp-end-year',endYear||'—');
+          set('fp-spending',fpK(floor)+'/yr');
+          fp.style.display='block';
+        }
+      } catch(_fpe){}
       
       
       
