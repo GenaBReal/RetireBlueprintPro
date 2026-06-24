@@ -101,16 +101,20 @@
   .fire-val { font-size:18px; font-weight:800; }
 
   /* CTA */
-  .cta-banner { background:#041E2F; border-radius:12px; padding:28px 24px; text-align:center; margin-top:20px; border-top:3px solid #f4b86a; }
-  .cta-banner h2 { font-size:20px; font-weight:900; color:#fff; margin-bottom:8px; }
-  .cta-banner p { font-size:12px; color:#8aaabb; margin-bottom:16px; line-height:1.7; }
+  .cta-banner { background:linear-gradient(135deg,#041E2F,#0A3145); border-radius:14px; padding:40px 28px; text-align:center; margin-top:20px; border-top:4px solid #f4b86a; box-shadow:0 6px 24px rgba(5,22,40,.18); }
+  .cta-banner h2 { font-size:30px; font-weight:900; color:#fff; margin-bottom:10px; letter-spacing:-0.3px; }
+  .cta-banner h2 .teal{ color:var(--teal); }
+  .cta-eyebrow{ font-size:11px; font-weight:800; color:var(--teal); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px; }
+  .cta-trust{ font-size:11px; color:#8aaabb; margin-top:12px; letter-spacing:.3px; }
+  .feature-head{ font-size:11px; font-weight:800; color:#f4b86a; text-transform:uppercase; letter-spacing:1.2px; margin:24px auto 0; max-width:520px; text-align:left; }
+  .cta-banner p { font-size:14px; color:#c5d6df; margin:0 auto 20px; max-width:560px; line-height:1.7; }
   .cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .cta-btn-primary { background:#1CC7D0; color:#041E2F; font-weight:800; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:13px; }
+  .cta-btn-primary { background:#1CC7D0; color:#041E2F; font-weight:900; padding:16px 40px; border-radius:10px; text-decoration:none; font-size:15px; box-shadow:0 4px 16px rgba(28,199,208,.35); display:inline-block; }
   .cta-btn-secondary { background:transparent; color:#f4b86a; border:2px solid #f4b86a; font-weight:700; padding:12px 22px; border-radius:8px; text-decoration:none; font-size:13px; }
 
   /* FEATURE LIST */
   .feature-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
-  .feature-item { display:flex; align-items:center; gap:8px; font-size:11px; color:#d8eaf5; }
+  .feature-item { display:flex; align-items:center; gap:8px; font-size:12.5px; color:#e2eef3; }
 
   .disclaimer { font-size:9px; color:#456A73; text-align:center; padding:12px; margin-top:12px; }
 
@@ -355,13 +359,15 @@ window.addEventListener('storage', function(e) {
 
   <!-- CTA -->
   <div class="cta-banner">
-    <h2>Ready to see your numbers?</h2>
-    <p>This demo uses sample data. Your real plan connects to your own private Google Sheet — your actual accounts, your Social Security, your spending, your legacy goal. Projection through age 110, Roth conversion optimizer, stress testing, and a printable PDF summary your financial advisor will read.</p>
+    <div class="cta-eyebrow">You just tested a sample plan</div>
+    <h2>Now run it on <span class="teal">your</span> retirement</h2>
+    <p>Connect your own private Google Sheet — your accounts, your Social Security, your spending, your legacy goal — and see whether <b>your</b> plan survives a 2008-style crash, how much extra you could safely spend, and how long your money really lasts.</p>
     <div class="cta-btns">
-      <a href="#" data-etsy="1" class="cta-btn-primary">Get RetireBlueprint Pro on Etsy</a>
-      <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html" class="cta-btn-secondary">See the full feature list</a>
+      <a href="#" data-etsy="1" class="cta-btn-primary">Get RetireBlueprint Pro on Etsy →</a>
     </div>
-    <div class="feature-list" style="max-width:500px;margin:16px auto 0;">
+    <div class="cta-trust">One-time purchase · instant download · works right in Google Sheets · free updates</div>
+    <div class="feature-head">Everything inside:</div>
+    <div class="feature-list" style="max-width:520px;margin:10px auto 0;">
       <div class="feature-item">✅ Projection through age 110</div>
       <div class="feature-item">✅ Roth conversion optimizer</div>
       <div class="feature-item">✅ SS survivor benefit modeling</div>
