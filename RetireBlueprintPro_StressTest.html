@@ -3932,8 +3932,16 @@ function loadData() {
           var legacy=(d.legacy&&d.legacy.goal)||0;
           var floor=0; if(by.length){var b0=by[0]||{}; floor=(+b0.totalNeed)||((+b0.baseLiving||0)+(+b0.healthcare||0)+(+b0.debt||0));}
           if(!floor) floor=(d.spending&&d.spending.baseAnnual)||0;
-          var ending=0; for(var fi=el.length-1;fi>=0;fi--){ if(el[fi]>0){ending=el[fi];break;} } if(!ending&&el.length)ending=el[el.length-1];
-          var endYear=yrs.length?yrs[yrs.length-1]:'';
+          // true plan-end (later partner's death year) — ignore any padded filler years
+          var planEnd=0; try{ planEnd=(typeof rbpPlanEndYear==='function')?rbpPlanEndYear():0; }catch(_pe){}
+          var ending=0, endYear='';
+          if(planEnd && yrs.length){
+            for(var fi=0; fi<yrs.length; fi++){ if(yrs[fi]<=planEnd && el[fi]!=null) ending=el[fi]; }
+            endYear=planEnd;
+          } else {
+            for(var fj=el.length-1;fj>=0;fj--){ if(el[fj]>0){ending=el[fj];break;} } if(!ending&&el.length)ending=el[el.length-1];
+            endYear=yrs.length?yrs[yrs.length-1]:'';
+          }
           var set=function(id,v,c){var e=document.getElementById(id); if(e){e.textContent=v; if(c)e.style.color=c;}};
           set('fp-portfolio',fpK(port));
           set('fp-legacy',fpK(legacy));
