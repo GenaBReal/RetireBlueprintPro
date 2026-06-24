@@ -120,6 +120,19 @@
     .demo-hero h1 { font-size:18px; }
   }
 input[type=range],input[type="range"]{touch-action:none;}
+  /* LIVE CRASH STRESS TEST */
+  .crash-card{background:linear-gradient(135deg,#041E2F,#0d2d44);border:2px solid #f4b86a;border-radius:12px;padding:18px;margin-bottom:16px;}
+  .crash-presets{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+  .crashbtn{padding:9px 15px;border-radius:20px;border:2px solid #1a3a52;background:transparent;color:#8aaabb;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;}
+  .crashbtn:hover{border-color:var(--teal);color:var(--teal);}
+  .crashbtn.on{background:var(--teal);border-color:var(--teal);color:var(--navy);}
+  .crashbtn.on[data-crash="none"]{background:var(--green);border-color:var(--green);color:#fff;}
+  .crash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+  .crash-stat{background:rgba(0,0,0,.3);border-radius:8px;padding:10px;text-align:center;}
+  .crash-stat .l{font-size:8px;color:#8aaabb;text-transform:uppercase;letter-spacing:.7px;}
+  .crash-stat .v{font-size:19px;font-weight:800;margin-top:3px;}
+  .crash-verdict{margin-top:14px;padding:13px 16px;border-radius:10px;background:rgba(0,0,0,.28);font-size:13px;line-height:1.6;color:#d8eaf5;}
+  @media(max-width:768px){ .crash-stats{grid-template-columns:1fr;} }
 </style>
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
@@ -209,7 +222,7 @@ window.addEventListener('storage', function(e) {
     <button class="persona-btn active" onclick="loadPersona('traditional')">Traditional Retiree<br><span style="font-size:9px;font-weight:400;">Age 63/55 · SS + 401k</span></button>
     <button class="persona-btn" onclick="loadPersona('fire')">Early FIRE Retiree<br><span style="font-size:9px;font-weight:400;">Age 45/42 · Retiring Now</span></button>
     <button class="persona-btn" onclick="loadPersona('single')">Single Retiree<br><span style="font-size:9px;font-weight:400;">Age 60 · Pension + IRA</span></button>
-    <button class="persona-btn" onclick="loadPersona('fatfire')">Fat FIRE<br><span style="font-size:9px;font-weight:400;">Age 55/52 · $3M Portfolio</span></button>
+    <button class="persona-btn" onclick="loadPersona('fatfire')">Fat FIRE<br><span style="font-size:9px;font-weight:400;">Age 55/52 · $4M Portfolio</span></button>
   </div>
 </div>
 
@@ -221,7 +234,7 @@ window.addEventListener('storage', function(e) {
     <div class="ctrl-grid">
       <div class="ctrl-item">
         <label>Annual Spending ($)</label>
-        <input type="range" id="ctrl-spend" min="30000" max="150000" step="5000" value="87000" oninput="recalc()">
+        <input type="range" id="ctrl-spend" min="30000" max="200000" step="5000" value="87000" oninput="recalc()">
         <div class="ctrl-val" id="ctrl-spend-val">$87,000</div>
       </div>
       <div class="ctrl-item">
@@ -313,31 +326,24 @@ window.addEventListener('storage', function(e) {
     </div>
   </div>
 
-  <!-- STRESS TEST -->
-  <div class="card" style="margin-bottom:16px;border-color:rgba(28,199,208,0.3);">
-    <div class="card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span>Stress Test — Sequence of Returns Risk</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
-      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
-        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">Base Scenario</div>
-        <div style="font-size:22px;font-weight:800;" id="d-stress-base">—</div>
-        <div style="font-size:9px;margin-top:4px;" id="d-stress-base-note">—</div>
-      </div>
-      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
-        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">Year 1 Down 20%</div>
-        <div style="font-size:22px;font-weight:800;" id="d-stress-20">—</div>
-        <div style="font-size:9px;margin-top:4px;" id="d-stress-20-note">Mild bear market</div>
-      </div>
-      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
-        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">Year 1 Down 30%</div>
-        <div style="font-size:22px;font-weight:800;" id="d-stress-30">—</div>
-        <div style="font-size:9px;margin-top:4px;" id="d-stress-30-note">Severe bear market</div>
-      </div>
-      <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;">
-        <div style="font-size:9px;color:#8aaabb;text-transform:uppercase;margin-bottom:6px;">High Inflation (5%)</div>
-        <div style="font-size:22px;font-weight:800;" id="d-stress-inf">—</div>
-        <div style="font-size:9px;margin-top:4px;" id="d-stress-inf-note">vs base 3%</div>
-      </div>
+  <!-- LIVE CRASH STRESS TEST -->
+  <div class="crash-card">
+    <div class="card-title" style="color:#f4b86a;font-size:11px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#0c2438;border:0.5px solid rgba(244,184,106,0.55);vertical-align:middle;margin-right:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f4b86a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span>Live Stress Test — Could This Plan Survive a Crash?</div>
+    <div style="font-size:12px;color:#b8dde6;line-height:1.6;">Drop a real market crash on the <b>worst possible year — the year this plan retires</b> — and watch it react. These are the same scenarios in the full Stress Test, built from actual S&amp;P 500 losses.</div>
+    <div class="crash-presets" id="crash-presets">
+      <button class="crashbtn on" data-crash="none">No Crash</button>
+      <button class="crashbtn" data-crash="c2008">2008 Crisis &minus;37%</button>
+      <button class="crashbtn" data-crash="dotcom">Dot-Com &minus;37% / 3yr</button>
+      <button class="crashbtn" data-crash="covid">COVID &minus;20%</button>
+      <button class="crashbtn" data-crash="blackmon">Black Monday &rsquo;87 &minus;22%</button>
     </div>
+    <div class="chart-area" style="height:230px;"><canvas id="chart-crash"></canvas></div>
+    <div class="crash-stats">
+      <div class="crash-stat"><div class="l">Lowest Point</div><div class="v" id="crash-low" style="color:#ff6b6b;">&mdash;</div></div>
+      <div class="crash-stat"><div class="l">Ending Balance</div><div class="v" id="crash-end" style="color:#1CC7D0;">&mdash;</div></div>
+      <div class="crash-stat"><div class="l">vs No-Crash Plan</div><div class="v" id="crash-vs" style="color:#f4b86a;">&mdash;</div></div>
+    </div>
+    <div class="crash-verdict" id="crash-verdict">Pick a crash above to see how this plan holds up when the market drops at the worst possible time.</div>
   </div>
 
   <!-- CTA -->
@@ -376,9 +382,9 @@ var PERSONAS = {
     legacyGoal:250000, ret:0.07, inflation:0.03, label:'Traditional Retiree'
   },
   fire: {
-    name:'Sam & Casey', p1age:45, p2age:42, portfolio:1200000,
+    name:'Sam & Casey', p1age:45, p2age:42, portfolio:1800000,
     spend:72000, ss:0, pension:0, retAge:45,
-    pretax:600000, roth:400000, taxable:200000,
+    pretax:900000, roth:600000, taxable:300000,
     legacyGoal:500000, ret:0.07, inflation:0.03, label:'Early FIRE'
   },
   single: {
@@ -388,9 +394,9 @@ var PERSONAS = {
     legacyGoal:100000, ret:0.065, inflation:0.03, label:'Single Retiree'
   },
   fatfire: {
-    name:'Riley & Quinn', p1age:55, p2age:52, portfolio:3200000,
-    spend:180000, ss:0, pension:0, retAge:55,
-    pretax:1800000, roth:800000, taxable:600000,
+    name:'Riley & Quinn', p1age:55, p2age:52, portfolio:4000000,
+    spend:160000, ss:0, pension:0, retAge:55,
+    pretax:2200000, roth:1000000, taxable:800000,
     legacyGoal:1000000, ret:0.07, inflation:0.03, label:'Fat FIRE'
   }
 };
@@ -418,6 +424,101 @@ function loadPersona(key) {
   recalc();
 }
 
+// LIVE CRASH STRESS TEST — real historical sequences (actual S&P 500 losses)
+var CRASH = {
+  none:    {label:'no crash',                seq:[]},
+  c2008:   {label:'a 2008-style crash',      seq:[-0.37]},
+  dotcom:  {label:'a Dot-Com-style slump',   seq:[-0.091,-0.119,-0.221]},
+  covid:   {label:'a COVID-style shock',     seq:[-0.20]},
+  blackmon:{label:'a Black Monday crash',    seq:[-0.22]}
+};
+var crashKey = 'none';
+
+// Today's-dollars projection: portfolio grows at real return (return − inflation),
+// level real spending, guaranteed income = SS + pension. Optional crash sequence
+// applied starting the retirement year. Returns portfolio + tax-bucket arrays.
+function projectPortfolio(p, seq) {
+  var yrs = 30;
+  var port=[], preA=[], rothA=[], taxA=[];
+  var preTax = p.pretax, roth = p.roth, taxable = p.taxable;
+  var realRet = p.ret - p.inflation;
+  var guaranteed = p.ss + p.pension;
+  var draw = Math.max(0, p.spend - guaranteed);
+  for (var i=0; i<yrs; i++) {
+    var ft = Math.min(draw, taxable); taxable -= ft;
+    var fp = Math.min(draw - ft, preTax); preTax -= fp;
+    var fr = Math.min(draw - ft - fp, roth); roth -= fr;
+    var r = (seq && i < seq.length) ? seq[i] : realRet;
+    preTax  = Math.max(0, preTax  * (1 + r));
+    roth    = Math.max(0, roth    * (1 + r));
+    taxable = Math.max(0, taxable * (1 + r));
+    if (i < 15 && preTax > 0) { var conv = Math.min(preTax*0.05, 30000); preTax -= conv; roth += conv*0.85; }
+    port.push(Math.round(preTax + roth + taxable));
+    preA.push(Math.round(preTax)); rothA.push(Math.round(roth)); taxA.push(Math.round(taxable));
+  }
+  return {port:port, pre:preA, roth:rothA, tax:taxA};
+}
+
+function drawCrash() {
+  var p = window.__demoP; if (!p) return;
+  document.querySelectorAll('#crash-presets .crashbtn').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-crash') === crashKey);
+  });
+  var sc = CRASH[crashKey];
+  var base = projectPortfolio(p, []).port;
+  var crashed = projectPortfolio(p, sc.seq).port;
+  var curYear = new Date().getFullYear();
+  var yrs = base.length, step = Math.ceil(yrs/10), idx = [], labels = [];
+  for (var i=0; i<yrs; i+=step) { idx.push(i); labels.push(curYear+i); }
+  if (idx[idx.length-1] !== yrs-1) { idx.push(yrs-1); labels.push(curYear+yrs-1); }
+  var baseD = idx.map(function(i){return base[i];});
+  var crashD = idx.map(function(i){return crashed[i];});
+  var ds = [{label:'Base plan', data:baseD, borderColor:'#1CC7D0', backgroundColor:'rgba(28,199,208,.10)', fill:true, tension:.3, pointRadius:0, borderWidth:2}];
+  if (crashKey !== 'none') ds.push({label:'With '+sc.label.replace(/^a /,''), data:crashD, borderColor:'#ff6b6b', backgroundColor:'rgba(255,107,107,.10)', fill:true, tension:.3, pointRadius:0, borderWidth:2, borderDash:[5,4]});
+  if (charts['chart-crash']) charts['chart-crash'].destroy();
+  var cctx = document.getElementById('chart-crash');
+  if (cctx) charts['chart-crash'] = new Chart(cctx, {
+    type:'line', data:{labels:labels, datasets:ds},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:true, labels:{font:{size:10}, color:'#8aaabb', boxWidth:10}}},
+      scales:{
+        x:{ticks:{font:{size:9}, color:'#8aaabb'}, grid:{display:false}},
+        y:{ticks:{font:{size:9}, color:'#8aaabb', callback:function(v){return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':'$0';}}, grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+
+  var endC = crashed[crashed.length-1], endB = base[base.length-1];
+  var low = Math.min.apply(null, crashed);
+  document.getElementById('crash-low').textContent = fmt(Math.max(0,low));
+  var endEl = document.getElementById('crash-end');
+  endEl.textContent = fmt(endC);
+  endEl.style.color = endC >= p.legacyGoal ? '#1CC7D0' : '#f4b86a';
+  var diff = endC - endB;
+  document.getElementById('crash-vs').textContent = crashKey==='none' ? '—' : (diff>=0?'+':'–')+fmt(Math.abs(diff));
+
+  var pct = p.legacyGoal>0 ? Math.round(endC/p.legacyGoal*100) : 100;
+  var v = document.getElementById('crash-verdict');
+  if (crashKey === 'none') {
+    v.innerHTML = 'This is the plan with <b>smooth average returns</b>. Pick a crash above to drop it on the year this plan retires — the worst possible timing — and see if it still holds.';
+  } else if (low <= 0) {
+    v.innerHTML = 'With <b>'+sc.label+'</b> hitting right at retirement, this sample plan <b style="color:#ff6b6b;">runs out of money</b> before the end. In the real tool, the Stress Test finds the exact spending level that survives it.';
+  } else if (endC >= p.legacyGoal) {
+    v.innerHTML = 'Even with <b>'+sc.label+'</b> the year this plan retires, it never runs dry and still ends at <b style="color:#1CC7D0;">'+fmt(endC)+'</b> — <b>'+pct+'% of the legacy goal</b>. That\u2019s sequence-of-returns risk, survived.';
+  } else {
+    v.innerHTML = 'With <b>'+sc.label+'</b> at retirement, the plan survives but ends at <b style="color:#f4b86a;">'+fmt(endC)+'</b> ('+pct+'% of goal). In the full tool you\u2019d trim spending slightly to close that gap.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var pr = document.getElementById('crash-presets');
+  if (pr) pr.addEventListener('click', function(e){
+    var b = e.target.closest('.crashbtn'); if (!b) return;
+    crashKey = b.getAttribute('data-crash');
+    drawCrash();
+  });
+});
+
 function recalc() {
   var p = Object.assign({}, PERSONAS[current]);
   p.spend = parseInt(document.getElementById('ctrl-spend').value);
@@ -431,50 +532,13 @@ function recalc() {
   document.getElementById('ctrl-inflation-val').textContent = (p.inflation*100).toFixed(1)+'%';
   document.getElementById('ctrl-retage-val').textContent = 'Age '+p.retAge;
 
-  // PROJECTION 
-  var yrs = 50;
-  var years = [], portfolioVals = [], preTaxVals = [], rothVals = [], taxableVals = [];
-  var bal = p.portfolio;
-  var preTax = p.pretax, roth = p.roth, taxable = p.taxable;
+  // PROJECTION (shared today's-dollars engine — same one the crash card uses)
+  var yrs = 30;
   var curYear = new Date().getFullYear();
-
-  for (var i=0; i<yrs; i++) {
-    var yr = curYear + i;
-    years.push(yr);
-
-    // Guaranteed income grows with COLA
-    var ssThisYr = i > 5 ? p.ss * Math.pow(1.025, i-5) : (i < 2 ? p.ss*0.5 : p.ss);
-    var penThisYr = p.pension * 12;
-    var guaranteed = ssThisYr + penThisYr;
-
-    // Inflation-adjusted spending
-    var spendThisYr = p.spend * Math.pow(1+p.inflation, i);
-    var withdrawal = Math.max(0, spendThisYr - guaranteed);
-
-    // Draw from taxable first, then pre-tax, then roth
-    var fromTaxable = Math.min(withdrawal, taxable);
-    taxable -= fromTaxable;
-    var fromPreTax = Math.min(withdrawal - fromTaxable, preTax);
-    preTax -= fromPreTax;
-    var fromRoth = Math.min(withdrawal - fromTaxable - fromPreTax, roth);
-    roth -= fromRoth;
-
-    // Growth
-    preTax  = Math.max(0, preTax  * (1 + p.ret));
-    roth    = Math.max(0, roth    * (1 + p.ret));
-    taxable = Math.max(0, taxable * (1 + p.ret));
-    // Small Roth conversion each year during low-income years
-    if (i < 15 && preTax > 0) {
-      var conv = Math.min(preTax * 0.05, 30000);
-      preTax -= conv; roth += conv * 0.85; // after tax
-    }
-
-    bal = preTax + roth + taxable;
-    portfolioVals.push(Math.round(bal));
-    preTaxVals.push(Math.round(preTax));
-    rothVals.push(Math.round(roth));
-    taxableVals.push(Math.round(taxable));
-  }
+  var R = projectPortfolio(p, []);
+  var portfolioVals = R.port, preTaxVals = R.pre, rothVals = R.roth, taxableVals = R.tax;
+  var years = [];
+  for (var i=0; i<yrs; i++) years.push(curYear + i);
 
   var endBal = portfolioVals[portfolioVals.length-1];
   var conf = p.legacyGoal > 0 ? Math.min(100, Math.round(endBal/p.legacyGoal*100)) : 100;
@@ -493,7 +557,7 @@ function recalc() {
   document.getElementById('d-ending-sub').textContent = endBal>=p.legacyGoal ? '✅ Legacy goal met' : '⚠️ '+fmt(p.legacyGoal)+' goal';
 
   // FIRE METRICS 
-  var gap = Math.max(0, p.spend - (p.ss + p.pension*12));
+  var gap = Math.max(0, p.spend - (p.ss + p.pension));
   var swr = p.portfolio > 0 && gap > 0 ? Math.round(gap/p.portfolio*1000)/10 : 0;
   var swrEl = document.getElementById('d-swr');
   swrEl.textContent = swr > 0 ? swr.toFixed(1)+'%' : '0%';
@@ -522,24 +586,9 @@ function recalc() {
   if(p.portfolio>=coast&&coast>0){coastEl.style.color='#1CC7D0';document.getElementById('d-coast-note').textContent='✅ Already coasting!';}
   else{coastEl.style.color='#f4b86a';document.getElementById('d-coast-note').textContent=coast>0?fmt(coast-p.portfolio)+' to coast':'—';}
 
-  // STRESS TEST 
-  var stressNote = function(val,goal) {
-    if(val>=goal&&goal>0) return {txt:'✅ Goal met',col:'#1CC7D0'};
-    if(val>0) return {txt:'⚠️ '+fmt(goal-val)+' short',col:'#f4b86a'};
-    return {txt:'⛔ Depleted',col:'#ff6b6b'};
-  };
-  var e20 = Math.max(0, Math.round(endBal*(p.portfolio*0.8/p.portfolio)*0.92));
-  var e30 = Math.max(0, Math.round(endBal*(p.portfolio*0.7/p.portfolio)*0.85));
-  var einf = Math.max(0, Math.round(endBal*0.82));
-
-  [['d-stress-base',endBal],['d-stress-20',e20],['d-stress-30',e30],['d-stress-inf',einf]].forEach(function(item,i){
-    var el = document.getElementById(item[0]);
-    var note = stressNote(item[1],p.legacyGoal);
-    el.textContent = fmt(item[1]);
-    el.style.color = note.col;
-    if(i>0) document.getElementById(item[0]+'-note').textContent = note.txt;
-    else document.getElementById('d-stress-base-note').textContent = note.txt;
-  });
+  // LIVE CRASH STRESS TEST — store resolved plan params + redraw
+  window.__demoP = p;
+  drawCrash();
 
   // CHARTS 
   var step = Math.ceil(yrs/10);
@@ -588,19 +637,14 @@ function recalc() {
     });
   }
 
-  // Income bridge
-  var incomeData = dispIdx.map(function(i){
-    var ss = i>5?p.ss*Math.pow(1.025,i-5):(i<2?p.ss*0.5:p.ss);
-    return Math.round(ss + p.pension*12);
-  });
-  var spendData = dispIdx.map(function(i){
-    return Math.round(p.spend * Math.pow(1+p.inflation,i));
-  });
+  // Income bridge (today's dollars — level guaranteed income vs level spending)
+  var incomeData = dispIdx.map(function(){ return Math.round(p.ss + p.pension); });
+  var spendData = dispIdx.map(function(){ return Math.round(p.spend); });
   mkLine('chart-income', dispYrs, [
     {label:'Guaranteed Income',data:incomeData,borderColor:'#1CC7D0',backgroundColor:'rgba(76,175,80,0.1)',fill:true,tension:0.3,pointRadius:2,borderWidth:2},
     {label:'Total Expenses',data:spendData,borderColor:'#ff6b6b',borderDash:[4,2],fill:false,tension:0.3,pointRadius:0,borderWidth:1.5}
   ]);
-  var yr1gap = p.spend - (p.ss + p.pension*12);
+  var yr1gap = p.spend - (p.ss + p.pension);
   document.getElementById('chart-income-note').textContent = yr1gap > 0 ? 'Year 1 gap: '+fmt(yr1gap)+' funded by portfolio' : 'Income covers all expenses ✅';
 }
 
