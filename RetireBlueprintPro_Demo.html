@@ -114,6 +114,15 @@
 
   /* FEATURE LIST */
   .feature-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .email-capture{ max-width:470px; margin:4px auto 0; }
+  .email-offer{ font-size:13px; color:#e2eef3; margin-bottom:10px; font-weight:600; line-height:1.5; }
+  .email-offer b{ color:#f4b86a; }
+  .email-row{ display:flex; gap:8px; }
+  .email-row input{ flex:1; padding:13px 14px; border-radius:10px; border:1px solid #2a4a5e; background:#0c2438; color:#fff; font-size:14px; font-family:inherit; }
+  .email-row input::placeholder{ color:#7a93a0; }
+  .email-btn{ background:#f4b86a; color:#041E2F; font-weight:900; padding:13px 20px; border-radius:10px; border:none; cursor:pointer; font-size:14px; font-family:inherit; white-space:nowrap; }
+  .email-msg{ font-size:12px; margin-top:8px; min-height:16px; }
+  @media(max-width:560px){ .email-row{ flex-direction:column; } }
   .feature-item { display:flex; align-items:center; gap:8px; font-size:12.5px; color:#e2eef3; }
 
   .disclaimer { font-size:9px; color:#456A73; text-align:center; padding:12px; margin-top:12px; }
@@ -362,7 +371,15 @@ window.addEventListener('storage', function(e) {
     <div class="cta-eyebrow">You just tested a sample plan</div>
     <h2>Now run it on <span class="teal">your</span> retirement</h2>
     <p>Connect your own private Google Sheet — your accounts, your Social Security, your spending, your legacy goal — and see whether <b>your</b> plan survives a 2008-style crash, how much extra you could safely spend, and how long your money really lasts.</p>
-    <div class="cta-btns">
+    <div class="email-capture">
+      <div class="email-offer">📋 Not ready to buy? Get the free <b>“Will Your Plan Survive a Crash?”</b> checklist — plus a note the day it launches:</div>
+      <div class="email-row">
+        <input type="email" id="cap-email" placeholder="you@email.com" autocomplete="email">
+        <button class="email-btn" id="cap-btn" type="button">Send it to me</button>
+      </div>
+      <div class="email-msg" id="cap-msg"></div>
+    </div>
+    <div class="cta-btns" style="margin-top:18px;">
       <a href="#" data-etsy="1" class="cta-btn-primary">Get RetireBlueprint Pro on Etsy →</a>
     </div>
     <div class="cta-trust">One-time purchase · instant download · works right in Google Sheets · free updates</div>
@@ -580,6 +597,24 @@ function drawCrash() {
     v.innerHTML = lead + swing;
   }
 }
+
+// ── EMAIL CAPTURE ───────────────────────────────────────────────
+// To collect emails: sign up free at formspree.io, create a form, and paste your
+// endpoint below (looks like https://formspree.io/f/abcdwxyz). Until you do, the
+// form will show an error rather than silently dropping leads.
+var FORM_ENDPOINT = 'https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID';
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('cap-btn'); if (!btn) return;
+  btn.addEventListener('click', function(){
+    var email = (document.getElementById('cap-email').value || '').trim();
+    var msg = document.getElementById('cap-msg');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.style.color='#ff6b6b'; msg.textContent='Please enter a valid email.'; return; }
+    msg.style.color='#8aaabb'; msg.textContent='Sending…';
+    fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({ email:email, source:'RetireBlueprint Demo' }) })
+      .then(function(r){ if(r.ok){ msg.style.color='#1CC7D0'; msg.textContent='✓ You\u2019re on the list — check your inbox!'; document.getElementById('cap-email').value=''; } else { throw new Error(); } })
+      .catch(function(){ msg.style.color='#ff6b6b'; msg.textContent='Hmm, that didn\u2019t go through — try again in a moment.'; });
+  });
+});
 
 document.addEventListener('DOMContentLoaded', function(){
   var pr = document.getElementById('crash-presets');
