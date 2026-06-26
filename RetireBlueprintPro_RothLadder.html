@@ -727,10 +727,9 @@ function buildStrategyTable(p1Age, p2Age, p1Ret, p2Ret, taxable, rothBal, pretax
 function loadData() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId) {
-    document.getElementById('loading-msg').innerHTML = '⚠️ No sheet connected — showing default values. <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html" style="color:#1CC7D0;">Setup Guide</a>';
+    document.getElementById('loading-msg').innerHTML = '🔒 Connect your RetireBlueprint sheet to use the Roth Conversion Ladder. <a href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html" style="color:#1CC7D0;">Set up your sheet →</a>';
     document.getElementById('loading-msg').style.display = 'block';
-    document.getElementById('ladder-content').style.display = 'block';
-    buildLadder();
+    document.getElementById('ladder-content').style.display = 'none';
     return;
   }
 
