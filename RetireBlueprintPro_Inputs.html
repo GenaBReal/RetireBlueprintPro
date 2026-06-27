@@ -226,10 +226,10 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .partner-label.p2{color:var(--p2-color);}
 
 /* ── ACCOUNTS TABLE ── */
-.accounts-table{width:100%;border-collapse:collapse;font-size:11px;}
-.accounts-table th{background:var(--navy);color:var(--orange);font-size:8px;font-weight:700;
-                   text-transform:uppercase;letter-spacing:0.8px;padding:8px 10px;text-align:left;}
-.accounts-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.accounts-table{width:auto;min-width:100%;border-collapse:collapse;font-size:11px;}
+.accounts-table th{background:var(--navy);color:var(--orange);font-size:9px;font-weight:700;
+                   text-transform:uppercase;letter-spacing:0.5px;padding:8px 8px;text-align:left;white-space:nowrap;}
+.accounts-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap;}
 .accounts-table tr:hover td{background:var(--light);}
 .accounts-table input,.accounts-table select{
   border:1px solid var(--border);border-radius:4px;padding:3px 6px;
@@ -245,15 +245,15 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 /* ── Required-field validation highlight + multi-line status ────────────── */
 .rbp-needfix{outline:2px solid #e23b3b !important;outline-offset:1px;background:#fff5f5 !important;border-radius:5px;}
 #status-msg{white-space:pre-line;}
-/* ── Accounts table readability: shrink the Yes/No + % columns so the
-   important fields (name, balances, dates) aren't squished on a laptop ──── */
-.accounts-table td{padding-left:4px;padding-right:4px;}
-.accounts-table th{padding-left:4px;padding-right:4px;}
-.accounts-table .toggle-yes,.accounts-table .toggle-no{width:auto;min-width:34px;padding:3px 5px;}
-.accounts-table th:nth-child(1),.accounts-table td:nth-child(1){width:44px;text-align:center;}
-.accounts-table th:nth-child(7),.accounts-table td:nth-child(7){width:54px;}
-.accounts-table th:nth-child(14),.accounts-table td:nth-child(14){width:46px;text-align:center;}
-.accounts-table td:nth-child(2) input{min-width:130px;}
+/* ── Accounts tables: show the FULL column words and let the table slide
+   sideways instead of crushing the text. Columns size to their content; the
+   section scrolls horizontally only when the table is wider than the screen. ── */
+.section-body{overflow-x:auto;}
+.accounts-table th,.accounts-table td{padding-left:6px;padding-right:6px;}
+.accounts-table input,.accounts-table select{min-width:92px;}
+.accounts-table input[type=date]{min-width:128px;}
+.accounts-table td:nth-child(2) input{min-width:150px;}
+.accounts-table .toggle-yes,.accounts-table .toggle-no{width:auto;min-width:42px;padding:3px 8px;}
 
 /* ── EXPENSES TABLE ── */
 .expense-table{width:100%;border-collapse:collapse;font-size:11px;}
@@ -970,12 +970,26 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="field">
               <label>Monthly Pension ($)</label>
-              <input type="number" id="f-D46" value="0">
+              <input type="number" id="f-D46" value="0" onchange="calcPensionVsLumpSum('p2');">
             </div>
             <div class="field">
               <label>Pension Start Date</label>
               <input type="date" id="f-D47" value="">
             </div>
+          </div>
+          
+          <div style="margin-top:10px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
+              <div class="field">
+                <label>Lump Sum Offer ($) <span style="font-size:9px;color:#8aaabb;">optional</span></label>
+                <input type="number" id="p2-lump-sum" value="" placeholder="0" onchange="calcPensionVsLumpSum('p2');" style="border-color:rgba(244,184,106,0.3);">
+              </div>
+              <div class="field">
+                <label>Expected Lifespan (age)</label>
+                <input type="number" id="p2-pension-life" value="85" min="70" max="100" onchange="calcPensionVsLumpSum('p2');">
+              </div>
+            </div>
+            <div id="pension-compare-p2" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px;border:1px solid rgba(244,184,106,0.15);display:none;"></div>
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
