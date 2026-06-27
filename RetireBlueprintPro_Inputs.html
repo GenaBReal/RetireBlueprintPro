@@ -846,7 +846,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
                 <input type="number" id="p1-lump-sum" value="" placeholder="0" onchange="calcPensionVsLumpSum('p1');" style="border-color:rgba(244,184,106,0.3);">
               </div>
               <div class="field">
-                <label>Expected Lifespan (age)</label>
+                <label>Lifespan for pension comparison</label>
                 <input type="number" id="p1-pension-life" value="85" min="70" max="100" onchange="calcPensionVsLumpSum('p1');">
               </div>
             </div>
@@ -986,7 +986,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
                 <input type="number" id="p2-lump-sum" value="" placeholder="0" onchange="calcPensionVsLumpSum('p2');" style="border-color:rgba(244,184,106,0.3);">
               </div>
               <div class="field">
-                <label>Expected Lifespan (age)</label>
+                <label>Lifespan for pension comparison</label>
                 <input type="number" id="p2-pension-life" value="85" min="70" max="100" onchange="calcPensionVsLumpSum('p2');">
               </div>
             </div>
@@ -3312,6 +3312,19 @@ function saveAll() {
     rothPlan: collectRothPlan()
   };
 
+  // Snapshot the account-balance total we EXPECT the sheet to hold after this save,
+  // so the confirm read-back can verify the balances actually landed (not silently dropped).
+  var _rbpAcctExpected = (function(){
+    try {
+      var t = 0;
+      (accountsData||[]).forEach(function(a){
+        var inc = String((a&&(a.inc||a.showInCalc))||'Yes').toLowerCase()==='yes';
+        if (inc) t += (Number(a.bal||a.balance)||0);
+      });
+      return t;
+    } catch(e){ return null; }
+  })();
+
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   fetch(SCRIPT, {
@@ -3364,10 +3377,14 @@ function saveAll() {
     setStatus('✅ Saved. Confirming with your sheet…', 'success');
     setTimeout(function(){
       var cbName='rbpVerify_'+Date.now(), done=false;
-      function finish(confirmed){
+      function finish(confirmed, acctWarn){
         if(done) return; done=true; try{delete window[cbName];}catch(e){}
+        if(acctWarn){
+          setStatus('⚠️ Saved — but your ACCOUNT BALANCES may not have reached the sheet. Hit Refresh to check; if any balance is blank or wrong, re-enter it and Save again.', 'error');
+          return;
+        }
         if(confirmed){
-          setStatus('✅ Saved & confirmed — your sheet now shows Legacy Goal $'+want.toLocaleString()+'.', 'success');
+          setStatus('✅ Saved & confirmed — your sheet now shows Legacy Goal $'+want.toLocaleString()+' and your account balances.', 'success');
           var hg=document.getElementById('hdr-goal'); if(hg) hg.textContent='$'+want.toLocaleString();
         } else {
           setStatus('✅ Saved. If your numbers look off, hit Refresh in a moment to re-check.', 'success');
@@ -3403,7 +3420,16 @@ function saveAll() {
         } catch(_re){}
         var goalOK=_rbpNorm(leg.goal)===_rbpNorm(payload.global.B8);
         var yearOK=_rbpYr(gl.planYear!=null?gl.planYear:gl.planStartYear)===_rbpYr(payload.global.B6);
-        finish(goalOK && yearOK);
+        // Verify the account balances actually landed: compare the sheet's portfolio
+        // total to what we expected to save. Only checks when we expected real balances.
+        var _acctWarn=false;
+        try {
+          var _sheetTot=(d&&d.portfolio&&typeof d.portfolio.total==='number')?d.portfolio.total:null;
+          if(_rbpAcctExpected!=null && _rbpAcctExpected>0 && _sheetTot!=null){
+            _acctWarn = Math.abs(_sheetTot-_rbpAcctExpected) > Math.max(1,_rbpAcctExpected*0.005);
+          }
+        } catch(_we){}
+        finish(goalOK && yearOK, _acctWarn);
       };
       var s=document.createElement('script'); s.crossOrigin='anonymous';
       s.src=SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
