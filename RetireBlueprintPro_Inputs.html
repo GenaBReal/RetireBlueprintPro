@@ -535,7 +535,6 @@ input.currency::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Demo.html">Demo</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Changelog.html">What's New</a>
-  <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
 </div>
 </div>
 </div>
@@ -2500,6 +2499,31 @@ function hideLoadingOverlay() {
   if (ov) ov.classList.add('hidden');
 }
 
+var _rbpReadRetries = 0;
+// A read that comes back with NO accounts — but WITH an established plan (partner names
+// or a legacy goal) — means your data IS in the sheet but this read missed it: a cold
+// start, or the connector's brief ~8-second read cache handing back a stale snapshot.
+// Rather than painting a blank accounts table (the scary "my data vanished" moment),
+// wait past that cache window and read again; the fresh read returns your accounts.
+// Capped at 2 retries, and a genuinely new/empty sheet (no plan data) is accepted
+// immediately, so new customers are never delayed.
+function _rbpAcceptOrRetry(data) {
+  var hasAcct = !!(data && data.portfolio && data.portfolio.accounts && data.portfolio.accounts.length);
+  var hasPlan = !!(data && (
+    (data.legacy && (+data.legacy.goal) > 0) ||
+    (data.global && (+data.global.legacyGoal) > 0) ||
+    (data.people && ((data.people.craig && data.people.craig.name) || (data.people.gena && data.people.gena.name)))
+  ));
+  if (!hasAcct && hasPlan && _rbpReadRetries < 2) {
+    _rbpReadRetries++;
+    try { setStatus('Finishing load from your sheet — one moment…', ''); } catch(e){}
+    setTimeout(function(){ try { loadLiveData(); } catch(e){} }, 9000);
+    return false;
+  }
+  _rbpReadRetries = 0;
+  return true;
+}
+
 function loadLiveData() {
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId || sheetId === '1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA') {
@@ -2526,6 +2550,7 @@ function loadLiveData() {
         return;
       }
       try {
+        if (!_rbpAcceptOrRetry(data)) return;
         populateFromData(data);
         setStatus('Plan data loaded from your Google Sheet', 'success');
         showToast('Plan data loaded!', '');
@@ -2555,6 +2580,7 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
       return;
     }
     try {
+      if (!_rbpAcceptOrRetry(data)) return;
       populateFromData(data);
       setStatus('Plan data loaded!', 'success');
       showToast('Plan data loaded!', '');
