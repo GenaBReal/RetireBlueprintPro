@@ -1569,6 +1569,26 @@ var typeOptions  = ['Pretax (Deferred)','Roth (Tax Free)','Taxable (Liquid)',
                     'High-Yield Savings (HYSA)','Crypto Wallet'];
 var statusOptions = ['Use for Withdrawals','Protected'];
 
+// Read the account commit-on-change boxes straight from the screen and copy them into
+// accountsData. Date inputs and the Return % field only fire 'change' on commit; if a
+// background table rebuild happens between editing one and hitting Save, the typed value
+// can be dropped from accountsData even though it still shows on screen. Calling this right
+// before any save guarantees that whatever is VISIBLE is what gets saved.
+function rbpSyncAccountDates() {
+  try {
+    for (var _ai = 0; _ai < accountsData.length; _ai++) {
+      var _cs = document.getElementById('acc-cs-' + _ai);
+      var _ce = document.getElementById('acc-ce-' + _ai);
+      var _ws = document.getElementById('acc-ws-' + _ai);
+      var _rt = document.getElementById('acc-ret-' + _ai);
+      if (_cs) accountsData[_ai].contribStart  = _cs.value;
+      if (_ce) accountsData[_ai].contribEnd    = _ce.value;
+      if (_ws) accountsData[_ai].withdrawStart = _ws.value;
+      if (_rt) accountsData[_ai].ret           = parseFloat(_rt.value) || 0;
+    }
+  } catch (e) {}
+}
+
 function buildAccountsTable() {
   var tbody = document.getElementById('accounts-body');
   tbody.innerHTML = '';
@@ -1634,6 +1654,7 @@ function buildAccountsTable() {
     var retInp = document.createElement('input');
     retInp.type = 'number'; retInp.step = '0.01'; retInp.min = '0'; retInp.max = '20';
     retInp.style.width = '65px';
+    retInp.id = 'acc-ret-'+idx;
     retInp.value = a.ret ? parseFloat((+a.ret).toFixed(1)) : 0;
     retInp.addEventListener('change', function() {
       accountsData[idx].ret = parseFloat(this.value)||0; markDirty();
@@ -1670,6 +1691,7 @@ function buildAccountsTable() {
     var td9 = document.createElement('td');
     var csInp = document.createElement('input');
     csInp.type = 'date'; csInp.style.width = '110px';
+    csInp.id = 'acc-cs-'+idx;
     csInp.value = a.contribStart || '';
     (function(i){ csInp.addEventListener('change', function() {
       accountsData[i].contribStart = this.value; markDirty();
@@ -1691,6 +1713,7 @@ function buildAccountsTable() {
     var td11 = document.createElement('td');
     var wsInp = document.createElement('input');
     wsInp.type = 'date'; wsInp.style.width = '110px';
+    wsInp.id = 'acc-ws-'+idx;
     wsInp.value = a.withdrawStart || '';
     wsInp.title = 'Leave blank unless plan has specific restriction (e.g. 62½ for some 403b plans)';
     (function(i){ wsInp.addEventListener('change', function() {
@@ -3223,6 +3246,7 @@ function rbpValidateRequired(){
 }
 
 function saveAll() {
+  rbpSyncAccountDates(); // capture any on-screen account dates before packaging the save
   var sheetId = localStorage.getItem('rbp_sheet_id');
   if (!sheetId || sheetId === '1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA') {
     setStatus('No sheet connected — complete Setup first.', 'error');
