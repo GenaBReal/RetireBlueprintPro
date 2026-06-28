@@ -2653,6 +2653,12 @@ var EXPENSE_DEFAULTS = {58:'Verizon Wireless',59:'PG&E (Electric/Gas)',60:'Garba
 
 function populateFromData(d) {
   if (!d) return;
+  // GUARD: once the plan has loaded at least once (rbpDataLoaded) and the user has unsaved
+  // edits (isDirty), a background or late-arriving read must NOT repopulate the form — doing
+  // so silently overwrites freshly-typed values (return %, withdrawal dates) with the sheet's
+  // old data, which the user then unknowingly saves. What's on screen is the user's truth
+  // until they Save. (The very first load still runs, so the plan loads normally.)
+  if (typeof rbpDataLoaded !== 'undefined' && rbpDataLoaded === true && isDirty === true) return;
   try { window._rbpD = d; } catch(e){}   // keep the loaded plan reachable for instant post-save recompute
   // ── single-source: rebuild the projection with the shared engine so the Roth Conversion
   //    Solver and tax estimates use the exact same numbers as every other page. Built on a copy
@@ -2852,7 +2858,12 @@ var incEl  = document.getElementById('d-inc-'+i);
   }
 
   // ── ACCOUNTS ───────────────────────────────────────────
-  if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length) {
+  // GUARD: if the form has unsaved edits (isDirty), do NOT rebuild the accounts table from
+  // the sheet. A slow initial read or a background reload arriving mid-edit would otherwise
+  // overwrite freshly-typed return %, dates, etc. with the sheet's old values — the exact
+  // "I entered it, saved, and it's gone" bug. Balances looked safe only because they were
+  // already in the sheet; new values (returns/dates) got wiped. Skip the rebuild when dirty.
+  if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length && isDirty !== true) {
     // Get current partner names from form
     var _p1name = (document.getElementById('f-B31')||{value:''}).value.trim();
     var _p2name = (document.getElementById('f-D31')||{value:''}).value.trim();
