@@ -250,13 +250,16 @@ function rbpApplyEngine(d){
   var w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
   var yOf=function(x){ return x?new Date(x).getFullYear():null; };
   var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
+  // SOLVE the safe-extra spend in JS (the honest binary-search twin of the sheet's B119),
+  // then project WITH that value shaped across the phases — exactly what the sheet does for
+  // its committed-plan Master rows. This is what should make the engine match the sheet.
   var ext=I.committedExtra||0;
+  try { var _sv=RBP.solveSafeExtra(I); if(_sv && isFinite(_sv.safeExtra)) ext=_sv.safeExtra; } catch(_se){}
+  var _shape=function(yr){ var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2; return ph<0?0:(ext*w[ph]/avg); };
   // ENGINE FIRST: compute the Master rows in the browser (instant) — the same engine that
-  // powers the Stress Test page, matching the sheet within ~$1. This is what lets the page
-  // load fast instead of waiting 3–6 min for the sheet's recalc. If the engine can't run for
-  // any reason, we fall back to the sheet's own computed grid (the older, slower path).
+  // powers the Stress Test page. If the engine can't run, fall back to the sheet's grid.
   var rows=null;
-  try { rows = RBP.project(I); } catch(_pe){ rows=null; }
+  try { rows = RBP.project(I, { extraOverride: _shape }); } catch(_pe){ rows=null; }
   if(!rows || !rows.length){
     var _grid=(d.projections&&d.projections.masterGrid)||null;
     if(!_grid||!_grid.length){ try{ if(!document.getElementById('rbpSheetErr')){ document.body.insertAdjacentHTML('afterbegin','<div id="rbpSheetErr" style="background:#7a1f1f;color:#fff;padding:14px 16px;text-align:center;font-weight:700;font-size:14px;">\u26a0\ufe0f Couldn\u2019t load your sheet\u2019s numbers right now \u2014 please hit Refresh in a moment.</div>'); } }catch(_e){} return; }
