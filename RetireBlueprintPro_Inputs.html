@@ -666,63 +666,6 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       </div>
     </div>
 
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
-      <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Stress Test Settings</div>
-      <div style="font-size:10px;color:var(--muted);background:#fff;border-left:3px solid var(--orange);padding:8px 12px;border-radius:4px;margin-bottom:10px;line-height:1.6;">
-        <strong style="color:var(--text);">What is a stress test?</strong> Simulates a market crash during retirement to see if your plan survives.
-        <em>Early Bear</em> = crash right when you retire (worst case). <em>Late Bear</em> = crash later in retirement.
-        Leave both on <strong>Normal Returns</strong> for your base plan. Switch to <strong>Bear Market</strong> to test resilience.
-        <br><br>⚠️ <strong style="color:var(--text);">These settings change your saved plan everywhere</strong> — Dashboard, Tax Engine, and every page recalculate once you Save. For a quick throwaway what-if that does <em>not</em> touch your plan, use the <strong>Stress Test</strong> page instead.
-      </div>
-      <div class="form-grid-4">
-        <div class="field">
-          <label>Early Bear Market?</label>
-          <select id="f-B12" onchange="markDirty()">
-            <option value="Normal Returns" selected>Normal Returns</option>
-            <option value="Bear Market">Bear Market</option>
-          </select>
-          <span class="hint">Switch to "Bear Market" to stress test · Leave Normal for base plan</span>
-        </div>
-        <div class="field">
-          <label>Early Bear Start Year</label>
-          <input type="number" id="f-B13" value="2026" onchange="markDirty()">
-          <span class="hint">Typical: your retirement year · Tests sequence-of-returns risk</span>
-        </div>
-        <div class="field">
-          <label>Early Bear Duration (yrs)</label>
-          <input type="number" id="f-B14" value="6" min="1" max="10" onchange="markDirty()">
-          <span class="hint">Typical: 2–7 yrs · 2008 crash lasted ~2 yrs · Use 3–5 for realistic test</span>
-        </div>
-        <div class="field">
-          <label>Early Bear Return Drag (%)</label>
-          <input type="number" id="f-B15" value="0" min="0" max="50" onchange="markDirty()">
-          <span class="hint">Points cut from your growth-asset return <em>each</em> bear year (cash/bonds unaffected). A normal 7% year − 15 = −8%. Mild ≈ 10, Moderate ≈ 15, Severe ≈ 20–30. For a sharp 2008-style crash, use ~35 with a 1–2 yr duration.</span>
-        </div>
-        <div class="field">
-          <label>Late Bear Market?</label>
-          <select id="f-B16" onchange="markDirty()">
-            <option value="Normal Returns" selected>Normal Returns</option>
-            <option value="Bear Market">Bear Market</option>
-          </select>
-          <span class="hint">Optional second stress test · Tests a downturn later in retirement</span>
-        </div>
-        <div class="field">
-          <label>Late Bear Start Year</label>
-          <input type="number" id="f-B17" value="2045" onchange="markDirty()">
-          <span class="hint">Typical: 15–20 years into retirement · Tests mid-to-late resilience</span>
-        </div>
-        <div class="field">
-          <label>Late Bear Duration (yrs)</label>
-          <input type="number" id="f-B18" value="3" min="1" max="10" onchange="markDirty()">
-          <span class="hint">Typical: 2–5 yrs · Shorter than early bear is realistic</span>
-        </div>
-        <div class="field">
-          <label>Late Bear Return Drag (%)</label>
-          <input type="number" id="f-B19" value="0" min="0" max="50" onchange="markDirty()">
-          <span class="hint">Same idea as the Early Bear drag — points cut from growth returns during the late-bear years. Often a bit lower (≈ 10–15) than the early one.</span>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -1377,6 +1320,70 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="section-hdr" onclick="toggleSection(this)">
+    <div class="section-hdr-title">VIII. Stress Test Settings (Advanced)</div>
+    <div class="section-hdr-sub">Optional · bake a market crash into your saved plan</div>
+    <div class="section-hdr-arrow">▼</div>
+  </div>
+  <div class="section-body">
+    <div style="font-size:11px;color:var(--muted);background:#fff;border-left:3px solid var(--orange);padding:12px 16px;border-radius:4px;margin-bottom:14px;line-height:1.65;">
+      <strong style="color:var(--text);font-size:12.5px;">Want to test a market crash? Do it on the <a href="https://retireblueprintpro.com/RetireBlueprintPro_StressTest.html" style="color:var(--teal);font-weight:700;text-decoration:none;">Stress Test page</a> first — not here.</strong>
+      <br>That page lets you <em>play</em> with crash scenarios instantly, as many times as you like, <strong>without changing your saved plan</strong>. It's the place to explore "what if the market drops the year I retire?"
+      <br><br>Come back to <em>this</em> section only once you've decided you want a downturn <strong>baked into your plan permanently</strong> — saving here recalculates every page (Dashboard, Tax Engine, and the rest) to assume that crash happens.
+      <br><br><strong style="color:var(--text);">What these fields do:</strong> <em>Early Bear</em> simulates a crash right when you retire (the worst-case "sequence-of-returns" risk). <em>Late Bear</em> tests a downturn later in retirement. Leave both on <strong>Normal Returns</strong> for your base plan.
+    </div>
+      <div class="form-grid-4">
+        <div class="field">
+          <label>Early Bear Market?</label>
+          <select id="f-B12" onchange="markDirty()">
+            <option value="Normal Returns" selected>Normal Returns</option>
+            <option value="Bear Market">Bear Market</option>
+          </select>
+          <span class="hint">Switch to "Bear Market" to stress test · Leave Normal for base plan</span>
+        </div>
+        <div class="field">
+          <label>Early Bear Start Year</label>
+          <input type="number" id="f-B13" value="2026" onchange="markDirty()">
+          <span class="hint">Typical: your retirement year · Tests sequence-of-returns risk</span>
+        </div>
+        <div class="field">
+          <label>Early Bear Duration (yrs)</label>
+          <input type="number" id="f-B14" value="6" min="1" max="10" onchange="markDirty()">
+          <span class="hint">Typical: 2–7 yrs · 2008 crash lasted ~2 yrs · Use 3–5 for realistic test</span>
+        </div>
+        <div class="field">
+          <label>Early Bear Return Drag (%)</label>
+          <input type="number" id="f-B15" value="0" min="0" max="50" onchange="markDirty()">
+          <span class="hint">Points cut from your growth-asset return <em>each</em> bear year (cash/bonds unaffected). A normal 7% year − 15 = −8%. Mild ≈ 10, Moderate ≈ 15, Severe ≈ 20–30. For a sharp 2008-style crash, use ~35 with a 1–2 yr duration.</span>
+        </div>
+        <div class="field">
+          <label>Late Bear Market?</label>
+          <select id="f-B16" onchange="markDirty()">
+            <option value="Normal Returns" selected>Normal Returns</option>
+            <option value="Bear Market">Bear Market</option>
+          </select>
+          <span class="hint">Optional second stress test · Tests a downturn later in retirement</span>
+        </div>
+        <div class="field">
+          <label>Late Bear Start Year</label>
+          <input type="number" id="f-B17" value="2045" onchange="markDirty()">
+          <span class="hint">Typical: 15–20 years into retirement · Tests mid-to-late resilience</span>
+        </div>
+        <div class="field">
+          <label>Late Bear Duration (yrs)</label>
+          <input type="number" id="f-B18" value="3" min="1" max="10" onchange="markDirty()">
+          <span class="hint">Typical: 2–5 yrs · Shorter than early bear is realistic</span>
+        </div>
+        <div class="field">
+          <label>Late Bear Return Drag (%)</label>
+          <input type="number" id="f-B19" value="0" min="0" max="50" onchange="markDirty()">
+          <span class="hint">Same idea as the Early Bear drag — points cut from growth returns during the late-bear years. Often a bit lower (≈ 10–15) than the early one.</span>
+        </div>
+      </div>
   </div>
 </div>
 
