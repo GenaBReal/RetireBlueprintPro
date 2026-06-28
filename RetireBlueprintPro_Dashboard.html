@@ -251,11 +251,17 @@ function rbpApplyEngine(d){
   var yOf=function(x){ return x?new Date(x).getFullYear():null; };
   var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
   var ext=I.committedExtra||0;
-  // Prefer the SHEET's own Master rows (connector masterGrid) so every figure matches
-  // the sheet exactly; the JS engine stays only as a fallback for older connectors.
-  var _grid=(d.projections&&d.projections.masterGrid)||null;
-  if(!_grid||!_grid.length){ try{ if(!document.getElementById('rbpSheetErr')){ document.body.insertAdjacentHTML('afterbegin','<div id="rbpSheetErr" style="background:#7a1f1f;color:#fff;padding:14px 16px;text-align:center;font-weight:700;font-size:14px;">\u26a0\ufe0f Couldn\u2019t load your sheet\u2019s numbers right now \u2014 please hit Refresh in a moment.</div>'); } }catch(_e){} return; }
-  var rows=_grid.map(function(r){return {master:r};});
+  // ENGINE FIRST: compute the Master rows in the browser (instant) — the same engine that
+  // powers the Stress Test page, matching the sheet within ~$1. This is what lets the page
+  // load fast instead of waiting 3–6 min for the sheet's recalc. If the engine can't run for
+  // any reason, we fall back to the sheet's own computed grid (the older, slower path).
+  var rows=null;
+  try { rows = RBP.project(I); } catch(_pe){ rows=null; }
+  if(!rows || !rows.length){
+    var _grid=(d.projections&&d.projections.masterGrid)||null;
+    if(!_grid||!_grid.length){ try{ if(!document.getElementById('rbpSheetErr')){ document.body.insertAdjacentHTML('afterbegin','<div id="rbpSheetErr" style="background:#7a1f1f;color:#fff;padding:14px 16px;text-align:center;font-weight:700;font-size:14px;">\u26a0\ufe0f Couldn\u2019t load your sheet\u2019s numbers right now \u2014 please hit Refresh in a moment.</div>'); } }catch(_e){} return; }
+    rows=_grid.map(function(r){return {master:r};});
+  }
   if(!rows || !rows.length) return;
 
   function R(v){ return Math.round(Number(v)||0); }
@@ -914,7 +920,7 @@ var RBP = {
       if (onSuccess) onSuccess(d);
     };
     s = document.createElement('script'); s.crossOrigin = 'anonymous';
-    s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2);
+    s.src = SCRIPT_URL + '?authuser=0&action=read&fast=1&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2); // fast=1: inputs only, no recalc wait — the JS engine computes the projection in-browser
     s.onerror = function(){ if (!done){ done = true; clearTimeout(t); cleanup(); if (onError) onError('Could not reach your sheet. Check your connection and try again.'); } };
     document.head.appendChild(s);
   }
