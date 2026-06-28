@@ -1591,10 +1591,11 @@ function rbpSyncAccountDates() {
       var _ce = document.getElementById('acc-ce-' + _ai);
       var _ws = document.getElementById('acc-ws-' + _ai);
       var _rt = document.getElementById('acc-ret-' + _ai);
-      if (_cs) accountsData[_ai].contribStart  = _cs.value;
-      if (_ce) accountsData[_ai].contribEnd    = _ce.value;
-      if (_ws) accountsData[_ai].withdrawStart = _ws.value;
-      if (_rt) accountsData[_ai].ret           = parseFloat(_rt.value) || 0;
+      // Only ever FILL IN from the screen — never overwrite a captured value with a blank.
+      if (_cs && _cs.value !== '') accountsData[_ai].contribStart  = _cs.value;
+      if (_ce && _ce.value !== '') accountsData[_ai].contribEnd    = _ce.value;
+      if (_ws && _ws.value !== '') accountsData[_ai].withdrawStart = _ws.value;
+      if (_rt && _rt.value !== '') accountsData[_ai].ret           = parseFloat(_rt.value) || 0;
     }
   } catch (e) {}
 }
@@ -1666,7 +1667,7 @@ function buildAccountsTable() {
     retInp.style.width = '65px';
     retInp.id = 'acc-ret-'+idx;
     retInp.value = a.ret ? parseFloat((+a.ret).toFixed(1)) : 0;
-    retInp.addEventListener('change', function() {
+    retInp.addEventListener('input', function() {
       accountsData[idx].ret = parseFloat(this.value)||0; markDirty();
     });
     td6.appendChild(retInp);
@@ -1703,9 +1704,8 @@ function buildAccountsTable() {
     csInp.type = 'date'; csInp.style.width = '110px';
     csInp.id = 'acc-cs-'+idx;
     csInp.value = a.contribStart || '';
-    (function(i){ csInp.addEventListener('change', function() {
-      accountsData[i].contribStart = this.value; markDirty();
-    }); })(idx);
+    (function(i){ var h=function(){ accountsData[i].contribStart = this.value; markDirty(); };
+      csInp.addEventListener('input', h); csInp.addEventListener('change', h); })(idx);
     td9.appendChild(csInp);
 
     // Col 10: Contrib End Date
@@ -1714,9 +1714,8 @@ function buildAccountsTable() {
     ceInp.type = 'date'; ceInp.style.width = '110px';
     ceInp.id = 'acc-ce-'+idx;
     ceInp.value = a.contribEnd || '';
-    (function(i){ ceInp.addEventListener('change', function() {
-      accountsData[i].contribEnd = this.value; markDirty();
-    }); })(idx);
+    (function(i){ var h=function(){ accountsData[i].contribEnd = this.value; markDirty(); };
+      ceInp.addEventListener('input', h); ceInp.addEventListener('change', h); })(idx);
     td10.appendChild(ceInp);
 
     // Col 11: Withdrawal Start Date (plan restriction)
@@ -1726,9 +1725,8 @@ function buildAccountsTable() {
     wsInp.id = 'acc-ws-'+idx;
     wsInp.value = a.withdrawStart || '';
     wsInp.title = 'Leave blank unless plan has specific restriction (e.g. 62½ for some 403b plans)';
-    (function(i){ wsInp.addEventListener('change', function() {
-      accountsData[i].withdrawStart = this.value; markDirty();
-    }); })(idx);
+    (function(i){ var h=function(){ accountsData[i].withdrawStart = this.value; markDirty(); };
+      wsInp.addEventListener('input', h); wsInp.addEventListener('change', h); })(idx);
     td11.appendChild(wsInp);
 
     // Col 12: Status (select)
