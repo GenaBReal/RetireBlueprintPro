@@ -2548,6 +2548,7 @@ function _rbpAcceptOrRetry(data) {
   if (!hasAcct && hasPlan && _rbpReadRetries < 2) {
     _rbpReadRetries++;
     try { setStatus('Finishing load from your sheet — one moment…', ''); } catch(e){}
+    try { var _s=document.getElementById('dl-sub'); if(_s) _s.textContent='Almost there — finishing the first read (this can take a moment on a cold start)…'; } catch(e){}
     setTimeout(function(){ try { loadLiveData(); } catch(e){} }, 9000);
     return false;
   }
@@ -2574,20 +2575,22 @@ function loadLiveData() {
       return resp.json();
     })
     .then(function(data) {
-      hideLoadingOverlay();
       if (data && data.error) {
+        hideLoadingOverlay();
         setStatus('Error loading sheet: ' + data.error, 'error');
         showToast('Could not load sheet. Is it shared with retireblueprintpro@gmail.com?', 'error');
         return;
       }
       try {
-        if (!_rbpAcceptOrRetry(data)) return;
+        if (!_rbpAcceptOrRetry(data)) return;  // empty/cold read → retry pending, KEEP overlay up so the form stays blocked
+        hideLoadingOverlay();                  // real data in hand — now reveal the form
         populateFromData(data);
         setStatus('Plan data loaded from your Google Sheet', 'success');
         showToast('Plan data loaded!', '');
         var saveBtn = document.getElementById('save-btn');
         if (saveBtn) saveBtn.disabled = false;
       } catch(e) {
+        hideLoadingOverlay();
         setStatus('Data loaded with errors: ' + e.message, '');
 }
     })
@@ -2605,13 +2608,14 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
   window[callbackName] = function(data) {
     done = true;
     cleanup();
-    hideLoadingOverlay();
     if (data && data.error) {
+      hideLoadingOverlay();
       setStatus('Error: ' + data.error, 'error');
       return;
     }
     try {
-      if (!_rbpAcceptOrRetry(data)) return;
+      if (!_rbpAcceptOrRetry(data)) return;  // retry pending → keep overlay up
+      hideLoadingOverlay();
       populateFromData(data);
       setStatus('Plan data loaded!', 'success');
       showToast('Plan data loaded!', '');
@@ -2858,12 +2862,9 @@ var incEl  = document.getElementById('d-inc-'+i);
   }
 
   // ── ACCOUNTS ───────────────────────────────────────────
-  // GUARD: if the form has unsaved edits (isDirty), do NOT rebuild the accounts table from
-  // the sheet. A slow initial read or a background reload arriving mid-edit would otherwise
-  // overwrite freshly-typed return %, dates, etc. with the sheet's old values — the exact
-  // "I entered it, saved, and it's gone" bug. Balances looked safe only because they were
-  // already in the sheet; new values (returns/dates) got wiped. Skip the rebuild when dirty.
-  if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length && isDirty !== true) {
+  // (Background reloads are already blocked at the top of this function via the
+  // rbpDataLoaded+isDirty guard, so the accounts always load on the authoritative read.)
+  if (d.portfolio && d.portfolio.accounts && d.portfolio.accounts.length) {
     // Get current partner names from form
     var _p1name = (document.getElementById('f-B31')||{value:''}).value.trim();
     var _p2name = (document.getElementById('f-D31')||{value:''}).value.trim();
