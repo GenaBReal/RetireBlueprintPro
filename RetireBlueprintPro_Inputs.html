@@ -3396,40 +3396,6 @@ function saveAll() {
   })();
 
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
-  // ── TEMPORARY DIAGNOSTIC ─────────────────────────────────────────────────
-  // Shows EXACTLY what this Save is sending for the fields that keep going missing.
-  // Tap "Copy" then paste it to Claude (or screenshot). "Close" dismisses it.
-  try {
-    var _named = (accountsData||[]).filter(function(a){return (a.name||'').trim();})
-      .map(function(a){ return {name:a.name, bal:a.bal, ret:a.ret, wd:(a.withdrawStart||''), cs:(a.contribStart||''), ce:(a.contribEnd||'')}; });
-    var _txt = 'SAVE PAYLOAD\n\n'
-      + 'GLOBAL:\n' + JSON.stringify(payload.global, null, 1)
-      + '\n\nACCOUNTS (named only):\n' + JSON.stringify(_named, null, 1);
-    var _old = document.getElementById('rbp-dbg'); if (_old) _old.remove();
-    var _box = document.createElement('div'); _box.id='rbp-dbg';
-    _box.style.cssText='position:fixed;top:8px;right:8px;z-index:999999;max-width:92vw;width:430px;max-height:80vh;overflow:auto;background:#041E2F;color:#1CC7D0;font:11px/1.45 monospace;padding:10px;border:2px solid #f4b86a;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.55);';
-    var _bar = document.createElement('div');
-    _bar.style.cssText='display:flex;gap:8px;margin-bottom:8px;position:sticky;top:0;';
-    var _copy = document.createElement('button');
-    _copy.textContent='📋 Copy';
-    _copy.style.cssText='flex:1;background:#1CC7D0;color:#041E2F;border:0;border-radius:5px;padding:8px;font:700 12px sans-serif;cursor:pointer;';
-    _copy.onclick=function(ev){ ev.stopPropagation();
-      var done=function(){ _copy.textContent='✅ Copied!'; setTimeout(function(){_copy.textContent='📋 Copy';},1500); };
-      try { navigator.clipboard.writeText(_txt).then(done, function(){ _sel(); }); } catch(e){ _sel(); }
-      function _sel(){ var r=document.createRange(); r.selectNodeContents(_pre); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); try{document.execCommand('copy');}catch(_){} done(); }
-    };
-    var _close = document.createElement('button');
-    _close.textContent='✕ Close';
-    _close.style.cssText='background:#5b7383;color:#fff;border:0;border-radius:5px;padding:8px 12px;font:700 12px sans-serif;cursor:pointer;';
-    _close.onclick=function(ev){ ev.stopPropagation(); _box.remove(); };
-    _bar.appendChild(_copy); _bar.appendChild(_close);
-    var _pre = document.createElement('div');
-    _pre.style.cssText='white-space:pre-wrap;user-select:text;-webkit-user-select:text;';
-    _pre.textContent=_txt;
-    _box.appendChild(_bar); _box.appendChild(_pre);
-    document.body.appendChild(_box);
-  } catch(_e){}
-  // ── END DIAGNOSTIC ───────────────────────────────────────────────────────
 
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   fetch(SCRIPT, {
