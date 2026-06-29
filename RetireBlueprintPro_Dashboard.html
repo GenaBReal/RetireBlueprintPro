@@ -305,12 +305,9 @@ function rbpApplyEngine(d){
   // projection ends at the death-age year (post-death flat-growth padding removed)
 
   d.projections = P;
-  // HEADLINE NUMBERS STAY ON THE SHEET. The projected ending, variance, safe-extra and phase
-  // amounts in the KPI cards all come from the sheet's own summary cells (B129, B120, B119,
-  // G122-124) via the connector — so the Dashboard headline matches the Master and the sheet to
-  // the dollar. We deliberately DO NOT overwrite d.legacy.projectedEnding with the engine's ending:
-  // the engine rows above feed only the CHARTS (d.projections), where a few-dollar rounding
-  // difference is sub-pixel. Charts computed, headline numbers mirrored from the sheet.
+  // Dual-feed restored: the headline projected ending now comes from the JS engine's last
+  // row (same source as the charts), not the sheet's B129 summary cell. Variance follows.
+  try { d.legacy = d.legacy || {}; d.legacy.projectedEnding = Math.round(rows[rows.length-1].master[81]); } catch(e){}
 }
 </script>
 <script>
