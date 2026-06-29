@@ -69,12 +69,22 @@
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
 // Column meanings (from the Master layout your pages map). Unknown columns show as "Col N".
-var COLS = {0:'Year',2:'Craig age',3:'Gena age',14:'Total gross income',19:'Total contributions',
+var COLS = {0:'Year',2:'Craig age',3:'Gena age',
+  4:'Craig salary',5:'Craig SS',7:'Craig pension',8:'Craig other',
+  9:'Gena salary',10:'Gena SS',12:'Gena pension',13:'Gena other',
+  14:'Total gross income',19:'Total contributions',
   20:'Std deduction',23:'Base living',26:'Healthcare',27:'Debt',28:'Total need',29:'Gap',30:'Surplus',
-  31:'Chosen extra',32:'Funding required',35:'Total RMD',38:'Total conversions',39:'Total taxable',
-  40:'Federal taxes',41:'State tax',43:'Total taxes',58:'Monthly withdrawal',72:'Pre-tax total',
-  73:'Roth total',74:'Taxable total',76:'HSA total',81:'Ending liquid balance'};
-function colName(c){ return COLS[c] ? (COLS[c]+' (col '+c+')') : ('Col '+c); }
+  31:'Chosen extra',32:'Funding required',
+  33:'Craig RMD',34:'Gena RMD',35:'Total RMD',36:'Craig conversion',37:'Gena conversion',38:'Total conversions',
+  39:'Total taxable',40:'Federal taxes',41:'State tax',43:'Total taxes',58:'Monthly withdrawal',
+  71:'Start total',72:'Pre-tax total',73:'Roth total',74:'Taxable total',76:'HSA total',
+  78:'Post-RMD total',79:'Mid total',80:'Pre-end delta',81:'Ending liquid balance'};
+function colName(c){
+  if(COLS[c]) return COLS[c]+' (col '+c+')';
+  if(c>=46 && c<=57) return 'Acct '+(c-46)+' draw (col '+c+')';
+  if(c>=59 && c<=70) return 'Acct '+(c-59)+' ending (col '+c+')';
+  return 'Col '+c;
+}
 
 var LAST = null; // last summary text for copy
 
@@ -249,6 +259,24 @@ function compareAndRender(grid, eng){
     lines.push('ONSET — first year anything diverges: '+onsetAny);
     var os0=colDiffsAt(onsetAny);
     os0.slice(0,16).forEach(function(r){ lines.push('  '+colName(r.c)+': sheet '+fmt(r.sheet)+' vs engine '+fmt(r.eng)+' = '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
+  }
+  // ── CLIFF: biggest single-year jump in the ending-balance gap — a discrete event (e.g. a
+  //    death/survivor transition applied a year apart by sheet vs engine), not slow drift ──
+  var cliffYr=null, cliffJump=0;
+  for(var bi=1; bi<balRows.length; bi++){
+    var jump=balRows[bi].diff - balRows[bi-1].diff;
+    if(jump>cliffJump){ cliffJump=jump; cliffYr=balRows[bi].yr; }
+  }
+  if(cliffYr && cliffJump>100){
+    lines.push('');
+    lines.push('CLIFF — biggest one-year jump in the ending gap: +'+fmt(cliffJump)+' at '+cliffYr+'. A jump this size is a discrete event, not drift.');
+    var cb=colDiffsAt(cliffYr-1);
+    lines.push('  At '+(cliffYr-1)+' (calm year just before) the columns that differ:');
+    if(!cb.length) lines.push('    (none — fully matched the year before the cliff)');
+    cb.slice(0,20).forEach(function(r){ lines.push('    '+colName(r.c)+': sheet '+fmt(r.sheet)+' | engine '+fmt(r.eng)+' | diff '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
+    var ca=colDiffsAt(cliffYr);
+    lines.push('  At '+cliffYr+' (the cliff year) every column that differs, worst first:');
+    ca.slice(0,28).forEach(function(r){ lines.push('    '+colName(r.c)+': sheet '+fmt(r.sheet)+' | engine '+fmt(r.eng)+' | diff '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
   }
   try {
     var _fp = (typeof RBP!=='undefined' && RBP.project) ? RBP.project.toString() : '';
