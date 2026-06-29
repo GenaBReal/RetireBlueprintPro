@@ -3528,8 +3528,10 @@ function rbpSolveAndPersist(d, sheetId, SCRIPT){
   try {
     if (!d || typeof RBP==='undefined' || !RBP.buildI || !RBP.solveSafeExtra) return;
     var sp = d.spending || {};
-    var ov = (Number(sp.phase1Override)||0) + (Number(sp.phase2Override)||0) + (Number(sp.phase3Override)||0);
-    if (ov > 0) return;                                  // manual/advanced plan — leave the solver alone
+    var o1=(Number(sp.phase1Override)||0), o2=(Number(sp.phase2Override)||0), o3=(Number(sp.phase3Override)||0);
+    // The solver now holds any manually-pinned phase fixed and solves only the free phases.
+    // Only skip when EVERY phase is pinned — then B119 drives nothing to solve.
+    if (o1>0 && o2>0 && o3>0) return;
     var I = RBP.buildI(d); if (!I) return;
     var res = RBP.solveSafeExtra(I);
     var solved = res && Number(res.safeExtra);
