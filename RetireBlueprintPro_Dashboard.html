@@ -305,8 +305,12 @@ function rbpApplyEngine(d){
   // projection ends at the death-age year (post-death flat-growth padding removed)
 
   d.projections = P;
-  // legacy ending = liquid at the last LIVE year (before the flat extension)
-  try { d.legacy = d.legacy || {}; d.legacy.projectedEnding = Math.round(rows[rows.length-1].master[81]); } catch(e){}
+  // HEADLINE NUMBERS STAY ON THE SHEET. The projected ending, variance, safe-extra and phase
+  // amounts in the KPI cards all come from the sheet's own summary cells (B129, B120, B119,
+  // G122-124) via the connector — so the Dashboard headline matches the Master and the sheet to
+  // the dollar. We deliberately DO NOT overwrite d.legacy.projectedEnding with the engine's ending:
+  // the engine rows above feed only the CHARTS (d.projections), where a few-dollar rounding
+  // difference is sub-pixel. Charts computed, headline numbers mirrored from the sheet.
 }
 </script>
 <script>
@@ -923,7 +927,7 @@ var RBP = {
       if (onSuccess) onSuccess(d);
     };
     s = document.createElement('script'); s.crossOrigin = 'anonymous';
-    s.src = SCRIPT_URL + '?authuser=0&action=read&fast=1&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2); // fast=1: inputs only, no recalc wait — the JS engine computes the projection in-browser
+    s.src = SCRIPT_URL + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&nc=' + Date.now() + '&r=' + Math.random().toString(36).slice(2); // full read: waits for the sheet's iterative solver to SETTLE, so the headline numbers (ending, variance, safe-extra) match the Master and the sheet to the dollar. Charts still run on the in-browser engine.
     s.onerror = function(){ if (!done){ done = true; clearTimeout(t); cleanup(); if (onError) onError('Could not reach your sheet. Check your connection and try again.'); } };
     document.head.appendChild(s);
   }
