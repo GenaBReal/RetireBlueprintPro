@@ -357,15 +357,19 @@ function renderSolverCard(d, _rows, _ext, _w, _avg){
   if(_rows&&_rows.length){ ending=Math.round(Number(_rows[_rows.length-1].master[81])||0); }
   else { var _eg=(d&&d.projections&&d.projections.masterGrid)||null; ending=(_eg&&_eg.length)?Math.round(Number(_eg[_eg.length-1][81])||0):Math.round(leg.projectedEnding||0); }
   var surplus=ending-goal; // matches the SAME ending & goal shown in this card
-  var safe=Math.round((_ext!=null?_ext:sp.safeExtra)||0), base=Math.round(sp.baseAnnual||0);
+  // committed per-phase spend — the engine's OWN rule: client override if they entered one,
+  // else the suggested extra; and nothing at all if "assume extra spend" is off. This mirrors
+  // exactly what the grid above spends, so the chips can never disagree with the projection.
+  var _assume=String((d&&d.global&&d.global.assumeExtraSpend)||'').trim().toLowerCase()==='yes';
+  var _spend=function(ov,ex){ return _assume ? (((+ov)>0)?(+ov):(+ex||0)) : 0; };
+  var safe=Math.round(_assume?(sp.safeExtra||0):0), base=Math.round(sp.baseAnnual||0);
   if(!(safe>0) && !(ending>0)){ el.style.display='none'; return; } // nothing solved yet
   var onTrack=/go|track|on\s*track|\u2705/i.test(status);
   function yr(v){ return (v===null||v===undefined||v==='')?'?':(''+v); }
-  var _ph=function(i){ return (_ext!=null&&_w&&_avg)?Math.round(_ext*_w[i]/_avg):0; };
   var phases=[
-    {nm:'Go-Go',   sb:'most active', s:sp.phase1Start, e:sp.phase1End, x:(_ext!=null?_ph(0):Math.round(sp.phase1Extra||0))},
-    {nm:'Slow-Go', sb:'easing off',  s:sp.phase2Start, e:sp.phase2End, x:(_ext!=null?_ph(1):Math.round(sp.phase2Extra||0))},
-    {nm:'No-Go',   sb:'later years', s:sp.phase3Start, e:sp.phase3End, x:(_ext!=null?_ph(2):Math.round(sp.phase3Extra||0))}
+    {nm:'Go-Go',   sb:'most active', s:sp.phase1Start, e:sp.phase1End, x:Math.round(_spend(sp.phase1Override, sp.phase1Extra))},
+    {nm:'Slow-Go', sb:'easing off',  s:sp.phase2Start, e:sp.phase2End, x:Math.round(_spend(sp.phase2Override, sp.phase2Extra))},
+    {nm:'No-Go',   sb:'later years', s:sp.phase3Start, e:sp.phase3End, x:Math.round(_spend(sp.phase3Override, sp.phase3Extra))}
   ];
   var chips=phases.map(function(p){
     return '<div style="flex:1 1 150px;background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.35);border-radius:12px;padding:12px 14px;">'
@@ -391,30 +395,23 @@ function renderSolverCard(d, _rows, _ext, _w, _avg){
 
 function go(d){
   var who=applyThemeAndHeader(d);
-  // ENGINE FIRST: this page now computes the Master grid in the browser (instant) with the same
-  // engine that drives every other page, using the solved safe-extra shaped across the phases —
-  // exactly the committed-plan basis the sheet uses. If the engine can't run, fall back to the
-  // sheet's own settled grid (masterGrid) so the page still renders.
-  var rows=null, ext=0, w=[1,1,1], avg=1, _fromSheet=false;
+  // ENGINE FIRST: render the committed plan with the engine's OWN spending logic — per phase it
+  // uses the client's override if they entered one, else the suggested extra, and spends nothing
+  // if "assume extra spend" is off. No re-solve on load: the saved plan's numbers are replayed
+  // exactly (that's what makes this match the sheet to the dollar). Falls back to the sheet's
+  // settled grid only if the engine can't run.
+  var rows=null, _fromSheet=false;
   try {
     var I = RBP.buildI(d);
-    if (I) {
-      w=[I.w1||1,I.w2||1,I.w3||1]; avg=(w[0]+w[1]+w[2])/3;
-      var yOf=function(x){ return x?new Date(x).getFullYear():null; };
-      var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
-      ext=I.committedExtra||0;
-      try { var _sv=RBP.solveSafeExtra(I); if(_sv && isFinite(_sv.safeExtra)) ext=_sv.safeExtra; } catch(_se){}
-      var _shape=function(yr){ var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2; return ph<0?0:(ext*w[ph]/avg); };
-      rows = RBP.project(I, { extraOverride: _shape });
-    }
+    if (I) rows = RBP.project(I);
   } catch(_pe){ rows=null; }
   if(!rows || !rows.length){
     var _grid = (d.projections && d.projections.masterGrid) || null;
     if(!_grid || !_grid.length){ fail('We reached your sheet but it returned no projection rows yet \u2014 it may still be calculating. Give it a moment and hit Refresh; if it persists, open your sheet and confirm it finished calculating.'); return; }
     rows = _grid.map(function(row){ return {master: row}; });
-    ext=null; _fromSheet=true;
+    _fromSheet=true;
   }
-  try{ renderSolverCard(d, rows, ext, w, avg); }catch(_e){}
+  try{ renderSolverCard(d, rows); }catch(_e){}
   var p1n=String(who.p1.name||'').toLowerCase(), p2n=String(who.p2.name||'').toLowerCase();
   var slots=(d.portfolio&&d.portfolio.slots)||[];
   var cols=buildColumns(slots, p1n, p2n, (who.p1.name||'Partner 1'), (who.p2.name||'Partner 2'));
