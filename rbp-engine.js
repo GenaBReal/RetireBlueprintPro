@@ -326,13 +326,18 @@ function rbpProject(I, opts) {
 function rbpSolveSafeExtra(I){
   const yOf=d=>d?new Date(d).getFullYear():null;
   const w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
+  const ov=[+I.ph1Override||0, +I.ph2Override||0, +I.ph3Override||0]; // pinned phase spend (0 = free)
   const p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
   const A=I.accounts, nameL=s=>String(s||'').toLowerCase().trim();
   const withMask=A.map(a=>{const g=nameL(a.G); return (g===''||g.includes('use')||g.includes('yes')||g.includes('withdraw'))?1:0;});
   function shortfall(X){
     const rows=rbpProject(I,{extraOverride:(yr)=>{
       let ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2;
-      return ph<0?0: X*w[ph]/avg;
+      if(ph<0) return 0;
+      // A manually-overridden phase is FIXED — its spend doesn't scale with the trial X.
+      // Only the free (non-overridden) phases take X, shaped by their weight exactly the way
+      // the sheet's G122:G124 formulas shape B119 (X*weight/avg, avg over all three weights).
+      return ov[ph]>0 ? ov[ph] : X*w[ph]/avg;
     }});
     const wd=rows.map(r=> r.ends.reduce((s,v,i)=> s+(withMask[i]?v:0),0));
     const finalW=wd[wd.length-1], minW=Math.min.apply(null,wd);
@@ -472,9 +477,9 @@ function rbpBuildI(R, D) {
     irmaaMFJ:T.irmaaMFJ, irmaaSingle:T.irmaaMFJ, magiMFJ:T.magiMFJ, magiSingle:T.magiSingle, magiThresh:true,
     convTable:(function(){ var ct={}; (R.rothPlan||[]).forEach(function(row){ if(!row) return; var y=parseInt(row.year,10); if(!y) return; ct[y]={ c:(+row.p1||0), g:(+row.p2||0) }; }); return ct; })(),
     debts:(R.debts||[]).map(function(d){ return {status:d.inc, amount:d.ann, start:D(d.start), end:D(d.end)}; }),
-    ph1Start:Y(sp.phase1Start), ph1End:Y(sp.phase1End), ph1Spend:((+sp.phase1Override>0)?+sp.phase1Override:(+sp.phase1Extra||0)),
-    ph2Start:Y(sp.phase2Start), ph2End:Y(sp.phase2End), ph2Spend:((+sp.phase2Override>0)?+sp.phase2Override:(+sp.phase2Extra||0)),
-    ph3Start:Y(sp.phase3Start), ph3End:Y(sp.phase3End), ph3Spend:((+sp.phase3Override>0)?+sp.phase3Override:(+sp.phase3Extra||0)),
+    ph1Start:Y(sp.phase1Start), ph1End:Y(sp.phase1End), ph1Spend:((+sp.phase1Override>0)?+sp.phase1Override:(+sp.phase1Extra||0)), ph1Override:(+sp.phase1Override||0),
+    ph2Start:Y(sp.phase2Start), ph2End:Y(sp.phase2End), ph2Spend:((+sp.phase2Override>0)?+sp.phase2Override:(+sp.phase2Extra||0)), ph2Override:(+sp.phase2Override||0),
+    ph3Start:Y(sp.phase3Start), ph3End:Y(sp.phase3End), ph3Spend:((+sp.phase3Override>0)?+sp.phase3Override:(+sp.phase3Extra||0)), ph3Override:(+sp.phase3Override||0),
     w1:sp.phase1Weight, w2:sp.phase2Weight, w3:sp.phase3Weight,
     legacyB8:leg.goal, floorB9:leg.safetyFloor,
     crashType:'', crashStart:0, crashDur:0, crashDrag:0, lateCrashType:'', lateStart:0, lateDur:0, lateDrag:0,
