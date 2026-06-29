@@ -340,7 +340,7 @@ function rbpSolveSafeExtra(I){
   }
   let lo=0, hi=200000;
   for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
-  return { safeExtra:Math.round(lo), shortfallAtSolve:Math.round(shortfall(lo)) };
+  return { safeExtra:Math.round(lo*100)/100, shortfallAtSolve:Math.round(shortfall(lo)*100)/100 };
 }
 
 /* ── runStress: one crash scenario, fully re-solved, no approximations ──────
