@@ -351,9 +351,7 @@ function renderSolverCard(d, _rows, _ext, _w, _avg){
   var el=document.getElementById('solverCard'); if(!el) return;
   var sp=(d&&d.spending)||{}, leg=(d&&d.legacy)||{};
   var status=String(leg.status||'').trim();
-  // Ending = the engine rows' last-row liquid (col 81) when present — fresh & instant, and it
-  // agrees with the Dashboard and the settled sheet to the dollar. Falls back to the sheet
-  // grid / summary cell only if the engine didn't run.
+  // Ending = the sheet grid's last-row liquid (col 81) — the exact number the sheet calculated.
   var goal=Math.round(leg.goal||0);
   var ending;
   if(_rows&&_rows.length){ ending=Math.round(Number(_rows[_rows.length-1].master[81])||0); }
@@ -393,46 +391,14 @@ function renderSolverCard(d, _rows, _ext, _w, _avg){
 
 function go(d){
   var who=applyThemeAndHeader(d);
-  var I; try{ I=RBP.buildI(d); }catch(e){ fail('Could not read your inputs ('+e+').'); return; }
-  if(!I){ fail('Inputs did not load.'); return; }
-  // ENGINE FIRST: solve the safe-extra spend in JS (the B119 twin), shape it across the
-  // phases, and project — exactly what the sheet does for its committed-plan rows. This is
-  // fresh and instant, and never the stale computed grid a just-saved sheet returns while it
-  // is still recalculating in the background. Falls back to the sheet's grid if the engine
-  // can't run.
-  var w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
-  var yOf=function(x){return x?new Date(x).getFullYear():null;};
-  var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
-  var ext=I.committedExtra||0;
-  try { var _sv=RBP.solveSafeExtra(I); if(_sv&&isFinite(_sv.safeExtra)) ext=_sv.safeExtra; } catch(_se){}
-  // The engine's solver rounds its safe-extra to a whole dollar before returning it. Over 30+
-  // years of compounding, that sub-dollar rounding drifts the final ending a few dollars off
-  // target. Re-solve sub-dollar right around the engine's number so the projected ending lands
-  // exactly where the SHEET lands: the sheet's B119 solver settles a hair past the legacy goal
-  // (its surplus, cell B120), so we aim at legacy + that surplus. This makes the web Master read
-  // identical to the sheet a customer can compare against — same ending, and because the whole
-  // projection is driven by this one number, the intermediate rows fall into line too. Page-only;
-  // the shared engine is untouched. Floor constraint preserved exactly as the engine has it.
-  try{
-    var _surp=Number(d&&d.spending&&d.spending.surplus)||0;  // sheet's B120 overshoot above legacy
-    var _wm=I.accounts.map(function(a){ var g=String(a.G||'').toLowerCase().trim(); return (g===''||g.indexOf('use')>=0||g.indexOf('yes')>=0||g.indexOf('withdraw')>=0)?1:0; });
-    var _short=function(X){
-      var rr=RBP.project(I,{extraOverride:function(yr){ var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2; return ph<0?0:X*w[ph]/avg; }});
-      var wd=rr.map(function(r){ return r.ends.reduce(function(s,v,i){ return s+(_wm[i]?v:0); },0); });
-      return Math.min(wd[wd.length-1]-((I.legacyB8||0)+_surp), Math.min.apply(null,wd)-(I.floorB9||0));
-    };
-    var _lo=Math.max(0,ext-5), _hi=ext+5;
-    if(_short(_lo)>=0 && _short(_hi)<0){ for(var _k=0;_k<24;_k++){ var _m=(_lo+_hi)/2; if(_short(_m)>=0)_lo=_m; else _hi=_m; } ext=_lo; }
-  }catch(_re){}
-  var _shape=function(yr){ var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2; return ph<0?0:(ext*w[ph]/avg); };
-  var rows=null;
-  try { rows = RBP.project(I, {extraOverride:_shape}); } catch(_pe){ rows=null; }
-  if(!rows || !rows.length){
-    var _grid = (d.projections && d.projections.masterGrid) || null;
-    if(!_grid || !_grid.length){ fail('We reached your sheet but it returned no projection rows. Hit Refresh in a moment; if it persists, open your sheet and confirm it calculated.'); return; }
-    rows = _grid.map(function(row){ return {master: row}; });
-  }
-  try{ renderSolverCard(d, rows, ext, w, avg); }catch(_e){}
+  // SHEET-EXACT: this page shows the sheet's OWN settled computed grid (Master A8:CD200) verbatim.
+  // Customers download this and lay it next to their own Google Sheet, so every figure must match
+  // to the dollar — no in-browser recompute, no solver guessing. The fast JS engine drives every
+  // other page; this one waits for the real sheet numbers and prints exactly what the sheet got.
+  var _grid = (d.projections && d.projections.masterGrid) || null;
+  if(!_grid || !_grid.length){ fail('We reached your sheet but it returned no projection rows yet \u2014 it may still be calculating. Give it a moment and hit Refresh; if it persists, open your sheet and confirm it finished calculating.'); return; }
+  var rows = _grid.map(function(row){ return {master: row}; });
+  try{ renderSolverCard(d, rows, null, null, null); }catch(_e){}
   var p1n=String(who.p1.name||'').toLowerCase(), p2n=String(who.p2.name||'').toLowerCase();
   var slots=(d.portfolio&&d.portfolio.slots)||[];
   var cols=buildColumns(slots, p1n, p2n, (who.p1.name||'Partner 1'), (who.p2.name||'Partner 2'));
@@ -565,7 +531,7 @@ function load(){
   window[cb]=function(d){ if(done)return; done=true; clearTimeout(to); clearInterval(t); if(bf)bf.style.width='100%'; delete window[cb];
     setTimeout(function(){ try{ go(d); }catch(e){ fail(String(e&&e.message||e)); } }, 60); };
   var s=document.createElement('script'); s.crossOrigin='anonymous';
-  s.src=SCRIPT_URL+'?authuser=0&action=read&fast=1&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now(); // fast=1: inputs only, no recalc wait — the JS engine computes the projection in-browser
+  s.src=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now(); // full read: returns the sheet's settled computed grid so this page shows the SHEET's exact numbers (customers compare this download against their own sheet, so it must match to the dollar — no in-browser recompute)
   s.onerror=function(){ if(!done){done=true;clearTimeout(to);clearInterval(t);fail('Could not reach your sheet.');} };
   document.head.appendChild(s);
 }
