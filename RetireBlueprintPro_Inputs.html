@@ -45,16 +45,12 @@
 function rbpApplyEngine(d){
   if (!d || typeof RBP==='undefined' || !RBP.buildI || !RBP.project) return;
   var I = RBP.buildI(d); if (!I) return;
-  // committed-plan smile (the saved safe-extra) — same basis the sheet's plan line uses
-  var w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
-  var yOf=function(x){ return x?new Date(x).getFullYear():null; };
-  var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
-  var ext=I.committedExtra||0;
-  // Dual-feed: rebuild the projection with the shared JS engine (rbp-engine.js) so the
-  // same inputs run through BOTH engines on every load/save and we can watch them match.
-  var rows=RBP.project(I,{extraOverride:function(yr){
-    var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2;
-    return ph<0?0:ext*w[ph]/avg; }});
+  // Dual-feed: rebuild the committed-plan projection with the shared JS engine (rbp-engine.js)
+  // using the engine's OWN spending logic — per phase it uses the client's override if they
+  // entered one, else the suggested extra, and nothing at all if "assume extra spend" is off.
+  // No re-solve on load: the saved plan is replayed exactly, matching the sheet to the dollar.
+  // (The live "play with crash scenarios" tool is the Stress Test page; this is the committed view.)
+  var rows=RBP.project(I);
   if(!rows || !rows.length) return;
 
   function R(v){ return Math.round(Number(v)||0); }
@@ -3499,6 +3495,11 @@ function saveAll() {
             _acctWarn = Math.abs(_sheetTot-_rbpAcctExpected) > Math.max(1,_rbpAcctExpected*0.005);
           }
         } catch(_we){}
+        // ── JS SOLVER: now that we have the fresh read-back, solve the safe-extra in JS
+        //    (deterministic — can't bounce) and persist it to B119 so the sheet stops
+        //    re-solving. Reuses the proven buildI path; isolated in try/catch so it can
+        //    never disturb the save/confirm flow above. ──
+        try { rbpSolveAndPersist(d, sheetId, SCRIPT); } catch(_spp){}
         finish(goalOK && yearOK, _acctWarn);
       };
       var s=document.createElement('script'); s.crossOrigin='anonymous';
@@ -3507,6 +3508,66 @@ function saveAll() {
       setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 16000);
     }, 6000);
   }
+}
+
+// ── JS SAFE-SPEND SOLVER + PERSIST ───────────────────────────────────────────
+// Replaces the sheet's bouncing iterative B119 solver. After a save, we have the
+// fresh read-back plan `d`; we solve the safe-extra in JS with the engine's
+// deterministic bisection (RBP.solveSafeExtra — guaranteed to converge, targets the
+// legacy goal AND the floor) and write that single value to B119 via the connector.
+// The sheet then holds a STATIC B119, recomputes the phase extras (G122:G124) and the
+// grid from it instantly, and never iterates again — so the ending lands on the goal
+// to the dollar and the two-day bouncing is gone.
+//
+// Reuses the PROVEN buildI(d) path (the same one parity validated to the dollar), so
+// there's no risky form→engine re-mapping. Standard plans only: if any phase is
+// manually overridden, the uniform-shaping solver could miss the goal, so we leave the
+// sheet's solver untouched for those (advanced/manual mode keeps today's behavior).
+// Fully wrapped so it can never break the save flow.
+function rbpSolveAndPersist(d, sheetId, SCRIPT){
+  try {
+    if (!d || typeof RBP==='undefined' || !RBP.buildI || !RBP.solveSafeExtra) return;
+    var sp = d.spending || {};
+    var ov = (Number(sp.phase1Override)||0) + (Number(sp.phase2Override)||0) + (Number(sp.phase3Override)||0);
+    if (ov > 0) return;                                  // manual/advanced plan — leave the solver alone
+    var I = RBP.buildI(d); if (!I) return;
+    var res = RBP.solveSafeExtra(I);
+    var solved = res && Number(res.safeExtra);
+    if (!isFinite(solved) || solved <= 0 || solved > 200000) return;
+    var cur = Number(sp.safeExtra)||0;
+    if (Math.abs(solved - cur) < 0.5) return;            // already landed — nothing to persist
+    // persist B119 (static) via the connector — solver-only payload, everything else untouched
+    var pay = { solver: { B119: solved } };
+    var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(pay))));
+    fetch(SCRIPT, { method:'POST', mode:'no-cors',
+      headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+      body:'action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) + '&data=' + encodeURIComponent(b64)
+    }).catch(function(){});
+    // instant display: shape the solved extra across phases the way the sheet's G122:G124
+    // formulas do (X*weight/avg), then re-run the engine so the on-screen numbers reflect
+    // the corrected plan without waiting for another round-trip.
+    try {
+      var w1=Number(sp.phase1Weight)||1, w2=Number(sp.phase2Weight)||1, w3=Number(sp.phase3Weight)||1;
+      var avg=(w1+w2+w3)/3 || 1;
+      d.spending.safeExtra = solved;
+      d.spending.phase1Extra = solved*w1/avg;
+      d.spending.phase2Extra = solved*w2/avg;
+      d.spending.phase3Extra = solved*w3/avg;
+      window._rbpD = d;
+      if (typeof rbpApplyEngine==='function') rbpApplyEngine(d);
+      var _end = (d.legacy && Number(d.legacy.projectedEnding))||0;
+      var _goal = (d.legacy && Number(d.legacy.goal))||0;
+      var _usd=function(n){ n=Math.round(n||0); return Math.abs(n)>=1e6?('$'+(n/1e6).toFixed(2)+'M'):('$'+n.toLocaleString()); };
+      var _set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+      if(_end>0){ _set('hdr-ending',_usd(_end)); _set('s-ending',_usd(_end)); }
+      if(_end>0 && _goal>0){
+        var _ot=_end>=_goal;
+        _set('hdr-status', _ot?'ON TRACK':'REVIEW');
+        var _ss=document.getElementById('s-status'); if(_ss){ _ss.textContent=_ot?'ON TRACK ✅':'REVIEW'; _ss.className=_ot?'badge-go':'badge-watch'; }
+        var _spx=document.getElementById('s-surplus'); if(_spx){ var _df=_end-_goal; _spx.textContent=(_df>=0?'+':'')+_usd(_df); }
+      }
+    } catch(_de){}
+  } catch(e){}
 }
 
 function buildPayload() {
