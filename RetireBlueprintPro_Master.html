@@ -347,26 +347,27 @@ function applyThemeAndHeader(d){
 
 /* Solver summary card — shows the safe-spend verdict and the chosen extra for each
    spending phase (go-go / slow-go / no-go), read straight from the sheet's solver. */
-function renderSolverCard(d){
+function renderSolverCard(d, _rows, _ext, _w, _avg){
   var el=document.getElementById('solverCard'); if(!el) return;
   var sp=(d&&d.spending)||{}, leg=(d&&d.legacy)||{};
   var status=String(leg.status||'').trim();
-  // Ending = the projection grid's actual last-row liquid (col 81), same source every other
-  // page uses — so Master agrees with Inputs/Dashboard/Check-In and your sheet's grid to the
-  // dollar. (The connector's leg.projectedEnding reads summary cell B133, which can round a few
-  // dollars differently; we fall back to it only if the grid isn't present.)
+  // Ending = the engine rows' last-row liquid (col 81) when present — fresh & instant, and it
+  // agrees with the Dashboard and the settled sheet to the dollar. Falls back to the sheet
+  // grid / summary cell only if the engine didn't run.
   var goal=Math.round(leg.goal||0);
-  var _eg=(d&&d.projections&&d.projections.masterGrid)||null;
-  var ending=(_eg&&_eg.length)?Math.round(Number(_eg[_eg.length-1][81])||0):Math.round(leg.projectedEnding||0);
-  var surplus=ending-goal; // must match the SAME ending & goal shown in this card (was reading the sheet's separate B120 surplus cell, which drifted from the displayed grid ending and could show a cushion while actually short of goal)
-  var safe=Math.round(sp.safeExtra||0), base=Math.round(sp.baseAnnual||0);
+  var ending;
+  if(_rows&&_rows.length){ ending=Math.round(Number(_rows[_rows.length-1].master[81])||0); }
+  else { var _eg=(d&&d.projections&&d.projections.masterGrid)||null; ending=(_eg&&_eg.length)?Math.round(Number(_eg[_eg.length-1][81])||0):Math.round(leg.projectedEnding||0); }
+  var surplus=ending-goal; // matches the SAME ending & goal shown in this card
+  var safe=Math.round((_ext!=null?_ext:sp.safeExtra)||0), base=Math.round(sp.baseAnnual||0);
   if(!(safe>0) && !(ending>0)){ el.style.display='none'; return; } // nothing solved yet
   var onTrack=/go|track|on\s*track|\u2705/i.test(status);
   function yr(v){ return (v===null||v===undefined||v==='')?'?':(''+v); }
+  var _ph=function(i){ return (_ext!=null&&_w&&_avg)?Math.round(_ext*_w[i]/_avg):0; };
   var phases=[
-    {nm:'Go-Go',   sb:'most active', s:sp.phase1Start, e:sp.phase1End, x:Math.round(sp.phase1Extra||0)},
-    {nm:'Slow-Go', sb:'easing off',  s:sp.phase2Start, e:sp.phase2End, x:Math.round(sp.phase2Extra||0)},
-    {nm:'No-Go',   sb:'later years', s:sp.phase3Start, e:sp.phase3End, x:Math.round(sp.phase3Extra||0)}
+    {nm:'Go-Go',   sb:'most active', s:sp.phase1Start, e:sp.phase1End, x:(_ext!=null?_ph(0):Math.round(sp.phase1Extra||0))},
+    {nm:'Slow-Go', sb:'easing off',  s:sp.phase2Start, e:sp.phase2End, x:(_ext!=null?_ph(1):Math.round(sp.phase2Extra||0))},
+    {nm:'No-Go',   sb:'later years', s:sp.phase3Start, e:sp.phase3End, x:(_ext!=null?_ph(2):Math.round(sp.phase3Extra||0))}
   ];
   var chips=phases.map(function(p){
     return '<div style="flex:1 1 150px;background:rgba(255,255,255,.06);border:1px solid rgba(28,199,208,.35);border-radius:12px;padding:12px 14px;">'
@@ -391,22 +392,28 @@ function renderSolverCard(d){
 }
 
 function go(d){
-  try{ renderSolverCard(d); }catch(_e){}
   var who=applyThemeAndHeader(d);
   var I; try{ I=RBP.buildI(d); }catch(e){ fail('Could not read your inputs ('+e+').'); return; }
   if(!I){ fail('Inputs did not load.'); return; }
-  // project at the committed plan (the saved safe-extra smile) so columns match the sheet
+  // ENGINE FIRST: solve the safe-extra spend in JS (the B119 twin), shape it across the
+  // phases, and project — exactly what the sheet does for its committed-plan rows. This is
+  // fresh and instant, and never the stale computed grid a just-saved sheet returns while it
+  // is still recalculating in the background. Falls back to the sheet's grid if the engine
+  // can't run.
   var w=[I.w1||1,I.w2||1,I.w3||1], avg=(w[0]+w[1]+w[2])/3;
   var yOf=function(x){return x?new Date(x).getFullYear():null;};
   var p1s=yOf(I.ph1Start),p1e=yOf(I.ph1End),p2s=yOf(I.ph2Start),p2e=yOf(I.ph2End),p3s=yOf(I.ph3Start),p3e=yOf(I.ph3End);
   var ext=I.committedExtra||0;
-  // Prefer the SHEET's own Master rows (sent by the connector as masterGrid) so the
-  // page shows your sheet's official figures column-for-column. The JS engine is only
-  // a fallback for older connectors that don't send the grid — it can diverge from
-  // the sheet, so the sheet's numbers win whenever they're available.
-  var _grid = (d.projections && d.projections.masterGrid) || null;
-  if(!_grid || !_grid.length){ fail('We reached your sheet but it returned no projection rows. Hit Refresh in a moment; if it persists, open your sheet and confirm it calculated.'); return; }
-  var rows = _grid.map(function(row){ return {master: row}; });
+  try { var _sv=RBP.solveSafeExtra(I); if(_sv&&isFinite(_sv.safeExtra)) ext=_sv.safeExtra; } catch(_se){}
+  var _shape=function(yr){ var ph=-1; if(yr>=p1s&&yr<=p1e)ph=0; else if(yr>=p2s&&yr<=p2e)ph=1; else if(yr>=p3s&&yr<=p3e)ph=2; return ph<0?0:(ext*w[ph]/avg); };
+  var rows=null;
+  try { rows = RBP.project(I, {extraOverride:_shape}); } catch(_pe){ rows=null; }
+  if(!rows || !rows.length){
+    var _grid = (d.projections && d.projections.masterGrid) || null;
+    if(!_grid || !_grid.length){ fail('We reached your sheet but it returned no projection rows. Hit Refresh in a moment; if it persists, open your sheet and confirm it calculated.'); return; }
+    rows = _grid.map(function(row){ return {master: row}; });
+  }
+  try{ renderSolverCard(d, rows, ext, w, avg); }catch(_e){}
   var p1n=String(who.p1.name||'').toLowerCase(), p2n=String(who.p2.name||'').toLowerCase();
   var slots=(d.portfolio&&d.portfolio.slots)||[];
   var cols=buildColumns(slots, p1n, p2n, (who.p1.name||'Partner 1'), (who.p2.name||'Partner 2'));
@@ -539,7 +546,7 @@ function load(){
   window[cb]=function(d){ if(done)return; done=true; clearTimeout(to); clearInterval(t); if(bf)bf.style.width='100%'; delete window[cb];
     setTimeout(function(){ try{ go(d); }catch(e){ fail(String(e&&e.message||e)); } }, 60); };
   var s=document.createElement('script'); s.crossOrigin='anonymous';
-  s.src=SCRIPT_URL+'?authuser=0&action=read&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now();
+  s.src=SCRIPT_URL+'?authuser=0&action=read&fast=1&sheetId='+encodeURIComponent(sheetId)+'&callback='+cb+'&nc='+Date.now(); // fast=1: inputs only, no recalc wait — the JS engine computes the projection in-browser
   s.onerror=function(){ if(!done){done=true;clearTimeout(to);clearInterval(t);fail('Could not reach your sheet.');} };
   document.head.appendChild(s);
 }
