@@ -3392,6 +3392,27 @@ function saveAll() {
 
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
+  // ── Break the iterative solver ON THIS SAVE ──────────────────────────────
+  // Solve the safe-extra in JS from the last loaded plan and ride it along in the payload. The
+  // connector writes it to B119 FIRST (static), so the rest of the save runs against a fast sheet
+  // instead of timing out at 6 minutes on the iterative recalc. The post-save read-back re-solves
+  // from the freshly-saved inputs and corrects B119 if the edits moved it. Standard plans only
+  // (all-pinned plans have nothing for B119 to drive). Fully guarded — never blocks the save.
+  try {
+    if (window._rbpD && typeof RBP!=='undefined' && RBP.buildI && RBP.solveSafeExtra) {
+      var _sd = window._rbpD.spending || {};
+      var _o1=(Number(_sd.phase1Override)||0), _o2=(Number(_sd.phase2Override)||0), _o3=(Number(_sd.phase3Override)||0);
+      if (!(_o1>0 && _o2>0 && _o3>0)) {
+        var _Ipre = RBP.buildI(window._rbpD);
+        if (_Ipre) {
+          var _rpre = RBP.solveSafeExtra(_Ipre);
+          var _sol = _rpre && Number(_rpre.safeExtra);
+          if (isFinite(_sol) && _sol>0 && _sol<=200000) payload.solver = { B119: _sol };
+        }
+      }
+    }
+  } catch(_pe){}
+
   var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   fetch(SCRIPT, {
     method: 'POST',
@@ -3503,7 +3524,7 @@ function saveAll() {
         finish(goalOK && yearOK, _acctWarn);
       };
       var s=document.createElement('script'); s.crossOrigin='anonymous';
-      s.src=SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
+      s.src=SCRIPT + '?authuser=0&action=read&fast=1&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cbName + '&_=' + Date.now();
       document.body.appendChild(s);
       setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 16000);
     }, 6000);
@@ -3538,13 +3559,19 @@ function rbpSolveAndPersist(d, sheetId, SCRIPT){
     if (!isFinite(solved) || solved <= 0 || solved > 200000) return;
     var cur = Number(sp.safeExtra)||0;
     if (Math.abs(solved - cur) < 0.5) return;            // already landed — nothing to persist
-    // persist B119 (static) via the connector — solver-only payload, everything else untouched
-    var pay = { solver: { B119: solved } };
-    var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(pay))));
-    fetch(SCRIPT, { method:'POST', mode:'no-cors',
-      headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
-      body:'action=save&enc=b64&sheetId=' + encodeURIComponent(sheetId) + '&data=' + encodeURIComponent(b64)
-    }).catch(function(){});
+    // persist B119 (static) via the LEAN connector path — a dedicated, recalc-free write that
+    // lands in ~1s instead of dying at the 6-minute save timeout (a timed-out save throws its
+    // writes away, which is why the solved value never used to stick). JSONP GET so we get a
+    // confirmation back, and so it never rides the heavy writeInputs path.
+    try {
+      var cbW='rbpB119_'+Date.now();
+      window[cbW]=function(resp){ try{ delete window[cbW]; }catch(e){} };
+      var scW=document.createElement('script'); scW.crossOrigin='anonymous';
+      scW.src=SCRIPT + '?authuser=0&action=solveWriteB119&sheetId=' + encodeURIComponent(sheetId)
+            + '&b119=' + encodeURIComponent(solved) + '&callback=' + cbW + '&_=' + Date.now();
+      document.body.appendChild(scW);
+      setTimeout(function(){ if(scW.parentNode) scW.parentNode.removeChild(scW); }, 12000);
+    } catch(_we){}
     // instant display: shape the solved extra across phases the way the sheet's G122:G124
     // formulas do (X*weight/avg), then re-run the engine so the on-screen numbers reflect
     // the corrected plan without waiting for another round-trip.
