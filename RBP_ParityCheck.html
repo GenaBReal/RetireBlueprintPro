@@ -278,8 +278,30 @@ function compareAndRender(grid, eng){
     lines.push('  At '+cliffYr+' (the cliff year) every column that differs, worst first:');
     ca.slice(0,28).forEach(function(r){ lines.push('    '+colName(r.c)+': sheet '+fmt(r.sheet)+' | engine '+fmt(r.eng)+' | diff '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
   }
+  // ── MONTHLY-WITHDRAWAL PROBE: col 58 is monthly = annual/12, a leaf display cell (nothing reads
+  //    it), so a $1 here is pure rounding. Dump the raw numbers for the year it diverges so the
+  //    exact sheet rounding can be matched and zeroed. ──
+  if (colMax[58] && colMax[58].diff > 0) {
+    var _my = colMax[58].yr;
+    var _sr2 = sheetByYr[_my] || [], _er2 = engByYr[_my] || [];
+    var _sum2 = function(row,a,b){ var s=0; for(var i=a;i<=b;i++) s+=(Number(row[i])||0); return s; };
+    var _f6 = function(n){ return (Math.round((Number(n)||0)*1e6)/1e6); };
+    lines.push('');
+    lines.push('MONTHLY-WITHDRAWAL PROBE (col 58, year '+_my+') — raw full precision:');
+    lines.push('  col58 sheet raw   : '+_f6(_sr2[58]));
+    lines.push('  col58 engine raw  : '+_f6(_er2[58]));
+    lines.push('  engine annual (col58 x 12)        : '+_f6((Number(_er2[58])||0)*12));
+    lines.push('  sheet  sum of draws cols 46-57    : '+_f6(_sum2(_sr2,46,57)));
+    lines.push('  engine sum of draws cols 46-57    : '+_f6(_sum2(_er2,46,57)));
+    lines.push('  sheet  Display_AH(44) - Reinv(45) : '+_f6((Number(_sr2[44])||0)-(Number(_sr2[45])||0)));
+    lines.push('  sheet  col44='+_f6(_sr2[44])+'  col45='+_f6(_sr2[45]));
+    lines.push('  per-account draw diffs (sheet vs engine), cols 46-57 (only nonzero shown):');
+    for(var _di=46; _di<=57; _di++){
+      var _ds=Number(_sr2[_di])||0, _de=Number(_er2[_di])||0;
+      if(Math.abs(_ds-_de)>0.005) lines.push('    col'+_di+': sheet '+_f6(_ds)+' | engine '+_f6(_de)+' | diff '+_f6(_ds-_de));
+    }
+  }
   try {
-    var _fp = (typeof RBP!=='undefined' && RBP.project) ? RBP.project.toString() : '';
     lines.push('');
     lines.push('ENGINE FINGERPRINT: basisFix='+(_fp.indexOf('basisNextR')>=0?'YES':'NO')+'  otherIncomeFix='+(_fp.indexOf('otherFrac')>=0?'YES':'NO'));
   } catch(e){}
