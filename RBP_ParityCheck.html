@@ -55,7 +55,7 @@
       (it uses the same saved Sheet ID as your other pages). Your sheet stays the official record; nothing here changes it.
     </div>
     <div class="controls">
-      <label>Pass tolerance $ <input type="number" id="tol" value="10" min="0" step="1"></label>
+      <label>Pass tolerance $ <input type="number" id="tol" value="0" min="0" step="1"></label>
       <button class="btn-gold" onclick="runCheck()">&#9654; Run Parity Check</button>
       <button class="btn-ghost" onclick="copySummary()">Copy summary</button>
     </div>
@@ -138,7 +138,7 @@ function compareAndRender(grid, eng){
   var years = Object.keys(sheetByYr).map(Number).filter(function(y){ return engByYr[y]; }).sort(function(a,b){ return a-b; });
   if(!years.length){ status('Sheet and engine produced no overlapping years to compare.'); return; }
 
-  var tol = Math.max(0, +($('tol').value) || 10);
+  var _tv = parseFloat($('tol').value); var tol = (isFinite(_tv) && _tv >= 0) ? _tv : 0;
   var worst = { diff:0, yr:null, col:null };
   var colMax = {};            // col -> {diff, yr}
   var balRows = [];           // ending-balance per year
