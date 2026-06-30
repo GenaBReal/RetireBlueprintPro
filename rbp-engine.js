@@ -301,7 +301,7 @@ function rbpProject(I, opts) {
       rmdC, rmdG, totalRMD, convC, convG, totalConv,
       totalTaxable, baseTaxes+ordTaxActual, stateTax, cgTaxActual, totalTaxes,
       Math.max(totalRMD, fundingReq), reinvRMD,
-      D[0],D[1],D[2],D[3],D[4],D[5],D[6],D[7],D[8],D[9],D[10],D[11], (D.reduce((s,v)=>s+v,0))/12,
+      D[0],D[1],D[2],D[3],D[4],D[5],D[6],D[7],D[8],D[9],D[10],D[11], Math.floor((D.reduce((s,v)=>s+v,0))/12),
       ends[0],ends[1],ends[2],ends[3],ends[4],ends[5],ends[6],ends[7],ends[8],ends[9],ends[10],ends[11],
       _startTot, _sm(prevBals,i=>hier[i]===2), _sm(prevBals,i=>hier[i]===3), _sm(prevBals,i=>hier[i]===1),
       basisNextR, _sm(prevBals,i=>typeL[i].includes('hsa')), _sm(prevBals,i=>typeL[i].includes('529')),
