@@ -278,42 +278,6 @@ function compareAndRender(grid, eng){
     lines.push('  At '+cliffYr+' (the cliff year) every column that differs, worst first:');
     ca.slice(0,28).forEach(function(r){ lines.push('    '+colName(r.c)+': sheet '+fmt(r.sheet)+' | engine '+fmt(r.eng)+' | diff '+(r.diff<0?'-':'+')+fmt(Math.abs(r.diff))); });
   }
-  // ── MONTHLY ROUNDING RULE FINDER: col 58 (monthly withdrawal) is a leaf display cell whose basis
-  //    is the sum of per-account draws (cols 46-57); the sheet then rounds that /12 by SOME rule.
-  //    Test candidate rules against the sheet across ALL years to find the one that reproduces it
-  //    exactly — so the engine can match every client, not just this plan. ──
-  if (colMax[58]) {
-    var _my = colMax[58].yr, _sr2 = sheetByYr[_my] || [];
-    var _sum2 = function(row,a,b){ var s=0; for(var i=a;i<=b;i++) s+=(Number(row[i])||0); return s; };
-    var _f6 = function(n){ return (Math.round((Number(n)||0)*1e6)/1e6); };
-    lines.push('');
-    lines.push('MONTHLY PROBE (col 58, worst year '+_my+'): sheet='+_f6(_sr2[58])+'  sum-of-draws='+_f6(_sum2(_sr2,46,57))+'  /12='+_f6(_sum2(_sr2,46,57)/12));
-    var bankers = function(x){ var f=Math.floor(x), d=x-f; if(d<0.5)return f; if(d>0.5)return f+1; return (f%2===0)?f:f+1; };
-    var annual  = function(D){ var a=0; for(var i=46;i<=57;i++) a+=(Number(D[i])||0); return a; };
-    var rules = {
-      'A round-half-up( annual/12 )'  : function(D){ return Math.round(annual(D)/12); },
-      'B floor( annual/12 )'          : function(D){ return Math.floor(annual(D)/12); },
-      'C bankers( annual/12 )'        : function(D){ return bankers(annual(D)/12); },
-      'D sum of round(acct/12)'       : function(D){ var s=0; for(var i=46;i<=57;i++) s+=Math.round((Number(D[i])||0)/12); return s; },
-      'E sum of floor(acct/12)'       : function(D){ var s=0; for(var i=46;i<=57;i++) s+=Math.floor((Number(D[i])||0)/12); return s; },
-      'F sum of bankers(acct/12)'     : function(D){ var s=0; for(var i=46;i<=57;i++) s+=bankers((Number(D[i])||0)/12); return s; }
-    };
-    var keys = Object.keys(rules), score={}, miss={};
-    keys.forEach(function(k){ score[k]=0; miss[k]=[]; });
-    years.forEach(function(yr){
-      var sr=sheetByYr[yr]; if(!sr) return;
-      var sheetVal = Math.round(Number(sr[58])||0);
-      keys.forEach(function(k){
-        var v = rules[k](sr);
-        if(v===sheetVal) score[k]++; else if(miss[k].length<5) miss[k].push(yr+':got'+v+'/sheet'+sheetVal);
-      });
-    });
-    lines.push('RULE FINDER — which rule reproduces the sheet across all '+years.length+' years:');
-    keys.forEach(function(k){
-      var m=miss[k];
-      lines.push('  '+k+' : '+score[k]+'/'+years.length+(m.length? '   misses '+m.join(', ') : '   <<<<< MATCHES ALL'));
-    });
-  }
   try {
     lines.push('');
     lines.push('ENGINE FINGERPRINT: basisFix='+(_fp.indexOf('basisNextR')>=0?'YES':'NO')+'  otherIncomeFix='+(_fp.indexOf('otherFrac')>=0?'YES':'NO'));
