@@ -109,8 +109,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .kc-footer{font-size:8px;color:#5F6368;margin-top:3px;}
 .badge-watch{display:inline-block;background:#fff;color:#f4b86a;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;}
 .engines-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px;}
-.engine{background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8eaed;display:flex;flex-direction:column;}
-.eng-hdr{background:#041E2F;padding:9px 11px;flex-shrink:0;}
+.engine{background:#fff;border-radius:6px;border:1px solid #e8eaed;display:flex;flex-direction:column;}
+.eng-hdr{background:#041E2F;padding:9px 11px;flex-shrink:0;border-radius:6px 6px 0 0;}
 .eng-hdr-title{font-size:9px;font-weight:700;color:#f4b86a;letter-spacing:1px;text-transform:uppercase;}
 .eng-hdr-sub{font-size:8px;color:#1CC7D0;margin-top:2px;}
 .eng-body{padding:9px 11px;flex:1;display:flex;flex-direction:column;justify-content:space-between;}
@@ -172,6 +172,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 .solver-kpi-val{font-size:26px;font-weight:800;color:#f4b86a;margin-top:6px;}
 .solver-kpi-sub{font-size:11px;color:#8aaabb;margin-top:4px;line-height:1.4;}
 .tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(28,199,208,0.2);color:#1CC7D0;font-size:10px;font-weight:700;cursor:help;margin-left:4px;position:relative;flex-shrink:0;}
+.tooltip-icon.tt-wide:hover::after{width:290px;}
 .tooltip-icon:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#041E2F;color:#d8eaf5;font-size:11px;font-weight:400;padding:8px 12px;border-radius:6px;white-space:normal;width:220px;z-index:999;border:1px solid #1a3a52;line-height:1.5;pointer-events:none;}
 
 /* ── MOBILE NAV & HEADER FIX ──────────────────────────── */
@@ -518,7 +519,7 @@ window.addEventListener('storage', function(e) {
   </div>
 
   <div class="engine">
-    <div class="eng-hdr"><div class="eng-hdr-title">Legacy Engine</div><div class="eng-hdr-sub">Solver-optimized</div></div>
+    <div class="eng-hdr"><div class="eng-hdr-title">Legacy Engine <span class="tooltip-icon tt-wide" data-tip="A surplus above your goal is by design. Your plan guards a safety floor it never lets any year fall below. When that floor is the tighter limit, your safe spending is set by the floor — not the goal — so you finish with a cushion above your legacy target rather than exactly on it. The plan won't spend into your floor just to hit a number." style="font-size:9px;">?</span></div><div class="eng-hdr-sub">Solver-optimized</div></div>
     <div class="eng-body">
       <div class="eng-rows">
         <div class="eng-row"><span class="er-lbl">Legacy Goal</span><span class="er-val"><span id="eng-leg-goal">—</span><span class="s-go"></span></span></div>
@@ -528,9 +529,6 @@ window.addEventListener('storage', function(e) {
         <div class="eng-row"><span class="er-lbl">Achievement</span><span class="er-val"><span id="eng-leg-pct">—</span><span class="s-go"></span></span></div>
       </div>
       <div class="eng-hl"><div><div class="eh-lbl">Legacy Status</div><div class="eh-val" id="eng-leg-status">—</div></div><div class="eh-go" id="eng-leg-badge">—</div></div>
-      <div style="margin-top:11px;font-size:11px;color:#5a6b7a;line-height:1.55;border-top:1px solid #e6ebf0;padding-top:9px;">
-        <strong style="color:#0E9CA6;">A surplus above your goal is by design.</strong> Your plan guards a safety floor it never lets any year fall below. When that floor is the tighter limit, your safe spending is set by the floor — not the goal — so you finish with a cushion above your legacy target rather than exactly on it. The plan won't spend into your floor just to hit a number.
-      </div>
     </div>
   </div>
 </div>
