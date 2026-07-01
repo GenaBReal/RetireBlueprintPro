@@ -2405,11 +2405,11 @@ function rbpRunMonteCarlo(d,opts){
   <div style="background:linear-gradient(160deg,#041E2F,#0A3145 70%);padding:20px 26px;border-bottom:3px solid #f4b86a;">
     <div style="display:inline-block;background:#1CC7D0;color:#041E2F;font-size:11px;font-weight:900;letter-spacing:1px;padding:3px 11px;border-radius:14px;">TEST 3 &middot; LONGEVITY</div>
     <div style="font-size:23px;font-weight:900;color:#fff;letter-spacing:-.3px;margin-top:9px;">Does your money outlast you?</div>
-    <div style="font-size:13px;color:#b8dde6;line-height:1.7;max-width:640px;margin-top:6px;">
-      Every plan assumes an age you'll live to &mdash; but nobody knows that number. This runs your <b style="color:#fff;">exact plan, at your current spending</b>, as if you both lived <b style="color:#fff;">5 and 10 years longer</b>. It's the one risk a market crash can't warn you about.
+    <div style="font-size:13px;color:#b8dde6;line-height:1.7;max-width:660px;margin-top:6px;">
+      Your plan assumes an age you'll live to &mdash; but nobody knows that number. This runs your <b style="color:#fff;">exact plan</b> at every age from your planned one out toward 110, so you can see how long your money truly lasts. It's the one risk a market crash can't warn you about.
     </div>
   </div>
-  <div id="lng-body" style="padding:22px 26px 26px;">
+  <div id="lng-body" style="padding:22px 26px 24px;">
     <div id="lng-loading" style="color:#5a6b7a;font-size:13px;padding:34px 0;text-align:center;">Waiting for your saved plan&hellip;<br><span style="font-size:11px;color:#90A4AE;">This fills in with your real numbers on the live site.</span></div>
   </div>
 </div>
@@ -2421,87 +2421,76 @@ function rbpRenderLongevity(){
   if(!(window.RBP && window.RBP_I && RBP.runStress)) return;
   var I0=window.RBP_I;
   var committed=(I0.committedExtra!=null)?I0.committedExtra:0;
-  var goal=Math.round(I0.legacyB8||0);
-  var curYr=new Date().getFullYear();
-  var p1DYr=curYr+((I0.p1_lifeEnd||90)-(I0.p1_ageStart||60));
-  var p2DYr=curYr+((I0.p2_lifeEnd||90)-(I0.p2_ageStart||60));
-  var baseLastAge=(p1DYr>=p2DYr)?(I0.p1_lifeEnd||90):(I0.p2_lifeEnd||90);
-  var scen=[{label:'As planned',d:0},{label:'5 yrs longer',d:5},{label:'10 yrs longer',d:10}];
-  var res=scen.map(function(s){
+  var START=new Date().getFullYear();
+  var p1DYr=START+((I0.p1_lifeEnd||90)-(I0.p1_ageStart||60));
+  var p2DYr=START+((I0.p2_lifeEnd||90)-(I0.p2_ageStart||60));
+  var baseLastAge=Math.min((p1DYr>=p2DYr)?(I0.p1_lifeEnd||90):(I0.p2_lifeEnd||90),110);
+
+  // ages: from the last survivor's planned death age up to 110 in 5-yr steps, max 10 rows, ending at 110
+  var ages=[]; for(var A=baseLastAge; A<=110 && ages.length<10; A+=5){ ages.push(A); }
+  if(ages.length && ages.length<10 && ages[ages.length-1]<110) ages.push(110);
+
+  // must-haves/yr (constant) from a baseline zero-extra run — same math the crash table uses
+  var must=0; try{ var bb=RBP.runStress(I0,{start:0,drag:0,dur:1,plannedExtra:0}); must=(bb.floorY1?bb.floorY1.total:0)+((bb.cashflow&&bb.cashflow[0])?(bb.cashflow[0].taxes||0):0); }catch(e){}
+  var mustStr=must>0?('$'+Math.round(must/1000)+'K'):'\u2014';
+
+  var rows=ages.map(function(A){
+    var delta=A-baseLastAge;
     var I=JSON.parse(JSON.stringify(I0));
-    if(I.p1_lifeEnd) I.p1_lifeEnd=Math.min(I.p1_lifeEnd+s.d,110);
-    if(I.p2_lifeEnd) I.p2_lifeEnd=Math.min(I.p2_lifeEnd+s.d,110);
-    var r; try{ r=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:committed}); }catch(e){ return {error:true}; }
-    var series=(r&&r.series)||[];
-    var end=series.length?series[series.length-1].bal:0;
-    var minBal=series.length?Math.min.apply(null,series.map(function(q){return q.bal;})):0;
-    var breach=(r&&r.belowYear)||(r&&r.floorBreach)||null;
-    // tier: 0 = meets goal, 1 = lasts but legacy shrinks, 2 = portfolio exhausted / runs short
-    var tier;
-    if(breach || end<=5000 || minBal<=1000) tier=2;
-    else if(goal>0 && end < goal-1000) tier=1;
-    else tier=0;
-    return {label:s.label, toAge:Math.min(baseLastAge+s.d,110), end:Math.round(end), safe:Math.round((r&&r.safeExtra)||0), breach:breach, tier:tier};
+    if(I.p1_lifeEnd) I.p1_lifeEnd=Math.min((I0.p1_lifeEnd||90)+delta,110);
+    if(I.p2_lifeEnd) I.p2_lifeEnd=Math.min((I0.p2_lifeEnd||90)+delta,110);
+    var r,r0;
+    try{ r=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:committed}); r0=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:0}); }catch(e){ return {age:A,error:true}; }
+    return { age:A, floorOnly:(r0.depletes||null), atFull:(r.crossover||r.depletes||null), safe:Math.round(Math.max(0,r.safeExtra||0)) };
   });
-  if(res.some(function(r){return r.error;})){ body.innerHTML='<div style="color:#5a6b7a;font-size:13px;padding:22px 0;text-align:center;">Couldn\u2019t run the longevity projection \u2014 hit <b>Reload</b> at the top of the page.</div>'; return; }
+  if(rows.some(function(r){return r.error;})){ body.innerHTML='<div style="color:#5a6b7a;font-size:13px;padding:22px 0;text-align:center;">Couldn\u2019t run the longevity projection \u2014 hit <b>Reload</b> at the top of the page.</div>'; return; }
 
-  var worst=res.reduce(function(a,b){return b.tier>a.tier?b:a;},res[0]);
-  var worstTier=worst.tier, maxAge=res[res.length-1].toAge, worstSafe=res[res.length-1].safe;
+  var oldest=rows[rows.length-1];
+  var firstFail=rows.filter(function(r){return r.atFull;})[0];
   var head, sub;
-  if(worstTier===0){
-    head='Your plan keeps its full legacy \u2014 even a decade longer.';
-    sub='At today\u2019s spending, living to age '+maxAge+' still leaves your full '+rbpLngMoney(goal)+' behind. Outliving your money is a risk this plan already absorbs.';
-  } else if(worstTier===1){
-    head='Your essentials hold \u2014 a long life spends your legacy.';
-    sub='Your plan covers you to age '+maxAge+', but at today\u2019s spending each extra decade draws your legacy down (to '+rbpLngMoney(res[res.length-1].end)+' by '+maxAge+'). To leave your full '+rbpLngMoney(goal)+' even then, hold guilt-free extra to about <b>'+rbpLngMoney(worstSafe)+'/yr</b>.';
+  if(!firstFail){
+    head='Your money lasts \u2014 no matter how long you live.';
+    sub='Even at age '+oldest.age+', your plan holds at today\u2019s full spending. Outliving your savings is a risk this plan already absorbs.';
   } else {
-    head='A very long life is your plan\u2019s tightest test.';
-    sub='At today\u2019s spending, living to age '+maxAge+' thins the portfolio to near zero. Your essentials lean on Social Security and pensions late, and there\u2019s little legacy left. Holding guilt-free extra to about <b>'+rbpLngMoney(worstSafe)+'/yr</b> keeps your '+rbpLngMoney(goal)+' goal intact the whole way.';
+    head='A very long life is your plan\u2019s real test.';
+    sub='At today\u2019s full spending, the money would run dry around <b>'+firstFail.atFull+'</b> if you live to age '+firstFail.age+'. Trimming guilt-free extra to about <b>'+(oldest.safe>0?rbpLngMoney(oldest.safe)+'/yr':'must-haves only')+'</b> keeps the plan whole all the way to '+oldest.age+'.';
   }
 
-  // ── chart (size-constrained, with headroom so nothing collides) ──
-  var W=560,H=300, padL=8,padR=8,padT=48,padB=56, plotH=H-padT-padB, plotW=W-padL-padR;
-  var maxEnd=Math.max.apply(null,res.map(function(r){return Math.max(0,r.end);}));
-  var maxV=Math.max(goal, maxEnd, 1)*1.25;   // 25% headroom above the tallest of {goal, bars}
-  var slot=plotW/res.length, barW=Math.min(96,slot*0.5);
-  var colFor=function(t){ return t===0?'#1CC7D0':(t===1?'#E0A63E':'#E07856'); };
-  var svg='';
-  // baseline
-  svg+='<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="#e6ebf0" stroke-width="1.5"></line>';
-  // goal line + label (label anchored to the RIGHT, away from the tallest/leftmost bar)
-  if(goal>0){
-    var goalY=padT+plotH-(Math.min(goal,maxV)/maxV)*plotH;
-    svg+='<line x1="'+padL+'" y1="'+goalY+'" x2="'+(W-padR)+'" y2="'+goalY+'" stroke="#f4b86a" stroke-width="2" stroke-dasharray="7 5"></line>';
-    svg+='<text x="'+(W-padR)+'" y="'+(goalY-7)+'" text-anchor="end" font-size="11.5" font-weight="800" fill="#c98a2e">legacy goal '+rbpLngMoney(goal)+'</text>';
-  }
-  res.forEach(function(r,i){
-    var cx=padL+slot*i+slot/2;
-    var h=Math.max(3,(Math.max(0,r.end)/maxV)*plotH);
-    var y=padT+plotH-h;
-    svg+='<rect x="'+(cx-barW/2)+'" y="'+y+'" width="'+barW+'" height="'+h+'" rx="5" fill="'+colFor(r.tier)+'"></rect>';
-    svg+='<text x="'+cx+'" y="'+(y-9)+'" text-anchor="middle" font-size="15" font-weight="800" fill="#041E2F">'+rbpLngMoney(r.end)+'</text>';
-    svg+='<text x="'+cx+'" y="'+(padT+plotH+24)+'" text-anchor="middle" font-size="13" font-weight="800" fill="#37474F">'+r.label+'</text>';
-    svg+='<text x="'+cx+'" y="'+(padT+plotH+43)+'" text-anchor="middle" font-size="11.5" fill="#8595a2">to age '+r.toAge+'</text>';
-  });
-  var chart='<div style="max-width:'+W+'px;margin:14px auto 0;"><svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;height:auto;overflow:visible;">'+svg+'</svg></div>';
-
-  var tierTxt=function(t){ return t===0?'<span style="color:#0E9CA6;font-weight:800;">meets your goal</span>':(t===1?'<span style="color:#C08A2E;font-weight:800;">lasts \u2014 legacy shrinks</span>':'<span style="color:#C0392B;font-weight:800;">portfolio thins to ~$0</span>'); };
-  var rows=res.map(function(r){
-    return '<tr style="border-top:1px solid #eef1f4;"><td style="padding:9px 6px;font-weight:800;color:#041E2F;">'+r.label+' <span style="color:#90a4ae;font-weight:600;">(to '+r.toAge+')</span></td><td style="padding:9px 6px;text-align:right;font-weight:800;">'+rbpLngMoney(r.end)+'</td><td style="padding:9px 6px;text-align:right;">'+tierTxt(r.tier)+'</td><td style="padding:9px 6px;text-align:right;color:#37474F;">'+rbpLngMoney(r.safe)+'/yr</td></tr>';
+  var OK='#0A7E84', WARN='#A85A12', BAD='#C0392B';
+  var surv='<span style="color:'+OK+';font-weight:700;">\u2705 Survives</span>';
+  var yearCell=function(y){ return y?('<span style="color:'+(y<START+19?BAD:WARN)+';font-weight:700;">'+y+'</span>'):surv; };
+  var th='font-size:10px;letter-spacing:.5px;font-weight:700;text-transform:uppercase;padding:11px 14px;white-space:nowrap;';
+  var trs=rows.map(function(r,i){
+    var bg=i%2?'#fafbfc':'#ffffff', c='padding:11px 14px;border-top:1px solid #eef1f4;';
+    var fo=r.floorOnly?yearCell(r.floorOnly):surv;
+    var af=yearCell(r.atFull);
+    var rd=r.safe>0?('<span style="color:'+WARN+';font-weight:800;">'+rbpLngMoney(r.safe)+'/yr</span>'):('<span style="color:'+BAD+';font-weight:800;">$0 \u00b7 must-haves</span>');
+    var ar=r.safe>0?surv:(r.floorOnly?yearCell(r.floorOnly):surv);
+    return '<tr style="background:'+bg+';">'
+      +'<td style="'+c+'font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#041E2F;white-space:nowrap;">age '+r.age+'</td>'
+      +'<td style="'+c+'color:#546e7a;font-weight:600;white-space:nowrap;">'+mustStr+'</td>'
+      +'<td style="'+c+'">'+fo+'</td>'
+      +'<td style="'+c+'">'+af+'</td>'
+      +'<td style="'+c+'white-space:nowrap;">'+rd+'</td>'
+      +'<td style="'+c+'">'+ar+'</td>'
+      +'</tr>';
   }).join('');
 
   body.innerHTML=
-    '<div style="background:#0A3145;border-left:4px solid #1CC7D0;border-radius:8px;padding:15px 18px;margin-bottom:6px;">'+
-      '<div style="color:#1CC7D0;font-size:18px;font-weight:900;letter-spacing:-.2px;line-height:1.3;">'+head+'</div>'+
-      '<div style="color:#dbe9f0;font-size:13px;line-height:1.6;margin-top:6px;">'+sub+'</div>'+
+    '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px;"><div style="width:4px;height:15px;background:#1CC7D0;border-radius:2px;"></div><div style="font-size:12px;font-weight:800;letter-spacing:.5px;color:#0c7b84;text-transform:uppercase;">Does your money run dry if you live long?</div></div>'+
+    '<div style="font-size:13px;color:#0A3145;line-height:1.55;margin:6px 0 16px;"><b style="color:#0c7b84;">'+head+'</b> '+sub+'</div>'+
+    '<div style="border:1px solid #e6ebf0;border-radius:10px;overflow:hidden;overflow-x:auto;">'+
+      '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px;">'+
+        '<thead><tr style="background:#041E2F;color:#cfe3ef;">'+
+          '<th style="text-align:left;'+th+'">If you live to</th>'+
+          '<th style="text-align:left;'+th+'">Must-haves/yr</th>'+
+          '<th style="text-align:left;'+th+'">Must-haves only</th>'+
+          '<th style="text-align:left;'+th+'">At full plan</th>'+
+          '<th style="text-align:left;'+th+'">Reduce to</th>'+
+          '<th style="text-align:left;'+th+'">At reduced plan</th>'+
+        '</tr></thead><tbody>'+trs+'</tbody></table>'+
     '</div>'+
-    '<div style="font-size:12px;font-weight:800;letter-spacing:.5px;color:#5a6b7a;text-transform:uppercase;margin-top:18px;">What each extra decade leaves behind</div>'+
-    '<div style="font-size:12px;color:#8595a2;margin-bottom:2px;">keeping your plan and spending exactly as-is. dashed line is your legacy goal.</div>'+
-    chart+
-    '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:20px;">'+
-      '<thead><tr style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#8595a2;"><th style="padding:6px;text-align:left;">Horizon</th><th style="padding:6px;text-align:right;">Legacy at end</th><th style="padding:6px;text-align:right;">Outcome</th><th style="padding:6px;text-align:right;">Spend to keep your goal</th></tr></thead>'+
-      '<tbody>'+rows+'</tbody>'+
-    '</table>';
+    '<div style="font-size:11.5px;color:#546e7a;line-height:1.7;margin-top:13px;"><b>Must-haves only</b> = paused all extra, just the bill you can\u2019t skip. <b>At full plan</b> = your current extra held rigid through a long life. <b>Reduce to</b> = the Phase&nbsp;1 extra that still clears your legacy. <b>At reduced plan</b> = if you cut to that number, the plan lasts. Every figure is solved live from your saved plan \u2014 taxes, RMDs, and Social Security timing included.</div>';
 }
 (function(){
   var lastSig='';
