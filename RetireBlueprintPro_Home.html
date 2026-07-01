@@ -648,7 +648,7 @@ function showState(kind, msg){
     if(b){ b.className='state-banner warn'; b.style.display='flex';
       b.innerHTML='<div class="sb-txt"><div class="sb-h">Connect your Google Sheet to see your plan</div>'+
         '<div class="sb-p">Your numbers live in your own sheet. Once it\u2019s connected, your real plan appears here automatically.</div></div>'+
-        '<a class="sb-btn" href="https://retireblueprintpro.com/RetireBlueprintPro_SetupGuide.html">Go to Setup &rarr;</a>'; }
+        '<span class="sb-btn">Check your email for setup instructions</span>'; }
     set('m-status','No sheet connected'); setDot('#c8904a');
     setHTML('hv-headline','Connect your sheet to <span class="accent">begin</span>');
     set('hv-sub','Your plan will load here the moment your Google Sheet is connected.');
