@@ -288,8 +288,6 @@ window.addEventListener('storage', function(e) {
   <a href="#" onclick="if(typeof loadData==='function')loadData();else if(typeof loadReport==='function')loadReport();else location.reload();return false;" style="margin-left:auto;color:#f4b86a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;white-space:nowrap;display:flex;align-items:center;border-left:1px solid #1a3a52;">⟳ Refresh</a>
 </div>
 
-
-
 <div id="loading-msg" style="display:none;background:#0A3145;border-bottom:1px solid #1a3a52;padding:10px 20px;text-align:center;">
   <div id="loading-status" style="font-size:12px;font-weight:700;color:#dceaf5;margin-bottom:6px;">Connecting to your Google Sheet...</div>
   <div style="max-width:400px;margin:0 auto 4px;">
@@ -2395,10 +2393,10 @@ function rbpRunMonteCarlo(d,opts){
       if(ev.data.type==="rbpSWHeight" && ev.data.h){ frame.style.height=(ev.data.h+6)+'px'; } });
   })();
   </script>
-<!-- ════════ Test 4 divider (was Test 3) ════════ -->
+<!-- ════════ Test 3 divider (Monte Carlo) ════════ -->
 <div style="margin:40px 0 16px;display:flex;align-items:center;gap:14px;">
   <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
-  <div style="background:#1CC7D0;color:#041E2F;font-size:13px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:9px 22px;border-radius:22px;white-space:nowrap;box-shadow:0 4px 16px rgba(28,199,208,.4);">Test 4 &middot; Monte Carlo</div>
+  <div style="background:#1CC7D0;color:#041E2F;font-size:13px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:9px 22px;border-radius:22px;white-space:nowrap;box-shadow:0 4px 16px rgba(28,199,208,.4);">Test 3 &middot; Monte Carlo</div>
   <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
 </div>
 <div style="margin:18px 0 0;padding:22px 28px;background:linear-gradient(135deg,#041E2F,#0A3145 70%);border:2px solid #f4b86a;border-radius:14px;text-align:center;box-shadow:0 10px 32px rgba(4,30,47,.4);">
@@ -2412,119 +2410,6 @@ function rbpRunMonteCarlo(d,opts){
 </div>
 
 
-<!-- ════════ Test 3 · Longevity — "if you live longer" (inline, uses the main-page engine) ════════ -->
-<div style="margin:44px 0 16px;display:flex;align-items:center;gap:14px;">
-  <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
-  <div style="background:#1CC7D0;color:#041E2F;font-size:13px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;padding:6px 16px;border-radius:20px;white-space:nowrap;">Test 3 · If You Live Longer</div>
-  <div style="flex:1;height:2px;background:#1CC7D0;border-radius:2px;"></div>
-</div>
-
-<div style="background:#fff;border:1px solid #e6ebf0;border-radius:12px;overflow:hidden;">
-  <div style="background:linear-gradient(160deg,#041E2F,#0A3145 70%);padding:20px 26px;border-bottom:3px solid #f4b86a;">
-    <div style="display:inline-block;background:#1CC7D0;color:#041E2F;font-size:11px;font-weight:900;letter-spacing:1px;padding:3px 11px;border-radius:14px;">TEST 3 · LONGEVITY</div>
-    <div style="font-size:23px;font-weight:900;color:#fff;letter-spacing:-.3px;margin-top:9px;">Does your money outlast you?</div>
-    <div style="font-size:13px;color:#b8dde6;line-height:1.7;max-width:640px;margin-top:6px;">
-      Every plan assumes an age you'll live to. But nobody knows that number. This runs your <b style="color:#fff;">exact plan</b>, at your current spending, as if you both lived <b style="color:#fff;">5 and 10 years longer</b> &mdash; the one risk a market crash can't tell you about.
-    </div>
-  </div>
-  <div id="lng-body" style="padding:22px 26px;">
-    <div id="lng-loading" style="color:#5a6b7a;font-size:13px;padding:30px 0;text-align:center;">Waiting for your saved plan&hellip;<br><span style="font-size:11px;color:#90A4AE;">This fills in with your real numbers on the live site.</span></div>
-  </div>
-</div>
-
-<script>
-function rbpFmtMoney(n){ n=Math.round(n||0); var neg=n<0; n=Math.abs(n); var s=n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n/1000)+'K'; return neg?'\u2212'+s:s; }
-function rbpRenderLongevity(){
-  var body=document.getElementById('lng-body'); if(!body) return;
-  if(!(window.RBP && window.RBP_I && RBP.runStress)) return;
-  var I0=window.RBP_I;
-  var committed=(I0.committedExtra!=null)?I0.committedExtra:0;
-  var goal=I0.legacyB8||0;
-  var floor=0; try{ if(typeof rbpEssentialFloor==='function'){ var ef=rbpEssentialFloor(); floor=(ef&&ef.floor)||0; } }catch(e){}
-  var curYr=new Date().getFullYear();
-  var p1DeathYr=curYr+((I0.p1_lifeEnd||90)-(I0.p1_ageStart||60));
-  var p2DeathYr=curYr+((I0.p2_lifeEnd||90)-(I0.p2_ageStart||60));
-  var baseLastAge=(p1DeathYr>=p2DeathYr)?(I0.p1_lifeEnd||90):(I0.p2_lifeEnd||90);
-  var scen=[{label:'As planned',d:0},{label:'5 yrs longer',d:5},{label:'10 yrs longer',d:10}];
-  var res=scen.map(function(s){
-    var I=JSON.parse(JSON.stringify(I0));
-    if(I.p1_lifeEnd) I.p1_lifeEnd=Math.min(I.p1_lifeEnd+s.d,110);
-    if(I.p2_lifeEnd) I.p2_lifeEnd=Math.min(I.p2_lifeEnd+s.d,110);
-    var r; try{ r=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:committed}); }catch(e){ return {label:s.label,error:true}; }
-    var series=(r&&r.series)||[];
-    var end=series.length?series[series.length-1].bal:0;
-    var minBal=series.length?Math.min.apply(null,series.map(function(q){return q.bal;})):0;
-    return {label:s.label, toAge:baseLastAge+s.d, end:Math.round(end), min:Math.round(minBal), safe:Math.round((r&&r.safeExtra)||0), whole:(minBal>=(floor-1))};
-  });
-  if(res.some(function(r){return r.error;})){ body.innerHTML='<div style="color:#5a6b7a;font-size:13px;padding:20px 0;text-align:center;">Couldn\u2019t run the longevity projection \u2014 hit <b>Reload</b> at the top of the page.</div>'; return; }
-
-  var allWhole=res.every(function(r){return r.whole;});
-  var worst=res[res.length-1];
-  var head, sub;
-  if(allWhole){
-    head='Your plan holds \u2014 even a decade longer.';
-    sub='At your current spending, living to age '+worst.toAge+' still leaves <b>'+rbpFmtMoney(worst.end)+'</b>. Outliving your money is the risk this plan is built to survive.';
-  } else if(res[1].whole){
-    head='Comfortable to age '+res[1].toAge+' \u2014 tighter beyond.';
-    sub='Five extra years is well covered. Ten more (to age '+worst.toAge+') at today\u2019s spending draws the plan down \u2014 trimming to <b>'+rbpFmtMoney(worst.safe)+'/yr</b> extra keeps it whole the whole way.';
-  } else {
-    head='Longevity is your plan\u2019s tightest test.';
-    sub='At today\u2019s spending, extra years draw the plan below its safety floor. To stay whole to age '+worst.toAge+', hold guilt-free extra to about <b>'+rbpFmtMoney(worst.safe)+'/yr</b>.';
-  }
-
-  // chart scaling
-  var vals=res.map(function(r){return Math.max(0,r.end);});
-  var maxV=Math.max(goal, Math.max.apply(null,vals), 1);
-  var W=640,H=260, padL=8,padR=8,padT=28,padB=42, plotH=H-padT-padB, plotW=W-padL-padR;
-  var bw=Math.min(120, plotW/res.length*0.5), gap=plotW/res.length;
-  var goalY=padT+plotH-(Math.min(goal,maxV)/maxV)*plotH;
-  var bars='';
-  res.forEach(function(r,i){
-    var cx=padL+gap*i+gap/2;
-    var h=Math.max(2,(Math.max(0,r.end)/maxV)*plotH);
-    var y=padT+plotH-h;
-    var col=r.whole?'#1CC7D0':'#E07856';
-    bars+='<rect x="'+(cx-bw/2)+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="4" fill="'+col+'"></rect>';
-    bars+='<text x="'+cx+'" y="'+(y-7)+'" text-anchor="middle" font-size="14" font-weight="800" fill="#041E2F">'+rbpFmtMoney(r.end)+'</text>';
-    bars+='<text x="'+cx+'" y="'+(H-22)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#37474F">'+r.label+'</text>';
-    bars+='<text x="'+cx+'" y="'+(H-7)+'" text-anchor="middle" font-size="10.5" fill="#8595a2">to age '+r.toAge+'</text>';
-  });
-  var goalLine = goal>0 ? '<line x1="'+padL+'" y1="'+goalY+'" x2="'+(W-padR)+'" y2="'+goalY+'" stroke="#f4b86a" stroke-width="2" stroke-dasharray="7 5"></line><text x="'+padL+'" y="'+(goalY-6)+'" font-size="11" font-weight="800" fill="#c98a2e">legacy goal '+rbpFmtMoney(goal)+'</text>' : '';
-  var chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;">'+goalLine+bars+'</svg>';
-
-  var rows=res.map(function(r){
-    var badge=r.whole?'<span style="color:#0E9CA6;font-weight:800;">stays whole</span>':'<span style="color:#C0392B;font-weight:800;">runs short</span>';
-    return '<tr style="border-top:1px solid #eef1f4;"><td style="padding:9px 6px;font-weight:800;color:#041E2F;">'+r.label+' <span style="color:#90a4ae;font-weight:600;">(to '+r.toAge+')</span></td><td style="padding:9px 6px;text-align:right;font-weight:800;">'+rbpFmtMoney(r.end)+'</td><td style="padding:9px 6px;text-align:right;">'+badge+'</td><td style="padding:9px 6px;text-align:right;color:#37474F;">'+rbpFmtMoney(r.safe)+'/yr</td></tr>';
-  }).join('');
-
-  body.innerHTML=
-    '<div style="background:#0A3145;border-left:4px solid #1CC7D0;border-radius:8px;padding:15px 18px;margin-bottom:20px;">'+
-      '<div style="color:#1CC7D0;font-size:19px;font-weight:900;letter-spacing:-.2px;">'+head+'</div>'+
-      '<div style="color:#dbe9f0;font-size:13px;line-height:1.6;margin-top:5px;">'+sub+'</div>'+
-    '</div>'+
-    '<div style="font-size:12px;font-weight:800;letter-spacing:.5px;color:#5a6b7a;text-transform:uppercase;margin-bottom:2px;">Where each extra decade leaves you</div>'+
-    '<div style="font-size:12px;color:#8595a2;margin-bottom:10px;">keeping your plan and spending exactly as-is. dashed line is your legacy goal.</div>'+
-    chart+
-    '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:18px;">'+
-      '<thead><tr style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#8595a2;"><th style="padding:6px;text-align:left;">Horizon</th><th style="padding:6px;text-align:right;">Legacy at end</th><th style="padding:6px;text-align:right;">Outcome</th><th style="padding:6px;text-align:right;">Safe spend to stay whole</th></tr></thead>'+
-      '<tbody>'+rows+'</tbody>'+
-    '</table>';
-}
-(function(){
-  var lastSig='';
-  setInterval(function(){
-    try{
-      if(window.RBP && window.RBP_I && RBP.runStress){
-        var i=window.RBP_I, sig=[i.committedExtra,i.p1_lifeEnd,i.p2_lifeEnd,i.legacyB8].join('|');
-        if(sig!==lastSig){ lastSig=sig; rbpRenderLongevity(); }
-      }
-    }catch(e){}
-  }, 1000);
-})();
-</script>
-<!-- ════════ end Test 3 · Longevity ════════ -->
-
-
 <!-- ══ MONTE CARLO HEADER + BRIDGE EXPLAINER ══ -->
 <div style="margin:32px 0 0;padding:28px 32px 26px;background:linear-gradient(160deg,#041E2F,#0A3145 65%,#0c3a52);border-radius:18px 18px 0 0;border:1px solid rgba(28,199,208,.22);border-bottom:none;position:relative;overflow:hidden;">
   <!-- top accent rail -->
@@ -2536,7 +2421,7 @@ function rbpRenderLongevity(){
 
     <!-- Left: title + what it is -->
     <div style="flex:1;min-width:280px;">
-      <div style="margin-bottom:8px;"><span style="display:inline-block;background:#f4b86a;color:#041E2F;font-size:9px;font-weight:900;letter-spacing:.8px;padding:2px 9px;border-radius:10px;">TEST 4 · MONTE CARLO</span></div>
+      <div style="margin-bottom:8px;"><span style="display:inline-block;background:#f4b86a;color:#041E2F;font-size:9px;font-weight:900;letter-spacing:.8px;padding:2px 9px;border-radius:10px;">TEST 3 · MONTE CARLO</span></div>
       <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px;margin-bottom:10px;">Monte Carlo Simulation</div>
       <div style="font-size:13px;color:#b8dde6;line-height:1.75;max-width:520px;">
         The scenarios above each test <strong style="color:#fff;">one specific crash you define.</strong>
@@ -2578,8 +2463,6 @@ function rbpRenderLongevity(){
 
   </div>
 
-
-
   <div style="margin-top:20px;padding:12px 18px;background:rgba(255,255,255,.05);border:1px solid rgba(28,199,208,.18);border-radius:8px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:11.5px;position:relative;">
     <span style="color:#9fc1d6;font-weight:700;white-space:nowrap;">After running:</span>
     <span>✅ <strong style="color:#1CC7D0;">90%+</strong> <span style="color:#b8dde6;">Very strong</span></span>
@@ -2591,8 +2474,8 @@ function rbpRenderLongevity(){
 </div>
 
 
-  <!-- ══════ Test 4 · Monte Carlo — live engine, isolated frame ══════ -->
-  <iframe id="rbpMCFrame" title="Test 4 · Monte Carlo" scrolling="no" style="width:100%;height:1200px;border:0;display:block;background:#F8F9FA;border-radius:10px;overflow:hidden;margin-top:18px;"></iframe>
+  <!-- ══════ Test 3 · Monte Carlo — live engine, isolated frame ══════ -->
+  <iframe id="rbpMCFrame" title="Test 3 · Monte Carlo" scrolling="no" style="width:100%;height:1200px;border:0;display:block;background:#F8F9FA;border-radius:10px;overflow:hidden;margin-top:18px;"></iframe>
   <script type="text/plain" id="rbpMCsrc"><!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -2672,7 +2555,7 @@ function rbpRenderLongevity(){
 <body>
 <div class="wrap">
   <div class="hero">
-    <span class="tag">Test 4 &middot; Monte Carlo</span>
+    <span class="tag">Test 3 &middot; Monte Carlo</span>
     <h2>5,000 possible futures for your plan</h2>
     <p>Real markets never deliver the same return every year. This runs your exact plan through thousands
        of randomized market histories &mdash; good runs, bad runs, and brutal ones &mdash; and counts how often
