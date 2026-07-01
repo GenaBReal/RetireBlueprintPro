@@ -2432,6 +2432,7 @@ function rbpRenderLongevity(){
 
   var must=0; try{ var bb=RBP.runStress(I0,{start:0,drag:0,dur:1,plannedExtra:0}); must=(bb.floorY1?bb.floorY1.total:0)+((bb.cashflow&&bb.cashflow[0])?(bb.cashflow[0].taxes||0):0); }catch(e){}
   var mustStr=must>0?('$'+Math.round(must/1000)+'K'):'\u2014';
+  var fullExtraStr=rbpLngMoney(committed);
 
   var rows=ages.map(function(A){
     var delta=A-baseLastAge;
@@ -2453,10 +2454,10 @@ function rbpRenderLongevity(){
     sub='Even at age '+oldest.age+', your plan holds at today\u2019s full spending. Outliving your savings is a risk this plan already absorbs.';
   } else {
     head='A very long life is your plan\u2019s real test.';
-    sub='At today\u2019s full spending, the money would run dry around <b>'+firstFail.atFull+'</b> if you live to age '+firstFail.age+'. Trimming guilt-free extra to about <b>'+(oldest.safe>0?rbpLngMoney(oldest.safe)+'/yr':'must-haves only')+'</b> keeps the plan whole all the way to '+oldest.age+'.';
+    sub='At today\u2019s full spending, the money would run dry around <b>'+firstFail.atFull+'</b> if you live to age '+firstFail.age+'. Trimming your extra to about <b>'+(oldest.safe>0?rbpLngMoney(oldest.safe)+'/yr':'$0')+'</b> (on top of your '+mustStr+' must-haves) keeps the plan whole all the way to '+oldest.age+'.';
   }
 
-  // ── chart: what your plan leaves at each age (size-constrained, headroom, no overlap) ──
+  // chart: what your plan leaves at each age
   var W=700,H=286,padL=10,padR=10,padT=46,padB=50,plotH=H-padT-padB,plotW=W-padL-padR;
   var maxEnd=Math.max.apply(null,rows.map(function(r){return Math.max(0,r.end);}));
   var maxV=Math.max(goal,maxEnd,1)*1.22;
@@ -2484,16 +2485,23 @@ function rbpRenderLongevity(){
   var yearCell=function(y){ return y?('<span style="color:'+(y<START+19?BAD:WARN)+';font-weight:700;">'+y+'</span>'):surv; };
   var th='font-size:10px;letter-spacing:.5px;font-weight:700;text-transform:uppercase;padding:11px 14px;white-space:nowrap;';
   var trs=rows.map(function(r,i){
-    var bg=i%2?'#fafbfc':'#ffffff', c='padding:11px 14px;border-top:1px solid #eef1f4;';
+    var bg=i%2?'#fafbfc':'#ffffff', c='padding:11px 14px;border-top:1px solid #eef1f4;vertical-align:top;';
     var fo=r.floorOnly?yearCell(r.floorOnly):surv;
-    var af=yearCell(r.atFull);
-    var rd=r.safe>0?('<span style="color:'+WARN+';font-weight:800;">'+rbpLngMoney(r.safe)+'/yr</span>'):('<span style="color:'+BAD+';font-weight:800;">$0 \u00b7 must-haves</span>');
+    // At full plan: must-haves + full extra, with survival
+    var fullSpend='<b style="color:#041E2F;">'+mustStr+' + '+fullExtraStr+'</b>';
+    var af=r.atFull
+      ? fullSpend+'<br><span style="font-size:11px;color:'+(r.atFull<START+19?BAD:WARN)+';font-weight:700;">runs dry '+r.atFull+'</span>'
+      : fullSpend+'<br><span style="font-size:11px;color:'+OK+';font-weight:700;">\u2705 survives</span>';
+    // Reduce to: must-haves + reduced extra (never touches must-haves)
+    var rd=r.safe>0
+      ? '<span style="color:#041E2F;font-weight:800;">'+mustStr+' + '+rbpLngMoney(r.safe)+'</span><br><span style="font-size:11px;color:'+WARN+';font-weight:700;">trim extra to '+rbpLngMoney(r.safe)+'</span>'
+      : '<span style="color:#041E2F;font-weight:800;">'+mustStr+' only</span><br><span style="font-size:11px;color:'+WARN+';font-weight:700;">no extra</span>';
     var ar=r.safe>0?surv:(r.floorOnly?yearCell(r.floorOnly):surv);
     return '<tr style="background:'+bg+';">'
       +'<td style="'+c+'font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#041E2F;white-space:nowrap;">age '+r.age+'</td>'
       +'<td style="'+c+'color:#546e7a;font-weight:600;white-space:nowrap;">'+mustStr+'</td>'
       +'<td style="'+c+'">'+fo+'</td>'
-      +'<td style="'+c+'">'+af+'</td>'
+      +'<td style="'+c+'white-space:nowrap;">'+af+'</td>'
       +'<td style="'+c+'white-space:nowrap;">'+rd+'</td>'
       +'<td style="'+c+'">'+ar+'</td>'
       +'</tr>';
@@ -2506,7 +2514,7 @@ function rbpRenderLongevity(){
     '<div style="font-size:11.5px;color:#8595a2;margin-bottom:6px;">legacy remaining at today\u2019s full spending. dashed line is your legacy goal.</div>'+
     chart+
     '<div style="border:1px solid #e6ebf0;border-radius:10px;overflow:hidden;overflow-x:auto;">'+
-      '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px;">'+
+      '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:680px;">'+
         '<thead><tr style="background:#041E2F;color:#cfe3ef;">'+
           '<th style="text-align:left;'+th+'">If you live to</th>'+
           '<th style="text-align:left;'+th+'">Must-haves/yr</th>'+
@@ -2516,7 +2524,7 @@ function rbpRenderLongevity(){
           '<th style="text-align:left;'+th+'">At reduced plan</th>'+
         '</tr></thead><tbody>'+trs+'</tbody></table>'+
     '</div>'+
-    '<div style="font-size:11.5px;color:#546e7a;line-height:1.7;margin-top:13px;"><b>Must-haves only</b> = paused all extra, just the bill you can\u2019t skip. <b>At full plan</b> = your current extra held rigid through a long life. <b>Reduce to</b> = the Phase&nbsp;1 extra that still clears your legacy. <b>At reduced plan</b> = if you cut to that number, the plan lasts. Every figure is solved live from your saved plan \u2014 taxes, RMDs, and Social Security timing included.</div>';
+    '<div style="font-size:11.5px;color:#546e7a;line-height:1.7;margin-top:13px;"><b>Your '+mustStr+' must-haves are always covered</b> \u2014 only the extra on top ever changes. <b>At full plan</b> = must-haves plus your current extra ('+fullExtraStr+'). <b>Reduce to</b> = must-haves plus the most extra that still leaves your legacy. Every figure is solved live from your saved plan \u2014 taxes, RMDs, and Social Security timing included.</div>';
 }
 (function(){
   var lastSig='';
