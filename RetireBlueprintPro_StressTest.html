@@ -2421,16 +2421,15 @@ function rbpRenderLongevity(){
   if(!(window.RBP && window.RBP_I && RBP.runStress)) return;
   var I0=window.RBP_I;
   var committed=(I0.committedExtra!=null)?I0.committedExtra:0;
+  var goal=Math.round(I0.legacyB8||0);
   var START=new Date().getFullYear();
   var p1DYr=START+((I0.p1_lifeEnd||90)-(I0.p1_ageStart||60));
   var p2DYr=START+((I0.p2_lifeEnd||90)-(I0.p2_ageStart||60));
   var baseLastAge=Math.min((p1DYr>=p2DYr)?(I0.p1_lifeEnd||90):(I0.p2_lifeEnd||90),110);
 
-  // ages: from the last survivor's planned death age up to 110 in 5-yr steps, max 10 rows, ending at 110
   var ages=[]; for(var A=baseLastAge; A<=110 && ages.length<10; A+=5){ ages.push(A); }
   if(ages.length && ages.length<10 && ages[ages.length-1]<110) ages.push(110);
 
-  // must-haves/yr (constant) from a baseline zero-extra run — same math the crash table uses
   var must=0; try{ var bb=RBP.runStress(I0,{start:0,drag:0,dur:1,plannedExtra:0}); must=(bb.floorY1?bb.floorY1.total:0)+((bb.cashflow&&bb.cashflow[0])?(bb.cashflow[0].taxes||0):0); }catch(e){}
   var mustStr=must>0?('$'+Math.round(must/1000)+'K'):'\u2014';
 
@@ -2441,7 +2440,8 @@ function rbpRenderLongevity(){
     if(I.p2_lifeEnd) I.p2_lifeEnd=Math.min((I0.p2_lifeEnd||90)+delta,110);
     var r,r0;
     try{ r=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:committed}); r0=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:0}); }catch(e){ return {age:A,error:true}; }
-    return { age:A, floorOnly:(r0.depletes||null), atFull:(r.crossover||r.depletes||null), safe:Math.round(Math.max(0,r.safeExtra||0)) };
+    var series=(r&&r.series)||[]; var end=series.length?series[series.length-1].bal:0;
+    return { age:A, end:Math.round(end), floorOnly:(r0.depletes||null), atFull:(r.crossover||r.depletes||null), safe:Math.round(Math.max(0,r.safeExtra||0)) };
   });
   if(rows.some(function(r){return r.error;})){ body.innerHTML='<div style="color:#5a6b7a;font-size:13px;padding:22px 0;text-align:center;">Couldn\u2019t run the longevity projection \u2014 hit <b>Reload</b> at the top of the page.</div>'; return; }
 
@@ -2455,6 +2455,29 @@ function rbpRenderLongevity(){
     head='A very long life is your plan\u2019s real test.';
     sub='At today\u2019s full spending, the money would run dry around <b>'+firstFail.atFull+'</b> if you live to age '+firstFail.age+'. Trimming guilt-free extra to about <b>'+(oldest.safe>0?rbpLngMoney(oldest.safe)+'/yr':'must-haves only')+'</b> keeps the plan whole all the way to '+oldest.age+'.';
   }
+
+  // ── chart: what your plan leaves at each age (size-constrained, headroom, no overlap) ──
+  var W=700,H=286,padL=10,padR=10,padT=46,padB=50,plotH=H-padT-padB,plotW=W-padL-padR;
+  var maxEnd=Math.max.apply(null,rows.map(function(r){return Math.max(0,r.end);}));
+  var maxV=Math.max(goal,maxEnd,1)*1.22;
+  var N=rows.length, slot=plotW/N, barW=Math.min(62,slot*0.56);
+  var colFor=function(r){ if(r.end<=5000) return '#E07856'; if(goal>0 && r.end<goal-1000) return '#E0A63E'; return '#1CC7D0'; };
+  var svg='';
+  svg+='<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="#e6ebf0" stroke-width="1.5"></line>';
+  if(goal>0){
+    var gY=padT+plotH-(Math.min(goal,maxV)/maxV)*plotH;
+    svg+='<line x1="'+padL+'" y1="'+gY+'" x2="'+(W-padR)+'" y2="'+gY+'" stroke="#f4b86a" stroke-width="2" stroke-dasharray="7 5"></line>';
+    svg+='<text x="'+(W-padR)+'" y="'+(gY-7)+'" text-anchor="end" font-size="11.5" font-weight="800" fill="#c98a2e">legacy goal '+rbpLngMoney(goal)+'</text>';
+  }
+  rows.forEach(function(r,i){
+    var cx=padL+slot*i+slot/2;
+    var h=Math.max(3,(Math.max(0,r.end)/maxV)*plotH);
+    var y=padT+plotH-h;
+    svg+='<rect x="'+(cx-barW/2)+'" y="'+y+'" width="'+barW+'" height="'+h+'" rx="4" fill="'+colFor(r)+'"></rect>';
+    svg+='<text x="'+cx+'" y="'+(y-8)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#041E2F">'+rbpLngMoney(r.end)+'</text>';
+    svg+='<text x="'+cx+'" y="'+(padT+plotH+21)+'" text-anchor="middle" font-size="12.5" font-weight="800" fill="#37474F">'+r.age+'</text>';
+  });
+  var chart='<div style="max-width:'+W+'px;margin:2px auto 20px;"><svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;height:auto;overflow:visible;">'+svg+'</svg></div>';
 
   var OK='#0A7E84', WARN='#A85A12', BAD='#C0392B';
   var surv='<span style="color:'+OK+';font-weight:700;">\u2705 Survives</span>';
@@ -2478,7 +2501,10 @@ function rbpRenderLongevity(){
 
   body.innerHTML=
     '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px;"><div style="width:4px;height:15px;background:#1CC7D0;border-radius:2px;"></div><div style="font-size:12px;font-weight:800;letter-spacing:.5px;color:#0c7b84;text-transform:uppercase;">Does your money run dry if you live long?</div></div>'+
-    '<div style="font-size:13px;color:#0A3145;line-height:1.55;margin:6px 0 16px;"><b style="color:#0c7b84;">'+head+'</b> '+sub+'</div>'+
+    '<div style="font-size:13px;color:#0A3145;line-height:1.55;margin:6px 0 18px;"><b style="color:#0c7b84;">'+head+'</b> '+sub+'</div>'+
+    '<div style="font-size:11.5px;font-weight:800;letter-spacing:.4px;color:#8595a2;text-transform:uppercase;margin-bottom:2px;">What your plan leaves at each age</div>'+
+    '<div style="font-size:11.5px;color:#8595a2;margin-bottom:6px;">legacy remaining at today\u2019s full spending. dashed line is your legacy goal.</div>'+
+    chart+
     '<div style="border:1px solid #e6ebf0;border-radius:10px;overflow:hidden;overflow-x:auto;">'+
       '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px;">'+
         '<thead><tr style="background:#041E2F;color:#cfe3ef;">'+
