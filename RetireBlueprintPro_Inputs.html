@@ -1761,8 +1761,13 @@ function statusSel(idx, val) {
   return o + '</select>';
 }
 function dashSel(idx, val) {
-  var o = '<select aria-label="Show on dashboard" onchange="accountsData['+idx+'].dash=this.value">';
-  ['Yes','No'].forEach(function(op){ o += '<option'+(op===val?' selected':'')+'>'+op+'</option>'; });
+  // "Show on Summary?" is the last (scroll-right) column, so many users never reach it.
+  // Default to "Yes" so accounts appear on the Summary Report unless the user deliberately
+  // chose "No". Persist the normalized value so what's shown matches what gets saved.
+  var cur = (val === 'No') ? 'No' : 'Yes';
+  if (typeof accountsData !== 'undefined' && accountsData[idx]) accountsData[idx].dash = cur;
+  var o = '<select aria-label="Show on summary" onchange="accountsData['+idx+'].dash=this.value">';
+  ['Yes','No'].forEach(function(op){ o += '<option'+(op===cur?' selected':'')+'>'+op+'</option>'; });
   return o + '</select>';
 }
 
