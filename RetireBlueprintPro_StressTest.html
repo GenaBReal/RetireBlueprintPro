@@ -510,7 +510,7 @@ window.addEventListener('storage', function(e) {
   .d-extra{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:11px 12px;margin-bottom:13px}
   .d-extra-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:#cdd9e3;font-weight:600;margin-bottom:1px}
   .d-extra-h b{font-size:15px;font-weight:800;color:#f4b86a}
-  .d-extra input[type=range]{background:#0c3346;margin:9px 0 4px}
+  .d-extra input[type=range]{background:rgba(255,255,255,.25);margin:9px 0 4px}
   .d-extra input[type=range]::-webkit-slider-thumb{background:#E0A33A}
   .d-extra input[type=range]::-moz-range-thumb{background:#E0A33A}
   .d-extra-n{font-size:9.5px;color:#9fc1d6;line-height:1.4}
@@ -2347,7 +2347,8 @@ function rbpRunMonteCarlo(d,opts){
     rows.forEach(function(r){
       var fo = r.floorOnly ? ('<span class="bad">'+r.floorOnly+'</span>') : '<span class="ok">\u2705 Survives</span>';
       var af = r.atFull ? ('<b>'+mustStr+' + '+fmtK(COMMITTED)+'</b><br><span class="'+(r.atFull<START+19?'bad':'warn')+'" style="font-size:11px">runs dry '+r.atFull+'</span>') : ('<b>'+mustStr+' + '+fmtK(COMMITTED)+'</b><br><span class="ok" style="font-size:11px">\u2705 survives</span>');
-      var rd = r.safe>0 ? ('<b>'+mustStr+' + '+fmtK(r.safe)+'</b><br>'+((r.safe-COMMITTED)>500?('<span class="ok" style="font-size:11px">room to add '+fmtK(r.safe-COMMITTED)+' more</span>'):((r.safe-COMMITTED)<-500?('<span class="warn" style="font-size:11px">trim extra to '+fmtK(r.safe)+'</span>'):('<span style="font-size:11px;color:#8595a2">right at your plan</span>')))) : ('<b>'+mustStr+' only</b><br><span class="warn" style="font-size:11px">no extra</span>');
+      var _sK=Math.round(r.safe/1000), _cK=Math.round(COMMITTED/1000), _dK=_sK-_cK;
+      var rd = r.safe>0 ? ('<b>'+mustStr+' + '+fmtK(r.safe)+'</b><br>'+(_dK>0?('<span class="ok" style="font-size:11px">room to add $'+_dK+'K more</span>'):(_dK<0?('<span class="warn" style="font-size:11px">trim extra to '+fmtK(r.safe)+'</span>'):('<span style="font-size:11px;color:#8595a2">right at your plan</span>')))) : ('<b>'+mustStr+' only</b><br><span class="warn" style="font-size:11px">no extra</span>');
       var ar = r.safe>0 ? '<span class="ok">\u2705 Survives</span>' : (r.floorOnly?('<span class="bad">'+r.floorOnly+'</span>'):'<span class="ok">\u2705 Survives</span>');
       th+='<div class="tbl-row">'
         +'<div class="tbl-scn" data-label="Scenario">'+r.lab+'</div>'
@@ -2493,10 +2494,10 @@ function rbpRenderLongevity(){
       ? fullSpend+'<br><span style="font-size:11px;color:'+(r.atFull<START+19?BAD:WARN)+';font-weight:700;">runs dry '+r.atFull+'</span>'
       : fullSpend+'<br><span style="font-size:11px;color:'+OK+';font-weight:700;">\u2705 survives</span>';
     // Reduce to: must-haves + reduced extra (never touches must-haves)
-    var rdD=r.safe-committed;
+    var _sK=Math.round(r.safe/1000), _cK=Math.round(committed/1000), rdD=_sK-_cK;
     var rdNote=r.safe<=0 ? '<span style="font-size:11px;color:'+WARN+';font-weight:700;">no extra</span>'
-      : (rdD>500 ? '<span style="font-size:11px;color:'+OK+';font-weight:700;">room to add '+rbpLngMoney(rdD)+' more</span>'
-      : (rdD<-500 ? '<span style="font-size:11px;color:'+WARN+';font-weight:700;">trim extra to '+rbpLngMoney(r.safe)+'</span>'
+      : (rdD>0 ? '<span style="font-size:11px;color:'+OK+';font-weight:700;">room to add $'+rdD+'K more</span>'
+      : (rdD<0 ? '<span style="font-size:11px;color:'+WARN+';font-weight:700;">trim extra to '+rbpLngMoney(r.safe)+'</span>'
       : '<span style="font-size:11px;color:#8595a2;font-weight:700;">right at your plan</span>'));
     var rd=(r.safe>0?('<span style="color:#041E2F;font-weight:800;">'+mustStr+' + '+rbpLngMoney(r.safe)+'</span>'):('<span style="color:#041E2F;font-weight:800;">'+mustStr+' only</span>'))+'<br>'+rdNote;
     var ar=r.safe>0?surv:(r.floorOnly?yearCell(r.floorOnly):surv);
