@@ -2346,8 +2346,8 @@ function rbpRunMonteCarlo(d,opts){
     var th='';
     rows.forEach(function(r){
       var fo = r.floorOnly ? ('<span class="bad">'+r.floorOnly+'</span>') : '<span class="ok">\u2705 Survives</span>';
-      var af = r.atFull ? ('<span class="'+(r.atFull<START+19?'bad':'warn')+'">'+r.atFull+'</span>') : '<span class="ok">\u2705 Survives</span>';
-      var rd = r.safe>0 ? ('<span class="warn">'+fmtK(r.safe)+'/yr</span>') : '<span class="bad">$0 \u00b7 must-haves</span>';
+      var af = r.atFull ? ('<b>'+mustStr+' + '+fmtK(COMMITTED)+'</b><br><span class="'+(r.atFull<START+19?'bad':'warn')+'" style="font-size:11px">runs dry '+r.atFull+'</span>') : ('<b>'+mustStr+' + '+fmtK(COMMITTED)+'</b><br><span class="ok" style="font-size:11px">\u2705 survives</span>');
+      var rd = r.safe>0 ? ('<b>'+mustStr+' + '+fmtK(r.safe)+'</b><br><span class="warn" style="font-size:11px">trim extra to '+fmtK(r.safe)+'</span>') : ('<b>'+mustStr+' only</b><br><span class="warn" style="font-size:11px">no extra</span>');
       var ar = r.safe>0 ? '<span class="ok">\u2705 Survives</span>' : (r.floorOnly?('<span class="bad">'+r.floorOnly+'</span>'):'<span class="ok">\u2705 Survives</span>');
       th+='<div class="tbl-row">'
         +'<div class="tbl-scn" data-label="Scenario">'+r.lab+'</div>'
@@ -2746,8 +2746,8 @@ function rbpRenderLongevity(){
           </select></div>
         <div class="field"><label>How long to test</label>
           <select id="mc-horizon">
-            <option value="95" selected>Through age 95 &mdash; longevity stress test</option>
-            <option value="death">Through your entered plan age</option>
+            <option value="95">Through age 95 &mdash; longevity stress test</option>
+            <option value="death" selected>Through your entered plan age</option>
           </select></div>
       </div>
       <div class="runrow">
