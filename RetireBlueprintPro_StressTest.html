@@ -2459,7 +2459,7 @@ function rbpRenderLongevity(){
   }
 
   // chart: the most EXTRA you can safely spend at each age (on top of must-haves)
-  var W=700,H=286,padL=10,padR=10,padT=46,padB=50,plotH=H-padT-padB,plotW=W-padL-padR;
+  var W=700,H=300,padL=10,padR=10,padT=46,padB=64,plotH=H-padT-padB,plotW=W-padL-padR;
   var maxSafe=Math.max.apply(null,rows.map(function(r){return Math.max(0,r.safe);}));
   var maxV=Math.max(committed,maxSafe,1)*1.28;
   var N=rows.length, slot=plotW/N, barW=Math.min(62,slot*0.56);
@@ -2480,6 +2480,7 @@ function rbpRenderLongevity(){
     var lbl=r.floorOnly?'runs dry':(r.safe>0?rbpLngMoney(r.safe):'$0');
     svg+='<text x="'+cx+'" y="'+(y-8)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#041E2F">'+lbl+'</text>';
     svg+='<text x="'+cx+'" y="'+(padT+plotH+21)+'" text-anchor="middle" font-size="12.5" font-weight="800" fill="#37474F">'+r.age+'</text>';
+    if(goal>0 && r.safe>0 && !r.floorOnly){ svg+='<text x="'+cx+'" y="'+(padT+plotH+38)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0A7E84">\u2713 leaves '+rbpLngMoney(goal)+'</text>'; }
   });
   var chart='<div style="max-width:'+W+'px;margin:2px auto 20px;"><svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;height:auto;overflow:visible;">'+svg+'</svg></div>';
 
