@@ -2458,31 +2458,42 @@ function rbpRenderLongevity(){
     sub='At today\u2019s full spending, the money would run dry around <b>'+firstFail.atFull+'</b> if you live to age '+firstFail.age+'. Trimming your extra to about <b>'+(oldest.safe>0?rbpLngMoney(oldest.safe)+'/yr':'$0')+'</b> (on top of your '+mustStr+' must-haves) keeps the plan whole all the way to '+oldest.age+'.';
   }
 
-  // chart: the most EXTRA you can safely spend at each age (on top of must-haves)
-  var W=700,H=300,padL=10,padR=10,padT=46,padB=64,plotH=H-padT-padB,plotW=W-padL-padR;
+  // chart: what you can safely spend at each age (must-haves base + safe extra on top)
+  var W=700,H=300,padL=10,padR=10,padT=52,padB=64,plotH=H-padT-padB,plotW=W-padL-padR;
+  var mh=Math.max(0,must);
   var maxSafe=Math.max.apply(null,rows.map(function(r){return Math.max(0,r.safe);}));
-  var maxV=Math.max(committed,maxSafe,1)*1.28;
+  var today=mh+committed;
+  var maxV=Math.max(mh+maxSafe, today, 1)*1.14;
   var N=rows.length, slot=plotW/N, barW=Math.min(62,slot*0.56);
-  var colFor=function(r){ if(r.floorOnly) return '#C0392B'; if(r.safe<=0) return '#E0A63E'; return '#f4b86a'; };
   var svg='';
   svg+='<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="#e6ebf0" stroke-width="1.5"></line>';
-  if(committed>0){
-    var cY=padT+plotH-(Math.min(committed,maxV)/maxV)*plotH;
-    svg+='<line x1="'+padL+'" y1="'+cY+'" x2="'+(W-padR)+'" y2="'+cY+'" stroke="#0A7E84" stroke-width="2" stroke-dasharray="7 5"></line>';
-    svg+='<text x="'+(W-padR)+'" y="'+(cY-7)+'" text-anchor="end" font-size="11.5" font-weight="800" fill="#0A7E84">your extra today '+rbpLngMoney(committed)+'</text>';
+  if(today>0){
+    var tY=padT+plotH-(Math.min(today,maxV)/maxV)*plotH;
+    svg+='<line x1="'+padL+'" y1="'+tY+'" x2="'+(W-padR)+'" y2="'+tY+'" stroke="#0A7E84" stroke-width="2" stroke-dasharray="7 5"></line>';
+    svg+='<text x="'+(W-padR)+'" y="'+(tY-7)+'" text-anchor="end" font-size="11.5" font-weight="800" fill="#0A7E84">you spend '+rbpLngMoney(today)+' today</text>';
   }
   rows.forEach(function(r,i){
     var cx=padL+slot*i+slot/2;
-    var val=Math.max(0,r.safe);
-    var h=Math.max(3,(val/maxV)*plotH);
-    var y=padT+plotH-h;
-    svg+='<rect x="'+(cx-barW/2)+'" y="'+y+'" width="'+barW+'" height="'+h+'" rx="4" fill="'+colFor(r)+'"></rect>';
-    var lbl=r.floorOnly?'runs dry':(r.safe>0?rbpLngMoney(r.safe):'$0');
-    svg+='<text x="'+cx+'" y="'+(y-8)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#041E2F">'+lbl+'</text>';
+    var ex=Math.max(0,r.safe);
+    var baseH=(mh/maxV)*plotH, exH=(ex/maxV)*plotH;
+    var baseY=padT+plotH-baseH, exY=baseY-exH;
+    var mhColor=r.floorOnly?'#C0392B':'#0c7b84';
+    if(ex>0 && !r.floorOnly){
+      svg+='<rect x="'+(cx-barW/2)+'" y="'+baseY+'" width="'+barW+'" height="'+(baseH+3)+'" fill="'+mhColor+'"></rect>';
+      svg+='<rect x="'+(cx-barW/2)+'" y="'+exY+'" width="'+barW+'" height="'+Math.max(2,exH)+'" rx="3" fill="#f4b86a"></rect>';
+    } else {
+      svg+='<rect x="'+(cx-barW/2)+'" y="'+baseY+'" width="'+barW+'" height="'+Math.max(3,baseH)+'" rx="3" fill="'+mhColor+'"></rect>';
+    }
+    var topY=(ex>0 && !r.floorOnly)?exY:baseY;
+    var lbl=r.floorOnly?'runs dry':(ex>0?'+'+rbpLngMoney(ex):'no extra');
+    svg+='<text x="'+cx+'" y="'+(topY-8)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#041E2F">'+lbl+'</text>';
     svg+='<text x="'+cx+'" y="'+(padT+plotH+21)+'" text-anchor="middle" font-size="12.5" font-weight="800" fill="#37474F">'+r.age+'</text>';
     if(goal>0 && r.safe>0 && !r.floorOnly){ svg+='<text x="'+cx+'" y="'+(padT+plotH+38)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0A7E84">\u2713 leaves '+rbpLngMoney(goal)+'</text>'; }
   });
-  var chart='<div style="max-width:'+W+'px;margin:2px auto 20px;"><svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;height:auto;overflow:visible;">'+svg+'</svg></div>';
+  var legend='<div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:11.5px;color:#546e7a;margin:0 0 4px;">'
+    +'<span><span style="display:inline-block;width:10px;height:10px;background:#0c7b84;border-radius:2px;margin-right:5px;vertical-align:middle;"></span>must-haves ('+mustStr+') \u2014 always covered</span>'
+    +'<span><span style="display:inline-block;width:10px;height:10px;background:#f4b86a;border-radius:2px;margin-right:5px;vertical-align:middle;"></span>safe extra on top</span></div>';
+  var chart='<div style="max-width:'+W+'px;margin:2px auto 20px;">'+legend+'<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;height:auto;overflow:visible;">'+svg+'</svg></div>';
 
   var OK='#0A7E84', WARN='#A85A12', BAD='#C0392B';
   var surv='<span style="color:'+OK+';font-weight:700;">\u2705 Survives</span>';
@@ -2517,8 +2528,8 @@ function rbpRenderLongevity(){
   body.innerHTML=
     '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px;"><div style="width:4px;height:15px;background:#1CC7D0;border-radius:2px;"></div><div style="font-size:12px;font-weight:800;letter-spacing:.5px;color:#0c7b84;text-transform:uppercase;">Does your money run dry if you live long?</div></div>'+
     '<div style="font-size:13px;color:#0A3145;line-height:1.55;margin:6px 0 18px;"><b style="color:#0c7b84;">'+head+'</b> '+sub+'</div>'+
-    '<div style="font-size:11.5px;font-weight:800;letter-spacing:.4px;color:#8595a2;text-transform:uppercase;margin-bottom:2px;">The most extra you can safely spend at each age</div>'+
-    '<div style="font-size:11.5px;color:#8595a2;margin-bottom:6px;">on top of your '+mustStr+' must-haves, which never change. dashed line is the extra your plan spends today \u2014 spending at these levels keeps your legacy intact.</div>'+
+    '<div style="font-size:11.5px;font-weight:800;letter-spacing:.4px;color:#8595a2;text-transform:uppercase;margin-bottom:2px;">What you can safely spend at each age</div>'+
+    '<div style="font-size:11.5px;color:#8595a2;margin-bottom:6px;">your '+mustStr+' must-haves are always covered \u2014 only the safe extra on top changes with how long you live.</div>'+
     chart+
     '<div style="border:1px solid #e6ebf0;border-radius:10px;overflow:hidden;overflow-x:auto;">'+
       '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:680px;">'+
