@@ -2460,23 +2460,28 @@ function rbpRenderLongevity(){
 
   // chart: what you can safely spend at each age (must-haves base + safe extra on top)
   //        dashed step line traces the saved plan's chosen extra across its 3 tiers (phases)
-  var W=700,H=384,padL=10,padR=10,padT=56,padB=72,plotH=H-padT-padB,plotW=W-padL-padR;
+  var W=700,H=430,padL=10,padR=10,padT=58,padB=66,plotH=H-padT-padB,plotW=W-padL-padR;
   var mh=Math.max(0,must);
   var maxSafe=Math.max.apply(null,rows.map(function(r){return Math.max(0,r.safe);}));
   // chosen extra by age, from the plan's phase tiers (same year->phase mapping the engine uses)
   var yOf=function(d){ if(!d) return null; var t=new Date(d); return isNaN(t)?null:t.getFullYear(); };
   var p1s=yOf(I0.ph1Start),p1e=yOf(I0.ph1End),p2s=yOf(I0.ph2Start),p2e=yOf(I0.ph2End),p3s=yOf(I0.ph3Start),p3e=yOf(I0.ph3End);
   var refAgeStart=(p1DYr>=p2DYr)?(I0.p1_ageStart||60):(I0.p2_ageStart||60);
-  var _w=[+I0.w1||1,+I0.w2||1,+I0.w3||1], _avgW=((_w[0]+_w[1]+_w[2])/3)||1;
-  var chosenExtraAt=function(A){                       // mirrors the engine's red-line extra: committed x phase-weight / avg
-    var yr=START+(A-refAgeStart), ph=-1;
-    if(p1s&&yr>=p1s&&yr<=p1e) ph=0; else if(p2s&&yr>=p2s&&yr<=p2e) ph=1; else if(p3s&&yr>=p3s&&yr<=p3e) ph=2;
-    return ph<0 ? 0 : committed*_w[ph]/_avgW;
+  var chosenExtraAt=function(A){                       // the plan's chosen extra $ for the phase covering this age; last tier carries into bonus years
+    var yr=START+(A-refAgeStart);
+    if(p1s&&yr>=p1s&&yr<=p1e) return +I0.ph1Spend||0;
+    if(p2s&&yr>=p2s&&yr<=p2e) return +I0.ph2Spend||0;
+    if(p3s&&yr>=p3s&&yr<=p3e) return +I0.ph3Spend||0;
+    if(p3e&&yr>p3e) return +I0.ph3Spend||0;
+    if(p1s&&yr<p1s) return +I0.ph1Spend||0;
+    return committed;
   };
   var chosen=rows.map(function(r){ return Math.max(0,chosenExtraAt(r.age)); });
   var maxChosen=Math.max.apply(null,chosen.concat([0]));
   var maxV=Math.max(mh+maxSafe, mh+maxChosen, 1)*1.16;
   var N=rows.length, slot=plotW/N, barW=Math.min(52,slot*0.46);
+  var big=slot>=118, mid=slot>=88;
+  var fTot=big?13.5:(mid?12:10.5), fExt=big?11:(mid?10:9), fAge=big?12.5:(mid?11.5:10.5), fLeg=big?10.5:(mid?9.5:8.5), legPre=mid?'leaves ':'';
   var svg='';
   svg+='<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="#e6ebf0" stroke-width="1.5"></line>';
   rows.forEach(function(r,i){
@@ -2485,19 +2490,22 @@ function rbpRenderLongevity(){
     var baseH=(mh/maxV)*plotH, exH=(ex/maxV)*plotH;
     var baseY=padT+plotH-baseH, exY=baseY-exH;
     var mhColor=r.floorOnly?'#C0392B':'#0c7b84';
-    if(ex>0 && !r.floorOnly){
+    var hasGold=(ex>0 && !r.floorOnly);
+    if(hasGold){
       svg+='<rect x="'+(cx-barW/2)+'" y="'+baseY+'" width="'+barW+'" height="'+(baseH+3)+'" fill="'+mhColor+'"></rect>';
       svg+='<rect x="'+(cx-barW/2)+'" y="'+exY+'" width="'+barW+'" height="'+Math.max(2,exH)+'" rx="3" fill="#f4b86a"></rect>';
-      if(exH>=17){ svg+='<text x="'+cx+'" y="'+(exY+exH/2+4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#5a3d12">+'+rbpLngMoney(ex)+'</text>'; }
-      else { svg+='<text x="'+cx+'" y="'+(exY-6)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#5a3d12">+'+rbpLngMoney(ex)+'</text>'; }
     } else {
       svg+='<rect x="'+(cx-barW/2)+'" y="'+baseY+'" width="'+barW+'" height="'+Math.max(3,baseH)+'" rx="3" fill="'+mhColor+'"></rect>';
     }
-    var topY=(ex>0 && !r.floorOnly)?exY:baseY;
+    var topY=hasGold?exY:baseY;
     var totLbl=r.floorOnly?'runs dry':rbpLngMoney(mh+ex);
-    svg+='<text x="'+cx+'" y="'+(topY-10)+'" text-anchor="middle" font-size="13.5" font-weight="800" fill="#041E2F">'+totLbl+'</text>';
-    svg+='<text x="'+cx+'" y="'+(padT+plotH+22)+'" text-anchor="middle" font-size="12.5" font-weight="800" fill="#37474F">'+r.age+'</text>';
-    if(goal>0 && r.safe>0 && !r.floorOnly){ svg+='<text x="'+cx+'" y="'+(padT+plotH+40)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0A7E84">\u2713 leaves '+rbpLngMoney(goal)+'</text>'; }
+    svg+='<text x="'+cx+'" y="'+(topY-7)+'" text-anchor="middle" font-size="'+fTot+'" font-weight="800" fill="#041E2F">'+totLbl+'</text>';
+    if(hasGold){
+      if(exH>=fExt+7){ svg+='<text x="'+cx+'" y="'+(exY+exH/2+fExt*0.35)+'" text-anchor="middle" font-size="'+fExt+'" font-weight="800" fill="#5a3d12">+'+rbpLngMoney(ex)+'</text>'; }
+      else { svg+='<text x="'+cx+'" y="'+(baseY+fExt+3)+'" text-anchor="middle" font-size="'+fExt+'" font-weight="800" fill="#ffffff">+'+rbpLngMoney(ex)+'</text>'; }
+    }
+    svg+='<text x="'+cx+'" y="'+(padT+plotH+fAge+7)+'" text-anchor="middle" font-size="'+fAge+'" font-weight="800" fill="#37474F">'+r.age+'</text>';
+    if(goal>0 && r.safe>0 && !r.floorOnly){ svg+='<text x="'+cx+'" y="'+(padT+plotH+fAge+fLeg+11)+'" text-anchor="middle" font-size="'+fLeg+'" font-weight="700" fill="#0A7E84">\u2713 '+legPre+rbpLngMoney(goal)+'</text>'; }
   });
   // dashed tiered "your planned spend" step line, drawn on top so it's fully visible
   (function(){
@@ -2565,7 +2573,7 @@ function rbpRenderLongevity(){
           '<th style="text-align:left;'+th+'">At that level</th>'+
         '</tr></thead><tbody>'+trs+'</tbody></table>'+
     '</div>'+
-    '<div style="font-size:11.5px;color:#546e7a;line-height:1.7;margin-top:13px;"><b>Your '+mustStr+' must-haves are always covered</b> \u2014 only the extra on top ever changes. <b>At full plan</b> = must-haves plus your planned extra, which shifts by phase (it averages '+fullExtraStr+'). <b>Safe to spend</b> = must-haves plus the most extra that still leaves your legacy \u2014 sometimes more than your plan, sometimes less. Every figure is solved live from your saved plan \u2014 taxes, RMDs, and Social Security timing included.</div>';
+    '<div style="font-size:11.5px;color:#546e7a;line-height:1.7;margin-top:13px;"><b>Your '+mustStr+' must-haves are always covered</b> \u2014 only the extra on top ever changes. <b>At full plan</b> = must-haves plus the chosen extra you set for each phase (it shifts across your plan phases). <b>Safe to spend</b> = must-haves plus the most extra that still leaves your legacy \u2014 sometimes more than your plan, sometimes less. Every figure is solved live from your saved plan \u2014 taxes, RMDs, and Social Security timing included.</div>';
 }
 (function(){
   var lastSig='';
