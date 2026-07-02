@@ -2459,18 +2459,18 @@ function rbpRenderLongevity(){
   }
 
   // chart: what you can safely spend at each age (must-haves base + safe extra on top)
-  var W=700,H=300,padL=10,padR=10,padT=52,padB=64,plotH=H-padT-padB,plotW=W-padL-padR;
+  var W=700,H=384,padL=10,padR=10,padT=56,padB=72,plotH=H-padT-padB,plotW=W-padL-padR;
   var mh=Math.max(0,must);
   var maxSafe=Math.max.apply(null,rows.map(function(r){return Math.max(0,r.safe);}));
   var today=mh+committed;
-  var maxV=Math.max(mh+maxSafe, today, 1)*1.14;
-  var N=rows.length, slot=plotW/N, barW=Math.min(62,slot*0.56);
+  var maxV=Math.max(mh+maxSafe, today, 1)*1.16;
+  var N=rows.length, slot=plotW/N, barW=Math.min(52,slot*0.46);
   var svg='';
   svg+='<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="#e6ebf0" stroke-width="1.5"></line>';
   if(today>0){
     var tY=padT+plotH-(Math.min(today,maxV)/maxV)*plotH;
     svg+='<line x1="'+padL+'" y1="'+tY+'" x2="'+(W-padR)+'" y2="'+tY+'" stroke="#0A7E84" stroke-width="2" stroke-dasharray="7 5"></line>';
-    svg+='<text x="'+(W-padR)+'" y="'+(tY-7)+'" text-anchor="end" font-size="11.5" font-weight="800" fill="#0A7E84">you spend '+rbpLngMoney(today)+' today</text>';
+    svg+='<text x="'+(W-padR)+'" y="'+(tY-9)+'" text-anchor="end" font-size="11.5" font-weight="800" fill="#0A7E84">you spend '+rbpLngMoney(today)+' today</text>';
   }
   rows.forEach(function(r,i){
     var cx=padL+slot*i+slot/2;
@@ -2481,14 +2481,16 @@ function rbpRenderLongevity(){
     if(ex>0 && !r.floorOnly){
       svg+='<rect x="'+(cx-barW/2)+'" y="'+baseY+'" width="'+barW+'" height="'+(baseH+3)+'" fill="'+mhColor+'"></rect>';
       svg+='<rect x="'+(cx-barW/2)+'" y="'+exY+'" width="'+barW+'" height="'+Math.max(2,exH)+'" rx="3" fill="#f4b86a"></rect>';
+      if(exH>=17){ svg+='<text x="'+cx+'" y="'+(exY+exH/2+4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#5a3d12">+'+rbpLngMoney(ex)+'</text>'; }
+      else { svg+='<text x="'+cx+'" y="'+(exY-6)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#5a3d12">+'+rbpLngMoney(ex)+'</text>'; }
     } else {
       svg+='<rect x="'+(cx-barW/2)+'" y="'+baseY+'" width="'+barW+'" height="'+Math.max(3,baseH)+'" rx="3" fill="'+mhColor+'"></rect>';
     }
     var topY=(ex>0 && !r.floorOnly)?exY:baseY;
-    var lbl=r.floorOnly?'runs dry':(ex>0?'+'+rbpLngMoney(ex):'no extra');
-    svg+='<text x="'+cx+'" y="'+(topY-8)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#041E2F">'+lbl+'</text>';
-    svg+='<text x="'+cx+'" y="'+(padT+plotH+21)+'" text-anchor="middle" font-size="12.5" font-weight="800" fill="#37474F">'+r.age+'</text>';
-    if(goal>0 && r.safe>0 && !r.floorOnly){ svg+='<text x="'+cx+'" y="'+(padT+plotH+38)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0A7E84">\u2713 leaves '+rbpLngMoney(goal)+'</text>'; }
+    var totLbl=r.floorOnly?'runs dry':rbpLngMoney(mh+ex);
+    svg+='<text x="'+cx+'" y="'+(topY-10)+'" text-anchor="middle" font-size="13.5" font-weight="800" fill="#041E2F">'+totLbl+'</text>';
+    svg+='<text x="'+cx+'" y="'+(padT+plotH+22)+'" text-anchor="middle" font-size="12.5" font-weight="800" fill="#37474F">'+r.age+'</text>';
+    if(goal>0 && r.safe>0 && !r.floorOnly){ svg+='<text x="'+cx+'" y="'+(padT+plotH+40)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0A7E84">\u2713 leaves '+rbpLngMoney(goal)+'</text>'; }
   });
   var legend='<div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:11.5px;color:#546e7a;margin:0 0 4px;">'
     +'<span><span style="display:inline-block;width:10px;height:10px;background:#0c7b84;border-radius:2px;margin-right:5px;vertical-align:middle;"></span>must-haves ('+mustStr+') \u2014 always covered</span>'
