@@ -2434,6 +2434,19 @@ function rbpRenderLongevity(){
   var must=0; try{ var bb=RBP.runStress(I0,{start:0,drag:0,dur:1,plannedExtra:0}); must=(bb.floorY1?bb.floorY1.total:0)+((bb.cashflow&&bb.cashflow[0])?(bb.cashflow[0].taxes||0):0); }catch(e){}
   var mustStr=must>0?('$'+Math.round(must/1000)+'K'):'\u2014';
   var fullExtraStr=rbpLngMoney(committed);
+  // phase tiers -> chosen extra $ by year/age (chosen amounts; last tier carries into bonus years)
+  var yOf=function(d){ if(!d) return null; var t=new Date(d); return isNaN(t)?null:t.getFullYear(); };
+  var p1s=yOf(I0.ph1Start),p1e=yOf(I0.ph1End),p2s=yOf(I0.ph2Start),p2e=yOf(I0.ph2End),p3s=yOf(I0.ph3Start),p3e=yOf(I0.ph3End);
+  var refAgeStart=(p1DYr>=p2DYr)?(I0.p1_ageStart||60):(I0.p2_ageStart||60);
+  var chosenExtraForYear=function(yr){
+    if(p1s&&yr>=p1s&&yr<=p1e) return +I0.ph1Spend||0;
+    if(p2s&&yr>=p2s&&yr<=p2e) return +I0.ph2Spend||0;
+    if(p3s&&yr>=p3s&&yr<=p3e) return +I0.ph3Spend||0;
+    if(p3e&&yr>p3e) return +I0.ph3Spend||0;
+    if(p1s&&yr<p1s) return +I0.ph1Spend||0;
+    return committed;
+  };
+  var chosenExtraAt=function(A){ return chosenExtraForYear(START+(A-refAgeStart)); };
 
   var rows=ages.map(function(A){
     var delta=A-baseLastAge;
@@ -2443,7 +2456,13 @@ function rbpRenderLongevity(){
     var r,r0;
     try{ r=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:committed}); r0=RBP.runStress(I,{start:0,drag:0,dur:1,plannedExtra:0}); }catch(e){ return {age:A,error:true}; }
     var series=(r&&r.series)||[]; var end=series.length?series[series.length-1].bal:0;
-    return { age:A, end:Math.round(end), floorOnly:(r0.depletes||null), atFull:(r.crossover||r.depletes||null), safe:Math.round(Math.max(0,r.safeExtra||0)) };
+    // runs-dry / survives recomputed on the plan's CHOSEN phase amounts (matches the numbers shown)
+    var atFull=(r.crossover||r.depletes||null);
+    try{
+      var pj=RBP.project(I,{extraOverride:function(yr){return chosenExtraForYear(yr);}});
+      if(pj&&pj.length){ atFull=null; var _lg=goal||0; for(var k=0;k<pj.length;k++){ var _b=Math.round(pj[k].endTotal); if((_lg>0&&_b<_lg)||_b<=0){ atFull=pj[k].yr; break; } } }
+    }catch(e){}
+    return { age:A, end:Math.round(end), floorOnly:(r0.depletes||null), atFull:atFull, safe:Math.round(Math.max(0,r.safeExtra||0)) };
   });
   if(rows.some(function(r){return r.error;})){ body.innerHTML='<div style="color:#5a6b7a;font-size:13px;padding:22px 0;text-align:center;">Couldn\u2019t run the longevity projection \u2014 hit <b>Reload</b> at the top of the page.</div>'; return; }
 
@@ -2463,19 +2482,6 @@ function rbpRenderLongevity(){
   var W=700,H=430,padL=10,padR=10,padT=58,padB=66,plotH=H-padT-padB,plotW=W-padL-padR;
   var mh=Math.max(0,must);
   var maxSafe=Math.max.apply(null,rows.map(function(r){return Math.max(0,r.safe);}));
-  // chosen extra by age, from the plan's phase tiers (same year->phase mapping the engine uses)
-  var yOf=function(d){ if(!d) return null; var t=new Date(d); return isNaN(t)?null:t.getFullYear(); };
-  var p1s=yOf(I0.ph1Start),p1e=yOf(I0.ph1End),p2s=yOf(I0.ph2Start),p2e=yOf(I0.ph2End),p3s=yOf(I0.ph3Start),p3e=yOf(I0.ph3End);
-  var refAgeStart=(p1DYr>=p2DYr)?(I0.p1_ageStart||60):(I0.p2_ageStart||60);
-  var chosenExtraAt=function(A){                       // the plan's chosen extra $ for the phase covering this age; last tier carries into bonus years
-    var yr=START+(A-refAgeStart);
-    if(p1s&&yr>=p1s&&yr<=p1e) return +I0.ph1Spend||0;
-    if(p2s&&yr>=p2s&&yr<=p2e) return +I0.ph2Spend||0;
-    if(p3s&&yr>=p3s&&yr<=p3e) return +I0.ph3Spend||0;
-    if(p3e&&yr>p3e) return +I0.ph3Spend||0;
-    if(p1s&&yr<p1s) return +I0.ph1Spend||0;
-    return committed;
-  };
   var chosen=rows.map(function(r){ return Math.max(0,chosenExtraAt(r.age)); });
   var maxChosen=Math.max.apply(null,chosen.concat([0]));
   var maxV=Math.max(mh+maxSafe, mh+maxChosen, 1)*1.16;
