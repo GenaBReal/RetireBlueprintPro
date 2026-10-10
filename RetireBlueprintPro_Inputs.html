@@ -3202,10 +3202,12 @@ function rbpCheckDraft(){
   document.body.appendChild(bar);
 }
 
+var rbpZeroDebtNames = [];
 function rbpValidateRequired(){
   // Clear any prior highlights
   Array.prototype.forEach.call(document.querySelectorAll('.rbp-needfix'), function(el){ el.classList.remove('rbp-needfix'); });
   var problems = []; // {label, el}
+  rbpZeroDebtNames = []; // named debts with no payment/balance — saved anyway, noted after save
   function val(id){ var el=document.getElementById(id); return el ? String(el.value).trim() : ''; }
   function num(id){ return parseFloat(String(val(id)).replace(/[$,%\s]/g,'')) || 0; }
   function need(id,label){ var el=document.getElementById(id); if(el && !String(el.value).trim()){ problems.push({label:label, el:el}); } }
@@ -3241,8 +3243,12 @@ function rbpValidateRequired(){
   for (var di=0; document.getElementById('d-inc-'+di); di++){
     var inc = document.getElementById('d-inc-'+di);
     if (inc.textContent.trim() !== 'Yes') continue;
-    var nm = val('d-name-'+di), mo = num('d-mo-'+di), bal = num('d-bal-'+di);
+    var nm = val('d-name-'+di), mo = num('d-mo-'+di), bal = num('d-bal-'+di), cv = num('d-curval-'+di);
     if (!nm && !mo && !bal) continue; // empty row
+    // Named but all zeros (no payment, no balance, no current value) — e.g. a paid-off debt
+    // the customer wants to keep listed. Nothing to project, so don't block the save;
+    // just note it so we can tell them after saving.
+    if (!mo && !bal && !cv) { rbpZeroDebtNames.push(nm); continue; }
     var lbl = nm || ('Debt #'+(di+1));
     need('d-start-'+di, lbl+' — Start Date');
     need('d-end-'+di,   lbl+' — End (payoff) Date');
@@ -3293,6 +3299,10 @@ function saveAll() {
   }
   document.getElementById('save-btn').disabled = true;
   setStatus('Saving...', '');
+  if (rbpZeroDebtNames.length){
+    var _zd = rbpZeroDebtNames.join(', ');
+    showToast('Saving. Note: ' + _zd + (rbpZeroDebtNames.length>1 ? ' have' : ' has') + ' no payment or balance, so ' + (rbpZeroDebtNames.length>1 ? 'they won\u2019t' : 'it won\u2019t') + ' affect your plan.', '');
+  }
 
   function gv(id) { var el=document.getElementById(id); return el ? el.value.trim() : ''; }
   function gn(id) {
