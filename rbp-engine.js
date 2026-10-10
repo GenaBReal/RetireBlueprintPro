@@ -341,7 +341,10 @@ function rbpSolveSafeExtra(I){
     }});
     const wd=rows.map(r=> r.ends.reduce((s,v,i)=> s+(withMask[i]?v:0),0));
     const finalW=wd[wd.length-1], minW=Math.min.apply(null,wd);
-    return Math.min(finalW-(I.legacyB8||0), minW-(I.floorB9||0));
+    // Safety floor is never below $1: with a $0 legacy goal AND $0 floor every spend level
+    // "passed" (balances stop at $0), so the solver ran to its $200K cap. Requiring at least
+    // $1 left every year means the money must last for the whole plan. Real goals/floors unchanged.
+    return Math.min(finalW-(I.legacyB8||0), minW-Math.max(I.floorB9||0, 1));
   }
   let lo=0, hi=200000;
   for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
