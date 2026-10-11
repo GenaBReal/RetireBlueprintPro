@@ -477,7 +477,7 @@ window.addEventListener('storage', function(e) {
   </div>
 
   <div class="engine">
-    <div class="eng-hdr"><div class="eng-hdr-title">Tax Engine</div><div class="eng-hdr-sub">MFJ · Roth window open</div></div>
+    <div class="eng-hdr"><div class="eng-hdr-title">Tax Engine</div><div class="eng-hdr-sub" id="eng-roth-sub">MFJ · Roth window open</div></div>
     <div class="eng-body">
       <div class="eng-rows">
         <div class="eng-row"><span class="er-lbl">Effective Federal Rate</span><span class="er-val"><span id="eng-eff-rate">—</span><span class="s-go"></span></span></div>
@@ -486,7 +486,7 @@ window.addEventListener('storage', function(e) {
         <div class="eng-row"><span class="er-lbl">Roth Conversion Savings</span><span class="er-val"><span id="eng-roth-save">—</span><span class="s-go"></span></span></div>
         <div class="eng-row"><span class="er-lbl">SS COLA</span><span class="er-val"><span id="eng-cola">—</span><span class="s-go"></span></span></div>
       </div>
-      <div class="eng-hl"><div><div class="eh-lbl">Roth Window</div><div class="eh-val">PRIME</div></div><div class="eh-go">Convert Now</div></div>
+      <div class="eng-hl"><div><div class="eh-lbl">Roth Window</div><div class="eh-val" id="eng-roth-window">PRIME</div></div><div class="eh-go" id="eng-roth-go">Convert Now</div></div>
     </div>
   </div>
 
@@ -839,7 +839,7 @@ window.addEventListener('storage', function(e) {
       <div class="intel-row"><span class="ir-lbl" id="intel-lon-lbl">Longevity Coverage</span><span class="b-go">Covered</span></div>
       <div class="intel-row"><span class="ir-lbl">Healthcare Inflation</span><span class="b-watch" id="intel-hc">—</span></div>
       <div class="intel-row"><span class="ir-lbl">Inflation Impact</span><span class="b-watch">Monitor</span></div>
-      <div class="intel-row"><span class="ir-lbl">Roth Conversion Window</span><span class="b-teal">PRIME</span></div>
+      <div class="intel-row"><span class="ir-lbl">Roth Conversion Window</span><span class="b-teal" id="intel-roth-window">PRIME</span></div>
       <div class="intel-row"><span class="ir-lbl">Social Security Strategy</span><span class="b-watch" id="intel-ss">—</span></div>
       <div class="intel-row"><span class="ir-lbl">Legacy Goal</span><span class="b-go" id="intel-legacy">—</span></div>
       <div class="intel-row"><span class="ir-lbl" id="intel-surv-lbl">Survivor Plan</span><span class="b-go">Funded</span></div>
@@ -1480,6 +1480,7 @@ function populate(d){
   set('eng-eff-rate', fmtP(tax.effectiveRate));
   set('eng-std-ded', fmt(gl.standardDeduction));
   set('eng-state-rate', fmtP(tax.stateRate));
+  try{ var _rr=(d&&d.roth)||{}, _room=+_rr.optimalAmount>0; var _e1=document.getElementById('eng-roth-window'); if(_e1) _e1.textContent=_room?'PRIME':'FULL'; var _e2=document.getElementById('eng-roth-go'); if(_e2) _e2.textContent=_room?'Convert Now':'No action'; var _e3=document.getElementById('intel-roth-window'); if(_e3) _e3.textContent=_room?'PRIME':'FULL'; var _e4=document.getElementById('eng-roth-sub'); if(_e4) _e4.textContent=_room?'MFJ · Roth window open':'MFJ · 12% bracket already used'; }catch(_rw){}
   set('eng-roth-save', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
   var cola=tax.ssCola<1?tax.ssCola*100:tax.ssCola;
   set('eng-cola', cola.toFixed(1)+'%');

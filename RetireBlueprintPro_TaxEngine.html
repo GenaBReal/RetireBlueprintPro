@@ -956,6 +956,10 @@ function populate(data) {
 
   // Roth hero
   set('r-year',    (Number(roth.year)>2020) ? roth.year : 'Not set yet');
+  // Roth window badge follows the real result (was hard-coded PRIME — ACT NOW)
+  var _room = +roth.optimalAmount>0;
+  set('window-status', _room ? 'PRIME — ACT NOW' : 'BRACKET FULL — NO CONVERSION NEEDED');
+  set('hdr-window', _room ? 'PRIME' : 'FULL');
   set('r-optimal', fmt(roth.optimalAmount||0));
   set('r-cost',    fmt(roth.marginalTax||0)); // tax cost of the conversion (row 144)
   set('r-savings', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
