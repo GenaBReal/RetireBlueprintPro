@@ -1041,7 +1041,10 @@ function rbpSolveSafeExtra(I){
   }
   let lo=0, hi=200000;
   for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
-  return { safeExtra:Math.round(lo), shortfallAtSolve:Math.round(shortfall(lo)) };
+  // Round DOWN (never up past a tax cliff), then confirm the exact value still clears the goal & floor.
+  let safe=Math.floor(lo), guard=0;
+  while(safe>0 && shortfall(safe)<0 && guard<500){ safe=Math.max(0, safe-1); guard++; }
+  return { safeExtra:safe, shortfallAtSolve:Math.round(shortfall(safe)) };
 }
 
 /* ── runStress: one crash scenario, fully re-solved, no approximations ──────
@@ -2014,7 +2017,10 @@ function rbpSolveSafeExtra(I){
   }
   let lo=0, hi=200000;
   for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
-  return { safeExtra:Math.round(lo), shortfallAtSolve:Math.round(shortfall(lo)) };
+  // Round DOWN (never up past a tax cliff), then confirm the exact value still clears the goal & floor.
+  let safe=Math.floor(lo), guard=0;
+  while(safe>0 && shortfall(safe)<0 && guard<500){ safe=Math.max(0, safe-1); guard++; }
+  return { safeExtra:safe, shortfallAtSolve:Math.round(shortfall(safe)) };
 }
 
 /* ── runStress: one crash scenario, fully re-solved, no approximations ──────
@@ -3262,7 +3268,10 @@ function rbpSolveSafeExtra(I){
   }
   let lo=0, hi=200000;
   for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
-  return { safeExtra:Math.round(lo), shortfallAtSolve:Math.round(shortfall(lo)) };
+  // Round DOWN (never up past a tax cliff), then confirm the exact value still clears the goal & floor.
+  let safe=Math.floor(lo), guard=0;
+  while(safe>0 && shortfall(safe)<0 && guard<500){ safe=Math.max(0, safe-1); guard++; }
+  return { safeExtra:safe, shortfallAtSolve:Math.round(shortfall(safe)) };
 }
 
 /* ── runStress: one crash scenario, fully re-solved, no approximations ──────

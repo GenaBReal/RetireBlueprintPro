@@ -348,7 +348,12 @@ function rbpSolveSafeExtra(I){
   }
   let lo=0, hi=200000;
   for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
-  return { safeExtra:Math.round(lo*100)/100, shortfallAtSolve:Math.round(shortfall(lo)*100)/100 };
+  // Round DOWN to the cent — never up. Near a tax cliff a few cents more can drop the ending
+  // far below the goal (seen live: $41,792.00 → ends $117,699; $41,792.97 → ends $78,444).
+  // Then confirm the exact value we return still clears the goal & floor; step down $1 if not.
+  let safe=Math.floor(lo*100)/100, guard=0;
+  while(safe>0 && shortfall(safe)<0 && guard<500){ safe=Math.max(0, Math.round((safe-1)*100)/100); guard++; }
+  return { safeExtra:safe, shortfallAtSolve:Math.round(shortfall(safe)*100)/100 };
 }
 
 /* ── runStress: one crash scenario, fully re-solved, no approximations ──────
