@@ -36,6 +36,7 @@
 <title>RetireBlueprint Pro — Inputs</title>
 <script src="rbp-tax-config.js"></script>
 <script>document.write('<scr'+'ipt src="https://retireblueprintpro.com/rbp-engine.js?v='+Math.floor(Date.now()/3600000)+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="https://retireblueprintpro.com/rbp-tiller.js?v='+Math.floor(Date.now()/3600000)+'"></scr'+'ipt>');</script>
 <script>
 /* ── ENGINE ADAPTER ───────────────────────────────────────────────
    Rebuilds d.projections from the one formula (rbp-engine.js), in the EXACT shape the
@@ -963,6 +964,31 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
     <div class="section-hdr-arrow">▼</div>
   </div>
   <div class="section-body">
+    <!-- ── Tiller spending comparison (optional, review-and-apply) ───────── -->
+    <div id="tspend-card-slim" style="display:none;font-size:11px;color:var(--muted);margin-bottom:10px;">🔗 Tiller auto-update is tucked away · <a href="#" onclick="rbpTillerShowAgain();return false;" style="color:var(--teal);">Show it</a></div>
+    <div id="tspend-card" style="border:1px solid var(--teal);border-radius:8px;padding:12px 14px;margin-bottom:14px;background:var(--light);">
+      <div onclick="rbpSpendToggle()" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;">
+        <div style="font-weight:700;font-size:13px;">🔗 Compare my spending with Tiller <span style="font-weight:400;color:var(--muted);">(optional)</span></div>
+        <div id="tspend-status" style="font-size:11px;color:var(--muted);">▾</div>
+      </div>
+      <div id="tspend-body" style="display:none;margin-top:10px;font-size:12px;line-height:1.6;">
+        <div class="tiller-intro"></div>
+        <p style="margin:0 0 8px;">See what you <em>actually</em> spend each month, from your Tiller transactions, next to the numbers in your plan. Nothing changes until you tick a line and tap <strong>Apply</strong>.</p>
+        <ol style="margin:0 0 10px 18px;padding:0;">
+          <li>Your Tiller sheet must be linked (see <strong>VI. Named Accounts</strong>), or paste its link there first.</li>
+          <li>Pick an expense line for each Tiller category you want to use. Several categories can go into one line.</li>
+          <li>Tick the lines you want to update, then tap <strong>Apply ticked lines</strong>.</li>
+        </ol>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <label style="font-size:12px;">Average over the last
+            <select id="tspend-months" style="margin-left:4px;"><option value="3">3 months</option><option value="6" selected>6 months</option><option value="12">12 months</option></select>
+          </label>
+          <button type="button" onclick="rbpSpendFind()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Show my Tiller spending</button>
+        </div>
+        <div id="tspend-map" style="margin-top:10px;"></div>
+        <div id="tspend-msg" style="margin-top:8px;font-size:12px;"></div>
+      </div>
+    </div>
       <div style="font-size:11px;color:var(--muted);background:var(--light);border-left:3px solid var(--teal);padding:9px 13px;border-radius:4px;margin-bottom:12px;line-height:1.55;">💡 <strong style="color:var(--text);">These expense names are just suggestions.</strong> Rename, clear, or repurpose any row to match how you actually budget — the names are only labels, so your totals work the same whatever you call them.</div>
     <table class="expense-table">
       <thead><tr><th>Expense</th><th>Monthly ($)</th><th>Annual ($)</th><th>Notes</th></tr></thead>
@@ -1178,6 +1204,29 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
     <div class="section-hdr-arrow">▼</div>
   </div>
   <div class="section-body">
+    <!-- ── Tiller auto-update (optional) ─────────────────────────────────── -->
+    <div id="tiller-card-slim" style="display:none;font-size:11px;color:var(--muted);margin-bottom:10px;">🔗 Tiller auto-update is tucked away · <a href="#" onclick="rbpTillerShowAgain();return false;" style="color:var(--teal);">Show it</a></div>
+    <div id="tiller-card" style="border:1px solid var(--teal);border-radius:8px;padding:12px 14px;margin-bottom:14px;background:var(--light);">
+      <div onclick="rbpTillerToggle()" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;">
+        <div style="font-weight:700;font-size:13px;">🔗 Auto-update balances from Tiller <span style="font-weight:400;color:var(--muted);">(optional)</span></div>
+        <div id="tiller-status" style="font-size:11px;color:var(--muted);">Not linked ▾</div>
+      </div>
+      <div id="tiller-body" style="display:none;margin-top:10px;font-size:12px;line-height:1.6;">
+        <div class="tiller-intro"></div>
+        <p style="margin:0 0 8px;"><strong>Already use Tiller?</strong> Link it and your account balances update here automatically. Your logins stay with Tiller; RetireBlueprint Pro only reads the balances.</p>
+        <ol style="margin:0 0 10px 18px;padding:0;">
+          <li>Open your Tiller Google Sheet, click <strong>Share</strong>, and add <strong>retireblueprintpro@gmail.com</strong> as a <strong>Viewer</strong>. (In Tiller, turn on <strong>AutoFill</strong> so it refreshes every day.)</li>
+          <li>Paste that sheet’s link below and tap <strong>Find my accounts</strong>.</li>
+          <li>Match each Tiller account to one of your plan accounts, then tap <strong>Save &amp; update balances</strong>.</li>
+        </ol>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" id="tiller-url" placeholder="Paste your Tiller sheet link" style="flex:1;min-width:220px;">
+          <button type="button" onclick="rbpTillerFind()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Find my accounts</button>
+        </div>
+        <div id="tiller-map" style="margin-top:10px;"></div>
+        <div id="tiller-msg" style="margin-top:8px;font-size:12px;"></div>
+      </div>
+    </div>
       <div style="font-size:11px;color:var(--muted);background:var(--light);border-left:3px solid var(--teal);padding:9px 13px;border-radius:4px;margin-bottom:12px;line-height:1.55;">💡 <strong style="color:var(--text);">Account names are yours to rename.</strong> Change "Brokerage (Taxable)" to "Dad's account," or anything meaningful to you — the names are just starting suggestions. <strong style="color:var(--text);">One thing to keep right:</strong> the tax math follows each row's <em>Account Type</em> dropdown (401k, Roth, Taxable, etc.), not its name — so rename freely, just make sure the Type is set correctly.</div>
 
     <table class="accounts-table">
@@ -2659,6 +2708,7 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
 var EXPENSE_DEFAULTS = {58:'Verizon Wireless',59:'PG&E (Electric/Gas)',60:'Garbage & Water',61:'Car/RV Insurance',62:'Xfinity Internet',63:'Apple/Netflix/Adobe',64:'Misc',65:'Misc',66:'Misc',67:'Misc',68:'Misc',69:'Misc',71:'Groceries / Food',72:'Gas / Vehicle Maint',73:'Personal Care',74:'Giving / Charity',75:'Clothing',76:'Misc',77:'Misc',78:'Misc',79:'Misc',80:'Misc',81:'Misc',83:'Home Maintenance (1%)',84:'Travel / Go-Go Fund',85:'Annual Fees / DMV'};
 
 function populateFromData(d) {
+  try { rbpTillerSetStatus(d && d.tiller); } catch(_ts){}
   try{ if(d&&d.tax&&d.roth&&d.roth.taxSavings!==''&&d.roth.taxSavings!=null&&isFinite(+d.roth.taxSavings)) d.tax.rothConversionSavings=+d.roth.taxSavings; }catch(_rs){} // real Roth SAVINGS (B146), not the conversion's tax cost (B144)
   if (!d) return;
   // GUARD: once the plan has loaded at least once (rbpDataLoaded) and the user has unsaved
@@ -3885,6 +3935,354 @@ initPctFields();
 updatePartnerNames();
 updateTheme(1, 'Steel Blue');
 updateTheme(2, 'Muted Mauve');
+
+// ══════════════════════════════════════════════════════════════════════════
+// TILLER AUTO-UPDATE (optional) — see rbp-tiller.js. Reads balances from the
+// customer's own shared Tiller sheet; the bank/403(b) logins stay with Tiller.
+// ══════════════════════════════════════════════════════════════════════════
+function rbpTillerToggle(){
+  var b=document.getElementById('tiller-body'); if(!b) return;
+  b.style.display = (b.style.display==='none') ? 'block' : 'none';
+}
+function rbpTillerSetStatus(cfg){
+  window._rbpTillerCfg = cfg || null;
+  var el=document.getElementById('tiller-status'); if(!el) return;
+  if (cfg && cfg.tillerId){
+    el.innerHTML = '✅ Linked' + (cfg.asOf ? ' · balances as of ' + cfg.asOf : '') + ' ▾';
+    var u=document.getElementById('tiller-url');
+    if (u && !u.value) u.value = 'https://docs.google.com/spreadsheets/d/' + cfg.tillerId + '/edit';
+  } else { el.textContent = 'Not linked ▾'; }
+  try { rbpTillerUI(); } catch(_u){}
+  var ss=document.getElementById('tspend-status');
+  if (ss) ss.textContent = (cfg && cfg.spend && cfg.spend.map && Object.keys(cfg.spend.map).length) ? '✅ Categories matched ▾' : '▾';
+}
+function rbpTillerMsg(html, ok){
+  var m=document.getElementById('tiller-msg'); if(!m) return;
+  m.innerHTML = html; m.style.color = ok===false ? '#c0392b' : (ok ? '#147a82' : 'var(--muted)');
+}
+function rbpTillerFriendly(err){
+  err=String(err||'');
+  if (/Unknown|not supported/i.test(err) || err==='timeout' || err==='network') return 'We couldn’t reach the Tiller connection just now. Please try again in a minute.';
+  if (/permission|not found|access|Requested entity/i.test(err)) return 'We couldn’t open that sheet. Make sure your Tiller sheet is shared with <strong>retireblueprintpro@gmail.com</strong>, then try again.';
+  if (/Accounts/i.test(err)) return 'That doesn’t look like a Tiller sheet (no Accounts tab). Paste the link to your Tiller sheet.';
+  return err;
+}
+function rbpTillerSlots(){
+  var d=window._rbpD||{}, sl=(d.portfolio&&d.portfolio.slots)||[];
+  return sl.map(function(s,i){ return {i:i, name:String((s&&s.name)||'').trim(), type:String((s&&s.type)||'')}; }).filter(function(s){ return s.name; });
+}
+function rbpTillerGuess(a, slots){
+  var words=(String(a.name)+' '+String(a.institution)).toLowerCase().split(/[^a-z0-9]+/).filter(function(w){return w.length>2;});
+  var t=String(a.type).toLowerCase(), best=-1, bestScore=0;
+  slots.forEach(function(s){
+    var n=s.name.toLowerCase(), sc=0;
+    words.forEach(function(w){ if(n.indexOf(w)>=0) sc+=2; });
+    if (/40[13]k|403b|401k|ira|pension|retire/.test(t) && /pretax|deferred/i.test(s.type)) sc+=1;
+    if (/roth/.test(t) && /roth/i.test(s.type)) sc+=2;
+    if (/hsa/.test(t+n) && /hsa/i.test(s.type)) sc+=2;
+    if (/brokerage|investment|taxable/.test(t) && /taxable/i.test(s.type)) sc+=1;
+    if (sc>bestScore){ bestScore=sc; best=s.i; }
+  });
+  return bestScore>=2 ? best : -1;
+}
+function rbpTillerFind(){
+  if (!window.RBPTiller){ rbpTillerMsg('Please refresh the page and try again.', false); return; }
+  var url=(document.getElementById('tiller-url')||{}).value||'';
+  rbpTillerMsg('Looking up your Tiller accounts…');
+  RBPTiller.list(url, function(r){
+    if (!r || r.error){ rbpTillerMsg(rbpTillerFriendly(r&&r.error), false); return; }
+    var accts=r.accounts||[], slots=rbpTillerSlots(), cfg=window._rbpTillerCfg||{}, saved=(cfg.map)||{};
+    if (!accts.length){ rbpTillerMsg('Your Tiller sheet has no accounts yet. Add them in the Tiller Console, click Fill in the sheet, then try again.', false); return; }
+    var h='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr>'+
+          '<th style="text-align:left;padding:4px;">Tiller account</th><th style="text-align:right;padding:4px;">Balance</th><th style="text-align:left;padding:4px;">Use for plan account</th></tr></thead><tbody>';
+    accts.forEach(function(a,k){
+      // Nothing is matched unless the customer picks it (or picked it before). Our best guess is only shown as a hint.
+      var guess = rbpTillerGuess(a, slots), guessName = '';
+      slots.forEach(function(s){ if (s.i===guess) guessName = s.name; });
+      var pick = (saved[a.id]!==undefined) ? Number(saved[a.id]) : -1;
+      var opts='<option value="-1">— don’t use —</option>'+slots.map(function(s){ return '<option value="'+s.i+'"'+(s.i===pick?' selected':'')+'>'+s.name.replace(/</g,'&lt;')+'</option>'; }).join('');
+      h+='<tr style="border-top:1px solid rgba(0,0,0,.08);"><td style="padding:6px 4px;"><strong>'+String(a.name||'Account').replace(/</g,'&lt;')+'</strong><br><span style="color:var(--muted);font-size:11px;">'+
+         [a.institution,a.type,(a.num?'…'+a.num:'')].filter(Boolean).join(' · ').replace(/</g,'&lt;')+'</span></td>'+
+         '<td style="padding:6px 4px;text-align:right;">'+(a.balance===null?'—':RBPTiller.money(a.balance))+'</td>'+
+         '<td style="padding:6px 4px;"><select data-tid="'+a.id+'" class="tiller-pick" style="max-width:220px;">'+opts+'</select>'+
+         ((pick<0 && guessName)?'<br><span style="color:var(--muted);font-size:11px;">Suggested: '+guessName.replace(/</g,'&lt;')+'</span>':'')+'</td></tr>';
+    });
+    h+='</tbody></table><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">'+
+       '<button type="button" onclick="rbpTillerSave()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Save &amp; update balances</button>'+
+       ((cfg&&cfg.tillerId)?'<button type="button" onclick="rbpTillerUnlink()" style="background:transparent;border:1px solid var(--muted);color:var(--muted);border-radius:6px;padding:8px 14px;cursor:pointer;">Unlink Tiller</button>':'')+'</div>';
+    document.getElementById('tiller-map').innerHTML=h;
+    rbpTillerMsg('Found '+accts.length+' Tiller account'+(accts.length===1?'':'s')+'. Pick only the ones you want to update in your plan — anything left on “don’t use” is ignored.', true);
+  });
+}
+function rbpTillerSave(){
+  if (typeof isDirty!=='undefined' && isDirty){ rbpTillerMsg('You have unsaved changes on this page — tap <strong>Save All Changes</strong> first, then link Tiller.', false); return; }
+  var url=(document.getElementById('tiller-url')||{}).value||'', map={}, used={};
+  var dup=false;
+  Array.prototype.forEach.call(document.querySelectorAll('.tiller-pick'), function(sel){
+    var v=Number(sel.value); if (v>=0){ if (used[v]) dup=true; used[v]=1; map[sel.getAttribute('data-tid')]=v; }
+  });
+  if (dup){ rbpTillerMsg('Two Tiller accounts are matched to the same plan account. Pick a different plan account for one of them.', false); return; }
+  if (!Object.keys(map).length){ rbpTillerMsg('Match at least one Tiller account to a plan account first.', false); return; }
+  rbpTillerMsg('Saving your Tiller link…');
+  RBPTiller.link(url, map, function(r){
+    if (!r || r.error){ rbpTillerMsg(rbpTillerFriendly(r&&r.error), false); return; }
+    rbpTillerSetStatus(r.cfg);
+    rbpTillerMsg('Linked! Pulling your latest balances…', true);
+    RBPTiller.pull(function(p){
+      if (!p || p.error){ rbpTillerMsg(rbpTillerFriendly(p&&p.error), false); return; }
+      if (!p.updated || !p.updated.length){ rbpTillerMsg('✅ Linked. '+RBPTiller.describe(p), true); return; }
+      rbpTillerMsg(RBPTiller.describe(p)+' — recalculating your plan…', true);
+      RBPTiller.refreshPlan(function(){
+        try { localStorage.setItem('rbp_tiller_pulled_'+(localStorage.getItem('rbp_sheet_id')||''), String(Date.now())); } catch(e){}
+        rbpTillerMsg('✅ '+RBPTiller.describe(p)+'. Your plan has been updated.', true);
+        try { loadLiveData(); } catch(e){}
+      });
+    });
+  });
+}
+function rbpTillerUnlink(){
+  rbpTillerMsg('Unlinking…');
+  RBPTiller.unlink(function(r){
+    if (!r || r.error){ rbpTillerMsg(rbpTillerFriendly(r&&r.error), false); return; }
+    rbpTillerSetStatus(null); document.getElementById('tiller-map').innerHTML='';
+    rbpTillerMsg('Tiller is unlinked. Your balances stay as they are, and you can type them in as usual.', true);
+  });
+}
+
+// ── TILLER SPENDING (optional) — compare actual monthly spending, apply only ticked lines ──
+function rbpSpendToggle(){
+  var b=document.getElementById('tspend-body'); if(!b) return;
+  b.style.display = (b.style.display==='none') ? 'block' : 'none';
+}
+function rbpSpendMsg(html, ok){
+  var m=document.getElementById('tspend-msg'); if(!m) return;
+  m.innerHTML = html; m.style.color = ok===false ? '#c0392b' : (ok ? '#147a82' : 'var(--muted)');
+}
+function rbpSpendEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+function rbpSpendTillerRef(){
+  var u=(document.getElementById('tiller-url')||{}).value||'';
+  var c=window._rbpTillerCfg||{};
+  return u || (c.tillerId||'');
+}
+function rbpSpendFind(){
+  if (!window.RBPTiller || !RBPTiller.spend){ rbpSpendMsg('Please refresh the page and try again.', false); return; }
+  var ref=rbpSpendTillerRef();
+  if (!ref){ rbpSpendMsg('Link your Tiller sheet first in <strong>VI. Named Accounts</strong> (paste its link there).', false); return; }
+  var months=Number((document.getElementById('tspend-months')||{}).value)||6;
+  rbpSpendMsg('Adding up your Tiller transactions…');
+  document.getElementById('tspend-map').innerHTML='';
+  RBPTiller.spend(ref, months, function(r){
+    if (!r || r.error){
+      var e=String(r&&r.error||'');
+      rbpSpendMsg(/Transactions/i.test(e) ? 'We couldn’t find a Transactions tab in your Tiller sheet.' : (/no transactions/i.test(e) ? 'Your Tiller sheet has no transactions yet. In Tiller, click <strong>Fill</strong>, then try again.' : rbpTillerFriendly(e)), false);
+      return;
+    }
+    window._rbpSpend = r;
+    rbpSpendRender();
+  });
+}
+// Which plan debt (section V) a Tiller category looks like — so mortgage / loan payments
+// aren't counted twice. Each debt is matched to at most ONE category: amounts must be within
+// 3% (or $15), and loan-like category names (Housing, Mortgage, Loan…) win over everything else,
+// then the closest amount. So a $359 "Insurance" never gets mistaken for a $369 RV loan when
+// "Loan Repayment" is exactly $369.
+function rbpSpendDebtMatches(cats){
+  var out={}, used={};
+  var ds=((window._rbpD||{}).debts||[]).filter(function(d){ return d && String(d.inc||'').toLowerCase()==='yes' && Number(d.mo)>0; });
+  ds.forEach(function(d){
+    var mo=Number(d.mo), best=null, bestScore=-1;
+    cats.forEach(function(c){
+      if (used[c.name]) return;
+      var diff=Math.abs(c.monthly-mo); if (diff > Math.max(15, mo*0.03)) return;
+      var hint=/loan|mortgage|housing|rent|car payment|auto payment|financ/i.test(c.name+' '+(c.group||'')) ? 1 : 0;
+      var score=hint*100000 - diff;
+      if (score>bestScore){ bestScore=score; best=c; }
+    });
+    if (best){ used[best.name]=1; out[best.name]=d.name||'a debt'; }
+  });
+  return out;
+}
+function rbpSpendRender(){
+  var r=window._rbpSpend; if(!r) return;
+  var rows=(r.rows||[]).filter(function(x){ return String(x.name||'').trim(); });
+  var saved=(r.saved&&r.saved.map)||{}, gapSaved=(r.saved&&r.saved.gap)||null, gapCats={};
+  if (gapSaved && gapSaved.cats) gapSaved.cats.forEach(function(c){ gapCats[c]=1; });
+  if (!r.categories.length){ rbpSpendMsg('No spending found in your Tiller sheet for '+r.from+' – '+r.to+'.', false); return; }
+  var debts=rbpSpendDebtMatches(r.categories);
+  var h='<div style="font-weight:700;margin:4px 0 6px;">1 · Your Tiller spending</div>'+
+        '<div style="color:var(--muted);font-size:11px;margin-bottom:4px;"><strong>Count</strong> = include it in your actual-spending total (used in step 3). Pick an expense line only if you want to update that line directly (step 2).</div>'+
+        '<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr>'+
+        '<th style="text-align:center;padding:4px;">Count</th><th style="text-align:left;padding:4px;">Tiller category</th><th style="text-align:right;padding:4px;">Per month</th><th style="text-align:left;padding:4px;">Use for expense line</th></tr></thead><tbody>';
+  r.categories.forEach(function(c){
+    var pick = (saved[c.name]!==undefined) ? Number(saved[c.name]) : -1;
+    var debt = debts[c.name] || '';
+    var counted = gapSaved ? !!gapCats[c.name] : !debt;
+    var opts='<option value="-1">— don’t use —</option>'+rows.map(function(x){
+      return '<option value="'+x.row+'"'+(x.row===pick?' selected':'')+'>'+rbpSpendEsc(x.name)+'</option>'; }).join('');
+    h+='<tr style="border-top:1px solid rgba(0,0,0,.08);">'+
+       '<td style="padding:6px 4px;text-align:center;"><input type="checkbox" class="tspend-count" data-cat="'+rbpSpendEsc(c.name)+'"'+(counted?' checked':'')+' onchange="rbpSpendGapCalc()"></td>'+
+       '<td style="padding:6px 4px;"><strong>'+rbpSpendEsc(c.name)+'</strong>'+
+       '<br><span style="color:var(--muted);font-size:11px;">'+[c.group, c.count+' transaction'+(c.count===1?'':'s')].filter(Boolean).map(rbpSpendEsc).join(' · ')+'</span>'+
+       (debt?'<br><span style="color:#b9770e;font-size:11px;">Looks like your “'+rbpSpendEsc(debt)+'” payment in V. Debts — left out so it isn’t counted twice.</span>':'')+'</td>'+
+       '<td style="padding:6px 4px;text-align:right;">'+RBPTiller.money(c.monthly)+'</td>'+
+       '<td style="padding:6px 4px;"><select class="tspend-pick" data-cat="'+rbpSpendEsc(c.name)+'" onchange="rbpSpendCompare()" style="max-width:220px;">'+opts+'</select></td></tr>';
+  });
+  h+='</tbody></table>'+
+     '<div style="font-weight:700;margin:14px 0 6px;">2 · Update individual lines <span style="font-weight:400;color:var(--muted);">(optional)</span></div>'+
+     '<div id="tspend-compare"></div>'+
+     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">'+
+     '<button type="button" onclick="rbpSpendApply()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Apply ticked lines</button>'+
+     '<button type="button" onclick="rbpSpendSaveOnly()" style="background:transparent;border:1px solid var(--muted);color:var(--muted);border-radius:6px;padding:8px 14px;cursor:pointer;">Just save my matches</button></div>'+
+     '<div style="font-weight:700;margin:16px 0 6px;">3 · Or add the whole difference as one line <span style="font-weight:400;color:var(--muted);">(optional)</span></div>'+
+     '<div style="color:var(--muted);font-size:11px;margin-bottom:6px;">Keeps every other line exactly as you set it, and puts the gap between what you actually spend and what your plan has into one line called <strong>Tiller Difference (actual spending)</strong>.</div>'+
+     '<div id="tspend-gap"></div>';
+  document.getElementById('tspend-map').innerHTML=h;
+  rbpSpendCompare();
+  rbpSpendGapCalc();
+  rbpSpendMsg('Based on '+r.monthsUsed+' month'+(r.monthsUsed===1?'':'s')+' of Tiller history ('+r.from+' – '+r.to+'). '+
+    'Transfers, income and credit-card payments are left out'+(r.skipped?' ('+r.skipped+' transactions)':'')+'. '+
+    (r.monthsUsed < (r.months||6) ? 'Tiller has less history than you asked for, so this is a shorter average.' : ''), true);
+}
+var RBP_GAP_NAME='Tiller Difference (actual spending)';
+function rbpSpendGapRowDefault(r){
+  var rows=r.rows||[], g=r.saved&&r.saved.gap;
+  if (g && rows.some(function(x){ return x.row===g.row; })) return g.row;
+  var t=rows.filter(function(x){ return /^tiller difference/i.test(String(x.name||'')); })[0]; if (t) return t.row;
+  var m=rows.filter(function(x){ return !x.formula && !(x.monthly>0) && (/^misc$/i.test(String(x.name||'').trim()) || !String(x.name||'').trim()); })[0];
+  return m ? m.row : -1;
+}
+function rbpSpendGapCalc(){
+  var r=window._rbpSpend, el=document.getElementById('tspend-gap'); if(!r||!el) return;
+  var sel=document.getElementById('tspend-gap-row');
+  var row = sel ? Number(sel.value) : rbpSpendGapRowDefault(r);
+  var counted={}; Array.prototype.forEach.call(document.querySelectorAll('.tspend-count'), function(cb){ if(cb.checked) counted[cb.getAttribute('data-cat')]=1; });
+  var actual=0; r.categories.forEach(function(c){ if(counted[c.name]) actual+=c.monthly; });
+  var plan=0; (r.rows||[]).forEach(function(x){ if(x.row!==row) plan+=(x.monthly||0); });
+  var gap=Math.round(actual-plan);
+  var choices=(r.rows||[]).filter(function(x){ return !x.formula && (/^tiller difference/i.test(String(x.name||'')) || (/^misc$/i.test(String(x.name||'').trim()) && !(x.monthly>0)) || !String(x.name||'').trim() || x.row===row); });
+  var opts=choices.map(function(x){ return '<option value="'+x.row+'"'+(x.row===row?' selected':'')+'>'+rbpSpendEsc(String(x.name||'').trim()||'(empty line)')+(x.monthly>0?' — now '+RBPTiller.money(x.monthly):'')+'</option>'; }).join('');
+  if (!choices.length) opts='<option value="-1">No empty Misc line — clear one first</option>';
+  var h='<table style="width:100%;max-width:420px;border-collapse:collapse;font-size:12px;">'+
+        '<tr><td style="padding:4px;">Actual spending (counted categories)</td><td style="padding:4px;text-align:right;">'+RBPTiller.money(actual)+'/mo</td></tr>'+
+        '<tr><td style="padding:4px;">Your other expense lines</td><td style="padding:4px;text-align:right;">− '+RBPTiller.money(plan)+'/mo</td></tr>'+
+        '<tr style="border-top:2px solid rgba(0,0,0,.2);font-weight:700;"><td style="padding:4px;">Tiller Difference</td><td style="padding:4px;text-align:right;color:'+(gap>0?'#c0392b':'#147a82')+';">'+RBPTiller.money(Math.max(0,gap))+'/mo</td></tr></table>'+
+        (gap<=0?'<div style="color:#147a82;font-size:11px;margin-top:4px;">Your plan already covers what you actually spend, so this line would be $0.</div>':'')+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;">'+
+        '<label style="font-size:12px;">Put it in <select id="tspend-gap-row" onchange="rbpSpendGapCalc()" style="max-width:240px;">'+opts+'</select></label>'+
+        '<button type="button" onclick="rbpSpendGapApply()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Add Tiller Difference</button></div>';
+  el.innerHTML=h;
+}
+function rbpSpendGapApply(){
+  if (typeof isDirty!=='undefined' && isDirty){ rbpSpendMsg('You have unsaved changes on this page — tap <strong>Save All Changes</strong> first.', false); return; }
+  var row=Number((document.getElementById('tspend-gap-row')||{}).value);
+  if (!(row>0)){ rbpSpendMsg('Pick an empty Misc line for the difference (clear one first if they’re all in use).', false); return; }
+  var cats=[]; Array.prototype.forEach.call(document.querySelectorAll('.tspend-count'), function(cb){ if(cb.checked) cats.push(cb.getAttribute('data-cat')); });
+  if (!cats.length){ rbpSpendMsg('Tick at least one Tiller category to count.', false); return; }
+  var months=Number((document.getElementById('tspend-months')||{}).value)||6;
+  rbpSpendMsg('Adding your Tiller Difference…');
+  RBPTiller.spendGap(row, cats, months, function(p){
+    if (!p || p.error){ rbpSpendMsg(rbpTillerFriendly(p&&p.error), false); return; }
+    var txt='Tiller Difference set to '+RBPTiller.money(p.gap)+'/mo (actual '+RBPTiller.money(p.actual)+' − plan '+RBPTiller.money(p.plan)+')';
+    if (p.gap===p.from){ rbpSpendMsg('✅ '+txt+'. That’s what it already was, so nothing else changed.', true); return; }
+    rbpSpendMsg(txt+' — recalculating your plan…', true);
+    RBPTiller.refreshPlan(function(){
+      rbpSpendMsg('✅ '+txt+'. Your plan has been recalculated.', true);
+      try { loadLiveData(); } catch(e){}
+      setTimeout(rbpSpendFind, 1500);
+    });
+  });
+}
+function rbpSpendMap(){
+  var map={};
+  Array.prototype.forEach.call(document.querySelectorAll('.tspend-pick'), function(sel){
+    var v=Number(sel.value); if (v>=0) map[sel.getAttribute('data-cat')]=v;
+  });
+  return map;
+}
+function rbpSpendCompare(){
+  var r=window._rbpSpend, el=document.getElementById('tspend-compare'); if(!r||!el) return;
+  var map=rbpSpendMap(), byCat={}, per={}, cats={};
+  r.categories.forEach(function(c){ byCat[c.name]=c.monthly; });
+  Object.keys(map).forEach(function(c){ var rw=map[c]; per[rw]=(per[rw]||0)+(byCat[c]||0); (cats[rw]=cats[rw]||[]).push(c); });
+  var ticked={}; Array.prototype.forEach.call(document.querySelectorAll('.tspend-tick'), function(cb){ if(cb.checked) ticked[cb.value]=1; });
+  var lines=(r.rows||[]).filter(function(x){ return per[x.row]!==undefined; });
+  if (!lines.length){ el.innerHTML='<div style="color:var(--muted);">Pick an expense line above and it will show here, next to what your plan has now.</div>'; return; }
+  var h='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr><th style="padding:4px;"></th>'+
+        '<th style="text-align:left;padding:4px;">Expense line</th><th style="text-align:right;padding:4px;">Plan now</th><th style="text-align:right;padding:4px;">Tiller says</th><th style="text-align:right;padding:4px;">Change</th></tr></thead><tbody>';
+  lines.forEach(function(x){
+    var t=Math.round(per[x.row]), diff=t-(x.monthly||0);
+    var dis = x.formula ? ' disabled title="This line is a formula in your sheet, so it isn’t changed"' : '';
+    h+='<tr style="border-top:1px solid rgba(0,0,0,.08);"><td style="padding:6px 4px;"><input type="checkbox" class="tspend-tick" value="'+x.row+'"'+(ticked[x.row]&&!x.formula?' checked':'')+dis+'></td>'+
+       '<td style="padding:6px 4px;"><strong>'+rbpSpendEsc(x.name)+'</strong><br><span style="color:var(--muted);font-size:11px;">from '+cats[x.row].map(rbpSpendEsc).join(' + ')+'</span></td>'+
+       '<td style="padding:6px 4px;text-align:right;">'+RBPTiller.money(x.monthly)+'</td>'+
+       '<td style="padding:6px 4px;text-align:right;">'+RBPTiller.money(t)+'</td>'+
+       '<td style="padding:6px 4px;text-align:right;color:'+(diff>0?'#c0392b':(diff<0?'#147a82':'var(--muted)'))+';">'+(diff>0?'+':(diff<0?'−':''))+RBPTiller.money(Math.abs(diff))+'/mo</td></tr>';
+  });
+  el.innerHTML=h+'</tbody></table>';
+}
+function rbpSpendSave(then){
+  var r=window._rbpSpend; if(!r) return;
+  var months=Number((document.getElementById('tspend-months')||{}).value)||6;
+  RBPTiller.spendLink(rbpSpendTillerRef(), rbpSpendMap(), months, function(res){
+    if (!res || res.error){ rbpSpendMsg(rbpTillerFriendly(res&&res.error), false); return; }
+    r.saved = res.cfg && res.cfg.spend; window._rbpTillerCfg = res.cfg; then();
+  });
+}
+function rbpSpendSaveOnly(){
+  rbpSpendMsg('Saving your matches…');
+  rbpSpendSave(function(){ rbpSpendMsg('✅ Matches saved. Nothing in your plan was changed.', true); });
+}
+function rbpSpendApply(){
+  if (typeof isDirty!=='undefined' && isDirty){ rbpSpendMsg('You have unsaved changes on this page — tap <strong>Save All Changes</strong> first, then apply.', false); return; }
+  var rows=[]; Array.prototype.forEach.call(document.querySelectorAll('.tspend-tick'), function(cb){ if(cb.checked && !cb.disabled) rows.push(Number(cb.value)); });
+  if (!rows.length){ rbpSpendMsg('Tick at least one expense line to update.', false); return; }
+  rbpSpendMsg('Saving your matches…');
+  rbpSpendSave(function(){
+    rbpSpendMsg('Updating '+rows.length+' expense line'+(rows.length===1?'':'s')+'…');
+    RBPTiller.spendApply(rows, function(p){
+      if (!p || p.error){ rbpSpendMsg(rbpTillerFriendly(p&&p.error), false); return; }
+      if (!p.updated || !p.updated.length){ rbpSpendMsg('✅ Those lines already match Tiller. Nothing changed.', true); return; }
+      var txt=p.updated.map(function(u){ return rbpSpendEsc(u.name||'Line')+' '+RBPTiller.money(u.from)+' → '+RBPTiller.money(u.to); }).join(' · ');
+      rbpSpendMsg('Updated: '+txt+' — recalculating your plan…', true);
+      RBPTiller.refreshPlan(function(){
+        rbpSpendMsg('✅ Updated: '+txt+'. Your plan has been recalculated.', true);
+        try { loadLiveData(); } catch(e){}
+        setTimeout(rbpSpendFind, 1500);
+      });
+    });
+  });
+}
+
+// ── Tiller promo / tuck-away ─────────────────────────────────────────────────
+// Not linked → each Tiller box opens with a short "what is Tiller" explainer and a sign-up
+// button (affiliate link lives in rbp-tiller.js). "I don't use Tiller" tucks both boxes into a
+// one-line "Show it" link, remembered in this browser. Linked customers always see the boxes.
+function rbpTillerIntroHTML(){
+  var T=window.RBPTiller||{}, url=T.signupUrl||'https://tiller.com/';
+  return '<div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:10px 12px;margin-bottom:10px;">'+
+    '<div style="font-weight:700;margin-bottom:4px;">New to Tiller?</div>'+
+    '<p style="margin:0 0 6px;">Tiller is a separate service that securely connects to your bank, credit card and retirement accounts and keeps <strong>your own Google Sheet</strong> up to date every day. Link it here and RetireBlueprint Pro can keep your account balances current and compare your real spending with your plan.</p>'+
+    '<p style="margin:0 0 8px;color:var(--muted);">Your bank logins stay with Tiller — RetireBlueprint Pro only reads the numbers in your Tiller sheet. Tiller is '+(T.priceNote||'a paid subscription')+', billed by Tiller.</p>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">'+
+      '<a href="'+url+'" target="_blank" rel="noopener sponsored" style="display:inline-block;background:var(--orange);color:var(--navy);text-decoration:none;border-radius:6px;padding:8px 14px;font-weight:800;">Try Tiller free for 30 days →</a>'+
+      '<a href="#" onclick="rbpTillerTuck();return false;" style="color:var(--muted);font-size:11px;">I don’t use Tiller — tuck this away</a>'+
+    '</div>'+
+    (T.isAffiliate?'<div style="color:var(--muted);font-size:10px;margin-top:6px;">Affiliate link: if you subscribe through it, RetireBlueprint Pro may earn a commission at no extra cost to you.</div>':'')+
+  '</div>';
+}
+function rbpTillerUI(){
+  var cfg=window._rbpTillerCfg, linked=!!(cfg&&cfg.tillerId);
+  var hidden=!linked && !!(window.RBPTiller&&RBPTiller.isHidden&&RBPTiller.isHidden());
+  ['tiller-card','tspend-card'].forEach(function(id){
+    var c=document.getElementById(id), s=document.getElementById(id+'-slim');
+    if (c) c.style.display = hidden ? 'none' : '';
+    if (s) s.style.display = hidden ? '' : 'none';
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.tiller-intro'), function(el){ el.innerHTML = linked ? '' : rbpTillerIntroHTML(); });
+}
+function rbpTillerTuck(){ if (window.RBPTiller) RBPTiller.setHidden(true); rbpTillerUI(); }
+function rbpTillerShowAgain(){ if (window.RBPTiller) RBPTiller.setHidden(false); rbpTillerUI(); }
+try { rbpTillerUI(); } catch(_u0){}
 
 loadLiveData();
 
