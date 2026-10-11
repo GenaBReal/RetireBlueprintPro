@@ -350,9 +350,11 @@ function rbpSolveSafeExtra(I){
   for(let it=0; it<48; it++){ const mid=(lo+hi)/2; if(shortfall(mid)>=0) lo=mid; else hi=mid; }
   // Round DOWN to the cent — never up. Near a tax cliff a few cents more can drop the ending
   // far below the goal (seen live: $41,792.00 → ends $117,699; $41,792.97 → ends $78,444).
-  // Then confirm the exact value we return still clears the goal & floor; step down $1 if not.
+  // Then confirm the value we return still clears the goal & floor even with a $5/yr cushion
+  // (so tiny sheet-vs-engine rounding differences can never tip a plan over a cliff); step down $1 if not.
+  const CUSHION=5;
   let safe=Math.floor(lo*100)/100, guard=0;
-  while(safe>0 && shortfall(safe)<0 && guard<500){ safe=Math.max(0, Math.round((safe-1)*100)/100); guard++; }
+  while(safe>0 && (shortfall(safe)<0 || shortfall(safe+CUSHION)<0) && guard<500){ safe=Math.max(0, Math.round((safe-1)*100)/100); guard++; }
   return { safeExtra:safe, shortfallAtSolve:Math.round(shortfall(safe)*100)/100 };
 }
 
