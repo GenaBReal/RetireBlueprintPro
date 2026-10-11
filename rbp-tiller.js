@@ -18,6 +18,14 @@
                                      changed, re-solve and hand back fresh data
    ───────────────────────────────────────────────────────────────────────────── */
 (function (root) {
+  // ── Sign-up link shown to customers who don't use Tiller yet ──────────────────────────
+  // Swap SIGNUP_URL for your Awin affiliate link once you're approved. That is the ONLY change
+  // needed; every "Try Tiller" button on the site reads it from here.
+  var SIGNUP_URL = 'https://tiller.com/';
+  var IS_AFFILIATE = false;          // set to true when SIGNUP_URL is your affiliate link (shows the disclosure)
+  var PRICE_NOTE = '$99/year after a 30-day free trial';
+  var HIDE_KEY = 'rbp_tiller_hidden';
+
   var SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
 
   function sheetId() { try { return localStorage.getItem('rbp_sheet_id') || ''; } catch (e) { return ''; } }
@@ -43,6 +51,12 @@
   var api = {
     tillerIdFrom: tillerIdFrom,
     money: money,
+    signupUrl: SIGNUP_URL,
+    isAffiliate: IS_AFFILIATE,
+    priceNote: PRICE_NOTE,
+    // "I don't use Tiller — tuck this away" (remembered in this browser only)
+    isHidden: function () { try { return localStorage.getItem(HIDE_KEY) === '1'; } catch (e) { return false; } },
+    setHidden: function (on) { try { if (on) localStorage.setItem(HIDE_KEY, '1'); else localStorage.removeItem(HIDE_KEY); } catch (e) {} },
 
     list: function (tiller, cb) {
       var id = tillerIdFrom(tiller);
