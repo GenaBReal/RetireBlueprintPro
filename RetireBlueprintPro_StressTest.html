@@ -1240,7 +1240,7 @@ function rbpRunMonteCarlo(d,opts){
   var chosenExtraNow=(proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))?(+proj.byYear[0].chosenExtra):0;
   var baseSpend=floorNow+chosenExtraNow;
   var legacyGoal=leg.goal||0;
-  var inflMean=(gl.inflation||0.03), colaMean=(gl.ssCola||0.025);
+  var inflMean=((gl.inflation!=null&&gl.inflation!=='')?+gl.inflation:((d.tax&&d.tax.inflation!=null&&d.tax.inflation!=='')?+d.tax.inflation:0.03)), colaMean=((gl.ssCola!=null&&gl.ssCola!=='')?+gl.ssCola:((d.tax&&d.tax.ssCola!=null&&d.tax.ssCola!=='')?+d.tax.ssCola:0.025)); // inflation & COLA live under d.tax in the connector read
   var ssYear1=((p1.ssYear1||0)+(p2.ssYear1||0)); var pension=(((p1.pension||0)+(p2.pension||0))*12);
   var curYear=new Date().getFullYear();
   var GK_TRIGGER=1.20, initialWR=0.04;
@@ -2213,7 +2213,7 @@ function rbpRunMonteCarlo(d,opts){
   var chosenExtraNow=(proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))?(+proj.byYear[0].chosenExtra):0;
   var baseSpend=floorNow+chosenExtraNow;
   var legacyGoal=leg.goal||0;
-  var inflMean=(gl.inflation||0.03), colaMean=(gl.ssCola||0.025);
+  var inflMean=((gl.inflation!=null&&gl.inflation!=='')?+gl.inflation:((d.tax&&d.tax.inflation!=null&&d.tax.inflation!=='')?+d.tax.inflation:0.03)), colaMean=((gl.ssCola!=null&&gl.ssCola!=='')?+gl.ssCola:((d.tax&&d.tax.ssCola!=null&&d.tax.ssCola!=='')?+d.tax.ssCola:0.025)); // inflation & COLA live under d.tax in the connector read
   var ssYear1=((p1.ssYear1||0)+(p2.ssYear1||0)); var pension=(((p1.pension||0)+(p2.pension||0))*12);
   var curYear=new Date().getFullYear();
   var GK_TRIGGER=1.20, initialWR=0.04;
@@ -3461,7 +3461,7 @@ function rbpRunMonteCarlo(d,opts){
   var chosenExtraNow=(proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))?(+proj.byYear[0].chosenExtra):0;
   var baseSpend=floorNow+chosenExtraNow;
   var legacyGoal=leg.goal||0;
-  var inflMean=(gl.inflation||0.03), colaMean=(gl.ssCola||0.025);
+  var inflMean=((gl.inflation!=null&&gl.inflation!=='')?+gl.inflation:((d.tax&&d.tax.inflation!=null&&d.tax.inflation!=='')?+d.tax.inflation:0.03)), colaMean=((gl.ssCola!=null&&gl.ssCola!=='')?+gl.ssCola:((d.tax&&d.tax.ssCola!=null&&d.tax.ssCola!=='')?+d.tax.ssCola:0.025)); // inflation & COLA live under d.tax in the connector read
   var ssYear1=((p1.ssYear1||0)+(p2.ssYear1||0)); var pension=(((p1.pension||0)+(p2.pension||0))*12);
   var curYear=new Date().getFullYear();
   var GK_TRIGGER=1.20, initialWR=0.04;

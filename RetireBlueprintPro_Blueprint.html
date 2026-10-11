@@ -450,6 +450,9 @@ function rbpCachePut(d){ try { var k=rbpCacheKey(); if(k) sessionStorage.setItem
 /* ---- helpers ---- */
 function money(n){ if(n===null||n===undefined||n===''||isNaN(n)) return '\u2014'; return '$' + Math.round(Number(n)).toLocaleString(); }
 function num(n){ if(n===null||n===undefined||n===''||isNaN(n)) return '\u2014'; return Math.round(Number(n)).toLocaleString(); }
+function _rbpPick(a,b){ return (a!=null&&a!=='')?a:((b!=null&&b!=='')?b:null); }
+function _rbpInfl(d){ d=d||{}; return _rbpPick((d.global||{}).inflation,(d.tax||{}).inflation); }
+function _rbpCola(d){ d=d||{}; return _rbpPick((d.global||{}).ssCola,(d.tax||{}).ssCola); }
 function pctSmart(v){ if(v===null||v===undefined||v===''||isNaN(v)) return '\u2014'; var x=Number(v); if(Math.abs(x)<=1) x=x*100; return (Math.round(x*10)/10) + '%'; }
 function txt(v){ if(v===null||v===undefined||v==='') return '\u2014'; return String(v); }
 function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
@@ -552,7 +555,7 @@ function rbpRunMonteCarlo(d,opts){
   var chosenExtraNow=(proj.byYear&&proj.byYear[0]&&(+proj.byYear[0].chosenExtra))?(+proj.byYear[0].chosenExtra):0;
   var baseSpend=floorNow+chosenExtraNow;
   var legacyGoal=leg.goal||0;
-  var inflation=(gl.inflation||0.03), colaRate=(gl.ssCola||0.025);
+  var inflation=((gl.inflation!=null&&gl.inflation!=='')?+gl.inflation:((d.tax&&d.tax.inflation!=null&&d.tax.inflation!=='')?+d.tax.inflation:0.03)), colaRate=((gl.ssCola!=null&&gl.ssCola!=='')?+gl.ssCola:((d.tax&&d.tax.ssCola!=null&&d.tax.ssCola!=='')?+d.tax.ssCola:0.025));
   var ssYear1=((p1.ssYear1||0)+(p2.ssYear1||0)); var pension=(((p1.pension||0)+(p2.pension||0))*12);
   var curYear=new Date().getFullYear();
   var GK_TRIGGER=1.20, initialWR=0.04;
@@ -874,7 +877,7 @@ function populate(d){
   if(port.total) F.push('You have <b>'+money(port.total)+'</b> invested'+((arr(port.accounts).length)?(' across '+arr(port.accounts).length+' account'+(arr(port.accounts).length>1?'s':'')):'')+'.');
   if(sp.baseAnnual) F.push('Your plan budgets <b>'+money(sp.baseAnnual)+'</b> of base spending per year'+(sp.safeExtra?(', plus up to '+money(sp.safeExtra)+' when conditions allow'):'')+'.');
   F.push('Projected lifetime taxes of about <b>'+money(lifeTax)+'</b>'+(endYear?(' through '+endYear):'')+'.');
-  if(roth&&roth.optimalAmount&&tax.rothConversionSavings) F.push('Converting about <b>'+money(roth.optimalAmount)+'</b> to Roth per year'+((Number(roth.year)>0)?(' during the prime window (now\u2013'+(Number(roth.year)+5)+')'):'')+' could reduce lifetime taxes by roughly <b>'+money(tax.rothConversionSavings)+'</b>.');
+  if(roth&&roth.optimalAmount&&(+tax.rothConversionSavings>0)) F.push('Converting about <b>'+money(roth.optimalAmount)+'</b> to Roth per year'+((Number(roth.year)>0)?(' during the prime window (now\u2013'+(Number(roth.year)+5)+')'):'')+' could reduce lifetime taxes by roughly <b>'+money(tax.rothConversionSavings)+'</b>.');
   var estate=(leg.projectedEnding!=null&&leg.projectedEnding!=='')?leg.projectedEnding:estateEnd;
   if(estate!=null) F.push('Projected estate of about <b>'+money(estate)+'</b> at the end of your plan'+(endYear?(' in '+endYear):'')+'.');
   document.getElementById('findings').innerHTML = F.length? F.map(function(x){return '<li>'+x+'</li>';}).join('') : '<li>Connect your full plan to see personalized findings here.</li>';
@@ -901,7 +904,7 @@ function populate(d){
     s+='<br><br>';
     if(Number(leg.goal)>0){ s+='<strong>'+esc(who)+'</strong> '+tverb+' tracking toward a <strong>$'+Math.round(Number(leg.goal)/1000)+'K legacy goal</strong> \u2014 '+(goalMet?'currently <strong>on track to meet it</strong>':('currently <strong>'+Math.round(leg.achievedPct||0)+'% funded</strong>'))+((leg.projectedEnding!=null&&leg.projectedEnding!=='')?(', with a projected estate of <strong>'+money(leg.projectedEnding)+'</strong>'+(endYear?(' at '+endYear):'')):'')+'. '; }
     var effR=pctSmart(tax.effectiveRate); if(effR&&effR!=='\u2014'){ s+='The effective federal tax rate is <strong>'+effR+'</strong>. '; }
-    if(roth&&roth.optimalAmount&&tax.rothConversionSavings){ s+='Converting about <strong>'+money(roth.optimalAmount)+'/year</strong> to Roth'+((Number(roth.year)>0)?(' during the prime window (now\u2013'+(Number(roth.year)+5)+')'):'')+' could save an estimated <strong>'+money(tax.rothConversionSavings)+'</strong> in lifetime taxes. '; }
+    if(roth&&roth.optimalAmount&&(+tax.rothConversionSavings>0)){ s+='Converting about <strong>'+money(roth.optimalAmount)+'/year</strong> to Roth'+((Number(roth.year)>0)?(' during the prime window (now\u2013'+(Number(roth.year)+5)+')'):'')+' could save an estimated <strong>'+money(tax.rothConversionSavings)+'</strong> in lifetime taxes. '; }
     s+='<br><br>';
     if(confR==null){ s+='<strong>Bottom line:</strong> The detailed projections that follow show the full picture of this plan.'; }
     else if(confR>=85&&goalMet){ s+='\u2705 <strong>Bottom line:</strong> This plan is resilient \u2014 projected to fund a full retirement and hold the legacy goal. '+esc(who)+' can plan with confidence.'; }
@@ -930,7 +933,7 @@ function populate(d){
   var ir='<div class="grid2">';
   ir+='<div class="kv">';
   ir+='<div class="row"><span class="k">Household income, year 1</span><span class="v">'+money(inc1)+'</span></div>';
-  if(gl.ssCola!=null&&gl.ssCola!=='') ir+='<div class="row"><span class="k">Social Security COLA</span><span class="v">'+pctSmart(gl.ssCola)+'</span></div>';
+  if(_rbpCola(d)!=null) ir+='<div class="row"><span class="k">Social Security COLA</span><span class="v">'+pctSmart(_rbpCola(d))+'</span></div>';
   if(gl.survivorReduction!=null&&gl.survivorReduction!=='') ir+='<div class="row"><span class="k">Survivor income reduction</span><span class="v">'+pctSmart(gl.survivorReduction)+'</span></div>';
   ir+='</div>';
   function incLines(p){ if(!hasName(p)) return ''; var o=''; if(p.ssMonthly) o+='<div class="row"><span class="k">'+esc(p.name)+' \u00b7 Social Security</span><span class="v">'+money(p.ssMonthly*12)+'/yr</span></div>'; if(p.pension) o+='<div class="row"><span class="k">'+esc(p.name)+' \u00b7 Pension</span><span class="v">'+money(p.pension)+'</span></div>'; if(p.salary) o+='<div class="row"><span class="k">'+esc(p.name)+' \u00b7 Employment</span><span class="v">'+money(p.salary)+'</span></div>'; if(p.otherIncome) o+='<div class="row"><span class="k">'+esc(p.name)+' \u00b7 Other</span><span class="v">'+money(p.otherIncome)+'</span></div>'; return o; }
@@ -981,7 +984,7 @@ function populate(d){
   function phaseRow(lbl,s,e,extra){ if(!s&&!e&&!extra) return ''; var rng=(s||'\u2014')+(e?(' \u2013 '+e):''); return '<div class="row"><span class="k">'+lbl+'</span><span class="v">'+rng+(extra?(' \u00b7 +'+money(extra)):'')+'</span></div>'; }
   var ph=phaseRow('Go-go years',sp.phase1Start,sp.phase1End,sp.phase1Extra)+phaseRow('Slow-go years',sp.phase2Start,sp.phase2End,sp.phase2Extra)+phaseRow('No-go years',sp.phase3Start,sp.phase3End,sp.phase3Extra);
   spr+=(ph||'<div class="row"><span class="k">Spending phases</span><span class="v">\u2014</span></div>');
-  spr+='<div class="row"><span class="k">Inflation assumption</span><span class="v">'+pctSmart(gl.inflation)+'</span></div>';
+  spr+='<div class="row"><span class="k">Inflation assumption</span><span class="v">'+pctSmart(_rbpInfl(d))+'</span></div>';
   spr+='</div></div>';
   document.getElementById('spending').innerHTML=spr;
 
@@ -1071,7 +1074,7 @@ function populate(d){
   tr+='</div><div class="kv">';
   tr+='<div class="row"><span class="k">Projected lifetime taxes</span><span class="v">'+money(lifeTax)+'</span></div>';
   if(rmdYr) tr+='<div class="row"><span class="k">RMDs begin</span><span class="v">'+rmdYr+'</span></div>';
-  if(tax.rothConversionSavings) tr+='<div class="row"><span class="k">Roth plan tax savings</span><span class="v">'+money(tax.rothConversionSavings)+'</span></div>';
+  if(+tax.rothConversionSavings>0) tr+='<div class="row"><span class="k">Roth plan tax savings</span><span class="v">'+money(tax.rothConversionSavings)+'</span></div>';
   tr+='</div></div>';
   document.getElementById('tax').innerHTML=tr;
 
@@ -1080,7 +1083,7 @@ function populate(d){
     rr='<div class="kv">';
     if(roth.optimalAmount) rr+='<div class="row"><span class="k">Optimal annual conversion <span style="color:#9aa6b2;font-weight:400">(to fill bracket)</span></span><span class="v">'+money(roth.optimalAmount)+'</span></div>';
     if(Number(roth.year)>0) rr+='<div class="row"><span class="k">Prime conversion window</span><span class="v">Now \u2013 '+(Number(roth.year)+5)+'</span></div>';
-    if(tax.rothConversionSavings) rr+='<div class="row"><span class="k">Estimated lifetime tax savings</span><span class="v">'+money(tax.rothConversionSavings)+'</span></div>';
+    if(+tax.rothConversionSavings>0) rr+='<div class="row"><span class="k">Estimated lifetime tax savings</span><span class="v">'+money(tax.rothConversionSavings)+'</span></div>';
     rr+='</div><div class="note" style="margin-top:12px">Converting traditional savings to Roth in lower-income years can reduce lifetime taxes and required withdrawals later. Run the Roth Ladder page in the app to fine-tune the amount and timing.</div>';
   } else rr='<div class="empty">No Roth conversion opportunity was identified for your current plan. You can still model conversions on the Roth Ladder page.</div>';
   document.getElementById('roth').innerHTML=rr;
@@ -1106,8 +1109,8 @@ function populate(d){
 
   var ar='<div class="grid2"><div class="kv">';
   if(gl.filingStatus) ar+='<div class="row"><span class="k">Filing status</span><span class="v">'+esc(txt(gl.filingStatus))+'</span></div>';
-  ar+='<div class="row"><span class="k">Inflation</span><span class="v">'+pctSmart(gl.inflation)+'</span></div>';
-  if(gl.ssCola!=null&&gl.ssCola!=='') ar+='<div class="row"><span class="k">Social Security COLA</span><span class="v">'+pctSmart(gl.ssCola)+'</span></div>';
+  ar+='<div class="row"><span class="k">Inflation</span><span class="v">'+pctSmart(_rbpInfl(d))+'</span></div>';
+  if(_rbpCola(d)!=null) ar+='<div class="row"><span class="k">Social Security COLA</span><span class="v">'+pctSmart(_rbpCola(d))+'</span></div>';
   ar+='</div><div class="kv">';
   if(tax.healthcareInflation!=null&&tax.healthcareInflation!=='') ar+='<div class="row"><span class="k">Healthcare inflation</span><span class="v">'+pctSmart(tax.healthcareInflation)+'</span></div>';
   if(gl.survivorReduction!=null&&gl.survivorReduction!=='') ar+='<div class="row"><span class="k">Survivor income reduction</span><span class="v">'+pctSmart(gl.survivorReduction)+'</span></div>';

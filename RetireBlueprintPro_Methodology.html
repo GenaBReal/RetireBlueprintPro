@@ -253,6 +253,9 @@ function rbpCacheGet(){ try{ var k=rbpCacheKey(); if(!k) return null; var raw=se
 function rbpCachePut(d){ try{ var k=rbpCacheKey(); if(k) sessionStorage.setItem(k,JSON.stringify({t:Date.now(),d:d})); }catch(e){} }
 
 function money(n){ if(n===null||n===undefined||n===''||isNaN(n)) return '\u2014'; return '$'+Math.round(Number(n)).toLocaleString(); }
+function _rbpPick(a,b){ return (a!=null&&a!=='')?a:((b!=null&&b!=='')?b:null); }
+function _rbpInfl(d){ d=d||{}; return _rbpPick((d.global||{}).inflation,(d.tax||{}).inflation); }
+function _rbpCola(d){ d=d||{}; return _rbpPick((d.global||{}).ssCola,(d.tax||{}).ssCola); }
 function pctSmart(v){ if(v===null||v===undefined||v===''||isNaN(v)) return '\u2014'; var x=Number(v); if(Math.abs(x)<=1) x=x*100; return (Math.round(x*10)/10)+'%'; }
 function txt(v){ if(v===null||v===undefined||v==='') return '\u2014'; return String(v); }
 function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
@@ -276,8 +279,8 @@ function fillAssumptions(d){
   var endYear=dy.length?Math.max.apply(null,dy):null;
 
   set('ya-filing', txt(gl.filingStatus));
-  set('ya-inflation', pctSmart(gl.inflation));
-  set('ya-cola', pctSmart(gl.ssCola));
+  set('ya-inflation', pctSmart(_rbpInfl(d)));
+  set('ya-cola', pctSmart(_rbpCola(d)));
   set('ya-hcinfl', pctSmart(tax.healthcareInflation));
   set('ya-survivor', pctSmart(gl.survivorReduction));
   var br=blendedReturn(port);

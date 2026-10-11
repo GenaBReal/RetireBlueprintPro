@@ -951,13 +951,13 @@ function populate(data) {
   if (typeof calcGrossUp === 'function') calcGrossUp();
   set('hdr-filing',  (gl.filingStatus||'MFJ')+' '+(meta.planYear||2026));
   set('hdr-state',   tax.stateRate ? (tax.stateRate<1?tax.stateRate*100:tax.stateRate).toFixed(1)+'%' : '—');
-  set('hdr-savings', fmt(tax.rothConversionSavings||0));
+  set('hdr-savings', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
 
   // Roth hero
-  set('r-year',    roth.year||'—');
+  set('r-year',    (Number(roth.year)>2020) ? roth.year : 'Not set yet');
   set('r-optimal', fmt(roth.optimalAmount||0));
-  set('r-cost',    fmt(tax.rothConversionSavings||0));
-  set('r-savings', fmt(tax.rothConversionSavings||0));
+  set('r-cost',    fmt(roth.marginalTax||0)); // tax cost of the conversion (row 144)
+  set('r-savings', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
 
   // Tax profile — use real data from projections
   var _pKeys2 = Object.keys(data.people || {});

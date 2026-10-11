@@ -2950,7 +2950,7 @@ var incEl  = document.getElementById('d-inc-'+i);
     statusEl.textContent = String(leg.status||'').replace('Enter a Target in B4','Set your Legacy Target') || (leg.achievedPct>=100?'ON TRACK':'CHECK PLAN');
     statusEl.className = leg.achievedPct>=100 ? 'badge-go' : 'badge-watch';
   }
-  setTxt('r-savings', fmt(tax.rothConversionSavings));
+  setTxt('r-savings', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
 
   // Header stats
   var hdrStatus = document.getElementById('hdr-status');
@@ -2962,6 +2962,7 @@ var incEl  = document.getElementById('d-inc-'+i);
 
   // ── ROTH SETTINGS ────────────────────────────────────
   if (roth.year && roth.year > 2020) sv('f-B139', roth.year);
+  else sv('f-B139', Math.max(Number((d.meta||{}).planYear)||0, new Date().getFullYear())); // blank year made the sheet look up $0 income → full-bracket conversion advice
   // Trigger SS breakeven calculations
   setTimeout(function(){
     calcSSBreakeven('f-B40','f-B41','f-B33');
@@ -3013,7 +3014,7 @@ var incEl  = document.getElementById('d-inc-'+i);
   setTxt('r-income', fmt(_rothIncome));
   setTxt('r-optimal',   fmt(roth.optimalAmount));
   setTxt('r-tax-now',  fmt(roth.marginalTax));
-  setTxt('r-savings',  fmt(roth.taxSavings));
+  setTxt('r-savings',  (+roth.taxSavings>0 ? fmt(roth.taxSavings) : '$0'));
   
   // Store projections for year lookup when user changes analysis year
   if (d.projections) window._rbpProjections = d.projections;

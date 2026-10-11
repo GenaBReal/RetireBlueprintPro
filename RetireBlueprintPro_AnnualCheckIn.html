@@ -469,30 +469,57 @@ RBP.loadCached = function(onOk, onErr){
            function(msg){ if (!cached && onErr) onErr(msg); });
 };
 
+// Build the year-by-year check-in table from the plan's own projection (every year of the
+// plan), merged with any actual balances / notes already saved on the sheet's Annual Check-In tab.
+// Works whether or not the sheet has any saved check-ins yet — a brand-new customer gets their
+// full projected table immediately instead of an empty "connect your sheet" table.
+function rbpBuildCheckIn(data) {
+  var proj = (data && data.projections) || {}, yrs = proj.years || [], end = proj.endLiquid || [];
+  var saved = {};
+  ((data && data.checkIn) || []).forEach(function(r){ if (r && r.year) saved[Number(r.year)] = r; });
+  var rows = [];
+  for (var i = 0; i < yrs.length; i++) {
+    var y = Number(yrs[i]); if (!y) continue;
+    var p = Number(end[i]); p = (end[i] === '' || end[i] == null || !isFinite(p)) ? null : p;
+    var s = saved[y] || {};
+    var a = (s.actual === null || s.actual === undefined || s.actual === '') ? null : Number(s.actual);
+    if (a !== null && !isFinite(a)) a = null;
+    rows.push({ year: y, projected: p, actual: a, variance: (a !== null && p !== null) ? a - p : null, notes: s.notes || '' });
+  }
+  return rows;
+}
+
+function rbpSetPeople(data) {
+  if (!data) return;
+  if (data.people) {
+    var _pKeys = Object.keys(data.people || {});
+    var P1 = data.people[_pKeys[0]] || {}, P2 = data.people[_pKeys[1]] || {};
+    window._p1Name = P1.name || 'Partner 1';
+    window._p2Name = P2.name || 'Partner 2';
+    try { if (window._p1Name !== 'Partner 1') localStorage.setItem('rbp_p1_name', window._p1Name); } catch(e){}
+    try { if (window._p2Name !== 'Partner 2') localStorage.setItem('rbp_p2_name', window._p2Name); } catch(e){}
+    if (typeof rbpApplyNames === 'function') rbpApplyNames(window._p1Name, window._p2Name);
+    if (Number(P1.age) > 0) window._p1Age = Number(P1.age);
+    if (Number(P2.age) > 0) window._p2Age = Number(P2.age);
+    if (Number(P1.projectedDeathYear) > 0) window._p1DeathYear = Number(P1.projectedDeathYear);
+  }
+  var py = Number((data.meta || {}).planYear) || Number((data.global || {}).planYear) || 0;
+  if (py) window._planYear = py;
+}
+
 function loadData() {
   RBP.loadCached(function(data) {
-    // single-source: use the shared engine projection for the projected-ending tile
-    try { if (typeof rbpApplyEngine==='function' && window.RBP && window.RBP.buildI && data) { var _engD=JSON.parse(JSON.stringify(data)); rbpApplyEngine(_engD); if(_engD&&_engD.projections) data.projections=_engD.projections; } } catch(_e){}
-
-    if (data.checkIn && data.checkIn.length) {
-      checkInData = data.checkIn;
+    // single-source: use the shared engine projection for the projected balances
+    try { if (typeof rbpApplyEngine==='function' && window.RBP && window.RBP.buildI && data) { var _engD=JSON.parse(JSON.stringify(data)); rbpApplyEngine(_engD); if(_engD&&_engD.projections) data.projections=_engD.projections; } } catch(_ae){}
+    rbpSetPeople(data);   // names/ages BEFORE the table renders (was after, so the first paint used placeholder ages)
+    var rows = rbpBuildCheckIn(data);
+    if (rows.length) {
+      checkInData = rows;
       renderTable(data);
       updateKPIs(data);
-      // Set partner names and plan year for table headers
-    if (data.people) {
-      var _pKeys=Object.keys(data.people||{}); window._p1Name=(data.people[_pKeys[0]]||{}).name||'Partner 1';
-      window._p2Name=(data.people[_pKeys[1]]||{}).name||'Partner 2';
-      try{if(window._p1Name!=='Partner 1')localStorage.setItem('rbp_p1_name',window._p1Name);}catch(e){}
-      try{if(window._p2Name!=='Partner 2')localStorage.setItem('rbp_p2_name',window._p2Name);}catch(e){}
-      if(typeof rbpApplyNames==='function') rbpApplyNames(window._p1Name, window._p2Name);
-      window._p1Age=(data.people[_pKeys[0]]||{}).age||63;
-      window._p2Age=(data.people[_pKeys[1]]||{}).age||55;
-    }
-    if (data.meta) window._planYear = data.meta.planYear||2026;
-    document.getElementById('save-msg').textContent = 'Data loaded — enter your actual balances below';
+      document.getElementById('save-msg').textContent = 'Data loaded — enter your actual balances below';
       document.getElementById('save-btn').disabled = false;
     } else {
-      // Use embedded fallback
       loadEmbedded();
     }
   }, function(){ loadEmbedded(); });
@@ -669,7 +696,7 @@ function saveCheckIn() {
   }).then(function() {
     rbpCacheClear(); // saved data changed — drop the cached snapshot so the next read is fresh
     var _sm=document.getElementById('save-msg');
-    if(_sm){ _sm.textContent='✅ Saved! Pulling your updated numbers from the sheet…'; _sm.className='save-msg ok'; }
+    if(_sm){ _sm.textContent='Saving… confirming with your Google Sheet'; _sm.className='save-msg'; }
     document.getElementById('save-btn').disabled = false;
     // The actuals you just saved change the projection, so we wait for the sheet to recompute,
     // then auto-refresh Projected End Balance + Plan Status with the REAL recomputed values —
@@ -684,7 +711,16 @@ function saveCheckIn() {
           var leg=(d&&d.legacy)||{}, end=+leg.projectedEnding||0, goal=+leg.goal||0;
           if(end>0){ var ke=document.getElementById('k-end'); if(ke) ke.textContent=fmt(end); }
           if(end>0 && goal>0){ var hs=document.getElementById('hdr-status'); if(hs) hs.textContent=(end>=goal?'ON TRACK':'REVIEW'); }
-          var sm2=document.getElementById('save-msg'); if(sm2){ sm2.textContent='✅ Saved & updated — Projected End Balance and Plan Status above now reflect your check-in.'; sm2.className='save-msg ok'; }
+          // Confirm the actuals really landed on the sheet before saying so (the POST is
+          // fire-and-forget, so it can't report a failure by itself).
+          var _got={}; ((d&&d.checkIn)||[]).forEach(function(r){ if(r&&r.year) _got[Number(r.year)]=r; });
+          var _want=trimmed.filter(function(r){ return r.actual!==null && r.actual!==undefined && r.actual!==''; });
+          var _ok=!!(d&&d.checkIn) && _want.every(function(r){ var g=_got[Number(r.year)]; return g && g.actual!==null && Math.abs(Number(g.actual)-Number(r.actual))<1; });
+          var sm2=document.getElementById('save-msg');
+          if(sm2){
+            if(_ok){ sm2.textContent='✅ Saved & confirmed — Projected End Balance and Plan Status above now reflect your check-in.'; sm2.className='save-msg ok'; }
+            else { sm2.textContent='⚠️ We couldn’t confirm your check-in saved. Please tap Save Actuals to Sheet again in a minute.'; sm2.className='save-msg'; }
+          }
         } catch(_e){}
       }, function(){
         var sm3=document.getElementById('save-msg'); if(sm3){ sm3.textContent='✅ Saved. Tap Refresh in a moment to see your updated numbers.'; sm3.className='save-msg ok'; }

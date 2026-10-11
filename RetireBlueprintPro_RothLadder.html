@@ -263,7 +263,7 @@ body{overflow-x:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#F
         </div>
         <div class="field">
           <label><span data-rbp-p2>P2</span> Retire Age</label>
-          <input type="number" id="p2-retire" value="57" min="30" max="80" onchange="buildLadder()">
+          <input type="number" id="p2-retire" value="65" min="30" max="80" onchange="buildLadder()">
         </div>
         <div class="field">
           <label>First Roth Conversion Year</label>
@@ -474,7 +474,7 @@ function buildLadder() {
   var p1Age   = parseInt(document.getElementById('p1-age').value)||63;
   var p2Age   = parseInt(document.getElementById('p2-age').value)||55;
   var p1Ret   = parseInt(document.getElementById('p1-retire').value)||65;
-  var p2Ret   = parseInt(document.getElementById('p2-retire').value)||57;
+  var p2Ret   = parseInt(document.getElementById('p2-retire').value)||65;
   var firstConv= parseInt(document.getElementById('first-conversion').value)||2026;
   var taxable = parseInt(document.getElementById('taxable-bal').value)||0;
   var rothBal = parseInt(document.getElementById('roth-bal').value)||0;
@@ -753,11 +753,11 @@ function loadData() {
       var curYear = new Date().getFullYear();
       if (p1.salaryEnd) {
         var p1RetYr = new Date(p1.salaryEnd).getFullYear();
-        if (p1RetYr > curYear) document.getElementById('p1-retire').value = p1.age + (p1RetYr - curYear);
+        if (isFinite(p1RetYr) && p1.age) document.getElementById('p1-retire').value = p1.age + Math.max(0, p1RetYr - curYear); // salary ending this year (or already ended) = retiring now
       }
       if (p2.salaryEnd) {
         var p2RetYr = new Date(p2.salaryEnd).getFullYear();
-        if (p2RetYr > curYear) document.getElementById('p2-retire').value = p2.age + (p2RetYr - curYear);
+        if (isFinite(p2RetYr) && p2.age) document.getElementById('p2-retire').value = p2.age + Math.max(0, p2RetYr - curYear);
       }
 
       // Get account balances by type

@@ -1249,7 +1249,7 @@ function populate(d){
   set('kpi-income-foot', p2n+' salary: '+fmt(p2.salary));
 
   set('kpi-tax', fmtP(tax.effectiveRate));
-  set('kpi-tax-delta', 'Roth conversion saves '+fmt(tax.rothConversionSavings)+' now vs. later');
+  set('kpi-tax-delta', (+tax.rothConversionSavings>0) ? ('Roth conversion saves '+fmt(tax.rothConversionSavings)+' now vs. later') : 'No Roth savings at your assumed future tax rate');
   set('kpi-tax-foot', 'State: '+fmtP(tax.stateRate)+' · Deduction: '+fmt(gl.standardDeduction));
   var tb=$s('kpi-tax-bar'); if(tb) tb.style.width=Math.min(100,(tax.effectiveRate<1?tax.effectiveRate*100:tax.effectiveRate)*3)+'%';
 
@@ -1479,7 +1479,7 @@ function populate(d){
   set('eng-eff-rate', fmtP(tax.effectiveRate));
   set('eng-std-ded', fmt(gl.standardDeduction));
   set('eng-state-rate', fmtP(tax.stateRate));
-  set('eng-roth-save', fmt(tax.rothConversionSavings));
+  set('eng-roth-save', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
   var cola=tax.ssCola<1?tax.ssCola*100:tax.ssCola;
   set('eng-cola', cola.toFixed(1)+'%');
 
@@ -1518,7 +1518,7 @@ function populate(d){
   set('intel-ss', p1n+' start: '+p1.ssStartDate);
   set('intel-legacy', pct>=100?'✅ Met':pct+'%');
   set('intel-surv-lbl', single ? ('Longevity Plan ('+longestN+')') : ('Survivor Plan ('+longestN+')'));
-  set('intel-roth', fmt(tax.rothConversionSavings));
+  set('intel-roth', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
 
   // CHART NOTES
   set('c1-sub', 'Total end-of-year liquid assets · '+meta.planYear+'–'+longestP.projectedDeathYear);

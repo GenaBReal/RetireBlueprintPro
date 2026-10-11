@@ -717,14 +717,14 @@ function loadData(){
       set('kpi-portfolio-sub', activeAccts+' active accounts · '+(meta.planYear||''));
       set('kpi-legacy', legPct>=100?'Met ✓':legPct+'%');
       set('kpi-legacy-sub', fmtK(leg.goal||gl.legacyGoal||0)+' target · '+(legVar>=0?'+':'')+fmtK(legVar));
-      set('kpi-roth', fmt(tax.rothConversionSavings));
+      set('kpi-roth', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
       set('kpi-runway-lbl', single?'Plan Coverage':'Survivor Runway');
       set('kpi-runway', runway+' yrs');
       set('kpi-runway-sub', (coverPerson.name||'Plan')+' covered to age '+endAge);
 
       /* ── next moves ── */
       set('move-extra', fmt(sp.safeExtra));
-      set('move-roth', fmt(tax.rothConversionSavings));
+      set('move-roth', (+tax.rothConversionSavings>0?fmt(tax.rothConversionSavings):'$0'));
       set('move-horizon', 'to age 110');
     }catch(e){ /* leave neutral state; don't paint fakes */ }
   }, function(msg, kind){
