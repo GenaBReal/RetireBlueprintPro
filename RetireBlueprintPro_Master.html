@@ -354,7 +354,7 @@ function applyThemeAndHeader(d){
 function renderSolverCard(d, _rows, _ext, _w, _avg){
   var el=document.getElementById('solverCard'); if(!el) return;
   var sp=(d&&d.spending)||{}, leg=(d&&d.legacy)||{};
-  var status=String(leg.status||'').trim();
+  var status=String(leg.status||'').trim().replace('Enter a Target in B4','Set your Legacy Target');
   // Ending = the sheet grid's last-row liquid (col 81) — the exact number the sheet calculated.
   var goal=Math.round(leg.goal||0);
   var ending;

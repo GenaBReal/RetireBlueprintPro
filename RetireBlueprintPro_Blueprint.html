@@ -1097,7 +1097,7 @@ function populate(d){
   lr+='</div><div class="kv">';
   if(lpct!=null) lr+='<div class="row"><span class="k">Goal achieved</span><span class="v">'+(goalMet?'Met \u2713':pctSmart(lpct))+'</span></div>';
   if(leg.safetyFloor!=null&&leg.safetyFloor!=='') lr+='<div class="row"><span class="k">Safety floor</span><span class="v">'+money(leg.safetyFloor)+'</span></div>';
-  var lstatus=goalMet?'Meets your legacy goal \u2713':(leg.status?esc(txt(leg.status)):'\u2014');
+  var lstatus=goalMet?'Meets your legacy goal \u2713':(leg.status?esc(txt(String(leg.status).replace('Enter a Target in B4','Set your Legacy Target'))):'\u2014');
   lr+='<div class="row"><span class="k">Status</span><span class="v">'+lstatus+'</span></div>';
   lr+='</div></div>';
   document.getElementById('legacy').innerHTML=lr;

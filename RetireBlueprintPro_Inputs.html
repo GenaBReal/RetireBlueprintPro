@@ -2947,7 +2947,7 @@ var incEl  = document.getElementById('d-inc-'+i);
   setTxt('s-leg-goal', fmt(leg.goal));
   var statusEl = document.getElementById('s-status');
   if (statusEl) {
-    statusEl.textContent = leg.status || (leg.achievedPct>=100?'ON TRACK':'CHECK PLAN');
+    statusEl.textContent = String(leg.status||'').replace('Enter a Target in B4','Set your Legacy Target') || (leg.achievedPct>=100?'ON TRACK':'CHECK PLAN');
     statusEl.className = leg.achievedPct>=100 ? 'badge-go' : 'badge-watch';
   }
   setTxt('r-savings', fmt(tax.rothConversionSavings));
@@ -3497,7 +3497,7 @@ function saveAll() {
           setStatus('✅ Saved & confirmed — your sheet now shows Legacy Goal $'+want.toLocaleString()+' and your account balances.', 'success');
           var hg=document.getElementById('hdr-goal'); if(hg) hg.textContent='$'+want.toLocaleString();
         } else {
-          setStatus('✅ Saved. If your numbers look off, hit Refresh in a moment to re-check.', 'success');
+          setStatus('✅ Saved. Your plan is still recalculating — your numbers will update in about a minute. (Tap Refresh if they don\'t.)', 'success');
         }
       }
       var giveUp=setTimeout(function(){ finish(false); }, 15000);
