@@ -3425,7 +3425,12 @@ function saveAll() {
         if (_Ipre) {
           var _rpre = RBP.solveSafeExtra(_Ipre);
           var _sol = _rpre && Number(_rpre.safeExtra);
-          if (isFinite(_sol) && _sol>0 && _sol<=200000) payload.solver = { B119: _sol };
+          // If the last-loaded plan can't be solved yet (a brand-new sheet with no balances, or a
+          // goal it can't meet yet), still send a $1 placeholder so B119 is a plain number during
+          // this save. That keeps the sheet off the slow self-adjusting formula (which made first
+          // saves time out and pages load for minutes); the post-save re-solve (rbpSolveAndPersist)
+          // then writes the real safe-spend number from the freshly saved inputs.
+          if (isFinite(_sol) && _sol<=200000) payload.solver = { B119: (_sol>0 ? _sol : 1) };
         }
       }
     }
