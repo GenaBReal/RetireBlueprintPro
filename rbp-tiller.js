@@ -10,6 +10,9 @@
      link(tillerUrlOrId, map, cb)  → save matching {tillerAccountId: planSlot 0-11} in the plan sheet
      unlink(cb)
      pull(cb)                      → write any changed balances into the plan → {ok, linked, updated:[], asOf}
+     spend(tiller, months, cb)     → monthly spending per Tiller category (transfers/income left out)
+     spendLink(tiller, map, months, cb) → save {tillerCategory: expenseRow 58-85}
+     spendApply(rows, cb)          → write the matched monthly totals into the ticked expense rows
      refreshPlan(cb)               → after a pull: fresh read, re-solve safe spending, store it → cb(freshData)
      autoPull(data, onUpdated)     → Dashboard: pull at most every 6 hours per browser; if anything
                                      changed, re-solve and hand back fresh data
@@ -54,6 +57,20 @@
     unlink: function (cb) { jsonp({ action: 'tillerLink', unlink: '1' }, cb); },
 
     pull: function (cb) { jsonp({ action: 'tillerPull' }, cb, 120000); },
+
+    // Spending (review-and-apply only — never automatic).
+    // spend → {ok, categories:[{name,group,monthly,total,count}], months, monthsUsed, from, to, saved, rows:[{row,name,monthly,formula}]}
+    spend: function (tiller, months, cb) {
+      var q = { action: 'tillerSpend', months: months || 6 }, id = tillerIdFrom(tiller);
+      if (id) q.tillerId = id;
+      jsonp(q, cb, 120000);
+    },
+    spendLink: function (tiller, map, months, cb) {
+      var q = { action: 'tillerSpendLink', map: JSON.stringify(map || {}), months: months || 6 }, id = tillerIdFrom(tiller);
+      if (id) q.tillerId = id;
+      jsonp(q, cb);
+    },
+    spendApply: function (rows, cb) { jsonp({ action: 'tillerSpendApply', rows: JSON.stringify(rows || []) }, cb, 120000); },
 
     // Fresh read → re-solve the safe-extra with the shared engine → store it (B119) the same
     // lean way the Inputs page does after a save. cb(freshData or null).
