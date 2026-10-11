@@ -936,6 +936,7 @@ function calcGrossUp() {
 }
 
 function populate(data) {
+  try{ if(data&&data.tax&&data.roth&&data.roth.taxSavings!==''&&data.roth.taxSavings!=null&&isFinite(+data.roth.taxSavings)) data.tax.rothConversionSavings=+data.roth.taxSavings; }catch(_rs){} // real Roth SAVINGS (B146), not the conversion's tax cost (B144)
   try {
   var tax=data.tax||{};
   var gl=data.global||{};

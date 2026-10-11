@@ -801,6 +801,7 @@ function stat(lbl,val,sub){ return '<div class="stat"><div class="lbl">'+esc(lbl
 
 /* ---- populate ---- */
 function populate(d){
+  try{ if(d&&d.tax&&d.roth&&d.roth.taxSavings!==''&&d.roth.taxSavings!=null&&isFinite(+d.roth.taxSavings)) d.tax.rothConversionSavings=+d.roth.taxSavings; }catch(_rs){} // real Roth SAVINGS (B146), not the conversion's tax cost (B144)
   if(!d || d.error){ showConnect(d && d.error ? 'We could not read your plan' : null, d && d.error ? esc(d.error) : null); return; }
   document.getElementById('connect').style.display='none';
   document.getElementById('blueprint').style.display='block';

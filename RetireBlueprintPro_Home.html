@@ -667,6 +667,7 @@ function loadData(){
   RBP.loadCached(function(d){
     try{
       var b=document.getElementById('rbp-state-banner'); if(b) b.style.display='none';
+      try{ if(d&&d.tax&&d.roth&&d.roth.taxSavings!==''&&d.roth.taxSavings!=null&&isFinite(+d.roth.taxSavings)) d.tax.rothConversionSavings=+d.roth.taxSavings; }catch(_rs){} // real Roth SAVINGS (B146)
       var p=d.people||{},port=d.portfolio||{},sp=d.spending||{},leg=d.legacy||{},tax=d.tax||{},meta=d.meta||{};
       var gl=d.global||{};
       var p1=p.craig||p.person1||{},p2=p.gena||p.person2||{};

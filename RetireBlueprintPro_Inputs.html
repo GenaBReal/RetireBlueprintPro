@@ -2659,6 +2659,7 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
 var EXPENSE_DEFAULTS = {58:'Verizon Wireless',59:'PG&E (Electric/Gas)',60:'Garbage & Water',61:'Car/RV Insurance',62:'Xfinity Internet',63:'Apple/Netflix/Adobe',64:'Misc',65:'Misc',66:'Misc',67:'Misc',68:'Misc',69:'Misc',71:'Groceries / Food',72:'Gas / Vehicle Maint',73:'Personal Care',74:'Giving / Charity',75:'Clothing',76:'Misc',77:'Misc',78:'Misc',79:'Misc',80:'Misc',81:'Misc',83:'Home Maintenance (1%)',84:'Travel / Go-Go Fund',85:'Annual Fees / DMV'};
 
 function populateFromData(d) {
+  try{ if(d&&d.tax&&d.roth&&d.roth.taxSavings!==''&&d.roth.taxSavings!=null&&isFinite(+d.roth.taxSavings)) d.tax.rothConversionSavings=+d.roth.taxSavings; }catch(_rs){} // real Roth SAVINGS (B146), not the conversion's tax cost (B144)
   if (!d) return;
   // GUARD: once the plan has loaded at least once (rbpDataLoaded) and the user has unsaved
   // edits (isDirty), a background or late-arriving read must NOT repopulate the form — doing

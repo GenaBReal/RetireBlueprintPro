@@ -1088,6 +1088,7 @@ function renderYear(d, yr){
 }
 
 function populate(d){
+  try{ if(d&&d.tax&&d.roth&&d.roth.taxSavings!==''&&d.roth.taxSavings!=null&&isFinite(+d.roth.taxSavings)) d.tax.rothConversionSavings=+d.roth.taxSavings; }catch(_rs){} // real Roth SAVINGS (B146), not the conversion's tax cost (B144)
   var _pk = Object.keys(d.people||{});
   var p1 = d.people[_pk[0]] || d.people.craig || d.people.person1 || {};
   var p2 = d.people[_pk[1]] || d.people.gena  || d.people.person2 || {};
