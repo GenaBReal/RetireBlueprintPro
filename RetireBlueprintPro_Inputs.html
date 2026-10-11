@@ -3966,18 +3966,22 @@ function rbpTillerFind(){
     var h='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr>'+
           '<th style="text-align:left;padding:4px;">Tiller account</th><th style="text-align:right;padding:4px;">Balance</th><th style="text-align:left;padding:4px;">Use for plan account</th></tr></thead><tbody>';
     accts.forEach(function(a,k){
-      var pick = (saved[a.id]!==undefined) ? Number(saved[a.id]) : rbpTillerGuess(a, slots);
+      // Nothing is matched unless the customer picks it (or picked it before). Our best guess is only shown as a hint.
+      var guess = rbpTillerGuess(a, slots), guessName = '';
+      slots.forEach(function(s){ if (s.i===guess) guessName = s.name; });
+      var pick = (saved[a.id]!==undefined) ? Number(saved[a.id]) : -1;
       var opts='<option value="-1">— don’t use —</option>'+slots.map(function(s){ return '<option value="'+s.i+'"'+(s.i===pick?' selected':'')+'>'+s.name.replace(/</g,'&lt;')+'</option>'; }).join('');
       h+='<tr style="border-top:1px solid rgba(0,0,0,.08);"><td style="padding:6px 4px;"><strong>'+String(a.name||'Account').replace(/</g,'&lt;')+'</strong><br><span style="color:var(--muted);font-size:11px;">'+
          [a.institution,a.type,(a.num?'…'+a.num:'')].filter(Boolean).join(' · ').replace(/</g,'&lt;')+'</span></td>'+
          '<td style="padding:6px 4px;text-align:right;">'+(a.balance===null?'—':RBPTiller.money(a.balance))+'</td>'+
-         '<td style="padding:6px 4px;"><select data-tid="'+a.id+'" class="tiller-pick" style="max-width:220px;">'+opts+'</select></td></tr>';
+         '<td style="padding:6px 4px;"><select data-tid="'+a.id+'" class="tiller-pick" style="max-width:220px;">'+opts+'</select>'+
+         ((pick<0 && guessName)?'<br><span style="color:var(--muted);font-size:11px;">Suggested: '+guessName.replace(/</g,'&lt;')+'</span>':'')+'</td></tr>';
     });
     h+='</tbody></table><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">'+
        '<button type="button" onclick="rbpTillerSave()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Save &amp; update balances</button>'+
        ((cfg&&cfg.tillerId)?'<button type="button" onclick="rbpTillerUnlink()" style="background:transparent;border:1px solid var(--muted);color:var(--muted);border-radius:6px;padding:8px 14px;cursor:pointer;">Unlink Tiller</button>':'')+'</div>';
     document.getElementById('tiller-map').innerHTML=h;
-    rbpTillerMsg('Found '+accts.length+' Tiller account'+(accts.length===1?'':'s')+'. Check the matches, then save.', true);
+    rbpTillerMsg('Found '+accts.length+' Tiller account'+(accts.length===1?'':'s')+'. Pick only the ones you want to update in your plan — anything left on “don’t use” is ignored.', true);
   });
 }
 function rbpTillerSave(){
