@@ -95,7 +95,18 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
       Click the button below. Google will show a box saying <strong>"Make a copy"</strong> — just click the blue button. Your personal retirement sheet opens in a new tab.<br><br>
       <strong>Keep that tab open</strong> — you'll need it for the next steps!
     </div>
-    <a href="https://docs.google.com/spreadsheets/d/1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA/copy" target="_blank" class="btn btn-teal" onclick="step1done()">
+    <!-- Access code: the template link is only handed out by the connector after a valid code -->
+    <div id="code-box" style="margin:4px 0 12px;">
+      <div style="font-size:13px;margin-bottom:6px;">Enter the <strong>access code</strong> from your <strong>Start Here</strong> guide (it came with your Etsy download):</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="text" id="access-code" placeholder="RBP-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"
+               style="flex:1;min-width:180px;padding:10px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:inherit;font-size:15px;letter-spacing:1px;text-transform:uppercase;"
+               onkeydown="if(event.key==='Enter'){unlockCopy();}">
+        <button type="button" class="btn btn-teal" id="unlock-btn" onclick="unlockCopy()" style="margin:0;">🔓 &nbsp;Unlock</button>
+      </div>
+      <div id="code-msg" style="font-size:12px;margin-top:6px;min-height:16px;"></div>
+    </div>
+    <a href="#" id="copy-btn" target="_blank" rel="noopener" class="btn btn-teal" onclick="step1done()" style="display:none;">
       📋 &nbsp;Make My Personal Copy of the Sheet
     </a>
   </div>
@@ -192,6 +203,39 @@ var GITHUB = 'https://genabreal.github.io/RetireBlueprintPro';
     document.getElementById('success-box').classList.add('show');
   }
 })();
+
+// ── ACCESS CODE ─────────────────────────────────────────────────────────────
+// The template's copy link is NOT in this page. The connector checks the code and only then
+// returns the link, so the sheet can't be copied by someone who just finds this page.
+var RBP_SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
+function codeMsg(t, ok){ var m=document.getElementById('code-msg'); m.innerHTML=t; m.style.color = ok===false ? '#ff8a80' : (ok ? '#1CC7D0' : ''); }
+function showCopy(url){
+  var a=document.getElementById('copy-btn'); a.href=url; a.style.display='';
+  document.getElementById('code-box').style.display='none';
+}
+function unlockCopy(){
+  var code=(document.getElementById('access-code').value||'').trim().toUpperCase();
+  if(!code){ codeMsg('Please type your access code.', false); return; }
+  codeMsg('Checking…');
+  var btn=document.getElementById('unlock-btn'); btn.disabled=true;
+  var name='rbpUnlock_'+Date.now(), done=false, s=document.createElement('script');
+  var t=setTimeout(function(){ if(!done){ done=true; btn.disabled=false; codeMsg('We couldn’t check your code just now. Please try again in a minute.', false); } }, 30000);
+  window[name]=function(r){
+    if(done) return; done=true; clearTimeout(t); btn.disabled=false;
+    try{ delete window[name]; }catch(e){}
+    if(r && r.ok && r.copyUrl){
+      try{ localStorage.setItem('rbp_access_ok', code); }catch(e){}
+      codeMsg('✓ Code accepted', true); showCopy(r.copyUrl);
+    } else {
+      codeMsg('That code didn’t work. Check your Start Here guide (it looks like <strong>RBP-XXXX-XXXX</strong>), or message us on Etsy and we’ll help.', false);
+    }
+  };
+  s.src=RBP_SCRIPT+'?action=unlockSetup&code='+encodeURIComponent(code)+'&callback='+name+'&_='+Date.now();
+  s.onerror=function(){ if(!done){ done=true; clearTimeout(t); btn.disabled=false; codeMsg('We couldn’t check your code just now. Please try again in a minute.', false); } };
+  document.head.appendChild(s);
+}
+// Remembered on this device: re-check quietly so the button comes back without retyping.
+(function(){ try{ var c=localStorage.getItem('rbp_access_ok'); if(c){ document.getElementById('access-code').value=c; unlockCopy(); } }catch(e){} })();
 
 function copyEmail(){
   navigator.clipboard.writeText('retireblueprintpro@gmail.com').then(function(){
