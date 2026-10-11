@@ -238,6 +238,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8F9FA;min-width:32
 }
 </style>
 <script>document.write('<scr'+'ipt src="rbp-engine.js?v='+Math.floor(Date.now()/3600000)+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="rbp-tiller.js?v='+Math.floor(Date.now()/3600000)+'"></scr'+'ipt>');</script>
 <script>
 /* ── ENGINE ADAPTER ───────────────────────────────────────────────
    Rebuilds d.projections from the one formula (rbp-engine.js), in the EXACT shape the
@@ -1773,6 +1774,19 @@ function loadData(){
       var b = $s('error-banner'); b.style.display = 'block';
       b.textContent = '⚠ Error displaying data: ' + e.message;
     }
+    // Tiller (optional): if this plan is linked, quietly pull newer balances, re-solve, and repaint.
+    try {
+      if (window.RBPTiller) RBPTiller.autoPull(data, function(fresh, res){
+        try { rbpApplyEngine(fresh); } catch(_e1){}
+        try { populate(fresh); window.__DASH_DATA = fresh; initYearSelector(fresh); } catch(_e2){}
+        try { rbpCacheClear(); } catch(_e3){}
+        var tb=document.getElementById('tiller-banner');
+        if (!tb){ tb=document.createElement('div'); tb.id='tiller-banner';
+          tb.style.cssText='margin:10px auto;max-width:1100px;padding:10px 14px;border-radius:8px;background:rgba(28,199,208,.12);border:1px solid #1CC7D0;font-size:13px;line-height:1.5;';
+          var host=document.getElementById('error-banner'); if(host&&host.parentNode) host.parentNode.insertBefore(tb, host.nextSibling); else document.body.insertBefore(tb, document.body.firstChild); }
+        tb.textContent='🔗 '+RBPTiller.describe(res)+'. Your plan has been recalculated.';
+      });
+    } catch(_tp){}
   }, function(msg){
     $s('loading-overlay').style.display = 'none';
     var b = $s('error-banner'); b.style.display = 'block';

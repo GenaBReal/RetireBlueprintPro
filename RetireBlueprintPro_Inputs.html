@@ -36,6 +36,7 @@
 <title>RetireBlueprint Pro — Inputs</title>
 <script src="rbp-tax-config.js"></script>
 <script>document.write('<scr'+'ipt src="https://retireblueprintpro.com/rbp-engine.js?v='+Math.floor(Date.now()/3600000)+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="https://retireblueprintpro.com/rbp-tiller.js?v='+Math.floor(Date.now()/3600000)+'"></scr'+'ipt>');</script>
 <script>
 /* ── ENGINE ADAPTER ───────────────────────────────────────────────
    Rebuilds d.projections from the one formula (rbp-engine.js), in the EXACT shape the
@@ -1178,6 +1179,27 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
     <div class="section-hdr-arrow">▼</div>
   </div>
   <div class="section-body">
+    <!-- ── Tiller auto-update (optional) ─────────────────────────────────── -->
+    <div id="tiller-card" style="border:1px solid var(--teal);border-radius:8px;padding:12px 14px;margin-bottom:14px;background:var(--light);">
+      <div onclick="rbpTillerToggle()" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;">
+        <div style="font-weight:700;font-size:13px;">🔗 Auto-update balances from Tiller <span style="font-weight:400;color:var(--muted);">(optional)</span></div>
+        <div id="tiller-status" style="font-size:11px;color:var(--muted);">Not linked ▾</div>
+      </div>
+      <div id="tiller-body" style="display:none;margin-top:10px;font-size:12px;line-height:1.6;">
+        <p style="margin:0 0 8px;">If you use <strong>Tiller</strong> — a separate subscription that securely connects your bank, brokerage and retirement accounts — your balances can update here automatically. Your account logins stay with Tiller; RetireBlueprint Pro only reads the balances.</p>
+        <ol style="margin:0 0 10px 18px;padding:0;">
+          <li>Open your Tiller Google Sheet, click <strong>Share</strong>, and add <strong>retireblueprintpro@gmail.com</strong> as a <strong>Viewer</strong>. (In Tiller, turn on <strong>AutoFill</strong> so it refreshes every day.)</li>
+          <li>Paste that sheet’s link below and tap <strong>Find my accounts</strong>.</li>
+          <li>Match each Tiller account to one of your plan accounts, then tap <strong>Save &amp; update balances</strong>.</li>
+        </ol>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" id="tiller-url" placeholder="Paste your Tiller sheet link" style="flex:1;min-width:220px;">
+          <button type="button" onclick="rbpTillerFind()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Find my accounts</button>
+        </div>
+        <div id="tiller-map" style="margin-top:10px;"></div>
+        <div id="tiller-msg" style="margin-top:8px;font-size:12px;"></div>
+      </div>
+    </div>
       <div style="font-size:11px;color:var(--muted);background:var(--light);border-left:3px solid var(--teal);padding:9px 13px;border-radius:4px;margin-bottom:12px;line-height:1.55;">💡 <strong style="color:var(--text);">Account names are yours to rename.</strong> Change "Brokerage (Taxable)" to "Dad's account," or anything meaningful to you — the names are just starting suggestions. <strong style="color:var(--text);">One thing to keep right:</strong> the tax math follows each row's <em>Account Type</em> dropdown (401k, Roth, Taxable, etc.), not its name — so rename freely, just make sure the Type is set correctly.</div>
 
     <table class="accounts-table">
@@ -2659,6 +2681,7 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
 var EXPENSE_DEFAULTS = {58:'Verizon Wireless',59:'PG&E (Electric/Gas)',60:'Garbage & Water',61:'Car/RV Insurance',62:'Xfinity Internet',63:'Apple/Netflix/Adobe',64:'Misc',65:'Misc',66:'Misc',67:'Misc',68:'Misc',69:'Misc',71:'Groceries / Food',72:'Gas / Vehicle Maint',73:'Personal Care',74:'Giving / Charity',75:'Clothing',76:'Misc',77:'Misc',78:'Misc',79:'Misc',80:'Misc',81:'Misc',83:'Home Maintenance (1%)',84:'Travel / Go-Go Fund',85:'Annual Fees / DMV'};
 
 function populateFromData(d) {
+  try { rbpTillerSetStatus(d && d.tiller); } catch(_ts){}
   try{ if(d&&d.tax&&d.roth&&d.roth.taxSavings!==''&&d.roth.taxSavings!=null&&isFinite(+d.roth.taxSavings)) d.tax.rothConversionSavings=+d.roth.taxSavings; }catch(_rs){} // real Roth SAVINGS (B146), not the conversion's tax cost (B144)
   if (!d) return;
   // GUARD: once the plan has loaded at least once (rbpDataLoaded) and the user has unsaved
@@ -3885,6 +3908,112 @@ initPctFields();
 updatePartnerNames();
 updateTheme(1, 'Steel Blue');
 updateTheme(2, 'Muted Mauve');
+
+// ══════════════════════════════════════════════════════════════════════════
+// TILLER AUTO-UPDATE (optional) — see rbp-tiller.js. Reads balances from the
+// customer's own shared Tiller sheet; the bank/403(b) logins stay with Tiller.
+// ══════════════════════════════════════════════════════════════════════════
+function rbpTillerToggle(){
+  var b=document.getElementById('tiller-body'); if(!b) return;
+  b.style.display = (b.style.display==='none') ? 'block' : 'none';
+}
+function rbpTillerSetStatus(cfg){
+  window._rbpTillerCfg = cfg || null;
+  var el=document.getElementById('tiller-status'); if(!el) return;
+  if (cfg && cfg.tillerId){
+    el.innerHTML = '✅ Linked' + (cfg.asOf ? ' · balances as of ' + cfg.asOf : '') + ' ▾';
+    var u=document.getElementById('tiller-url');
+    if (u && !u.value) u.value = 'https://docs.google.com/spreadsheets/d/' + cfg.tillerId + '/edit';
+  } else { el.textContent = 'Not linked ▾'; }
+}
+function rbpTillerMsg(html, ok){
+  var m=document.getElementById('tiller-msg'); if(!m) return;
+  m.innerHTML = html; m.style.color = ok===false ? '#c0392b' : (ok ? '#147a82' : 'var(--muted)');
+}
+function rbpTillerFriendly(err){
+  err=String(err||'');
+  if (/Unknown|not supported/i.test(err) || err==='timeout' || err==='network') return 'We couldn’t reach the Tiller connection just now. Please try again in a minute.';
+  if (/permission|not found|access|Requested entity/i.test(err)) return 'We couldn’t open that sheet. Make sure your Tiller sheet is shared with <strong>retireblueprintpro@gmail.com</strong>, then try again.';
+  if (/Accounts/i.test(err)) return 'That doesn’t look like a Tiller sheet (no Accounts tab). Paste the link to your Tiller sheet.';
+  return err;
+}
+function rbpTillerSlots(){
+  var d=window._rbpD||{}, sl=(d.portfolio&&d.portfolio.slots)||[];
+  return sl.map(function(s,i){ return {i:i, name:String((s&&s.name)||'').trim(), type:String((s&&s.type)||'')}; }).filter(function(s){ return s.name; });
+}
+function rbpTillerGuess(a, slots){
+  var words=(String(a.name)+' '+String(a.institution)).toLowerCase().split(/[^a-z0-9]+/).filter(function(w){return w.length>2;});
+  var t=String(a.type).toLowerCase(), best=-1, bestScore=0;
+  slots.forEach(function(s){
+    var n=s.name.toLowerCase(), sc=0;
+    words.forEach(function(w){ if(n.indexOf(w)>=0) sc+=2; });
+    if (/40[13]k|403b|401k|ira|pension|retire/.test(t) && /pretax|deferred/i.test(s.type)) sc+=1;
+    if (/roth/.test(t) && /roth/i.test(s.type)) sc+=2;
+    if (/hsa/.test(t+n) && /hsa/i.test(s.type)) sc+=2;
+    if (/brokerage|investment|taxable/.test(t) && /taxable/i.test(s.type)) sc+=1;
+    if (sc>bestScore){ bestScore=sc; best=s.i; }
+  });
+  return bestScore>=2 ? best : -1;
+}
+function rbpTillerFind(){
+  if (!window.RBPTiller){ rbpTillerMsg('Please refresh the page and try again.', false); return; }
+  var url=(document.getElementById('tiller-url')||{}).value||'';
+  rbpTillerMsg('Looking up your Tiller accounts…');
+  RBPTiller.list(url, function(r){
+    if (!r || r.error){ rbpTillerMsg(rbpTillerFriendly(r&&r.error), false); return; }
+    var accts=r.accounts||[], slots=rbpTillerSlots(), cfg=window._rbpTillerCfg||{}, saved=(cfg.map)||{};
+    if (!accts.length){ rbpTillerMsg('Your Tiller sheet has no accounts yet. Add them in the Tiller Console, click Fill in the sheet, then try again.', false); return; }
+    var h='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr>'+
+          '<th style="text-align:left;padding:4px;">Tiller account</th><th style="text-align:right;padding:4px;">Balance</th><th style="text-align:left;padding:4px;">Use for plan account</th></tr></thead><tbody>';
+    accts.forEach(function(a,k){
+      var pick = (saved[a.id]!==undefined) ? Number(saved[a.id]) : rbpTillerGuess(a, slots);
+      var opts='<option value="-1">— don’t use —</option>'+slots.map(function(s){ return '<option value="'+s.i+'"'+(s.i===pick?' selected':'')+'>'+s.name.replace(/</g,'&lt;')+'</option>'; }).join('');
+      h+='<tr style="border-top:1px solid rgba(0,0,0,.08);"><td style="padding:6px 4px;"><strong>'+String(a.name||'Account').replace(/</g,'&lt;')+'</strong><br><span style="color:var(--muted);font-size:11px;">'+
+         [a.institution,a.type,(a.num?'…'+a.num:'')].filter(Boolean).join(' · ').replace(/</g,'&lt;')+'</span></td>'+
+         '<td style="padding:6px 4px;text-align:right;">'+(a.balance===null?'—':RBPTiller.money(a.balance))+'</td>'+
+         '<td style="padding:6px 4px;"><select data-tid="'+a.id+'" class="tiller-pick" style="max-width:220px;">'+opts+'</select></td></tr>';
+    });
+    h+='</tbody></table><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">'+
+       '<button type="button" onclick="rbpTillerSave()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Save &amp; update balances</button>'+
+       ((cfg&&cfg.tillerId)?'<button type="button" onclick="rbpTillerUnlink()" style="background:transparent;border:1px solid var(--muted);color:var(--muted);border-radius:6px;padding:8px 14px;cursor:pointer;">Unlink Tiller</button>':'')+'</div>';
+    document.getElementById('tiller-map').innerHTML=h;
+    rbpTillerMsg('Found '+accts.length+' Tiller account'+(accts.length===1?'':'s')+'. Check the matches, then save.', true);
+  });
+}
+function rbpTillerSave(){
+  if (typeof isDirty!=='undefined' && isDirty){ rbpTillerMsg('You have unsaved changes on this page — tap <strong>Save All Changes</strong> first, then link Tiller.', false); return; }
+  var url=(document.getElementById('tiller-url')||{}).value||'', map={}, used={};
+  var dup=false;
+  Array.prototype.forEach.call(document.querySelectorAll('.tiller-pick'), function(sel){
+    var v=Number(sel.value); if (v>=0){ if (used[v]) dup=true; used[v]=1; map[sel.getAttribute('data-tid')]=v; }
+  });
+  if (dup){ rbpTillerMsg('Two Tiller accounts are matched to the same plan account. Pick a different plan account for one of them.', false); return; }
+  if (!Object.keys(map).length){ rbpTillerMsg('Match at least one Tiller account to a plan account first.', false); return; }
+  rbpTillerMsg('Saving your Tiller link…');
+  RBPTiller.link(url, map, function(r){
+    if (!r || r.error){ rbpTillerMsg(rbpTillerFriendly(r&&r.error), false); return; }
+    rbpTillerSetStatus(r.cfg);
+    rbpTillerMsg('Linked! Pulling your latest balances…', true);
+    RBPTiller.pull(function(p){
+      if (!p || p.error){ rbpTillerMsg(rbpTillerFriendly(p&&p.error), false); return; }
+      if (!p.updated || !p.updated.length){ rbpTillerMsg('✅ Linked. '+RBPTiller.describe(p), true); return; }
+      rbpTillerMsg(RBPTiller.describe(p)+' — recalculating your plan…', true);
+      RBPTiller.refreshPlan(function(){
+        try { localStorage.setItem('rbp_tiller_pulled_'+(localStorage.getItem('rbp_sheet_id')||''), String(Date.now())); } catch(e){}
+        rbpTillerMsg('✅ '+RBPTiller.describe(p)+'. Your plan has been updated.', true);
+        try { loadLiveData(); } catch(e){}
+      });
+    });
+  });
+}
+function rbpTillerUnlink(){
+  rbpTillerMsg('Unlinking…');
+  RBPTiller.unlink(function(r){
+    if (!r || r.error){ rbpTillerMsg(rbpTillerFriendly(r&&r.error), false); return; }
+    rbpTillerSetStatus(null); document.getElementById('tiller-map').innerHTML='';
+    rbpTillerMsg('Tiller is unlinked. Your balances stay as they are, and you can type them in as usual.', true);
+  });
+}
 
 loadLiveData();
 
