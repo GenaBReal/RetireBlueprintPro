@@ -35,7 +35,7 @@ _Last verified: 2026-06-19. Every outside link in the app, in one place._
 
 | Link | Used on | Status |
 |---|---|---|
-| https://docs.google.com/spreadsheets/d/1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA/copy | SetupGuide | verified |
+| (template copy link is no longer in the site — the connector hands it out after a valid access code; template re-made 2026-10-11) | setup.html | access-code |
 
 ### fhfa.gov
 
