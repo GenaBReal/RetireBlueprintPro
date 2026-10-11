@@ -70,6 +70,10 @@
       if (id) q.tillerId = id;
       jsonp(q, cb);
     },
+    // Put the whole gap (Tiller spending in the ticked categories − every other plan line) into one line.
+    spendGap: function (row, cats, months, cb) {
+      jsonp({ action: 'tillerSpendGap', row: row, cats: JSON.stringify(cats || []), months: months || 6 }, cb, 120000);
+    },
     spendApply: function (rows, cb) { jsonp({ action: 'tillerSpendApply', rows: JSON.stringify(rows || []) }, cb, 120000); },
 
     // Fresh read → re-solve the safe-extra with the shared engine → store it (B119) the same
