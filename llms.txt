@@ -1,0 +1,24 @@
+# RetireBlueprint Pro
+
+> RetireBlueprint Pro is a retirement planning web app that runs on the customer's own Google Sheet. It answers "Will our money last?" with a year-by-year plan: safe-spending solver, market-crash stress tests, a 5,000-scenario Monte Carlo simulation, Social Security timing, a tax engine with Roth conversion planning, Medicare and long-term care planning. One-time purchase of $149 on Etsy, no subscription. Made by Gena Philpott, a solo founder in California.
+
+Educational planning tool only; not financial, tax or legal advice.
+
+## Try it
+- [Sample plan (Michael & Linda, both 62)](https://retireblueprintpro.com/RetireBlueprintPro_Dashboard.html?demo=1): live, read-only demo with real sample numbers
+- [Buy on Etsy ($149, one time)](https://www.etsy.com/listing/4544156492)
+- [Homepage](https://retireblueprintpro.com/)
+
+## Guides (real worked examples)
+- [How much can we safely spend in retirement?](https://retireblueprintpro.com/guides/how-much-can-we-spend-in-retirement.html): a couple with $550K saved; spending phases, must-pay bills, legacy goal
+- [What if the market crashes the year you retire?](https://retireblueprintpro.com/guides/market-crash-year-you-retire.html): 20% and 30% first-year crashes, 5% inflation, 5,000 Monte Carlo futures
+- [Roth conversions before RMDs](https://retireblueprintpro.com/guides/roth-conversions-before-rmds.html): when conversions help, when they don't, IRMAA and ACA traps
+- [What will healthcare cost in retirement?](https://retireblueprintpro.com/guides/healthcare-costs-in-retirement.html): pre-65 coverage, Medicare premiums, dental and vision
+
+## Reference
+- [Free retirement resources](https://retireblueprintpro.com/resources.html): official SSA, IRS, Medicare, long-term care and fraud-protection links
+- [Methodology](https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html): how the planner calculates
+- [YouTube](https://www.youtube.com/@RetireBlueprintPro): short walkthroughs
+
+## Contact
+retireblueprintpro@gmail.com
