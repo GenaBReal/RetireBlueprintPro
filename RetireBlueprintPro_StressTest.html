@@ -3770,8 +3770,10 @@ function rbpRunMonteCarlo(d,opts){
             var b0=$('run'); b0.disabled=true; b0.innerHTML='Loading plan\u2026'; postHeight(); return; }
     var opts=readOpts();
     var btn=$('run'); btn.disabled=true; btn.dataset.running='1'; btn.innerHTML='Running\u2026';
-    $('results').style.display='none'; postHeight();
+    var R=$('results'), wasShown=(R.style.display==='block');
+    if(wasShown){ R.style.transition='opacity .2s'; R.style.opacity='.45'; } else { R.style.display='none'; postHeight(); }
     runBatched(opts, function(res){
+      R.style.opacity='1';
       btn.disabled=false; btn.dataset.running=''; btn.innerHTML='\u25B6&nbsp; Run the simulation'; ran=true; $('prog').style.display='none';
       if(!res){ $('r-readout').innerHTML='Couldn\u2019t run the simulation on this plan.'; $('results').style.display='block'; postHeight(); return; }
       paint(res, opts);
@@ -3798,7 +3800,7 @@ function rbpRunMonteCarlo(d,opts){
     window.addEventListener('message', function(ev){ if(!ev||!ev.data) return;
       if(ev.data.type==="rbpMCReady"){ last=''; send(); }
       if(ev.data.type==="rbpMCHeight" && ev.data.h){ frame.style.height=(ev.data.h+6)+'px'; }
-      if(ev.data.type==="rbpMCShow"){ var top=frame.getBoundingClientRect().top+window.pageYOffset+(+ev.data.y||0)-90; try{ window.scrollTo({top:Math.max(0,top), behavior:'smooth'}); }catch(e){ window.scrollTo(0,Math.max(0,top)); } } });
+      if(ev.data.type==="rbpMCShow"){ var onScreen=frame.getBoundingClientRect().top+(+ev.data.y||0); if(onScreen>40 && onScreen<window.innerHeight*0.6) return; var top=frame.getBoundingClientRect().top+window.pageYOffset+(+ev.data.y||0)-90; try{ window.scrollTo({top:Math.max(0,top), behavior:'smooth'}); }catch(e){ window.scrollTo(0,Math.max(0,top)); } } });
   })();
   </script>
 <div class="rbp-precision" style="max-width:1140px;margin:24px auto 0;padding:13px 20px;border-top:1px dashed #dfe6ec;text-align:center;font-size:10px;color:#7c93a4;line-height:1.6;">
