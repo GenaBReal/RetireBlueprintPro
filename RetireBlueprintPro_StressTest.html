@@ -2835,14 +2835,6 @@ function rbpRenderLongevity(){
     </div>
 
     <div id="results">
-      <!-- what the simulation is using (context) -->
-      <div id="r-context" style="display:none;background:linear-gradient(135deg,var(--navy2),var(--navy));border-radius:14px;padding:18px 20px;color:#dceaf5;margin-bottom:14px;box-shadow:0 8px 24px rgba(5,22,40,.16);">
-        <div style="font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">What this simulation is using</div>
-        <div id="r-spend" style="font-size:12.5px;line-height:1.65;">&mdash;</div>
-        <div id="r-horizon" style="font-size:11.5px;line-height:1.55;color:#9fc1d6;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.1);">&mdash;</div>
-        <div style="font-size:11px;line-height:1.55;color:#9fc1d6;margin-top:9px;">Monte Carlo replays your plan through thousands of random market histories (calm years, crashes, long flat stretches) and counts how it turns out &mdash; using the inflation and returns from your saved plan. It answers <b style="color:#fff;">&ldquo;how often does my plan work?&rdquo;</b> rather than &ldquo;what if returns are exactly average?&rdquo;</div>
-      </div>
-
       <div class="head">
         <div class="big" id="r-never">&mdash;</div>
         <div class="bigsub">of the time, your plan <b>never runs out of money</b> &mdash; if you trim the discretionary extras in the worst years, like most retirees do</div>
@@ -2865,6 +2857,14 @@ function rbpRenderLongevity(){
 
       <div class="readout" id="r-readout">&mdash;</div>
       <div class="readout" id="r-assumed" style="border-left-color:var(--gold);display:none;">&mdash;</div>
+      <!-- what the simulation is using (context) -->
+      <div id="r-context" style="display:none;background:linear-gradient(135deg,var(--navy2),var(--navy));border-radius:14px;padding:18px 20px;color:#dceaf5;margin-bottom:14px;box-shadow:0 8px 24px rgba(5,22,40,.16);">
+        <div style="font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">What this simulation is using</div>
+        <div id="r-spend" style="font-size:12.5px;line-height:1.65;">&mdash;</div>
+        <div id="r-horizon" style="font-size:11.5px;line-height:1.55;color:#9fc1d6;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.1);">&mdash;</div>
+        <div style="font-size:11px;line-height:1.55;color:#9fc1d6;margin-top:9px;">Monte Carlo replays your plan through thousands of random market histories (calm years, crashes, long flat stretches) and counts how it turns out &mdash; using the inflation and returns from your saved plan. It answers <b style="color:#fff;">&ldquo;how often does my plan work?&rdquo;</b> rather than &ldquo;what if returns are exactly average?&rdquo;</div>
+      </div>
+
 
       <div style="font-size:11.5px;font-weight:700;color:var(--mut);margin:16px 2px 6px;">What&rsquo;s left at the end if you keep spending every planned extra, with no trimming:</div>
       <div class="tiles">
@@ -3775,6 +3775,7 @@ function rbpRunMonteCarlo(d,opts){
       btn.disabled=false; btn.dataset.running=''; btn.innerHTML='\u25B6&nbsp; Run the simulation'; ran=true; $('prog').style.display='none';
       if(!res){ $('r-readout').innerHTML='Couldn\u2019t run the simulation on this plan.'; $('results').style.display='block'; postHeight(); return; }
       paint(res, opts);
+      setTimeout(function(){ postHeight(); try{ var h=$('r-never'); var y=h? h.getBoundingClientRect().top : 0; parent.postMessage({type:'rbpMCShow', y:y}, '*'); }catch(e){} }, 120);
     });
   });
 
@@ -3796,7 +3797,8 @@ function rbpRunMonteCarlo(d,opts){
     setInterval(send, 900);
     window.addEventListener('message', function(ev){ if(!ev||!ev.data) return;
       if(ev.data.type==="rbpMCReady"){ last=''; send(); }
-      if(ev.data.type==="rbpMCHeight" && ev.data.h){ frame.style.height=(ev.data.h+6)+'px'; } });
+      if(ev.data.type==="rbpMCHeight" && ev.data.h){ frame.style.height=(ev.data.h+6)+'px'; }
+      if(ev.data.type==="rbpMCShow"){ var top=frame.getBoundingClientRect().top+window.pageYOffset+(+ev.data.y||0)-90; try{ window.scrollTo({top:Math.max(0,top), behavior:'smooth'}); }catch(e){ window.scrollTo(0,Math.max(0,top)); } } });
   })();
   </script>
 <div class="rbp-precision" style="max-width:1140px;margin:24px auto 0;padding:13px 20px;border-top:1px dashed #dfe6ec;text-align:center;font-size:10px;color:#7c93a4;line-height:1.6;">
