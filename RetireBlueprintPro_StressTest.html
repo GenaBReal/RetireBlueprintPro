@@ -2858,7 +2858,7 @@ function rbpRenderLongevity(){
           </div>
           <div>
             <div class="n" id="r-median" style="color:#cfe3ef;">&mdash;</div>
-            <div class="nlab">typical amount left at the end</div>
+            <div class="nlab">typical amount left at the end, at full spending</div>
           </div>
         </div>
       </div>
@@ -2866,6 +2866,7 @@ function rbpRenderLongevity(){
       <div class="readout" id="r-readout">&mdash;</div>
       <div class="readout" id="r-assumed" style="border-left-color:var(--gold);display:none;">&mdash;</div>
 
+      <div style="font-size:11.5px;font-weight:700;color:var(--mut);margin:16px 2px 6px;">What&rsquo;s left at the end if you keep spending every planned extra, with no trimming:</div>
       <div class="tiles">
         <div class="tile"><div class="tlab">Rough markets &middot; bottom 10%</div>
           <div class="tval" id="t-p10" style="color:var(--warn);">&mdash;</div>
@@ -3550,7 +3551,7 @@ function rbpRunMonteCarlo(d,opts){
 <script>
 (function(){
   var RBP=window.RBP, $=function(id){return document.getElementById(id);};
-  var d=null, ran=false, lastRes=null;
+  var d=null, ran=false, lastRes=null, pendingRun=false;
 
   function postHeight(){ try{ parent.postMessage({type:'rbpMCHeight', h:Math.ceil(document.body.scrollHeight)}, '*'); }catch(e){} }
   function fmt(n){ n=Math.round(n||0); var neg=n<0; n=Math.abs(n);
@@ -3624,12 +3625,16 @@ function rbpRunMonteCarlo(d,opts){
     $('r-never-ctx').textContent='Across '+opts.runs.toLocaleString()+' randomized futures using '+modelTxt+', '+flexTxt+'.';
 
     var goalTxt = res.legacyGoal>0 ? 'Your legacy goal is <b>'+fmt(res.legacyGoal)+'</b>. ' : '';
-    var verdict = fl>=85 ? 'This is a strong, resilient plan.' :
+    var verdict = (fl>=85 && full>=70) ? 'This is a strong, resilient plan.' :
+                  fl>=85 ? 'This plan holds up well, as long as you trim the extras in bad years.' :
                   fl>=70 ? 'This plan holds up in most futures once you flex spending in downturns.' :
                   fl>=50 ? 'This plan is workable but tight &mdash; trimming in bad years matters a lot here.' :
                            'This plan runs short in most futures even with trimming, and needs attention.';
-    $('r-readout').innerHTML=goalTxt+'In the toughest 10% of markets your plan still ends with about <b>'+fmt(res.p10)+'</b>; '+
-      'in a typical future, <b>'+fmt(res.median)+'</b>. <b>'+verdict+'</b>';
+    var horizonTxt = opts.endAge95 ? ' and live to 95' : '';
+    var trimTxt = res.flex>0 ? 'Trimming the extras by '+Math.round(res.flex*100)+'% in down years' : 'Trimming the extras in down years';
+    $('r-readout').innerHTML=goalTxt+'If you keep spending every planned extra dollar no matter what markets do'+horizonTxt+', your money lasts in <b>'+full+'%</b> of futures, '+
+      'and a typical future ends with about <b>'+fmt(res.median)+'</b> (toughest 10%: <b>'+fmt(res.p10)+'</b>). '+
+      trimTxt+' is what makes the difference: your essentials stay covered in <b>'+fl+'%</b> of futures. <b>'+verdict+'</b>';
 
     $('t-p10').textContent=fmt(res.p10);
     $('t-p50').textContent=fmt(res.median);
@@ -3757,10 +3762,12 @@ function rbpRunMonteCarlo(d,opts){
     var L=$('load'); if(L) L.style.display='none';
     var btn=$('run'); if(btn && !btn.dataset.running){ btn.disabled=false; btn.innerHTML='\u25B6&nbsp; Run the simulation'; }
     postHeight(); setTimeout(postHeight,60);
+    if(pendingRun && btn && !btn.dataset.running){ pendingRun=false; setTimeout(function(){ btn.click(); }, 50); }
   }
 
   $('run').addEventListener('click', function(){
-    if(!d){ var L=$('load'); if(L){ L.style.display=''; L.innerHTML='Still loading your plan numbers \u2014 give it a moment, then press Run.'; } return; }
+    if(!d){ pendingRun=true; var L=$('load'); if(L){ L.style.display=''; L.innerHTML='Loading your plan numbers \u2014 the simulation will start automatically in a moment.'; }
+            var b0=$('run'); b0.disabled=true; b0.innerHTML='Loading plan\u2026'; postHeight(); return; }
     var opts=readOpts();
     var btn=$('run'); btn.disabled=true; btn.dataset.running='1'; btn.innerHTML='Running\u2026';
     $('results').style.display='none'; postHeight();
