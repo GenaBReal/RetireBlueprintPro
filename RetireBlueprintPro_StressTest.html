@@ -3771,14 +3771,14 @@ function rbpRunMonteCarlo(d,opts){
     var opts=readOpts();
     var btn=$('run'); btn.disabled=true; btn.dataset.running='1'; btn.innerHTML='Running\u2026';
     var R=$('results'), wasShown=(R.style.display==='block');
-    if(wasShown){ R.style.transition='opacity .2s'; R.style.opacity='.45'; } else { R.style.display='none'; postHeight(); }
+    if(!wasShown){ R.style.display='none'; postHeight(); }
     runBatched(opts, function(res){
-      R.style.opacity='1';
       btn.disabled=false; btn.dataset.running=''; btn.innerHTML='\u25B6&nbsp; Run the simulation'; ran=true; $('prog').style.display='none';
       if(!res){ $('r-readout').innerHTML='Couldn\u2019t run the simulation on this plan.'; $('results').style.display='block'; postHeight(); return; }
       paint(res, opts);
       setTimeout(function(){ postHeight(); try{ var h=$('r-never'); var y=h? h.getBoundingClientRect().top : 0; parent.postMessage({type:'rbpMCShow', y:y}, '*'); }catch(e){} }, 120);
     });
+    if(wasShown){ $('prog').style.display='none'; }
   });
 
   window.addEventListener('message', function(ev){ if(ev&&ev.data&&ev.data.type==='rbpPlan'){ applyPlan(ev.data.I); } });
