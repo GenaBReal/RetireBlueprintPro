@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/rbp-demo.js"></script>
 <script>
 /* ── Always load the latest version (auto cache-bust) ──
    On the LIVE site, reload once through a unique URL on open so the browser fetches the
@@ -392,7 +393,7 @@ window.addEventListener('storage', function(e) {
   <iframe id="rbpT1Frame" title="Test 1 · Crash Test" scrolling="no" style="width:100%;height:1500px;border:0;display:block;background:#F8F9FA;border-radius:10px;overflow:hidden;margin-top:18px;"></iframe>
   <script type="text/plain" id="rbpT1src"><!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script src="/rbp-demo.js"><\/script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Test 1 · Crash Test — light prototype</title>
@@ -1564,7 +1565,7 @@ function rbpRunMonteCarlo(d,opts){
   <iframe id="rbpSWFrame" title="Test 2 · Scenario Sweep" scrolling="no" style="width:100%;height:1000px;border:0;display:block;background:#F8F9FA;border-radius:10px;overflow:hidden;margin-top:18px;"></iframe>
   <script type="text/plain" id="rbpSWsrc"><!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script src="/rbp-demo.js"><\/script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Test 2 · Scenario Sweep — light</title>
@@ -2701,7 +2702,7 @@ function rbpRenderLongevity(){
   <!-- ══════ Test 4 · Monte Carlo — live engine, isolated frame ══════ -->
   <iframe id="rbpMCFrame" title="Test 4 · Monte Carlo" scrolling="no" style="width:100%;height:1200px;border:0;display:block;background:#F8F9FA;border-radius:10px;overflow:hidden;margin-top:18px;"></iframe>
   <script type="text/plain" id="rbpMCsrc"><!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><script src="/rbp-demo.js"><\/script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   :root{
     --ink:#0f2433; --ink2:#3a5161; --mut:#6b8294; --line:#e3e9ee;
