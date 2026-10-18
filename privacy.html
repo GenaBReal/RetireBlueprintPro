@@ -152,7 +152,7 @@ footer .legal{flex-basis:100%;font-size:.82rem;color:#6F8A99;max-width:90ch}
     <p class="eyebrow" style="color:var(--gold)">Privacy policy</p>
     <h1>Your plan lives in <span>your own Google Sheet.</span></h1>
     <p class="lede">This page explains, in plain English, what information RetireBlueprint Pro handles, how the app connects to your plan, what we can and can't see, and what you can do about it.</p>
-    <p class="note" style="margin-top:10px">Effective October 17, 2026.</p>
+    <p class="note" style="margin-top:10px">Effective October 17, 2026. Updated October 17, 2026 for Google sign-in.</p>
   </div>
 </section>
 
@@ -161,7 +161,7 @@ footer .legal{flex-basis:100%;font-size:.82rem;color:#6F8A99;max-width:90ch}
   <div class="policy">
 
     <div class="box">
-      <p><b>The short version.</b> Your retirement plan is a Google Sheet in your own Google account. RetireBlueprint Pro does not keep a database of customer finances, and we never sell your information. Today, connecting the app means sharing your sheet with retireblueprintpro@gmail.com, which gives us access to it. We use that access only to run your plan, and we only open your sheet ourselves if you ask us for help. We're building a Google sign-in option so the app can work without that share at all.</p>
+      <p><b>The short version.</b> Your retirement plan is a Google Sheet in your own Google account. RetireBlueprint Pro does not keep a database of customer finances, and we never sell your information. You connect the app with Google sign-in: your browser reads and saves your sheet directly with Google, and RetireBlueprint Pro can't open your sheet or see your plan's numbers.</p>
     </div>
 
     <h2>Who we are</h2>
@@ -177,19 +177,25 @@ footer .legal{flex-basis:100%;font-size:.82rem;color:#6F8A99;max-width:90ch}
     </ul>
 
     <h2>How the app connects to your sheet</h2>
-    <h3>Today: sharing your sheet</h3>
-    <p>During setup, you share your copy of the planning sheet with retireblueprintpro@gmail.com as an Editor. The app's connector (a Google Apps Script that runs on Google's servers under that account) then reads your plan to draw each page and saves your changes when you click save.</p>
+    <h3>Google sign-in (standard)</h3>
+    <p>During setup, you click "Connect Privately with Google," sign in, and pick your planning sheet in Google's own file picker. From then on, your browser talks directly to Google to read and save your plan.</p>
     <ul>
-      <li>Sharing gives RetireBlueprint Pro access to your sheet. We use it only to run your plan.</li>
-      <li>We don't copy your plan into any other database. To keep pages fast, a read may be held in Google's temporary memory for about 45 seconds before it expires.</li>
-      <li>We only open your sheet ourselves if you ask us for help.</li>
-      <li>You can remove the share at any time in Google Sheets (Share, then remove retireblueprintpro@gmail.com). The app will stop updating until you share it again.</li>
+      <li>RetireBlueprint Pro asks only for access to the files you pick (Google's "drive.file" permission), not the rest of your Google Drive.</li>
+      <li>You don't share your sheet with us. Our servers and our Google account never receive your plan's data, and we can't open your sheet.</li>
+      <li>Google's sign-in pass is kept only in your browser for the current session and expires after about an hour.</li>
+      <li>You can remove the app's access any time in your Google Account (Security, then "Your connections to third-party apps &amp; services").</li>
+      <li>Because we can't open your sheet, if you want help with your plan, you can choose to share it with us temporarily, then remove the share afterward.</li>
     </ul>
-    <h3>Coming soon: Google sign-in</h3>
-    <p>We're adding a "Sign in with Google" option. With it, you pick your planning sheet in Google's own file picker, and your browser talks directly to Google to read and save your plan. RetireBlueprint Pro asks only for access to the files you choose (Google's "drive.file" permission), not the rest of your Google Drive. With sign-in, you don't share your sheet with us, and we don't receive your plan's data.</p>
+    <h3>The original way: sharing your sheet</h3>
+    <p>Some earlier customers connected by sharing their sheet with retireblueprintpro@gmail.com as an Editor, and the Setup page still offers this as a fallback. With that method, the app's connector (a Google Apps Script that runs on Google's servers under that account) reads your plan and saves your changes.</p>
+    <ul>
+      <li>Sharing gives RetireBlueprint Pro access to your sheet. We use it only to run your plan, and we only open your sheet ourselves if you ask us for help.</li>
+      <li>We don't copy your plan into any other database. To keep pages fast, a read may be held in Google's temporary memory for about 45 seconds before it expires.</li>
+      <li>You can switch to Google sign-in at any time on the Setup page, then remove the share in Google Sheets (Share, then remove retireblueprintpro@gmail.com).</li>
+    </ul>
 
     <h2>Optional: Tiller</h2>
-    <p>If you use Tiller, you can link it so your account balances update in your plan. Tiller is a separate service with its own privacy policy, and your bank logins stay with Tiller. Today, linking means sharing your Tiller sheet with retireblueprintpro@gmail.com as a Viewer, which gives us view access to that sheet, including your transactions. The app reads balances, and spending totals if you choose, to update your plan. We don't copy or keep your Tiller data, and you can remove the share at any time.</p>
+    <p>If you use Tiller, you can link it so your account balances update in your plan. Tiller is a separate service with its own privacy policy, and your bank logins stay with Tiller. Tiller linking is currently available only with the original connection, and it means sharing your Tiller sheet with retireblueprintpro@gmail.com as a Viewer, which gives us view access to that sheet, including your transactions. The app reads balances, and spending totals if you choose, to update your plan. We don't copy or keep your Tiller data, and you can remove the share at any time.</p>
 
     <h2>Google user data</h2>
     <p>RetireBlueprint Pro's use and transfer of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements. In particular:</p>

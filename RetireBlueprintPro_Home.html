@@ -658,11 +658,11 @@ function showState(kind, msg){
   } else {
     if(b){ b.className='state-banner err'; b.style.display='flex';
       b.innerHTML='<div class="sb-txt"><div class="sb-h">We couldn\u2019t load your plan</div>'+
-        '<div class="sb-p">'+(msg||'Please refresh. If it keeps happening, make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.')+'</div></div>'+
+        '<div class="sb-p">'+(msg||((function(){try{return localStorage.getItem('rbp_conn')==='google'}catch(e){return false}})()?'Please refresh. If it keeps happening, go to Setup and click Connect Privately with Google again.':'Please refresh. If it keeps happening, make sure your sheet is shared with retireblueprintpro@gmail.com as Editor.'))+'</div></div>'+
         '<a class="sb-btn" href="#" onclick="loadData();return false;">Try again</a>'; }
     set('m-status','Couldn\u2019t reach your sheet'); setDot('#c0504a');
     setHTML('hv-headline','We couldn\u2019t reach your <span class="accent">sheet</span>');
-    set('hv-sub', msg||'Refresh to try again. Make sure your sheet is shared with retireblueprintpro@gmail.com.');
+    set('hv-sub', msg||((function(){try{return localStorage.getItem('rbp_conn')==='google'}catch(e){return false}})()?'Refresh to try again, or reconnect with Google on the Setup page.':'Refresh to try again. Make sure your sheet is shared with retireblueprintpro@gmail.com.'));
   }
 }
 

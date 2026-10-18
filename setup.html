@@ -83,7 +83,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
 
 <div class="page">
   <div class="hero">
-    <div class="hero-title">Get Started in<br><em>Three Simple Steps</em></div>
+    <div class="hero-title">Get Started in<br><em>Two Simple Steps</em></div>
     <div class="hero-sub">No technical knowledge needed. Takes about 5 minutes — and you never have to do this again.</div>
   </div>
 
@@ -95,7 +95,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     </div>
     <div class="step-body">
       Click the button below. Google will show a box saying <strong>"Make a copy"</strong> — just click the blue button. Your personal retirement sheet opens in a new tab.<br><br>
-      <strong>Keep that tab open</strong> — you'll need it for the next steps!
+      Then come back to this page for Step 2.
     </div>
     <!-- Access code: the template link is only handed out by the connector after a valid code -->
     <div id="code-box" style="margin:4px 0 12px;">
@@ -113,14 +113,14 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     </a>
   </div>
 
-  <!-- PRIVATE OPTION: Google sign-in (shown when RBP_GOOGLE_LIVE is on, or with ?g=1 for testing) -->
+  <!-- STEP 2: PRIVATE CONNECTION (Google sign-in) -->
   <div class="step" id="g-step" style="display:none;border:1px solid var(--teal);">
     <div class="step-header">
-      <div class="step-num" id="ng">🔒</div>
-      <div class="step-title">Recommended: Connect Privately with Google</div>
+      <div class="step-num" id="ng">2</div>
+      <div class="step-title">Connect Privately with Google</div>
     </div>
     <div class="step-body">
-      Skip sharing. Sign in with Google and pick <strong>the copy you just made</strong>. Your browser then reads and saves your sheet directly with Google — <strong>RetireBlueprint Pro can't open your sheet</strong>, and you don't share it with anyone.
+      Click the button, sign in with the Google account that has your sheet, then pick <strong>the copy you just made</strong>. Your browser reads and saves your sheet directly with Google — <strong>RetireBlueprint Pro can't open your sheet</strong>, and you don't share it with anyone.
     </div>
     <button type="button" class="btn btn-teal" id="g-connect" onclick="connectGoogle()" style="margin-top:6px;">
       🔒 &nbsp;Connect Privately with Google
@@ -129,13 +129,17 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px;">
       Google will ask permission for RetireBlueprint Pro to see <strong>only the files you pick</strong> — not the rest of your Google Drive. Connected the old way before? After this, open your sheet, click <strong>Share</strong> and remove retireblueprintpro@gmail.com.
     </div>
-    <div style="font-size:12px;color:var(--muted);margin-top:8px;">Prefer the original way? Use steps 2 and 3 below instead.</div>
   </div>
+
+  <!-- ORIGINAL WAY (fallback): share + paste link -->
+  <details id="legacy-wrap" style="margin:4px 0 18px;">
+  <summary style="cursor:pointer;font-size:14px;color:var(--muted);padding:10px 2px;">Can't use Google sign-in? Connect the original way instead</summary>
+  <div style="font-size:12px;color:var(--muted);line-height:1.6;margin:6px 2px 10px;">The original way works by sharing your sheet with RetireBlueprint Pro, which gives us access to it. The Google sign-in above is more private, so use it if you can. Tiller syncing currently needs the original way.</div>
 
   <!-- STEP 2 -->
   <div class="step">
     <div class="step-header">
-      <div class="step-num" id="n2">2</div>
+      <div class="step-num" id="n2">A</div>
       <div class="step-title">Share Your Sheet So It Can Connect</div>
     </div>
     <div class="step-body">
@@ -161,7 +165,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
   <!-- STEP 3 -->
   <div class="step">
     <div class="step-header">
-      <div class="step-num" id="n3">3</div>
+      <div class="step-num" id="n3">B</div>
       <div class="step-title">Connect Your Sheet to Your Dashboard</div>
     </div>
     <div class="step-body">
@@ -190,6 +194,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
       </div>
     </div>
   </div>
+  </details>
 
   <!-- SUCCESS -->
   <div class="success-box" id="success-box">
@@ -222,6 +227,7 @@ var GITHUB = 'https://genabreal.github.io/RetireBlueprintPro';
     document.getElementById('n2').classList.add('done');
     document.getElementById('n3').textContent = '✓';
     document.getElementById('n3').classList.add('done');
+    var ng=document.getElementById('ng'); if(ng){ ng.textContent='✓'; ng.classList.add('done'); }
     document.getElementById('success-box').classList.add('show');
   }
 })();
@@ -297,7 +303,7 @@ function connect(){
 
 // ── PRIVATE CONNECTION (Google sign-in) ─────────────────────────────────────
 // Flip RBP_GOOGLE_LIVE to true once Google has approved the sign-in screen for everyone.
-var RBP_GOOGLE_LIVE = false;
+var RBP_GOOGLE_LIVE = true;
 (function(){
   if (RBP_GOOGLE_LIVE || /[?&]g=1\b/.test(location.search)) document.getElementById('g-step').style.display='';
 })();

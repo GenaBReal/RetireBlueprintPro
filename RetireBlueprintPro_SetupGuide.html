@@ -266,7 +266,7 @@ window.addEventListener('storage', function(e) {
     <div><span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 19 9 12 9 13 2"/></svg></span></div>
     <div>
       <div style="font-size:14px;font-weight:800;color:#041E2F;">Quick start — your first projection in five minutes</div>
-      <div style="font-size:11px;color:#5d3a00;">Step 1: Copy your sheet → Step 2: Share it with us (Editor access) → Step 3: Paste your sheet link to connect → then add your numbers on Inputs and see your Dashboard</div>
+      <div style="font-size:11px;color:#5d3a00;">Step 1: Copy your sheet → Step 2: Connect privately with Google → then add your numbers on Inputs and see your Dashboard</div>
     </div>
   </div>
   <a href="#start-setup" style="background:#041E2F;color:#f4b86a;font-size:12px;font-weight:700;padding:10px 20px;border-radius:6px;text-decoration:none;white-space:nowrap;flex-shrink:0;">Start Setup →</a>
@@ -356,7 +356,7 @@ window.addEventListener('storage', function(e) {
         <div class="step-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span></div>
         <div class="step-content">
           <div class="step-title">Your Data Stays in Your Sheet</div>
-          <div class="step-desc">Your data lives in <strong>your Google Sheet</strong> — not in a company database. Sharing it with us is what lets the app read and save your plan, and it gives RetireBlueprint Pro access to your sheet. We don't copy or keep your numbers, and we only open your sheet ourselves if you ask us for help. You can remove the share anytime from your sheet's Share settings.</div>
+          <div class="step-desc">Your data lives in <strong>your Google Sheet</strong> — not in a company database. When you connect with Google sign-in, your browser reads and saves your sheet directly with Google, and <strong>RetireBlueprint Pro can't open it</strong>. You don't share your sheet with anyone, and the app can see only the files you pick.</div>
         </div>
       </div>
     </div>
@@ -378,7 +378,7 @@ window.addEventListener('storage', function(e) {
         <div class="step-content">
           <div class="step-title">Step 1 — Make Your Personal Copy of the Sheet</div>
           <div class="step-desc">
-            Open the <a href="https://retireblueprintpro.com/setup.html" style="color:#1CC7D0;font-weight:700;">Setup &amp; Connect page</a> and enter the <strong>access code</strong> from your <strong>Start Here guide</strong> (the PDF from your purchase). Then click <strong>"Make My Personal Copy,"</strong> click <strong>"Make a copy"</strong> in Google, and keep that tab open for the next steps.
+            Open the <a href="https://retireblueprintpro.com/setup.html" style="color:#1CC7D0;font-weight:700;">Setup &amp; Connect page</a> and enter the <strong>access code</strong> from your <strong>Start Here guide</strong> (the PDF from your purchase). Then click <strong>"Make My Personal Copy,"</strong> click <strong>"Make a copy"</strong> in Google, then come back to the Setup page for Step 2.
           </div>
         </div>
       </div>
@@ -386,23 +386,12 @@ window.addEventListener('storage', function(e) {
       <div class="step">
         <div class="step-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div>
         <div class="step-content">
-          <div class="step-title">Step 2 — Share Your Sheet So It Can Connect</div>
+          <div class="step-title">Step 2 — Connect Privately with Google</div>
           <div class="step-desc">
-            In your new sheet, click the <strong>Share</strong> button (top right corner). Add this email as an <strong>Editor</strong>:
-          </div>
-          <div class="email-box">
-            <span class="email-addr">retireblueprintpro@gmail.com</span>
-            <button class="btn-copy" onclick="navigator.clipboard.writeText('retireblueprintpro@gmail.com').then(function(){this.textContent='✓ Copied!';setTimeout(function(){document.querySelector('.btn-copy').textContent='Copy';},2000)}.bind(this))">Copy</button>
-          </div>
-          <div class="step-desc">
-            <strong>How to share:</strong><br>
-            1. Click the blue <strong>Share</strong> button (top right of your sheet)<br>
-            2. Paste <code>retireblueprintpro@gmail.com</code> in the people box<br>
-            3. Make sure the permission says <strong>Editor</strong><br>
-            4. Click <strong>Send</strong>
+            On the Setup page, click <strong>Connect Privately with Google</strong>. Sign in with the Google account that has your sheet, then pick <strong>the copy you made in Step 1</strong> from Google's file list. That's it — the app opens straight to your plan.
           </div>
           <div class="tip">
-            <strong>Why do we need Editor access?</strong> When you enter your numbers on the Inputs page and click Save, our system writes those values directly to your sheet. Without Editor access, it can't write — and your data won't save. You can remove access at any time from your Google Drive settings.
+            <strong>What Google asks:</strong> Google will ask you to let RetireBlueprint Pro see <strong>only the files you pick</strong> — not the rest of your Google Drive. You don't share your sheet with us, and we can't open it. You can remove the app's access any time in your Google Account under <strong>Security → Your connections to third-party apps &amp; services</strong>.
           </div>
         </div>
       </div>
@@ -410,10 +399,9 @@ window.addEventListener('storage', function(e) {
       <div class="step">
         <div class="step-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.55);vertical-align:middle;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1CC7D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg></span></div>
         <div class="step-content">
-          <div class="step-title">Step 3 — Connect Your Sheet to This Dashboard</div>
+          <div class="step-title">Can't Use Google Sign-In?</div>
           <div class="step-desc">
-            Go to your new sheet tab. Click the browser address bar at the top — it shows a long web address. <strong>Select all and copy it</strong>, then go to Setup and paste it to connect.<br><br>
-            The address looks like: <code>https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit</code>
+            The Setup page also has the <strong>original way</strong> to connect (tap “Can't use Google sign-in?” under Step 2): you share your sheet with <code>retireblueprintpro@gmail.com</code> as an Editor and paste your sheet's address. That way gives RetireBlueprint Pro access to your sheet, so use Google sign-in if you can. Tiller syncing currently needs the original way.
           </div>
           <div style="margin-top:6px;padding:12px 14px;border-radius:10px;background:#0c2438;border:0.5px solid rgba(28,199,208,0.35);font-size:13px;color:#cfe3ea;line-height:1.55;">
             🔒 Setup is for buyers — you’ll need the <strong>access code</strong> from your <strong>Start Here guide</strong> (the PDF from your purchase). Lost it? Message us on Etsy and we’ll send it again.
@@ -521,7 +509,7 @@ window.addEventListener('storage', function(e) {
           <div class="step-desc">
             After entering or updating any data, click the <strong>Save All Changes</strong> button. Your Google Sheet updates in the background — wait a few seconds, then go to the <strong>Dashboard</strong> to see your updated projections.
           </div>
-          <div class="tip"><strong>Tip:</strong> You'll see a green "✅ Saved!" message when successful. If you see a red error, make sure your sheet is still shared with retireblueprintpro@gmail.com as Editor.</div>
+          <div class="tip"><strong>Tip:</strong> You'll see a green "✅ Saved!" message when successful. If you see a red error or a “Continue with Google” button, click it to sign in again, then save again.</div>
         </div>
       </div>
     </div>
@@ -612,9 +600,9 @@ window.addEventListener('storage', function(e) {
           <div class="step-desc">
             This is the most common issue. Work through these steps in order:<br><br>
             <strong>1. Check your internet connection</strong> — make sure you're online.<br><br>
-            <strong>2. Check that your sheet is still shared</strong> — open your Google Sheet, click <strong>Share</strong> (top right), and confirm <code>retireblueprintpro@gmail.com</code> is listed as <strong>Editor</strong>. If it's missing, re-add it.<br><br>
+            <strong>2. Sign in again if asked</strong> — if you see <strong>Continue with Google</strong>, click it; Google sign-ins expire after about an hour. (Connected the original way? Check that your sheet is still shared with <code>retireblueprintpro@gmail.com</code> as <strong>Editor</strong>.)<br><br>
             <strong>3. Try again</strong> — click Save All Changes again. If it still fails, press <strong>Cmd+Shift+R</strong> (Mac) or <strong>Ctrl+Shift+R</strong> (PC) to force-reload the page, then try saving again.<br><br>
-            <strong>4. Check your sheet URL</strong> — go to Setup and re-paste your Google Sheet URL. Sometimes the connection ID gets corrupted if you cleared browser data.
+            <strong>4. Reconnect</strong> — go to Setup and click <strong>Connect Privately with Google</strong> again, then pick your sheet. This fixes it if your browser data was cleared.
           </div>
         </div>
       </div>
@@ -649,10 +637,9 @@ window.addEventListener('storage', function(e) {
             Your data is safe — it's in your Google Sheet. You just need to reconnect on this device.<br><br>
             <strong>Steps:</strong><br>
             1. Open the <strong>Setup page</strong> (the link is in your Start Here guide / purchase PDF)<br>
-            2. <strong>Skip Steps 1 and 2</strong> (you already made your copy and shared it)<br>
-            3. Open your Google Sheet in another tab, copy the URL from the address bar<br>
-            4. Paste it in Step 3 on the Setup page and click Connect<br>
-            5. Done — your data will load on all pages
+            2. <strong>Skip Step 1</strong> (you already made your copy)<br>
+            3. Click <strong>Connect Privately with Google</strong> and pick your sheet<br>
+            4. Done — your data will load on all pages
           </div>
         </div>
       </div>
@@ -664,9 +651,9 @@ window.addEventListener('storage', function(e) {
           <div class="step-desc">
             This usually means the connection to your Google Sheet timed out. Try these in order:<br><br>
             <strong>1.</strong> Press <strong>Cmd+Shift+R</strong> to force-reload<br>
-            <strong>2.</strong> Make sure your Google Sheet is shared with <code>retireblueprintpro@gmail.com</code> as Editor<br>
-            <strong>3.</strong> Go to Setup and reconnect by pasting your Google Sheet URL again<br>
-            <strong>4.</strong> If none of the above works, email us at <strong>retireblueprintpro@gmail.com</strong> — include your sheet URL and we'll get you sorted
+            <strong>2.</strong> If you see <strong>Continue with Google</strong>, click it to sign in again<br>
+            <strong>3.</strong> Go to Setup and click <strong>Connect Privately with Google</strong> again<br>
+            <strong>4.</strong> If none of the above works, email us at <strong>retireblueprintpro@gmail.com</strong> and we'll get you sorted
           </div>
         </div>
       </div>
@@ -1247,7 +1234,7 @@ window.addEventListener('storage', function(e) {
           <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
             Is my financial data safe and private? <span>▾</span>
           </div>
-          <div class="faq-a">Your data lives in your own Google Sheet, protected by your Google account and Google's encryption. To make the app work, you share that sheet with retireblueprintpro@gmail.com, which gives RetireBlueprint Pro access to it. We use that access only to run your plan: we don't copy your numbers, we don't keep a database of customer finances, and we don't open your sheet unless you ask us for help. You can remove the share any time from your sheet's Share settings (the app will stop updating until you share it again).</div>
+          <div class="faq-a">Your data lives in your own Google Sheet, protected by your Google account and Google's encryption. When you connect with Google sign-in, your browser reads and saves your sheet directly with Google — RetireBlueprint Pro can't open your sheet, we don't receive your numbers, and we don't keep a database of customer finances. The app can see only the files you pick, not the rest of your Google Drive. (If you connected the original way, by sharing your sheet with retireblueprintpro@gmail.com, that share gives us access; you can switch to Google sign-in on the Setup page and then remove the share.) See our <a href="privacy.html" style="color:#1CC7D0;">Privacy Policy</a> for details.</div>
         </div>
 
         <div class="faq-item">

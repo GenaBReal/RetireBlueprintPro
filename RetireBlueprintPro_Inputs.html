@@ -976,6 +976,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       </div>
       <div id="tspend-body" style="display:none;margin-top:10px;font-size:12px;line-height:1.6;">
         <div class="tiller-intro"></div>
+        <div class="tiller-gnote" style="display:none;margin:0 0 10px;padding:10px 12px;border-radius:6px;background:rgba(244,184,106,.12);border:1px solid rgba(244,184,106,.45);">You're connected privately with Google sign-in. <strong>Tiller syncing isn't available with Google sign-in yet</strong> — you can keep updating your numbers by hand on this page.</div>
         <p style="margin:0 0 8px;">See what you <em>actually</em> spend each month, from your Tiller transactions, next to the numbers in your plan. Nothing changes until you tick a line and tap <strong>Apply</strong>.</p>
         <ol style="margin:0 0 10px 18px;padding:0;">
           <li>Your Tiller sheet must be linked (see <strong>VI. Named Accounts</strong>), or paste its link there first.</li>
@@ -1216,6 +1217,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       </div>
       <div id="tiller-body" style="display:none;margin-top:10px;font-size:12px;line-height:1.6;">
         <div class="tiller-intro"></div>
+        <div class="tiller-gnote" style="display:none;margin:0 0 10px;padding:10px 12px;border-radius:6px;background:rgba(244,184,106,.12);border:1px solid rgba(244,184,106,.45);">You're connected privately with Google sign-in. <strong>Tiller syncing isn't available with Google sign-in yet</strong> — you can keep updating your numbers by hand on this page.</div>
         <p style="margin:0 0 8px;"><strong>Already use Tiller?</strong> Link it and your account balances update here automatically. Your bank logins stay with Tiller. RetireBlueprint Pro reads your Tiller sheet to pull in your balances (and spending totals, if you choose). Sharing it gives us view access to that sheet, including your transactions. We don't copy or keep it, and you can remove the share any time.</p>
         <ol style="margin:0 0 10px 18px;padding:0;">
           <li>Open your Tiller Google Sheet, click <strong>Share</strong>, and add <strong>retireblueprintpro@gmail.com</strong> as a <strong>Viewer</strong>. (In Tiller, turn on <strong>AutoFill</strong> so it refreshes every day.)</li>
@@ -2633,7 +2635,7 @@ function loadLiveData() {
       if (data && data.error) {
         hideLoadingOverlay();
         setStatus('Error loading sheet: ' + data.error, 'error');
-        showToast('Could not load sheet. Is it shared with retireblueprintpro@gmail.com?', 'error');
+        showToast((function(){try{return localStorage.getItem('rbp_conn')==='google'}catch(e){return false}})() ? 'Could not load your sheet. Try reconnecting with Google on the Setup page.' : 'Could not load sheet. Is it shared with retireblueprintpro@gmail.com?', 'error');
         return;
       }
       try {
@@ -2701,7 +2703,7 @@ function loadLiveDataJSONP(sheetId, SCRIPT) {
     if (!done) {
       cleanup();
       hideLoadingOverlay();
-      setStatus('Timeout — make sure sheet is shared with retireblueprintpro@gmail.com as Editor.', 'error');
+      setStatus((function(){try{return localStorage.getItem('rbp_conn')==='google'}catch(e){return false}})() ? 'Timeout — try reconnecting with Google on the Setup page.' : 'Timeout — make sure sheet is shared with retireblueprintpro@gmail.com as Editor.', 'error');
     }
   }, 3600000); // 60 minutes
 
@@ -4839,5 +4841,6 @@ if(document.readyState!=='loading')w();else document.addEventListener('DOMConten
   if(document.readyState!=='loading')check();else document.addEventListener('DOMContentLoaded',check);
 })();
 </script>
+<script>(function(){try{if(localStorage.getItem('rbp_conn')==='google'){document.querySelectorAll('.tiller-gnote').forEach(function(e){e.style.display='';});}}catch(e){}})();</script>
 </body>
 </html>
