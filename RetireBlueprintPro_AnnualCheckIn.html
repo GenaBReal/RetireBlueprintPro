@@ -344,7 +344,7 @@ window.addEventListener('storage', function(e) {
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_RothLadder.html">Roth Ladder</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Medicare.html">Healthcare</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_LTC.html">LTC</a>
-  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Demo.html">Demo</a>
+  <a href="https://retireblueprintpro.com/RetireBlueprintPro_Dashboard.html?demo=1">Demo</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Methodology.html">Methodology</a>
   <a href="https://retireblueprintpro.com/RetireBlueprintPro_Changelog.html">What's New</a>
   
@@ -652,7 +652,7 @@ function updateKPIs(data) {
     if (lbl) lbl.textContent = 'Projected End ' + longestYear;
     // Also update header projected value from projections
     if (data.projections && data.projections.endLiquid && data.projections.endLiquid.length) {
-      document.getElementById('hdr-proj').textContent = fmt(data.projections.endLiquid[0]*1000||data.projections.endLiquid[0]);
+      document.getElementById('hdr-proj').textContent = fmt(data.projections.endLiquid[0]);
     }
   }
   updateKPIsFromData();
