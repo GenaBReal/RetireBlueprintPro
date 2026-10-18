@@ -4,7 +4,7 @@
 (function () {
   try {
     if (localStorage.getItem('rbp_conn') === 'google' && localStorage.getItem('rbp_g_sheet_id')) {
-      var v = '?v=20261017b';
+      var v = '?v=20261017c';
       ['rbp-google.js', 'rbp-gs-shim.js', 'rbp-gs-core.js', 'rbp-gbridge.js'].forEach(function (f) {
         document.write('<script src="/' + f + v + '"><\/script>');
       });

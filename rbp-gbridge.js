@@ -182,6 +182,18 @@
       case 'saveSweep':       return withBook(id, { '_StressTests': null }, function (b, c) { return c.saveSweep(b, decodePayload(p)); });
       case 'loadMonteCarlo':  return withBook(id, { '_StressTests': null }, function (b, c) { return c.loadMonteCarlo(b); });
       case 'saveMonteCarlo':  return withBook(id, { '_StressTests': null }, function (b, c) { return c.saveMonteCarlo(b, decodePayload(p)); });
+      case 'runStressTest':
+      case 'runSweep':
+      case 'runSweepOne':
+        // Same as the connector: heal any orphaned stress state first, run, then restore.
+        return S().load(id, { tabs: { 'Inputs': null, '_StressTests': null } }).then(function (book) {
+          var c = core(book), inp = book.getSheetByName('Inputs');
+          c.rbpHealStress(book, inp, true);
+          var run = action === 'runStressTest' ? c.runStressTest : action === 'runSweep' ? c.runSweepBatch : c.runSweepOne;
+          return Promise.resolve(run(book, inp, p)).then(function (res) {
+            return book.flush().then(function () { readCache = {}; return res; });
+          });
+        });
       case 'tillerGet':
         return S().load(id, { tabs: {} }).then(function (b) { return { ok: true, cfg: core(b).rbpTillerCfg(b) }; });
       default:

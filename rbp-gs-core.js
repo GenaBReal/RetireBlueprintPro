@@ -1084,6 +1084,347 @@ function rbpExpenseRows(inp) {
     return { row: row, name: String(a[i][0] || ''), monthly: Number(a[i][1]) || 0, formula: !!f[i][0] };
   });
 }
+function _rbpSweepScenarios() {
+  return [
+    { label:'+10%  (great year)', drag:-3,  dur:1 },
+    { label:' +5%  (good year)',  drag: 2,  dur:1 },
+    { label:'  0%  (flat year)',  drag: 7,  dur:1 },
+    { label:'-10%  (mild drop)',  drag:17,  dur:1 },
+    { label:'-20%  (bad year)',   drag:27,  dur:1 },
+    { label:'-30%  (bear mkt)',   drag:37,  dur:1 },
+    { label:'-40%  (severe)',     drag:47,  dur:1 },
+    { label:'-50%  (crash)',      drag:57,  dur:1 },
+  ];
+}
+async function runStressTest(ss, inp, p) {
+  try {
+    // --- 1. Save the customer's current stress cells (B12-B19) ---
+    var orig = (await inp.getRange('B12:B20').getValuesAsync()); // 9 rows: B12-B19 bear params + B20 inflation
+    rbpStashStress(ss, orig); // crash-safety: backup before we write, in case this run is killed mid-flight
+
+    // --- 2. Parse incoming test params (whole-number drags) ---
+    function pnum(v, d){ var n = Number(v); return isNaN(n) ? d : n; }
+    var eType  = (p.eType  !== undefined && p.eType  !== '') ? String(p.eType)  : 'bear';
+    var eStart = pnum(p.eStart, 0);
+    var eDur   = pnum(p.eDur,   0);
+    var eDrag  = pnum(p.eDrag,  0);   // whole number, e.g. 10
+    var lType  = (p.lType  !== undefined && p.lType  !== '') ? String(p.lType)  : '';
+    var lStart = pnum(p.lStart, 0);
+    var lDur   = pnum(p.lDur,   0);
+    var lDrag  = pnum(p.lDrag,  0);
+    // Inflation override (whole-number %, e.g. 5). null = leave the customer's saved inflation untouched.
+    var inflPct = (p.infl !== undefined && p.infl !== '') ? pnum(p.infl, null) : null;
+
+    // --- 3. Write the test values ---
+    // Only write an EARLY bear if a duration & drag were given; same for LATE.
+    var newVals = orig.map(function(r){ return [r[0]]; }); // clone
+    if (eDur > 0 && eDrag !== 0) {
+      newVals[0] = [eType];          // B12 type
+      newVals[1] = [eStart];         // B13 start
+      newVals[2] = [eDur];           // B14 duration
+      newVals[3] = [eDrag/100];      // B15 drag -> decimal
+    } else {
+      // no early stress this test — clear the trigger so it doesn't apply
+      newVals[0] = [''];
+    }
+    if (lDur > 0 && lDrag !== 0) {
+      newVals[4] = [lType || 'bear']; // B16 type
+      newVals[5] = [lStart];          // B17 start
+      newVals[6] = [lDur];            // B18 duration
+      newVals[7] = [lDrag/100];       // B19 drag -> decimal
+    } else {
+      newVals[4] = ['']; // clear late trigger
+    }
+    // Inflation override -> B20 (index 8). Stored as a DECIMAL (0.05), same /100 convention as setPct.
+    // Only override when a value was passed; otherwise the customer's saved inflation is preserved.
+    if (inflPct !== null && !isNaN(inflPct)) {
+      newVals[8] = [inflPct / 100];
+    }
+    inp.getRange('B12:B20').setValues(newVals);
+
+    // --- 4. Force recalc and WAIT for the safe-spend SOLVER to actually settle. ---
+    // The Master array recalculates fast, but the safe-spend (B119) sits DOWNSTREAM of
+    // it and lags. A fixed 1.2s wait was reading B119 before it finished — handing back
+    // the un-stressed (base) safe-spend. Instead, poll B119 until it stops moving.
+    await SpreadsheetApp.flushAsync();
+    var _prevSafe = null, _stable = 0;
+    for (var _w = 0; _w < 14; _w++) {          // up to ~14 x 1500ms ≈ 21s max
+      await Utilities.sleepAsync(1500);
+      await SpreadsheetApp.flushAsync();
+      var _curSafe = Number((await inp.getRange('B119').getValueAsync())) || 0;
+      if (_w >= 2 && _prevSafe !== null && Math.abs(_curSafe - _prevSafe) < 1) {
+        _stable++;
+        if (_stable >= 2) break;               // settled: two stable reads after a few passes
+      } else {
+        _stable = 0;
+      }
+      _prevSafe = _curSafe;
+    }
+
+    // --- 5. Read stressed results ---
+    async function cell(a1){ var v = (await inp.getRange(a1).getValueAsync()); return Number(v)||0; }
+    var safeExtra = await cell('B119');
+    var ending    = await cell('B129');  // Actual Ending Legacy Target Balance (real stressed ending). Was B133, a broken/mis-scoped cell.
+    var surplus   = await cell('B120');
+    var legacyGoal= await cell('B8');
+
+    // Year balance first drops below legacy goal + full stressed year-by-year series (for a real chart)
+    var belowYear = null;
+    var series = []; // [{year, bal}] stressed ending-liquid per year, straight from the recalculated Master
+
+    // ── Crash-adjusted safeExtra binary search ───────────────────────────────
+    // B119 (safeExtra) is the base-plan solver value — it doesn't change with crash params.
+    // Instead, use the stressed Master data to find the MAX Phase-1 extra that still
+    // clears the legacy goal UNDER this crash. This uses real RMD/SS/tax-adjusted
+    // withdrawals from the stressed sheet, making it far more accurate than a client-side estimate.
+    var safeExtraCrashAdj = Math.round(safeExtra); // fallback: base plan value
+    var master = ss.getSheetByName('Master');
+    if (master) {
+      var md = (await master.getRange('A8:CD200').getValuesAsync());
+
+      // ── 1. Build series + extract stressed floor withdrawals from same pass ──
+      var stressFloorW = [];   // net portfolio draw per year (extras removed)
+      var phaseRatios  = [];   // chosenExtra[i] / p1Amount (phase scaling)
+      var p1Amt = 0;
+
+      for (var i=0;i<md.length;i++){
+        var row = md[i];
+        var rawYr = row[0], yr;
+        if (rawYr instanceof Date) yr = rawYr.getFullYear();
+        else { yr = Number(rawYr); if (yr>40000 && yr<100000){ var d=new Date((yr-25569)*86400*1000); yr=d.getFullYear(); } }
+        if (!yr || yr<2020 || yr>2200) continue;
+
+        var endLiq = Number(row[81])||0;
+        series.push({ year:yr, bal:Math.round(endLiq) });
+        if (belowYear===null && legacyGoal>0 && endLiq < legacyGoal){ belowYear = yr; }
+
+        // Funding_Required = Display_AH - Reinvested_RMDs (cols 44, 45 zero-indexed)
+        var wNet = (Number(row[44])||0) - (Number(row[45])||0);
+        var cxAmt = Number(row[31])||0; // var_Chosen_Extra
+        stressFloorW.push(Math.max(0, wNet - cxAmt));
+        phaseRatios.push(cxAmt);
+        if (cxAmt > 0 && p1Amt === 0) p1Amt = cxAmt;
+      }
+
+      // ── 2. Normalize phase ratios & run binary search ────────────────────
+      var nYrs = stressFloorW.length;
+      if (nYrs > 2 && p1Amt > 0) {
+        for (var pi = 0; pi < phaseRatios.length; pi++) {
+          phaseRatios[pi] = phaseRatios[pi] / p1Amt;
+        }
+
+        // Starting portfolio: back-calculate from series[0].bal using mid-year convention
+        // series[0].bal = P * (1+yr1Ret) - floor[0] approx (simplified)
+        var yr1Ret  = (7 - eDrag) / 100;  // eDrag=37 → yr1Ret=-0.30
+        var expRet  = 0.07;                // expected return for post-crash years
+        var startPF = series.length > 0
+          ? (series[0].bal / Math.max(0.1, 1 + yr1Ret) + stressFloorW[0])
+          : 1000000;
+
+        function projEnd(p1x) {
+          var b = startPF;
+          for (var gi = 0; gi < nYrs; gi++) {
+            var gr = (gi === 0) ? yr1Ret : expRet;
+            var gh = Math.sqrt(Math.max(0.1, 1 + gr));
+            b = Math.max(0, b * gh - (stressFloorW[gi] + p1x * (phaseRatios[gi]||0)));
+            b = Math.max(0, b * gh);
+            if (b <= 0) return 0;
+          }
+          return b;
+        }
+
+        var bsLo = 0, bsHi = 600000, bsBest = 0;
+        for (var bsIt = 0; bsIt < 35; bsIt++) {
+          var bsMid = (bsLo + bsHi) / 2;
+          if (projEnd(bsMid) >= legacyGoal) { bsBest = bsMid; bsLo = bsMid; }
+          else { bsHi = bsMid; }
+        }
+
+        // ── Bake in the tax margin ───────────────────────────────────────────
+        // The binary search adds trial extra to stressFloorW without re-running
+        // the sheet's tax formula. stressFloorW already carries the tax burden on
+        // the CURRENT extra; when the trial extra differs, the real portfolio draw
+        // = trial_extra + taxes_on_trial_extra, not just trial_extra.
+        //
+        // Estimate effective marginal tax rate from the stressed data:
+        //   implied_extra_tax = (stressed_total_withdrawal - stressFloorW - current_extra) per phase year
+        //   eff_tax_rate = total_implied_extra_tax / total_current_extra_spending
+        // This reflects the sheet's actual tax calculations on the current extra level.
+        var impliedExtraTax = 0, currentExtraTotal = 0;
+        var origWithdrawals = [];
+        for (var ti = 0; ti < md.length; ti++) {
+          var tRow = md[ti];
+          var tYr = tRow[0];
+          if (tYr instanceof Date) tYr = tYr.getFullYear();
+          else { tYr = Number(tYr); if (tYr>40000){ var td=new Date((tYr-25569)*86400*1000); tYr=td.getFullYear(); } }
+          if (!tYr || tYr<2020 || tYr>2200) continue;
+          var tW  = (Number(tRow[44])||0) - (Number(tRow[45])||0); // total stressed withdrawal
+          var tCx = Number(tRow[31])||0;                            // current chosen extra (spending)
+          if (tCx > 0) {
+            // Extra tax = total_withdrawal - floor_withdrawal - extra_spending
+            // (floor_withdrawal ≈ stressFloorW[i], already computed)
+            var tFloor = Math.max(0, tW - tCx); // same as stressFloorW for this row
+            impliedExtraTax  += Math.max(0, tW - tFloor - tCx); // taxes attributed to extra
+            currentExtraTotal += tCx;
+          }
+        }
+        // Effective marginal tax rate on extra; clamp to sensible 5-25% range
+        var effTaxRate = (currentExtraTotal > 0)
+          ? Math.min(0.25, Math.max(0.05, impliedExtraTax / currentExtraTotal))
+          : 0.12; // fallback if no extra spending in plan
+
+        // Apply: safe extra the SPENDER actually keeps = bsBest × (1 - effTaxRate)
+        // This converts from "portfolio draw" to "spendable dollars" after taxes.
+        safeExtraCrashAdj = Math.round(bsBest * (1 - effTaxRate) / 500) * 500;
+      }
+    }
+
+    // --- 6. RESTORE the customer's original cells (B12-B19 bear params + B20 inflation) ---
+    inp.getRange('B12:B20').setValues(orig);
+    await SpreadsheetApp.flushAsync();
+    rbpClearStash(ss); // restored cleanly — drop the backup
+
+    return {
+      ok:true,
+      safeExtra:Math.round(safeExtra),    // REAL B119 solver value (re-solves under the crash); NO approximation
+      safeExtraBase:Math.round(safeExtra), // base-plan solver value (reference)
+      safeExtraTaxAdj:Math.round((typeof effTaxRate !== 'undefined' ? effTaxRate : 0.12) * 100), // % tax margin applied
+      ending:Math.round(ending),
+      surplus:Math.round(surplus),
+      legacyGoal:Math.round(legacyGoal),
+      held:(ending >= legacyGoal - Math.max(1, legacyGoal*0.005)),
+      belowYear:belowYear,
+      series:series
+    };
+  } catch(err) {
+    // Best-effort restore even on error
+    try { if (orig) inp.getRange('B12:B20').setValues(orig); await SpreadsheetApp.flushAsync(); rbpClearStash(ss); } catch(e2){}
+    return { ok:false, error: err.toString() };
+  }
+}
+async function _rbpRunOneSweepScenario(ss, inp, orig, s, inflPct, startYr) {
+  // ── Write crash params ──
+  var newVals = orig.map(function(r){ return [r[0]]; });
+  newVals[0] = ['bear']; newVals[1] = [startYr]; newVals[2] = [s.dur]; newVals[3] = [s.drag/100];
+  newVals[4] = [''];     // no second crash
+  if (inflPct !== null && !isNaN(inflPct)) newVals[8] = [inflPct/100];
+  inp.getRange('B12:B20').setValues(newVals);
+
+  // ── Poll B119 until stable ──
+  await SpreadsheetApp.flushAsync();
+  var _prev = null, _stable = 0;
+  for (var _w=0; _w<14; _w++) {
+    await Utilities.sleepAsync(1500);
+    await SpreadsheetApp.flushAsync();
+    var _cur = Number((await inp.getRange('B119').getValueAsync()))||0;
+    if (_w>=2 && _prev!==null && Math.abs(_cur-_prev)<1) {
+      _stable++;
+      if (_stable>=2) break;
+    } else { _stable=0; }
+    _prev = _cur;
+  }
+
+  // ── Read results & run crash-adjusted binary search ──
+  async function cell(a1){ return Number((await inp.getRange(a1).getValueAsync()))||0; }
+  var safeBase  = await cell('B119');
+  var endLegacy = await cell('B129');   // legacy-target ending (what the goal is judged on)
+  var legGoal   = await cell('B8');
+  var belowYear = null;
+
+  var master = ss.getSheetByName('Master');
+  var safeAdj = Math.round(safeBase);
+  if (master) {
+    var md = (await master.getRange('A8:CD200').getValuesAsync());
+    var stFW=[], phR=[], p1A=0, ser=[];
+    for (var i=0;i<md.length;i++){
+      var row=md[i], rawYr=row[0], yr;
+      if (rawYr instanceof Date) yr=rawYr.getFullYear();
+      else{ yr=Number(rawYr); if(yr>40000&&yr<100000){var dd=new Date((yr-25569)*86400*1000);yr=dd.getFullYear();} }
+      if(!yr||yr<2020||yr>2200) continue;
+      var endLiq=Number(row[81])||0;
+      ser.push({year:yr,bal:Math.round(endLiq)});
+      if(belowYear===null&&legGoal>0&&endLiq<legGoal) belowYear=yr;
+      var gW=(Number(row[44])||0)-(Number(row[45])||0), gCx=Number(row[31])||0;
+      stFW.push(Math.max(0,gW-gCx)); phR.push(gCx);
+      if(gCx>0&&p1A===0) p1A=gCx;
+    }
+    var nYr=stFW.length;
+    if(nYr>2&&p1A>0){
+      for(var pi=0;pi<phR.length;pi++) phR[pi]=phR[pi]/p1A;
+      var yr1R=(7-s.drag)/100, expR=0.07;
+      var sPF=ser.length>0?(ser[0].bal/Math.max(0.1,1+yr1R)+stFW[0]):1000000;
+      function pE(px){ var b=sPF; for(var gi=0;gi<nYr;gi++){var gh=Math.sqrt(Math.max(0.1,1+(gi===0?yr1R:expR))); b=Math.max(0,b*gh-(stFW[gi]+px*(phR[gi]||0))); b=Math.max(0,b*gh); if(b<=0)return 0;} return b; }
+      var itTax=0,itTot=0;
+      for(var ti=0;ti<md.length;ti++){
+        var tr=md[ti]; var tW=(Number(tr[44])||0)-(Number(tr[45])||0); var tCx=Number(tr[31])||0;
+        if(tCx>0){itTax+=Math.max(0,tW-Math.max(0,tW-tCx)-tCx); itTot+=tCx;}
+      }
+      var effTax=itTot>0?Math.min(0.25,Math.max(0.05,itTax/itTot)):0.12;
+      var bLo=0,bHi=600000,bBest=0;
+      for(var bIt=0;bIt<35;bIt++){var bM=(bLo+bHi)/2; if(pE(bM)>=legGoal){bBest=bM;bLo=bM;}else bHi=bM;}
+      safeAdj=Math.round(bBest*(1-effTax)/500)*500;
+    }
+  }
+
+  return {
+    ok:true, label:s.label,
+    safeExtra:Math.round(safeBase), safeExtraBase:Math.round(safeBase),  // REAL B119; NO approximation
+    ending:Math.round(endLegacy),
+    held:(endLegacy >= legGoal - Math.max(1, legGoal*0.005)),
+    belowYear:belowYear, legacyGoal:Math.round(legGoal)
+  };
+}
+async function runSweepBatch(ss, inp, p) {
+  var orig = (await inp.getRange('B12:B20').getValuesAsync());
+  rbpStashStress(ss, orig); // crash-safety backup before any write
+  var results = [];
+
+  function pnum(v, d){ var n=Number(v); return isNaN(n)?d:n; }
+  var inflPct = (p.infl !== undefined && p.infl !== '') ? pnum(p.infl, null) : null;
+  var startYr = pnum(p.startYr, 0);
+
+  var scenarios = _rbpSweepScenarios();
+
+  try {
+    for (var si = 0; si < scenarios.length; si++) {
+      results.push(await _rbpRunOneSweepScenario(ss, inp, orig, scenarios[si], inflPct, startYr));
+    }
+    // ── Restore ──
+    inp.getRange('B12:B20').setValues(orig);
+    await SpreadsheetApp.flushAsync();
+    rbpClearStash(ss);
+    return { ok:true, results:results };
+  } catch(err) {
+    try { inp.getRange('B12:B20').setValues(orig); await SpreadsheetApp.flushAsync(); rbpClearStash(ss); } catch(e2){}
+    return { ok:false, error:err.toString() };
+  }
+}
+async function runSweepOne(ss, inp, p) {
+  function pnum(v, d){ var n=Number(v); return isNaN(n)?d:n; }
+  var inflPct = (p.infl !== undefined && p.infl !== '') ? pnum(p.infl, null) : null;
+  var startYr = pnum(p.startYr, 0);
+  var idx     = pnum(p.idx, -1);
+
+  var scenarios = _rbpSweepScenarios();
+  if (idx < 0 || idx >= scenarios.length) {
+    return { ok:false, error:'Bad scenario index: ' + p.idx, idx: idx };
+  }
+
+  var orig = (await inp.getRange('B12:B20').getValuesAsync());
+  rbpStashStress(ss, orig); // crash-safety backup before any write
+  try {
+    var res = await _rbpRunOneSweepScenario(ss, inp, orig, scenarios[idx], inflPct, startYr);
+    res.idx = idx;
+    // ── Restore immediately so the customer's sheet is never left crashed ──
+    inp.getRange('B12:B20').setValues(orig);
+    await SpreadsheetApp.flushAsync();
+    rbpClearStash(ss);
+    return res;
+  } catch(err) {
+    try { inp.getRange('B12:B20').setValues(orig); await SpreadsheetApp.flushAsync(); rbpClearStash(ss); } catch(e2){}
+    return { ok:false, error:err.toString(), idx: idx };
+  }
+}
   return {
     readAll: readAll, writeInputs: writeInputs, writeCheckIn: writeCheckIn,
     rbpHealStress: rbpHealStress, rbpEnsureCalcSettings: rbpEnsureCalcSettings,
@@ -1092,6 +1433,7 @@ function rbpExpenseRows(inp) {
     loadSweep: loadSweep, saveSweep: saveSweep, loadMonteCarlo: loadMonteCarlo, saveMonteCarlo: saveMonteCarlo,
     rbpStashStress: rbpStashStress, rbpClearStash: rbpClearStash,
     rbpTillerId: rbpTillerId, rbpTillerCfg: rbpTillerCfg, rbpTillerSaveCfg: rbpTillerSaveCfg,
-    rbpExpenseRows: rbpExpenseRows, RBP_EXP_ROWS: RBP_EXP_ROWS, RBP_GAP_NAME: RBP_GAP_NAME
+    rbpExpenseRows: rbpExpenseRows, RBP_EXP_ROWS: RBP_EXP_ROWS, RBP_GAP_NAME: RBP_GAP_NAME,
+    runStressTest: runStressTest, runSweepBatch: runSweepBatch, runSweepOne: runSweepOne
   };
 };

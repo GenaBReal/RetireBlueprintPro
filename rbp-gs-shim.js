@@ -180,6 +180,29 @@
     }
     return out;
   };
+  // Fresh read straight from Google (after sending any pending writes) — used by the stress
+  // tests, which must see the sheet's recalculated numbers, not the copy loaded earlier.
+  Range.prototype.getValuesAsync = function () {
+    var self = this, book = this.sh.book, a1 = q(this.sh.title) + '!' + this._a1();
+    var fields = 'sheets(data(startRow,startColumn,rowData(values(effectiveValue,formattedValue,userEnteredValue/formulaValue,effectiveFormat/numberFormat/type))))';
+    return book.flush().then(function () {
+      return G().getSpreadsheet(book.id, 'ranges=' + encodeURIComponent(a1) + '&fields=' + encodeURIComponent(fields));
+    }).then(function (j) {
+      var out = [], rows = [];
+      try { rows = j.sheets[0].data[0].rowData || []; } catch (e) {}
+      for (var i = 0; i < self.nr; i++) {
+        var row = [], vals = (rows[i] && rows[i].values) || [];
+        for (var k = 0; k < self.nc; k++) {
+          var cell = vals[k], v = cellToValue(cell), f = (cell && cell.userEnteredValue && cell.userEnteredValue.formulaValue) || '';
+          row.push(v);
+          self.sh.cells[(self.r + i) + ',' + (self.c + k)] = { v: v, f: f };   // keep the local copy current too
+        }
+        out.push(row);
+      }
+      return out;
+    });
+  };
+  Range.prototype.getValueAsync = function () { return this.getValuesAsync().then(function (g) { return g[0][0]; }); };
   Range.prototype.getValues = function () { return this._grid(function (x) { return x ? x.v : ''; }); };
   Range.prototype.getValue = function () { return this.getValues()[0][0]; };
   Range.prototype.getFormulas = function () { return this._grid(function (x) { return (x && x.f) || ''; }); };
@@ -239,11 +262,13 @@
     return {
       SpreadsheetApp: {
         flush: function () {},          // writes are sent together by book.flush() afterwards
+        flushAsync: function () { return book ? book.flush() : Promise.resolve(); },   // stress tests: send writes now
         newDataValidation: validationBuilder,
         DeveloperMetadataVisibility: { DOCUMENT: 'DOCUMENT', PROJECT: 'PROJECT' },
         openById: function () { throw new Error('Opening another sheet is not available here'); }
       },
-      Utilities: { formatDate: formatDate, sleep: function () {} },
+      Utilities: { formatDate: formatDate, sleep: function () {},
+                   sleepAsync: function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); } },
       Logger: { log: function () { try { if (root.RBP_DEBUG) console.log.apply(console, arguments); } catch (e) {} } },
       Session: { getScriptTimeZone: function () { return book ? book.tz : 'America/Los_Angeles'; } },
       PropertiesService: { getDocumentProperties: function () { return { getProperty: function () { return 'true'; }, setProperty: function () {} }; } }
