@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Connection Match Check | RetireBlueprint Pro</title>
+<script src="rbp-google.js?v=3"></script>
+<script src="rbp-gs-shim.js?v=3"></script>
+<script src="rbp-gs-core.js?v=3"></script>
+<script src="rbp-gbridge.js?v=3"></script>
+<style>
+  :root{--navy:#041E2F;--navy2:#051628;--teal:#1CC7D0;--gold:#f4b86a;--ink:#E8F1F5;--muted:#9FB6C3}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--navy2);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:760px;margin:0 auto;padding:32px 16px 60px}
+  h1{font-size:1.5rem;margin:0 0 6px}
+  .tag{display:inline-block;background:rgba(244,184,106,.15);color:var(--gold);border:1px solid rgba(244,184,106,.4);border-radius:999px;padding:2px 10px;font-size:.8rem;margin-bottom:14px}
+  p{color:var(--muted)}
+  .step{background:var(--navy);border:1px solid rgba(28,199,208,.25);border-radius:12px;padding:16px;margin:14px 0}
+  .step h2{font-size:1rem;margin:0 0 8px;color:var(--teal)}
+  button{background:var(--teal);color:#041E2F;border:0;border-radius:8px;padding:10px 16px;font-weight:700;font-size:1rem;cursor:pointer}
+  button:disabled{opacity:.4;cursor:default}
+  .out{margin-top:10px;font-size:.95rem;white-space:pre-wrap;word-break:break-word}
+  .ok{color:#7fe0a0}.err{color:#ff8f8f}
+  .diffs{font:13px/1.5 ui-monospace,Menlo,monospace;max-height:420px;overflow:auto;background:#020d17;border-radius:8px;padding:10px;margin-top:10px}
+  .big{font-size:1.4rem;font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">Testing only</span>
+  <h1>Connection match check</h1>
+  <p>Reads one plan two ways — the current connector, and the new Google sign-in connection — and compares every number field by field. Nothing is changed beyond the normal self-repairs a page load already does.</p>
+
+  <div class="step">
+    <h2>1 · Sign in with Google</h2>
+    <button id="b1">Sign in with Google</button>
+    <div class="out" id="o1"></div>
+  </div>
+  <div class="step">
+    <h2>2 · Pick the sheet to compare</h2>
+    <button id="b2" disabled>Pick a sheet</button>
+    <div class="out" id="o2"></div>
+  </div>
+  <div class="step">
+    <h2>3 · Compare</h2>
+    <button id="b3" disabled>Compare both ways</button>
+    <div class="out" id="o3"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
+  var $ = function (id) { return document.getElementById(id); };
+  var picked = null;
+  function say(id, msg, cls) { var el = $(id); el.className = 'out ' + (cls || ''); el.textContent = msg; }
+
+  function oldRead(sheetId) {
+    return new Promise(function (res, rej) {
+      var cb = 'rbpParity_' + Date.now(), s = document.createElement('script');
+      var t = setTimeout(function () { rej(new Error('Old connector timed out')); }, 150000);
+      window[cb] = function (d) { clearTimeout(t); res(d); };
+      s.onerror = function () { clearTimeout(t); rej(new Error('Old connector could not be reached (is the sheet shared with it?)')); };
+      s.src = SCRIPT + '?authuser=0&action=read&sheetId=' + encodeURIComponent(sheetId) + '&callback=' + cb + '&_=' + Date.now();
+      document.head.appendChild(s);
+    });
+  }
+
+  function compare(a, b, path, out, stats) {
+    if (out.length > 300) return;
+    var ta = Object.prototype.toString.call(a), tb = Object.prototype.toString.call(b);
+    if (typeof a === 'number' && typeof b === 'number') {
+      stats.n++;
+      if (!(Math.abs(a - b) < 0.5 || (isNaN(a) && isNaN(b)))) out.push(path + ':  old ' + a + '  →  new ' + b);
+      return;
+    }
+    if (ta !== tb) { stats.n++; out.push(path + ':  old ' + JSON.stringify(a) + '  →  new ' + JSON.stringify(b)); return; }
+    if (ta === '[object Array]') {
+      if (a.length !== b.length) out.push(path + '.length:  old ' + a.length + '  →  new ' + b.length);
+      for (var i = 0; i < Math.min(a.length, b.length); i++) compare(a[i], b[i], path + '[' + i + ']', out, stats);
+      return;
+    }
+    if (ta === '[object Object]') {
+      var keys = {}; Object.keys(a).forEach(function (k) { keys[k] = 1; }); Object.keys(b).forEach(function (k) { keys[k] = 1; });
+      Object.keys(keys).forEach(function (k) {
+        if (!(k in a)) { out.push(path + '.' + k + ':  missing in old'); return; }
+        if (!(k in b)) { out.push(path + '.' + k + ':  missing in new'); return; }
+        compare(a[k], b[k], path + '.' + k, out, stats);
+      });
+      return;
+    }
+    stats.n++;
+    if (a !== b) out.push(path + ':  old ' + JSON.stringify(a) + '  →  new ' + JSON.stringify(b));
+  }
+
+  $('b1').onclick = function () {
+    say('o1', 'Opening Google sign-in…');
+    RBPGoogle.signIn(true).then(function () { say('o1', '✓ Signed in.', 'ok'); $('b2').disabled = false; })
+      .catch(function (e) { say('o1', '✗ ' + e.message, 'err'); });
+  };
+  $('b2').onclick = function () {
+    RBPGoogle.pickSheet().then(function (f) { picked = f; say('o2', '✓ ' + f.name, 'ok'); $('b3').disabled = false; })
+      .catch(function (e) { say('o2', '✗ ' + e.message, 'err'); });
+  };
+  $('b3').onclick = function () {
+    var btn = this; btn.disabled = true;
+    var t0 = Date.now(), oldData, tOld, tNew;
+    say('o3', 'Reading the old way (can take up to a minute)…');
+    oldRead(picked.id).then(function (d) {
+      if (d && d.error) throw new Error('Old connector: ' + d.error);
+      oldData = d; tOld = Math.round((Date.now() - t0) / 1000);
+      say('o3', 'Old way done in ' + tOld + 's. Reading the new way…');
+      var t1 = Date.now();
+      return RBPGBridge.handle({ action: 'read', sheetId: picked.id }).then(function (n) { tNew = Math.round((Date.now() - t1) / 1000); return n; });
+    }).then(function (newData) {
+      if (newData && newData.error) throw new Error('New connection: ' + newData.error);
+      var diffs = [], stats = { n: 0 };
+      compare(oldData, newData, 'plan', diffs, stats);
+      var el = $('o3'); el.className = 'out';
+      var head = diffs.length === 0
+        ? '<div class="big ok">✓ Exact match</div>'
+        : '<div class="big err">' + diffs.length + ' difference' + (diffs.length > 1 ? 's' : '') + '</div>';
+      el.innerHTML = head + '<div>' + stats.n.toLocaleString() + ' values compared · old ' + tOld + 's · new ' + tNew + 's</div>' +
+        (diffs.length ? '<div class="diffs">' + diffs.map(function (x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }).join('<br>') + '</div>' : '');
+      btn.disabled = false;
+    }).catch(function (e) { say('o3', '✗ ' + e.message, 'err'); btn.disabled = false; });
+  };
+})();
+</script>
+</body>
+</html>
