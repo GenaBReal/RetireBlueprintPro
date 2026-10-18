@@ -1,9 +1,9 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    RetireBlueprint Pro — Tiller bridge (optional)
    The customer keeps their OWN Tiller subscription. Tiller (via Plaid) holds the bank /
-   403(b) logins and refreshes the customer's own Tiller Google Sheet. The customer shares
-   that sheet with retireblueprintpro@gmail.com, and the connector READS the latest balances
-   from it (never writes to it). This file only talks to our connector.
+   403(b) logins and refreshes the customer's own Tiller Google Sheet. Customers connected with
+   Google sign-in pick that sheet themselves, and their own browser READS it (never writes to it);
+   rbp-gbridge.js answers these calls locally. Nothing is shared with retireblueprintpro@gmail.com.
 
    window.RBPTiller:
      list(tillerUrlOrId, cb)       → {ok, tillerId, accounts:[{id,name,num,institution,type,balance,lastUpdate}]}

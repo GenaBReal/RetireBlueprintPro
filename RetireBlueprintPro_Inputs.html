@@ -1227,16 +1227,8 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         <span id="tiller-picked" style="margin-left:8px;font-size:12px;color:var(--muted);"></span>
         </div>
         <div class="tiller-legacy">
-        <p style="margin:0 0 8px;"><strong>Already use Tiller?</strong> Link it and your account balances update here automatically. Your bank logins stay with Tiller. RetireBlueprint Pro reads your Tiller sheet to pull in your balances (and spending totals, if you choose). Sharing it gives us view access to that sheet, including your transactions. We don't copy or keep it, and you can remove the share any time.</p>
-        <ol style="margin:0 0 10px 18px;padding:0;">
-          <li>Open your Tiller Google Sheet, click <strong>Share</strong>, and add <strong>retireblueprintpro@gmail.com</strong> as a <strong>Viewer</strong>. (In Tiller, turn on <strong>AutoFill</strong> so it refreshes every day.)</li>
-          <li>Paste that sheet’s link below and tap <strong>Find my accounts</strong>.</li>
-          <li>Match each Tiller account to one of your plan accounts, then tap <strong>Save &amp; update balances</strong>.</li>
-        </ol>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <input type="text" id="tiller-url" placeholder="Paste your Tiller sheet link" style="flex:1;min-width:220px;">
-          <button type="button" onclick="rbpTillerFind()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Find my accounts</button>
-        </div>
+        <div style="margin:0 0 10px;padding:10px 12px;border-radius:6px;background:rgba(244,184,106,.12);border:1px solid rgba(244,184,106,.45);"><strong>Already use Tiller?</strong> To keep your accounts private, Tiller linking works only with <strong>Google sign-in</strong>. Your Tiller sheet is read right in your own browser and never shared with RetireBlueprint Pro. Go to <a href="/setup.html">Setup</a>, tap <strong>Connect Privately with Google</strong>, then come back here and tap <strong>Pick my Tiller sheet</strong>.</div>
+        <input type="hidden" id="tiller-url">
         </div>
         <div id="tiller-map" style="margin-top:10px;"></div>
         <div id="tiller-msg" style="margin-top:8px;font-size:12px;"></div>
@@ -3981,7 +3973,7 @@ function rbpTillerFriendly(err){
   if (/tiller_access/.test(err) || (gm && /permission|not found|access|Requested entity/i.test(err))) return 'The app can’t open your Tiller sheet yet. Tap <strong>Pick my Tiller sheet</strong> (in <strong>VI. Named Accounts</strong>) and choose your Tiller sheet, then try again.';
   if (/Picker closed|Nothing was picked|cancelled|window was closed/i.test(err)) return 'No sheet was picked. Tap <strong>Pick my Tiller sheet</strong> to try again.';
   if (/Unknown|not supported/i.test(err) || err==='timeout' || err==='network') return 'We couldn’t reach the Tiller connection just now. Please try again in a minute.';
-  if (/permission|not found|access|Requested entity/i.test(err)) return 'We couldn’t open that sheet. Make sure your Tiller sheet is shared with <strong>retireblueprintpro@gmail.com</strong>, then try again.';
+  if (/permission|not found|access|Requested entity/i.test(err)) return 'We couldn’t open your Tiller sheet. Tiller linking works only with Google sign-in — connect on the <a href="/setup.html">Setup</a> page, then tap <strong>Pick my Tiller sheet</strong>.';
   if (/Accounts/i.test(err)) return 'That doesn’t look like a Tiller sheet (no Accounts tab). Paste the link to your Tiller sheet.';
   return err;
 }
