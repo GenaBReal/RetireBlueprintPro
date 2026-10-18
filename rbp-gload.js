@@ -43,6 +43,14 @@
       '<a href="/RetireBlueprintPro_Dashboard.html?demo=1" style="' + btn + 'border:1px solid #1CC7D0;color:#1CC7D0;">Try the Free Demo</a>' +
       '<a href="/setup.html" style="' + btn + 'color:#9FB6C3;font-weight:400;text-decoration:underline;">Already bought? Connect your plan</a>';
     document.body.insertBefore(d, document.body.firstChild);
+    // The banner above explains things for shoppers, so hide the red "No sheet connected" strip.
+    function hideRed() {
+      var els = document.querySelectorAll('.error-banner, .state-banner, #error-banner');
+      for (var i = 0; i < els.length; i++) {
+        if (/No sheet connected/i.test(els[i].textContent || '')) els[i].style.display = 'none';
+      }
+    }
+    hideRed(); [600, 2000, 5000, 10000].forEach(function (t) { setTimeout(hideRed, t); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', show);
   else show();
