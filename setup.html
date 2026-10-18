@@ -118,7 +118,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     <div class="step-body">
       Click the button, sign in with the Google account that has your sheet, then pick <strong>the copy you just made</strong>. Your browser reads and saves your sheet directly with Google — <strong>RetireBlueprint Pro can't open your sheet</strong>, and you don't share it with anyone.
     </div>
-    <button type="button" class="btn btn-teal" id="g-connect" onclick="connectGoogle()" style="margin-top:6px;">
+    <button type="button" class="btn btn-teal" id="g-connect" onclick="rbpOpenConnect()" style="margin-top:6px;">
       🔒 &nbsp;Connect Privately with Google
     </button>
     <div id="g-msg" style="font-size:13px;margin-top:10px;min-height:16px;"></div>
@@ -321,6 +321,22 @@ function updateLinks(id){
   document.getElementById('nav-sheet').href    = 'https://docs.google.com/spreadsheets/d/' + id + '/edit';
   document.getElementById('go-inputs').href    = GITHUB + '/RetireBlueprintPro_Inputs.html';
 }
+</script>
+
+<!-- Friendly step before Google's own sign-in window -->
+<div id="rbp-connect-modal" role="dialog" aria-modal="true" aria-labelledby="rbp-cm-title" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(2,10,20,.72);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#0c2438;border:1px solid #1CC7D0;border-radius:14px;max-width:440px;width:100%;padding:26px 22px 20px;color:#E8F1F5;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.45);font-family:inherit;">
+    <img src="/apple-touch-icon.png" alt="" width="56" height="56" style="border-radius:12px;margin-bottom:10px;" onerror="this.style.display='none'">
+    <div id="rbp-cm-title" style="font-size:20px;font-weight:800;line-height:1.3;margin-bottom:10px;">Open your RetireBlueprint Pro web app</div>
+    <div style="font-size:14px;line-height:1.6;color:#cfe3ea;margin-bottom:18px;">Next, Google opens a small window so you can sign in and pick your planning sheet. Google may show our web address, <strong style="color:#fff;">retireblueprintpro.com</strong> &mdash; that&rsquo;s us. The app only sees the sheet you pick.</div>
+    <button type="button" class="btn btn-teal" onclick="rbpCloseConnect();connectGoogle();" style="width:100%;margin:0 0 10px;font-size:16px;">Take me to my RetireBlueprint Pro web app &rarr;</button>
+    <button type="button" onclick="rbpCloseConnect()" style="background:none;border:0;color:#9FB6C3;font-size:13px;cursor:pointer;text-decoration:underline;">Not now</button>
+  </div>
+</div>
+<script>
+function rbpOpenConnect(){ var m=document.getElementById('rbp-connect-modal'); m.style.display='flex'; }
+function rbpCloseConnect(){ document.getElementById('rbp-connect-modal').style.display='none'; }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') rbpCloseConnect(); });
 </script>
 </body>
 </html>
