@@ -63,6 +63,7 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
 .legal{font-size:10px;color:#1a3a52;text-align:center;padding:20px 0;}
 </style>
 <script src="/rbp-analytics.js" defer></script>
+<script src="/rbp-google.js?v=20261017c"></script>
 </head>
 <body>
 <div style="background:#041E2F;border-bottom:2px solid #f4b86a;padding:8px 16px;display:flex;align-items:center;">
@@ -110,6 +111,25 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     <a href="#" id="copy-btn" target="_blank" rel="noopener" class="btn btn-teal" onclick="step1done()" style="display:none;">
       📋 &nbsp;Make My Personal Copy of the Sheet
     </a>
+  </div>
+
+  <!-- PRIVATE OPTION: Google sign-in (shown when RBP_GOOGLE_LIVE is on, or with ?g=1 for testing) -->
+  <div class="step" id="g-step" style="display:none;border:1px solid var(--teal);">
+    <div class="step-header">
+      <div class="step-num" id="ng">🔒</div>
+      <div class="step-title">Recommended: Connect Privately with Google</div>
+    </div>
+    <div class="step-body">
+      Skip sharing. Sign in with Google and pick <strong>the copy you just made</strong>. Your browser then reads and saves your sheet directly with Google — <strong>RetireBlueprint Pro can't open your sheet</strong>, and you don't share it with anyone.
+    </div>
+    <button type="button" class="btn btn-teal" id="g-connect" onclick="connectGoogle()" style="margin-top:6px;">
+      🔒 &nbsp;Connect Privately with Google
+    </button>
+    <div id="g-msg" style="font-size:13px;margin-top:10px;min-height:16px;"></div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px;">
+      Google will ask permission for RetireBlueprint Pro to see <strong>only the files you pick</strong> — not the rest of your Google Drive. Connected the old way before? After this, open your sheet, click <strong>Share</strong> and remove retireblueprintpro@gmail.com.
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px;">Prefer the original way? Use steps 2 and 3 below instead.</div>
   </div>
 
   <!-- STEP 2 -->
@@ -266,12 +286,44 @@ function connect(){
     return;
   }
   localStorage.setItem('rbp_sheet_id', raw);
+  try { localStorage.removeItem('rbp_conn'); localStorage.removeItem('rbp_g_sheet_id'); } catch(e){}
   document.getElementById('n3').textContent = '✓';
   document.getElementById('n3').classList.add('done');
   showConnected(raw);
   updateLinks(raw);
   document.getElementById('success-box').classList.add('show');
   document.getElementById('success-box').scrollIntoView({behavior:'smooth'});
+}
+
+// ── PRIVATE CONNECTION (Google sign-in) ─────────────────────────────────────
+// Flip RBP_GOOGLE_LIVE to true once Google has approved the sign-in screen for everyone.
+var RBP_GOOGLE_LIVE = false;
+(function(){
+  if (RBP_GOOGLE_LIVE || /[?&]g=1\b/.test(location.search)) document.getElementById('g-step').style.display='';
+})();
+function gMsg(t, ok){ var m=document.getElementById('g-msg'); m.innerHTML=t; m.style.color = ok===false ? '#ff8a80' : (ok ? '#1CC7D0' : ''); }
+function connectGoogle(){
+  var btn=document.getElementById('g-connect'); btn.disabled=true;
+  gMsg('Opening Google sign-in…');
+  RBPGoogle.signIn(true).then(function(){
+    gMsg('Now pick the copy you made in Step 1…');
+    return RBPGoogle.pickSheet();
+  }).then(function(f){
+    if (/Client Template/i.test(f.name) && !/copy/i.test(f.name)) gMsg('Tip: make sure you picked <strong>your copy</strong>, not the original template.');
+    try {
+      localStorage.setItem('rbp_conn','google');
+      localStorage.setItem('rbp_g_sheet_id', f.id);
+      localStorage.setItem('rbp_sheet_id', f.id);
+    } catch(e){}
+    ['n1','n2','n3','ng'].forEach(function(n){ var el=document.getElementById(n); if(el){ el.textContent='✓'; el.classList.add('done'); } });
+    gMsg('✓ Connected privately to “' + f.name.replace(/</g,'&lt;') + '”.', true);
+    document.getElementById('sheet-id-input').value = f.id;
+    showConnected(f.id);
+    updateLinks(f.id);
+    document.getElementById('success-box').classList.add('show');
+    document.getElementById('success-box').scrollIntoView({behavior:'smooth'});
+    btn.disabled=false;
+  }).catch(function(e){ btn.disabled=false; gMsg('✗ ' + ((e && e.message) || e), false); });
 }
 
 function showConnected(id){
