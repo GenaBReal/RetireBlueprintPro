@@ -14,7 +14,7 @@
 
   try {
     if (conn === 'google' && gid) {
-      var v = '?v=20261019a';
+      var v = '?v=20261019b';
       ['rbp-google.js', 'rbp-gs-shim.js', 'rbp-gs-core.js', 'rbp-gbridge.js'].forEach(function (f) {
         document.write('<script src="/' + f + v + '"><\/script>');
       });

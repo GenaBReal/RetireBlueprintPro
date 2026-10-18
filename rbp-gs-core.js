@@ -1,5 +1,5 @@
 /* RetireBlueprint Pro — connector logic for the Google sign-in path (GENERATED — do not edit by hand)
-   Copied verbatim from the live Apps Script connector (source fingerprint 6a360fc716dd) so the
+   Copied verbatim from the live Apps Script connector (source fingerprint 3ee9b6daa769) so the
    numbers the pages receive are identical. Contains ONLY plan read/save/upkeep logic —
    no access codes, no template IDs. Rebuild with build_core.py after connector changes. */
 window.RBPCoreFactory = function (env) {
@@ -1152,7 +1152,9 @@ function rbpTiller(action, ss, inp, sheetId, p) {
         var nb = Math.round(a.balance * 100) / 100, cur = Number(vals[k][0]) || 0;
         if (Math.abs(nb - cur) >= 1) { updated.push({ slot: k, account: String(names[k][0] || ''), from: cur, to: nb }); vals[k][0] = nb; }
       });
-      if (updated.length) { rng.setValues(vals); rbpInvalidateReadCache(sheetId); }
+      // Write ONLY the cells that changed, so formulas in the other balance cells are never replaced.
+      updated.forEach(function (u) { inp.getRange(105 + u.slot, 5).setValue(u.to); });
+      if (updated.length) rbpInvalidateReadCache(sheetId);
       c.lastPull = new Date().toISOString(); c.asOf = asOf;
       rbpTillerSaveCfg(ss, c);
       return { ok: true, linked: true, updated: updated, asOf: asOf };
@@ -1263,7 +1265,9 @@ function rbpTillerSpendAction(action, ss, inp, sheetId, p) {
       var nv = Math.round(perRow[rw]), cur = Number(vals[i][0]) || 0;
       if (nv !== cur) { updated.push({ row: rw, name: String(nms[i][0] || ''), from: cur, to: nv }); vals[i][0] = nv; }
     });
-    if (updated.length) { rng.setValues(vals); rbpInvalidateReadCache(sheetId); }
+    // Write ONLY the ticked lines that changed, so formulas in other expense lines are never replaced.
+    updated.forEach(function (u) { inp.getRange(u.row, 2).setValue(u.to); });
+    if (updated.length) rbpInvalidateReadCache(sheetId);
     cfg.spend.lastApply = new Date().toISOString();
     rbpTillerSaveCfg(ss, cfg);
     return { ok: true, updated: updated, from: sp.from, to: sp.to, monthsUsed: sp.monthsUsed };
