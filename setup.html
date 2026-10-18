@@ -323,7 +323,13 @@ function connectGoogle(){
     document.getElementById('success-box').classList.add('show');
     document.getElementById('success-box').scrollIntoView({behavior:'smooth'});
     btn.disabled=false;
-  }).catch(function(e){ btn.disabled=false; gMsg('✗ ' + ((e && e.message) || e), false); });
+  }).catch(function(e){
+    btn.disabled=false;
+    var m = (e && e.message) || String(e);
+    if (/popup/i.test(m)) m = 'Your browser blocked the Google sign-in window. Allow pop-ups for this site, then click the button again.';
+    else if (/cancel|closed/i.test(m)) m = 'Sign-in was closed before it finished. Click the button to try again.';
+    gMsg('✗ ' + m, false);
+  });
 }
 
 function showConnected(id){
