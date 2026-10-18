@@ -1149,8 +1149,17 @@ function showConnect(h, p){
   var host=location.hostname||'';
   var isPreview=location.protocol==='file:'||host==='localhost'||host==='127.0.0.1'||/claude\.ai$/.test(host);
   if(isPreview||!sheetId||sheetId==='1D_vUyoSusb7iPX1z4c3jOv5TVGpFJqo2YZfvHfHOonA'){ showConnect(); return; }
-  var cached=rbpCacheGet(); if(cached){ try { rbpApplyEngine(cached); } catch(e){} populate(cached); }
-  window.RBP.load(function(d){ try { rbpApplyEngine(d); } catch(e){} rbpCachePut(d); populate(d); }, function(msg){ if(!cached){ if(msg==='no-sheet') showConnect(); else showConnect('We could not reach your plan','There was a problem loading your live numbers ('+esc(msg||'unknown')+'). Please check your connection and try again from your dashboard.'); } });
+  // Quick-reload copy is only used if it still has the sheet's own Master rows
+  // (older copies were saved after reshaping and lacked them, which caused a false red banner).
+  var cached=rbpCacheGet();
+  if(cached && !(cached.projections && cached.projections.masterGrid && cached.projections.masterGrid.length)) cached=null;
+  if(cached){ try { rbpApplyEngine(cached); } catch(e){} populate(cached); }
+  window.RBP.load(function(d){
+    rbpCachePut(d);   // save the raw copy BEFORE reshaping it for display
+    try { rbpApplyEngine(d); } catch(e){}
+    if(d && d.projections && d.projections.byYear){ var _b=document.getElementById('rbpSheetErr'); if(_b) _b.remove(); }
+    populate(d);
+  }, function(msg){ if(!cached){ if(msg==='no-sheet') showConnect(); else showConnect('We could not reach your plan','There was a problem loading your live numbers ('+esc(msg||'unknown')+'). Please check your connection and try again from your dashboard.'); } });
   rbpLoadStress();
   rbpLoadSweep();
 })();
