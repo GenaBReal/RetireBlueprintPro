@@ -58,30 +58,50 @@
 
   function hasToken() { return !!(token && Date.now() < tokenExp - 60000); }
 
+  // The Google window must open in the SAME moment as the click, or browsers block it as a pop-up.
+  // So Google's sign-in tools are loaded ahead of time (preload), and the click opens the window
+  // right away. Results come back through `pending`.
+  var pending = null;
+  function finish(fn, v) { var p = pending; pending = null; if (p) p[fn](v); }
+  function initClient() {
+    tokenClient = root.google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPE,
+      callback: function (r) {
+        if (!r || r.error) { finish('rej', new Error((r && (r.error_description || r.error)) || 'Sign-in was cancelled')); return; }
+        // Google lets people untick the permission box. Without it the app can't open their sheet.
+        if (!root.google.accounts.oauth2.hasGrantedAllScopes(r, SCOPE)) {
+          var e = new Error('The permission box was left unticked. Click Sign in again and tick the box so the app can open the sheet you pick.');
+          e.code = 'scope_missing'; finish('rej', e); return;
+        }
+        token = r.access_token; tokenExp = Date.now() + (Number(r.expires_in) || 3600) * 1000;
+        try { sessionStorage.setItem(KEY_TOKEN, JSON.stringify({ t: token, e: tokenExp })); } catch (e2) {}
+        finish('res', token);
+      },
+      error_callback: function (e) {
+        var t = (e && e.type) || '';
+        finish('rej', new Error(t === 'popup_failed_to_open' ? 'popup blocked' : ((e && e.message) || 'Sign-in window was closed')));
+      }
+    });
+  }
+  var preloading = null;
+  function preload() {
+    if (!preloading) preloading = ready().then(function () { if (!tokenClient) initClient(); });
+    return preloading;
+  }
+  function openGoogle(forceConsent) {
+    return new Promise(function (res, rej) {
+      if (pending) pending.rej(new Error('Sign-in was cancelled'));
+      pending = { res: res, rej: rej };
+      tokenClient.requestAccessToken({ prompt: forceConsent ? 'consent' : '' });
+    });
+  }
+
   // forceConsent: show Google's permission screen again (used when the box was left unticked).
   function signIn(forceConsent) {
     if (!forceConsent && hasToken()) return Promise.resolve(token);
-    return ready().then(function () {
-      return new Promise(function (res, rej) {
-        tokenClient = root.google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPE,
-          callback: function (r) {
-            if (!r || r.error) { rej(new Error((r && (r.error_description || r.error)) || 'Sign-in was cancelled')); return; }
-            // Google lets people untick the permission box. Without it the app can't open their sheet.
-            if (!root.google.accounts.oauth2.hasGrantedAllScopes(r, SCOPE)) {
-              var e = new Error('The permission box was left unticked. Click Sign in again and tick the box so the app can open the sheet you pick.');
-              e.code = 'scope_missing'; rej(e); return;
-            }
-            token = r.access_token; tokenExp = Date.now() + (Number(r.expires_in) || 3600) * 1000;
-            try { sessionStorage.setItem(KEY_TOKEN, JSON.stringify({ t: token, e: tokenExp })); } catch (e2) {}
-            res(token);
-          },
-          error_callback: function (e) { rej(new Error((e && e.message) || 'Sign-in window was closed')); }
-        });
-        tokenClient.requestAccessToken({ prompt: forceConsent ? 'consent' : '' });
-      });
-    });
+    if (tokenClient) return openGoogle(forceConsent);          // ready: open in the same click
+    return preload().then(function () { return openGoogle(forceConsent); });
   }
 
   function pickSheet() {
@@ -180,7 +200,9 @@
   root.RBPGoogle = {
     signIn: signIn, hasToken: hasToken, pickSheet: pickSheet,
     getValues: getValues, setValues: setValues,
-    getSpreadsheet: getSpreadsheet, batchUpdate: batchUpdate, valuesBatchUpdate: valuesBatchUpdate,
+    preload: preload, getSpreadsheet: getSpreadsheet, batchUpdate: batchUpdate, valuesBatchUpdate: valuesBatchUpdate,
     sheetId: sheetId, setSheetId: setSheetId, signOut: signOut
   };
+  // Get Google's sign-in tools ready in the background so a click opens the window instantly.
+  try { if (root.document) setTimeout(function () { preload().catch(function () { preloading = null; }); }, 0); } catch (e) {}
 })(typeof window !== 'undefined' ? window : this);
