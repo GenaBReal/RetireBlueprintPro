@@ -87,6 +87,15 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     <div class="hero-sub">No technical knowledge needed. Takes about 5 minutes — and you never have to do this again.</div>
   </div>
 
+  <!-- For visitors who haven't bought yet -->
+  <div id="visitor-box" style="background:rgba(244,184,106,.10);border:1px solid rgba(244,184,106,.45);border-radius:12px;padding:16px 18px;margin:0 0 18px;font-size:14px;line-height:1.6;">
+    <strong>Just looking around?</strong> This page is where buyers connect their own planning sheet. To get your own copy, pick up RetireBlueprint Pro on Etsy — or explore a sample plan first.
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+      <a href="https://www.etsy.com/listing/4544156492" class="btn btn-teal" style="margin:0;flex:1;min-width:160px;text-align:center;" target="_blank" rel="noopener">Get RetireBlueprint Pro on Etsy</a>
+      <a href="/RetireBlueprintPro_Dashboard.html?demo=1" class="btn" style="margin:0;flex:1;min-width:160px;text-align:center;border:1px solid var(--teal);color:var(--teal);background:transparent;">Try the Free Demo</a>
+    </div>
+  </div>
+
   <!-- STEP 1 -->
   <div class="step">
     <div class="step-header">
@@ -94,23 +103,10 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
       <div class="step-title">Make Your Personal Copy of the Sheet</div>
     </div>
     <div class="step-body">
-      Click the button below. Google will show a box saying <strong>"Make a copy"</strong> — just click the blue button. Your personal retirement sheet opens in a new tab.<br><br>
+      Open your <strong>Start Here guide</strong> (the PDF from your Etsy purchase) or your <strong>welcome email</strong>, and click <strong>“Make My Copy.”</strong> Google will show a box saying <strong>“Make a copy”</strong> — just click the blue button. Your personal retirement sheet opens in a new tab.<br><br>
       Then come back to this page for Step 2.
     </div>
-    <!-- Access code: the template link is only handed out by the connector after a valid code -->
-    <div id="code-box" style="margin:4px 0 12px;">
-      <div style="font-size:13px;margin-bottom:6px;">Enter the <strong>access code</strong> from your <strong>Start Here</strong> guide (it came with your Etsy download):</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <input type="text" id="access-code" placeholder="RBP-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"
-               style="flex:1;min-width:180px;padding:10px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:inherit;font-size:15px;letter-spacing:1px;text-transform:uppercase;"
-               onkeydown="if(event.key==='Enter'){unlockCopy();}">
-        <button type="button" class="btn btn-teal" id="unlock-btn" onclick="unlockCopy()" style="margin:0;">🔓 &nbsp;Unlock</button>
-      </div>
-      <div id="code-msg" style="font-size:12px;margin-top:6px;min-height:16px;"></div>
-    </div>
-    <a href="#" id="copy-btn" target="_blank" rel="noopener" class="btn btn-teal" onclick="step1done()" style="display:none;">
-      📋 &nbsp;Make My Personal Copy of the Sheet
-    </a>
+    <div style="font-size:12px;color:var(--muted);line-height:1.6;">Can't find your Start Here guide? It's in your Etsy purchases under <strong>Download Files</strong>. Still stuck? Message us on Etsy and we'll send it again. Haven't bought yet? <a href="https://www.etsy.com/listing/4544156492" target="_blank" rel="noopener" style="color:var(--teal);">Get it on Etsy</a>.</div>
   </div>
 
   <!-- STEP 2: PRIVATE CONNECTION (Google sign-in) -->
@@ -228,42 +224,10 @@ var GITHUB = 'https://genabreal.github.io/RetireBlueprintPro';
     document.getElementById('n3').textContent = '✓';
     document.getElementById('n3').classList.add('done');
     var ng=document.getElementById('ng'); if(ng){ ng.textContent='✓'; ng.classList.add('done'); }
+    var vb=document.getElementById('visitor-box'); if(vb) vb.style.display='none';
     document.getElementById('success-box').classList.add('show');
   }
 })();
-
-// ── ACCESS CODE ─────────────────────────────────────────────────────────────
-// The template's copy link is NOT in this page. The connector checks the code and only then
-// returns the link, so the sheet can't be copied by someone who just finds this page.
-var RBP_SCRIPT = 'https://script.google.com/macros/s/AKfycbxR40oJlUa6p8sCANeoHNfXU5XCnlwOudWfkgKWgorlzrXiqXAT8NbPuJU1x0QbfUg7/exec';
-function codeMsg(t, ok){ var m=document.getElementById('code-msg'); m.innerHTML=t; m.style.color = ok===false ? '#ff8a80' : (ok ? '#1CC7D0' : ''); }
-function showCopy(url){
-  var a=document.getElementById('copy-btn'); a.href=url; a.style.display='';
-  document.getElementById('code-box').style.display='none';
-}
-function unlockCopy(){
-  var code=(document.getElementById('access-code').value||'').trim().toUpperCase();
-  if(!code){ codeMsg('Please type your access code.', false); return; }
-  codeMsg('Checking…');
-  var btn=document.getElementById('unlock-btn'); btn.disabled=true;
-  var name='rbpUnlock_'+Date.now(), done=false, s=document.createElement('script');
-  var t=setTimeout(function(){ if(!done){ done=true; btn.disabled=false; codeMsg('We couldn’t check your code just now. Please try again in a minute.', false); } }, 30000);
-  window[name]=function(r){
-    if(done) return; done=true; clearTimeout(t); btn.disabled=false;
-    try{ delete window[name]; }catch(e){}
-    if(r && r.ok && r.copyUrl){
-      try{ localStorage.setItem('rbp_access_ok', code); }catch(e){}
-      codeMsg('✓ Code accepted', true); showCopy(r.copyUrl);
-    } else {
-      codeMsg('That code didn’t work. Check your Start Here guide (it looks like <strong>RBP-XXXX-XXXX</strong>), or message us on Etsy and we’ll help.', false);
-    }
-  };
-  s.src=RBP_SCRIPT+'?action=unlockSetup&code='+encodeURIComponent(code)+'&callback='+name+'&_='+Date.now();
-  s.onerror=function(){ if(!done){ done=true; clearTimeout(t); btn.disabled=false; codeMsg('We couldn’t check your code just now. Please try again in a minute.', false); } };
-  document.head.appendChild(s);
-}
-// Remembered on this device: re-check quietly so the button comes back without retyping.
-(function(){ try{ var c=localStorage.getItem('rbp_access_ok'); if(c){ document.getElementById('access-code').value=c; unlockCopy(); } }catch(e){} })();
 
 function copyEmail(){
   navigator.clipboard.writeText('retireblueprintpro@gmail.com').then(function(){
@@ -315,7 +279,14 @@ function connectGoogle(){
     gMsg('Now pick the copy you made in Step 1…');
     return RBPGoogle.pickSheet();
   }).then(function(f){
-    if (/Client Template/i.test(f.name) && !/copy/i.test(f.name)) gMsg('Tip: make sure you picked <strong>your copy</strong>, not the original template.');
+    if (/^RetireBlueprint Pro\s*[—-]\s*Client Template/i.test(f.name)) throw new Error('That’s the original template. Pick <strong>your copy</strong> instead (its name starts with “Copy of”). Haven’t made one yet? Use the <strong>Make My Copy</strong> button in your Start Here guide.');
+    gMsg('Checking your sheet…');
+    return RBPGoogle.getSpreadsheet(f.id, 'fields=sheets.properties.title').then(function(meta){
+      var tabs=((meta&&meta.sheets)||[]).map(function(x){ return x.properties.title; });
+      if (tabs.indexOf('Master')<0) throw new Error('That sheet isn’t a RetireBlueprint Pro planning sheet. Pick the copy you made from your Start Here guide. Don’t have one yet? <a href="https://www.etsy.com/listing/4544156492" target="_blank" rel="noopener" style="color:#1CC7D0;">Get RetireBlueprint Pro on Etsy</a>.');
+      return f;
+    });
+  }).then(function(f){
     try {
       localStorage.setItem('rbp_conn','google');
       localStorage.setItem('rbp_g_sheet_id', f.id);

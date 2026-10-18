@@ -14,14 +14,14 @@ body{font-family:'Segoe UI',sans-serif;background:#041E2F;color:#fff;text-align:
 <p style="color:#8a9ab0;margin-bottom:24px;">Redirecting to your personal Google Sheet.</p>
 <script>
   var sid = localStorage.getItem('rbp_sheet_id');
-  if (sid && sid !== '1bb7or0XWuU0tAtdwkIJm1HUetY2BiEbxVBVoH6jsYAY') {
+  if (sid && sid.length > 20) {
     window.location.href = 'https://docs.google.com/spreadsheets/d/' + sid + '/edit';
   } else {
-    document.write('<p style="color:#f4b86a;">No sheet connected yet.</p><a href="https://genabreal.github.io/RetireBlueprintPro/setup.html" class="btn">Go to Setup →</a>');
+    document.write('<p style="color:#f4b86a;">No sheet connected yet.</p><a href="/setup.html" class="btn">Go to Setup →</a>');
   }
 </script>
 <noscript>
-  <a href="https://genabreal.github.io/RetireBlueprintPro/setup.html" class="btn">Go to Setup →</a>
+  <a href="/setup.html" class="btn">Go to Setup →</a>
 </noscript>
 </body>
 </html>
