@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Google Sign-in Test | RetireBlueprint Pro</title>
+<style>
+  :root{--navy:#041E2F;--navy2:#051628;--teal:#1CC7D0;--gold:#f4b86a;--ink:#E8F1F5;--muted:#9FB6C3}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--navy2);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:640px;margin:0 auto;padding:32px 16px 60px}
+  h1{font-size:1.5rem;margin:0 0 6px}
+  .tag{display:inline-block;background:rgba(244,184,106,.15);color:var(--gold);border:1px solid rgba(244,184,106,.4);border-radius:999px;padding:2px 10px;font-size:.8rem;margin-bottom:14px}
+  p{color:var(--muted)}
+  .step{background:var(--navy);border:1px solid rgba(28,199,208,.25);border-radius:12px;padding:16px;margin:14px 0}
+  .step h2{font-size:1rem;margin:0 0 8px;color:var(--teal)}
+  button{background:var(--teal);color:#041E2F;border:0;border-radius:8px;padding:10px 16px;font-weight:700;font-size:1rem;cursor:pointer}
+  button:disabled{opacity:.4;cursor:default}
+  .out{margin-top:10px;font-size:.95rem;white-space:pre-wrap;word-break:break-word}
+  .ok{color:#7fe0a0}.err{color:#ff8f8f}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.95rem}
+  td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+  td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">Testing only · read-only</span>
+  <h1>Google sign-in test</h1>
+  <p>This page checks the new way of connecting: you sign in with Google, pick your planning sheet, and your browser reads it directly. Nothing is sent to RetireBlueprint Pro, and nothing in your sheet is changed.</p>
+
+  <div class="step">
+    <h2>1 · Sign in with Google</h2>
+    <button id="b1">Sign in with Google</button>
+    <div class="out" id="o1"></div>
+  </div>
+
+  <div class="step">
+    <h2>2 · Pick your planning sheet</h2>
+    <button id="b2" disabled>Pick my sheet</button>
+    <div class="out" id="o2"></div>
+  </div>
+
+  <div class="step">
+    <h2>3 · Read a few numbers</h2>
+    <button id="b3" disabled>Read my plan</button>
+    <div class="out" id="o3"></div>
+  </div>
+</div>
+
+<script src="rbp-google.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var picked = null;
+  function money(v) { var n = Number(v); return isFinite(n) && v !== '' ? '$' + Math.round(n).toLocaleString() : (v === undefined || v === '' ? '—' : String(v)); }
+  function say(id, msg, cls) { var el = $(id); el.className = 'out ' + (cls || ''); el.textContent = msg; }
+
+  $('b1').onclick = function () {
+    say('o1', 'Opening Google sign-in…');
+    RBPGoogle.signIn().then(function () {
+      say('o1', '✓ Signed in. RetireBlueprint Pro can only see files you pick next.', 'ok');
+      $('b2').disabled = false;
+    }).catch(function (e) { say('o1', '✗ ' + e.message, 'err'); });
+  };
+
+  $('b2').onclick = function () {
+    say('o2', 'Opening Google file picker…');
+    RBPGoogle.pickSheet().then(function (f) {
+      picked = f;
+      say('o2', '✓ Picked: ' + f.name, 'ok');
+      $('b3').disabled = false;
+    }).catch(function (e) { say('o2', '✗ ' + e.message, 'err'); });
+  };
+
+  $('b3').onclick = function () {
+    say('o3', 'Reading straight from your sheet…');
+    var cells = {
+      'Inputs!B8': 'Legacy goal', 'Inputs!B9': 'Safety floor',
+      'Inputs!B119': 'Safe extra spending', 'Inputs!B120': 'Surplus / shortfall', 'Inputs!C118': 'Status'
+    };
+    RBPGoogle.getValues(picked.id, Object.keys(cells)).then(function (vals) {
+      var html = '<span class="ok">✓ Read directly from Google. These came to your browser only.</span><table>';
+      Object.keys(cells).forEach(function (r) {
+        var v = (vals[r] && vals[r][0] && vals[r][0][0]);
+        html += '<tr><td>' + cells[r] + '</td><td>' + (r === 'Inputs!C118' ? (v || '—') : money(v)) + '</td></tr>';
+      });
+      $('o3').className = 'out'; $('o3').innerHTML = html + '</table>';
+    }).catch(function (e) { say('o3', '✗ ' + e.message, 'err'); });
+  };
+})();
+</script>
+</body>
+</html>
