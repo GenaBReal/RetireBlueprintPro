@@ -195,6 +195,24 @@
       .catch(function (e) { return { error: (e && e.message) || String(e) }; });
   }
 
+  root.RBPGBridge = {
+    isGoogleMode: isGoogleMode,
+    handle: function (params) { return answer(params); },
+    // Switch this browser to the Google sign-in connection for the sheet the customer picked.
+    useGoogle: function (sheetId) {
+      try {
+        localStorage.setItem(MODE_KEY, 'google');
+        localStorage.setItem('rbp_sheet_id', sheetId);
+        root.RBPGoogle.setSheetId(sheetId);
+      } catch (e) {}
+    },
+    // Go back to the old connection on this browser.
+    useLegacy: function () { try { localStorage.removeItem(MODE_KEY); } catch (e) {} }
+  };
+
+  // Only Google-connected browsers get the request interception installed at all.
+  if (!isGoogleMode()) return;
+
   // ── Interception: JSONP <script src=...> ──────────────────────────────────
   function runJsonp(el, url) {
     var params = parseParams(url.split('?')[1] || '');
@@ -244,20 +262,5 @@
       }
     }
     return origFetch.apply(this, arguments);
-  };
-
-  root.RBPGBridge = {
-    isGoogleMode: isGoogleMode,
-    handle: function (params) { return answer(params); },
-    // Switch this browser to the Google sign-in connection for the sheet the customer picked.
-    useGoogle: function (sheetId) {
-      try {
-        localStorage.setItem(MODE_KEY, 'google');
-        localStorage.setItem('rbp_sheet_id', sheetId);
-        root.RBPGoogle.setSheetId(sheetId);
-      } catch (e) {}
-    },
-    // Go back to the old connection on this browser.
-    useLegacy: function () { try { localStorage.removeItem(MODE_KEY); } catch (e) {} }
   };
 })(window);
