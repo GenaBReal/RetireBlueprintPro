@@ -95,7 +95,7 @@
 
   // ── Running the connector logic locally ───────────────────────────────────
   var S = function () { return root.RBPShim; };
-  function core(book) { return root.RBPCoreFactory(S().env(book)); }
+  function core(book, others) { return root.RBPCoreFactory(S().env(book, others)); }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
   // Port of rbpWaitForReadSettle: wait until the safe-spend cell stops moving (max ~21s).
@@ -159,6 +159,32 @@
     });
   }
 
+  // Tiller: the customer's own Tiller sheet is opened READ-ONLY with their Google sign-in
+  // (they pick it once in Google's file list), then the connector's own rbpTiller() runs
+  // exactly as on the server. Only the plan sheet is ever written to.
+  function runTiller(id, action, p) {
+    return S().load(id, { tabs: { 'Inputs': null } }).then(function (book) {
+      var c0 = core(book);
+      var unlink = action === 'tillerLink' && p.unlink === '1';
+      var tid = unlink ? '' : c0.rbpTillerId(p.tillerId || ((c0.rbpTillerCfg(book) || {}).tillerId));
+      var needTx = /^tillerSpend/.test(action);
+      var tabs = needTx ? { 'Transactions': null, 'Categories': null } : { 'Accounts': null };
+      var loadTiller = tid
+        ? S().load(tid, { tabs: tabs }).then(function (tb) { var o = {}; o[tid] = tb; return o; },
+            function (e) { if (e && e.code === 'need_signin') throw e; return null; })
+        : Promise.resolve(null);
+      return loadTiller.then(function (others) {
+        if (tid && !others) return { error: 'tiller_access' };
+        var res;
+        try {
+          res = core(book, others || {}).rbpTiller(action, book, book.getSheetByName('Inputs'), id, p);
+        } catch (e) { res = { error: (e && e.message) || String(e) }; }
+        if (res && /tiller_access/.test(String(res.error || ''))) return { error: 'tiller_access' };
+        return book.flush().then(function () { readCache = {}; return res; });
+      });
+    });
+  }
+
   function handle(p) {
     var id = p.sheetId, action = p.action || 'read';
     switch (action) {
@@ -196,6 +222,9 @@
         });
       case 'tillerGet':
         return S().load(id, { tabs: {} }).then(function (b) { return { ok: true, cfg: core(b).rbpTillerCfg(b) }; });
+      case 'tillerList': case 'tillerLink': case 'tillerPull':
+      case 'tillerSpend': case 'tillerSpendLink': case 'tillerSpendApply': case 'tillerSpendGap':
+        return runTiller(id, action, p);
       default:
         if (root.RBPGBridgeExtra && root.RBPGBridgeExtra[action]) return root.RBPGBridgeExtra[action](p);
         return Promise.resolve({ error: 'This feature isn’t available yet with Google sign-in (' + action + ').' });

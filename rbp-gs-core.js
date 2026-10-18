@@ -1084,6 +1084,216 @@ function rbpExpenseRows(inp) {
     return { row: row, name: String(a[i][0] || ''), monthly: Number(a[i][1]) || 0, formula: !!f[i][0] };
   });
 }
+function rbpTillerAccounts(tillerId) {
+  var t = SpreadsheetApp.openById(tillerId);
+  var sh = t.getSheetByName('Accounts');
+  if (!sh) throw new Error('No Accounts tab found in that Tiller sheet');
+  var v = sh.getDataRange().getValues();
+  var h = -1;
+  for (var i = 0; i < Math.min(v.length, 10); i++) {
+    if (v[i].indexOf('Account Id') >= 0 && v[i].indexOf('Last Balance') >= 0) { h = i; break; }
+  }
+  if (h < 0) throw new Error('Could not find the Tiller Accounts table');
+  var H = v[h], cId = H.indexOf('Account Id'), cBal = H.indexOf('Last Balance'), cUpd = H.indexOf('Last Update');
+  var cName = H.indexOf('Account', cId), cNum = H.indexOf('Account #', cId), cInst = H.indexOf('Institution', cId), cType = H.indexOf('Type', cId);
+  var out = [];
+  for (var r = h + 1; r < v.length; r++) {
+    var row = v[r], id = String(row[cId] || '').trim();
+    if (!id) continue;
+    var b = row[cBal], bal = (typeof b === 'number') ? b : Number(String(b).replace(/[$,\s]/g, ''));
+    var u = row[cUpd]; u = (u instanceof Date) ? Utilities.formatDate(u, Session.getScriptTimeZone(), 'M/d/yyyy') : String(u || '');
+    out.push({ id: id, name: String(cName >= 0 ? row[cName] : ''), num: String(cNum >= 0 ? row[cNum] : ''),
+               institution: String(cInst >= 0 ? row[cInst] : ''), type: String(cType >= 0 ? row[cType] : ''),
+               balance: (b === '' || !isFinite(bal)) ? null : bal, lastUpdate: u });
+  }
+  return out;
+}
+function rbpTiller(action, ss, inp, sheetId, p) {
+  try {
+    if (action === 'tillerGet') return { ok: true, cfg: rbpTillerCfg(ss) };
+    if (action === 'tillerSpend' || action === 'tillerSpendLink' || action === 'tillerSpendApply' || action === 'tillerSpendGap') return rbpTillerSpendAction(action, ss, inp, sheetId, p);
+
+    if (action === 'tillerList') {
+      var tid = rbpTillerId(p.tillerId || ((rbpTillerCfg(ss) || {}).tillerId));
+      if (!tid) return { error: 'No Tiller sheet link' };
+      return { ok: true, tillerId: tid, accounts: rbpTillerAccounts(tid) };
+    }
+
+    if (action === 'tillerLink') {
+      if (p.unlink === '1') { rbpTillerSaveCfg(ss, null); rbpInvalidateReadCache(sheetId); return { ok: true, unlinked: true }; }
+      var tid2 = rbpTillerId(p.tillerId);
+      if (!tid2) return { error: 'No Tiller sheet link' };
+      rbpTillerAccounts(tid2); // proves we can open it (shared) before saving
+      var map = {};
+      try { map = JSON.parse(p.map || '{}'); } catch (e) { return { error: 'Bad account matching' }; }
+      var clean = {};
+      Object.keys(map).forEach(function (k) { var n = Number(map[k]); if (n >= 0 && n <= 11) clean[k] = n; });
+      var cfg = { tillerId: tid2, map: clean, linkedAt: new Date().toISOString() };
+      var prevCfg = rbpTillerCfg(ss) || {};
+      if (prevCfg.spend && prevCfg.tillerId === tid2) cfg.spend = prevCfg.spend; // keep spending matches
+      rbpTillerSaveCfg(ss, cfg);
+      rbpInvalidateReadCache(sheetId);
+      return { ok: true, cfg: cfg };
+    }
+
+    if (action === 'tillerPull') {
+      var c = rbpTillerCfg(ss);
+      if (!c || !c.tillerId) return { ok: true, linked: false };
+      var accts = rbpTillerAccounts(c.tillerId), byId = {};
+      accts.forEach(function (a) { byId[a.id] = a; });
+      var rng = inp.getRange('E105:E116'), vals = rng.getValues(), fx = rng.getFormulas();
+      var names = inp.getRange('B105:B116').getValues();
+      var updated = [], asOf = '';
+      Object.keys(c.map || {}).forEach(function (id) {
+        var k = c.map[id], a = byId[id];
+        if (!a || a.balance === null || k < 0 || k > 11) return;
+        if (a.lastUpdate && (!asOf || new Date(a.lastUpdate) > new Date(asOf))) asOf = a.lastUpdate;
+        if (fx[k][0]) return; // never overwrite a formula
+        var nb = Math.round(a.balance * 100) / 100, cur = Number(vals[k][0]) || 0;
+        if (Math.abs(nb - cur) >= 1) { updated.push({ slot: k, account: String(names[k][0] || ''), from: cur, to: nb }); vals[k][0] = nb; }
+      });
+      if (updated.length) { rng.setValues(vals); rbpInvalidateReadCache(sheetId); }
+      c.lastPull = new Date().toISOString(); c.asOf = asOf;
+      rbpTillerSaveCfg(ss, c);
+      return { ok: true, linked: true, updated: updated, asOf: asOf };
+    }
+    return { error: 'Unknown Tiller action' };
+  } catch (err) {
+    return { error: String(err && err.message || err) };
+  }
+}
+function rbpTillerSpend(tillerId, months) {
+  var t = SpreadsheetApp.openById(tillerId);
+  var tx = t.getSheetByName('Transactions');
+  if (!tx) throw new Error('No Transactions tab found in that Tiller sheet');
+  var v = tx.getDataRange().getValues(), h = -1;
+  for (var i = 0; i < Math.min(v.length, 10); i++) {
+    if (v[i].indexOf('Date') >= 0 && v[i].indexOf('Amount') >= 0 && v[i].indexOf('Category') >= 0) { h = i; break; }
+  }
+  if (h < 0) throw new Error('Could not find the Tiller Transactions table');
+  var H = v[h], cDate = H.indexOf('Date'), cAmt = H.indexOf('Amount'), cCat = H.indexOf('Category');
+
+  // Category Type (Expense / Income / Transfer) and "Hide From Reports" from the Categories tab.
+  var types = {}, groups = {}, hidden = {};
+  var cs = t.getSheetByName('Categories');
+  if (cs) {
+    var cv = cs.getDataRange().getValues(), ch = -1;
+    for (var j = 0; j < Math.min(cv.length, 10); j++) { if (cv[j].indexOf('Category') >= 0 && cv[j].indexOf('Type') >= 0) { ch = j; break; } }
+    if (ch >= 0) {
+      var CH = cv[ch], kC = CH.indexOf('Category'), kT = CH.indexOf('Type'), kG = CH.indexOf('Group'), kH = CH.indexOf('Hide From Reports');
+      for (var q = ch + 1; q < cv.length; q++) {
+        var nm = String(cv[q][kC] || '').trim(); if (!nm) continue;
+        types[nm] = String(cv[q][kT] || '').trim();
+        groups[nm] = kG >= 0 ? String(cv[q][kG] || '').trim() : '';
+        hidden[nm] = kH >= 0 && String(cv[q][kH] || '').trim() !== '';
+      }
+    }
+  }
+
+  function toDate(x) { if (x instanceof Date) return x; var d = new Date(x); return isNaN(d) ? null : d; }
+  function toNum(x) { if (typeof x === 'number') return x; var n = Number(String(x || '').replace(/[$,\s]/g, '')); return isFinite(n) ? n : 0; }
+
+  var earliest = null;
+  for (var r = h + 1; r < v.length; r++) { var dd = toDate(v[r][cDate]); if (dd && (!earliest || dd < earliest)) earliest = dd; }
+  if (!earliest) throw new Error('Your Tiller sheet has no transactions yet');
+
+  // Window: the last N complete months. If Tiller is new and has less history, use what it has.
+  var now = new Date(), end = new Date(now.getFullYear(), now.getMonth(), 1);
+  var start = new Date(end.getFullYear(), end.getMonth() - months, 1);
+  if (earliest > start) start = earliest;
+  if ((end - start) < 28 * 86400000) end = now; // less than a month of history: include this month so far
+  var monthsUsed = Math.max((end - start) / (30.4375 * 86400000), 0.25);
+
+  var sums = {}, counts = {}, skipped = 0;
+  for (var k = h + 1; k < v.length; k++) {
+    var row = v[k], d = toDate(row[cDate]);
+    if (!d || d < start || d >= end) continue;
+    var cat = String(row[cCat] || '').trim() || '(Uncategorized)';
+    var ty = String(types[cat] || '').toLowerCase();
+    if (ty === 'transfer' || ty === 'income' || hidden[cat]) { skipped++; continue; }
+    sums[cat] = (sums[cat] || 0) - toNum(row[cAmt]); // Tiller: spending is negative
+    counts[cat] = (counts[cat] || 0) + 1;
+  }
+  var cats = Object.keys(sums).filter(function (c) { return sums[c] > 0.5; }).map(function (c) {
+    return { name: c, group: groups[c] || '', monthly: Math.round(sums[c] / monthsUsed), total: Math.round(sums[c]), count: counts[c] };
+  }).sort(function (a, b) { return b.monthly - a.monthly; });
+  var tz = Session.getScriptTimeZone();
+  return { categories: cats, months: months, monthsUsed: Math.round(monthsUsed * 10) / 10,
+           from: Utilities.formatDate(start, tz, 'M/d/yyyy'), to: Utilities.formatDate(new Date(end - 1), tz, 'M/d/yyyy'), skipped: skipped };
+}
+function rbpTillerSpendAction(action, ss, inp, sheetId, p) {
+  var cfg = rbpTillerCfg(ss) || {};
+  var tid = rbpTillerId(p.tillerId || cfg.tillerId);
+  if (!tid) return { error: 'No Tiller sheet link' };
+  var saved = cfg.spend || null;
+  var months = Number(p.months || (saved && saved.months) || 6);
+  if ([3, 6, 12].indexOf(months) < 0) months = 6;
+
+  if (action === 'tillerSpend') {
+    var s = rbpTillerSpend(tid, months);
+    s.ok = true; s.tillerId = tid; s.saved = saved; s.rows = rbpExpenseRows(inp);
+    return s;
+  }
+
+  if (action === 'tillerSpendLink') {
+    var map = {};
+    try { map = JSON.parse(p.map || '{}'); } catch (e) { return { error: 'Bad category matching' }; }
+    var clean = {};
+    Object.keys(map).forEach(function (c) { var n = Number(map[c]); if (RBP_EXP_ROWS.indexOf(n) >= 0) clean[c] = n; });
+    if (!cfg.tillerId) { cfg.tillerId = tid; cfg.map = cfg.map || {}; cfg.linkedAt = new Date().toISOString(); }
+    cfg.spend = { map: clean, months: months, linkedAt: new Date().toISOString(), gap: (saved && saved.gap) || null };
+    rbpTillerSaveCfg(ss, cfg);
+    rbpInvalidateReadCache(sheetId);
+    return { ok: true, cfg: cfg };
+  }
+
+  if (action === 'tillerSpendApply') {
+    if (!saved || !saved.map) return { error: 'Match your Tiller categories first' };
+    var want = [];
+    try { want = JSON.parse(p.rows || '[]').map(Number); } catch (e) { return { error: 'Bad expense lines' }; }
+    var sp = rbpTillerSpend(tid, months), byCat = {}, perRow = {};
+    sp.categories.forEach(function (c) { byCat[c.name] = c.monthly; });
+    Object.keys(saved.map).forEach(function (c) { var rw = saved.map[c]; perRow[rw] = (perRow[rw] || 0) + (byCat[c] || 0); });
+    var rng = inp.getRange('B58:B85'), vals = rng.getValues(), fx = rng.getFormulas(), nms = inp.getRange('A58:A85').getValues();
+    var updated = [];
+    want.forEach(function (rw) {
+      if (RBP_EXP_ROWS.indexOf(rw) < 0 || perRow[rw] === undefined) return;
+      var i = rw - 58;
+      if (fx[i][0]) return; // never overwrite a formula
+      var nv = Math.round(perRow[rw]), cur = Number(vals[i][0]) || 0;
+      if (nv !== cur) { updated.push({ row: rw, name: String(nms[i][0] || ''), from: cur, to: nv }); vals[i][0] = nv; }
+    });
+    if (updated.length) { rng.setValues(vals); rbpInvalidateReadCache(sheetId); }
+    cfg.spend.lastApply = new Date().toISOString();
+    rbpTillerSaveCfg(ss, cfg);
+    return { ok: true, updated: updated, from: sp.from, to: sp.to, monthsUsed: sp.monthsUsed };
+  }
+  // One line that carries the whole gap: (Tiller spending in the ticked categories) minus
+  // (every other expense line in the plan). Never negative; never overwrites a formula.
+  if (action === 'tillerSpendGap') {
+    var grow = Number(p.row);
+    if (RBP_EXP_ROWS.indexOf(grow) < 0) return { error: 'Pick an expense line for the difference' };
+    var gcats = [];
+    try { gcats = JSON.parse(p.cats || '[]'); } catch (e) { return { error: 'Bad category list' }; }
+    var want2 = {}; gcats.forEach(function (c) { want2[String(c)] = 1; });
+    var gsp = rbpTillerSpend(tid, months), actual = 0;
+    gsp.categories.forEach(function (c) { if (want2[c.name]) actual += c.monthly; });
+    var erows = rbpExpenseRows(inp), plan = 0, target = null;
+    erows.forEach(function (x) { if (x.row === grow) target = x; else plan += x.monthly; });
+    if (!target) return { error: 'Pick an expense line for the difference' };
+    if (target.formula) return { error: 'That line is a formula in your sheet. Pick a different line.' };
+    var gap = Math.max(0, Math.round(actual - plan));
+    inp.getRange('A' + grow).setValue(RBP_GAP_NAME);
+    inp.getRange('B' + grow).setValue(gap);
+    cfg.spend = cfg.spend || { map: {}, months: months };
+    cfg.spend.months = months;
+    cfg.spend.gap = { row: grow, cats: gcats, at: new Date().toISOString() };
+    rbpTillerSaveCfg(ss, cfg);
+    rbpInvalidateReadCache(sheetId);
+    return { ok: true, row: grow, name: RBP_GAP_NAME, actual: Math.round(actual), plan: Math.round(plan), gap: gap, from: target.monthly, prevName: target.name };
+  }
+  return { error: 'Unknown Tiller action' };
+}
 function _rbpSweepScenarios() {
   return [
     { label:'+10%  (great year)', drag:-3,  dur:1 },
@@ -1433,7 +1643,7 @@ async function runSweepOne(ss, inp, p) {
     loadSweep: loadSweep, saveSweep: saveSweep, loadMonteCarlo: loadMonteCarlo, saveMonteCarlo: saveMonteCarlo,
     rbpStashStress: rbpStashStress, rbpClearStash: rbpClearStash,
     rbpTillerId: rbpTillerId, rbpTillerCfg: rbpTillerCfg, rbpTillerSaveCfg: rbpTillerSaveCfg,
-    rbpExpenseRows: rbpExpenseRows, RBP_EXP_ROWS: RBP_EXP_ROWS, RBP_GAP_NAME: RBP_GAP_NAME,
+    rbpExpenseRows: rbpExpenseRows, rbpTiller: rbpTiller, RBP_EXP_ROWS: RBP_EXP_ROWS, RBP_GAP_NAME: RBP_GAP_NAME,
     runStressTest: runStressTest, runSweepBatch: runSweepBatch, runSweepOne: runSweepOne
   };
 };

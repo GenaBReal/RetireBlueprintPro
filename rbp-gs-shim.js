@@ -258,14 +258,19 @@
     if (pattern === 'M/d/yyyy') return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
     return d.toISOString();
   }
-  function env(book) {
+  // others: { sheetId: Book } — extra sheets already loaded for this request (e.g. the
+  // customer's Tiller sheet, read-only). openById hands those back; anything else is refused.
+  function env(book, others) {
     return {
       SpreadsheetApp: {
         flush: function () {},          // writes are sent together by book.flush() afterwards
         flushAsync: function () { return book ? book.flush() : Promise.resolve(); },   // stress tests: send writes now
         newDataValidation: validationBuilder,
         DeveloperMetadataVisibility: { DOCUMENT: 'DOCUMENT', PROJECT: 'PROJECT' },
-        openById: function () { throw new Error('Opening another sheet is not available here'); }
+        openById: function (id) {
+          if (others && others[id]) return others[id];
+          var e = new Error('tiller_access'); e.code = 'tiller_access'; throw e;
+        }
       },
       Utilities: { formatDate: formatDate, sleep: function () {},
                    sleepAsync: function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); } },

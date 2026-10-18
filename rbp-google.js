@@ -104,7 +104,7 @@
     return preload().then(function () { return openGoogle(forceConsent); });
   }
 
-  function pickSheet() {
+  function pickSheet(title) {
     return signIn().then(function (tok) {
       return ready().then(function () {
         return new Promise(function (res, rej) {
@@ -115,7 +115,7 @@
             .setOAuthToken(tok)
             .setDeveloperKey(API_KEY)
             .setAppId(APP_ID)
-            .setTitle('Pick your RetireBlueprint Pro planning sheet')
+            .setTitle(title || 'Pick your RetireBlueprint Pro planning sheet')
             .setCallback(function (d) {
               if (d.action === g.Action.PICKED) {
                 var doc = d.docs && d.docs[0];

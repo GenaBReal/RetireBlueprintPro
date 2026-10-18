@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="/rbp-gload.js?v=20261018c"></script>
+<script src="/rbp-gload.js?v=20261019a"></script>
 <script src="/rbp-demo.js"></script>
 <script>
 /* ── Always load the latest version (auto cache-bust) ──
@@ -976,10 +976,10 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       </div>
       <div id="tspend-body" style="display:none;margin-top:10px;font-size:12px;line-height:1.6;">
         <div class="tiller-intro"></div>
-        <div class="tiller-gnote" style="display:none;margin:0 0 10px;padding:10px 12px;border-radius:6px;background:rgba(244,184,106,.12);border:1px solid rgba(244,184,106,.45);">You're connected privately with Google sign-in. <strong>Tiller syncing isn't available with Google sign-in yet</strong> — you can keep updating your numbers by hand on this page.</div>
+        
         <p style="margin:0 0 8px;">See what you <em>actually</em> spend each month, from your Tiller transactions, next to the numbers in your plan. Nothing changes until you tick a line and tap <strong>Apply</strong>.</p>
         <ol style="margin:0 0 10px 18px;padding:0;">
-          <li>Your Tiller sheet must be linked (see <strong>VI. Named Accounts</strong>), or paste its link there first.</li>
+          <li>Your Tiller sheet must be linked first (see <strong>VI. Named Accounts</strong>).</li>
           <li>Pick an expense line for each Tiller category you want to use. Several categories can go into one line.</li>
           <li>Tick the lines you want to update, then tap <strong>Apply ticked lines</strong>.</li>
         </ol>
@@ -1217,7 +1217,16 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
       </div>
       <div id="tiller-body" style="display:none;margin-top:10px;font-size:12px;line-height:1.6;">
         <div class="tiller-intro"></div>
-        <div class="tiller-gnote" style="display:none;margin:0 0 10px;padding:10px 12px;border-radius:6px;background:rgba(244,184,106,.12);border:1px solid rgba(244,184,106,.45);">You're connected privately with Google sign-in. <strong>Tiller syncing isn't available with Google sign-in yet</strong> — you can keep updating your numbers by hand on this page.</div>
+        <div class="tiller-gnote" style="display:none;">
+        <p style="margin:0 0 8px;"><strong>Already use Tiller?</strong> Link it and your account balances update here automatically. Your bank logins stay with Tiller. Because you signed in privately with Google, the app reads your Tiller sheet <strong>right in your own browser</strong> — nothing is shared with RetireBlueprint Pro, and your Tiller sheet is only read, never changed.</p>
+        <ol style="margin:0 0 10px 18px;padding:0;">
+          <li>Tap <strong>Pick my Tiller sheet</strong> and choose your Tiller sheet in Google’s window. (In Tiller, turn on <strong>AutoFill</strong> so it refreshes every day.)</li>
+          <li>Match each Tiller account to one of your plan accounts, then tap <strong>Save &amp; update balances</strong>.</li>
+        </ol>
+        <button type="button" onclick="rbpTillerPick()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Pick my Tiller sheet</button>
+        <span id="tiller-picked" style="margin-left:8px;font-size:12px;color:var(--muted);"></span>
+        </div>
+        <div class="tiller-legacy">
         <p style="margin:0 0 8px;"><strong>Already use Tiller?</strong> Link it and your account balances update here automatically. Your bank logins stay with Tiller. RetireBlueprint Pro reads your Tiller sheet to pull in your balances (and spending totals, if you choose). Sharing it gives us view access to that sheet, including your transactions. We don't copy or keep it, and you can remove the share any time.</p>
         <ol style="margin:0 0 10px 18px;padding:0;">
           <li>Open your Tiller Google Sheet, click <strong>Share</strong>, and add <strong>retireblueprintpro@gmail.com</strong> as a <strong>Viewer</strong>. (In Tiller, turn on <strong>AutoFill</strong> so it refreshes every day.)</li>
@@ -1227,6 +1236,7 @@ if(localStorage.getItem('rbp_first_time_seen')==='1'){
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <input type="text" id="tiller-url" placeholder="Paste your Tiller sheet link" style="flex:1;min-width:220px;">
           <button type="button" onclick="rbpTillerFind()" style="background:var(--teal);color:#041E2F;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;">Find my accounts</button>
+        </div>
         </div>
         <div id="tiller-map" style="margin-top:10px;"></div>
         <div id="tiller-msg" style="margin-top:8px;font-size:12px;"></div>
@@ -3967,6 +3977,9 @@ function rbpTillerMsg(html, ok){
 }
 function rbpTillerFriendly(err){
   err=String(err||'');
+  var gm=false; try{gm=localStorage.getItem('rbp_conn')==='google';}catch(_g){}
+  if (/tiller_access/.test(err) || (gm && /permission|not found|access|Requested entity/i.test(err))) return 'The app can’t open your Tiller sheet yet. Tap <strong>Pick my Tiller sheet</strong> (in <strong>VI. Named Accounts</strong>) and choose your Tiller sheet, then try again.';
+  if (/Picker closed|Nothing was picked|cancelled|window was closed/i.test(err)) return 'No sheet was picked. Tap <strong>Pick my Tiller sheet</strong> to try again.';
   if (/Unknown|not supported/i.test(err) || err==='timeout' || err==='network') return 'We couldn’t reach the Tiller connection just now. Please try again in a minute.';
   if (/permission|not found|access|Requested entity/i.test(err)) return 'We couldn’t open that sheet. Make sure your Tiller sheet is shared with <strong>retireblueprintpro@gmail.com</strong>, then try again.';
   if (/Accounts/i.test(err)) return 'That doesn’t look like a Tiller sheet (no Accounts tab). Paste the link to your Tiller sheet.';
@@ -3989,6 +4002,16 @@ function rbpTillerGuess(a, slots){
     if (sc>bestScore){ bestScore=sc; best=s.i; }
   });
   return bestScore>=2 ? best : -1;
+}
+function rbpTillerPick(){
+  if (!window.RBPGoogle){ rbpTillerMsg('Please refresh the page and try again.', false); return; }
+  rbpTillerMsg('Opening Google’s file window…');
+  RBPGoogle.pickSheet('Pick your Tiller sheet').then(function(f){
+    if (f.id === RBPGoogle.sheetId()){ rbpTillerMsg('That’s your RetireBlueprint Pro plan. Tap <strong>Pick my Tiller sheet</strong> again and choose your <strong>Tiller</strong> sheet.', false); return; }
+    var u=document.getElementById('tiller-url'); if (u) u.value='https://docs.google.com/spreadsheets/d/'+f.id+'/edit';
+    var t=document.getElementById('tiller-picked'); if (t) t.textContent='Picked: '+f.name;
+    rbpTillerFind();
+  }).catch(function(e){ rbpTillerMsg(rbpTillerFriendly(e&&e.message), false); });
 }
 function rbpTillerFind(){
   if (!window.RBPTiller){ rbpTillerMsg('Please refresh the page and try again.', false); return; }
@@ -4072,7 +4095,7 @@ function rbpSpendTillerRef(){
 function rbpSpendFind(){
   if (!window.RBPTiller || !RBPTiller.spend){ rbpSpendMsg('Please refresh the page and try again.', false); return; }
   var ref=rbpSpendTillerRef();
-  if (!ref){ rbpSpendMsg('Link your Tiller sheet first in <strong>VI. Named Accounts</strong> (paste its link there).', false); return; }
+  if (!ref){ rbpSpendMsg('Link your Tiller sheet first in <strong>VI. Named Accounts</strong> (link it there).', false); return; }
   var months=Number((document.getElementById('tspend-months')||{}).value)||6;
   rbpSpendMsg('Adding up your Tiller transactions…');
   document.getElementById('tspend-map').innerHTML='';
@@ -4841,6 +4864,6 @@ if(document.readyState!=='loading')w();else document.addEventListener('DOMConten
   if(document.readyState!=='loading')check();else document.addEventListener('DOMContentLoaded',check);
 })();
 </script>
-<script>(function(){try{if(localStorage.getItem('rbp_conn')==='google'){document.querySelectorAll('.tiller-gnote').forEach(function(e){e.style.display='';});}}catch(e){}})();</script>
+<script>(function(){try{if(localStorage.getItem('rbp_conn')==='google'){document.querySelectorAll('.tiller-gnote').forEach(function(e){e.style.display='';});document.querySelectorAll('.tiller-legacy').forEach(function(e){e.style.display='none';});}}catch(e){}})();</script>
 </body>
 </html>
