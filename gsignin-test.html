@@ -59,7 +59,7 @@
 
   $('b1').onclick = function () {
     say('o1', 'Opening Google sign-in…');
-    RBPGoogle.signIn().then(function () {
+    RBPGoogle.signIn(true).then(function () {
       say('o1', '✓ Signed in. RetireBlueprint Pro can only see files you pick next.', 'ok');
       $('b2').disabled = false;
     }).catch(function (e) { say('o1', '✗ ' + e.message, 'err'); });

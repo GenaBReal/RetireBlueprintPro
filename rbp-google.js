@@ -43,8 +43,9 @@
     });
   }
 
-  function signIn() {
-    if (token && Date.now() < tokenExp - 60000) return Promise.resolve(token);
+  // forceConsent: show Google's permission screen again (used when the box was left unticked).
+  function signIn(forceConsent) {
+    if (!forceConsent && token && Date.now() < tokenExp - 60000) return Promise.resolve(token);
     return ready().then(function () {
       return new Promise(function (res, rej) {
         tokenClient = root.google.accounts.oauth2.initTokenClient({
@@ -52,12 +53,17 @@
           scope: SCOPE,
           callback: function (r) {
             if (!r || r.error) { rej(new Error((r && (r.error_description || r.error)) || 'Sign-in was cancelled')); return; }
+            // Google lets people untick the permission box. Without it the app can't open their sheet.
+            if (!root.google.accounts.oauth2.hasGrantedAllScopes(r, SCOPE)) {
+              var e = new Error('The permission box was left unticked. Click Sign in again and tick the box so the app can open the sheet you pick.');
+              e.code = 'scope_missing'; rej(e); return;
+            }
             token = r.access_token; tokenExp = Date.now() + (Number(r.expires_in) || 3600) * 1000;
             res(token);
           },
           error_callback: function (e) { rej(new Error((e && e.message) || 'Sign-in window was closed')); }
         });
-        tokenClient.requestAccessToken({ prompt: '' });
+        tokenClient.requestAccessToken({ prompt: forceConsent ? 'consent' : '' });
       });
     });
   }
