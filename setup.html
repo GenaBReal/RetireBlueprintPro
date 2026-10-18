@@ -127,70 +127,10 @@ nav{background:var(--navy);border-bottom:2px solid var(--o2);padding:0;display:f
     </div>
   </div>
 
-  <!-- ORIGINAL WAY (fallback): share + paste link -->
-  <details id="legacy-wrap" style="margin:4px 0 18px;">
-  <summary style="cursor:pointer;font-size:14px;color:var(--muted);padding:10px 2px;">Can't use Google sign-in? Connect the original way instead</summary>
-  <div style="font-size:12px;color:var(--muted);line-height:1.6;margin:6px 2px 10px;">The original way works by sharing your sheet with RetireBlueprint Pro, which gives us access to it. The Google sign-in above is more private, so use it if you can. Tiller linking works only with Google sign-in, so your Tiller accounts are never shared with us.</div>
-
-  <!-- STEP 2 -->
-  <div class="step">
-    <div class="step-header">
-      <div class="step-num" id="n2">A</div>
-      <div class="step-title">Share Your Sheet So It Can Connect</div>
-    </div>
-    <div class="step-body">
-      In your new sheet, click the <strong>Share</strong> button in the top right corner. Add this email address as an <strong>Editor</strong> — this is what connects your sheet to your dashboard:
-    </div>
-    <div class="email-box">
-      <span class="email-addr">retireblueprintpro@gmail.com</span>
-      <button class="btn-copy-email" onclick="copyEmail()">Copy</button>
-    </div>
-    <div class="share-steps">
-      <strong>How to share:</strong><br>
-      1. Click the blue <strong>Share</strong> button (top right of your sheet)<br>
-      2. Paste <strong>retireblueprintpro@gmail.com</strong> in the box<br>
-      3. Make sure it says <strong>Editor</strong><br>
-      4. Click <strong>Send</strong> — done!
-    </div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px;"><strong style="color:var(--text);">Why Editor?</strong> It lets the app read your numbers and save your changes. It also gives RetireBlueprint Pro access to this sheet. We use it only to run your plan, we never copy or keep your data, and we only open your sheet ourselves if you ask for help. You can remove the share any time.</div>
-    <button class="btn btn-teal" onclick="step2done()" style="margin-top:12px;">
-      ✓ &nbsp;Done — I Shared My Sheet
-    </button>
-  </div>
-
-  <!-- STEP 3 -->
-  <div class="step">
-    <div class="step-header">
-      <div class="step-num" id="n3">B</div>
-      <div class="step-title">Connect Your Sheet to Your Dashboard</div>
-    </div>
-    <div class="step-body">
-      Go to your new sheet tab. Click the address bar at the top of your browser — it shows the web address. <strong>Select all and copy the whole address</strong> — then paste it below. We'll find your ID automatically!
-    </div>
-
-    <div class="connect-tip">
-      <span class="tip-head">&#9888;&nbsp; Connect YOUR copy — not the original</span>
-      Paste the address of the <strong>copy you made in Step 1</strong>, not the original template you copied it from. Your dashboard simply mirrors whichever sheet you connect here — so if your dashboard numbers ever look off or don't match your sheet, you've most likely connected the wrong copy. Just come back to this page and paste <strong>your own sheet's address</strong> again.
-    </div>
-
-    <div class="sheet-id-wrap">
-      <label>Paste Your Browser Address Here</label>
-      <div class="sheet-id-row">
-        <input type="text" class="sheet-id-input" id="sheet-id-input"
-          placeholder="Paste the full address from your browser here">
-        <button class="btn-connect" onclick="connect()">Connect →</button>
-      </div>
-    </div>
-
-    <div class="connected-box" id="connected-box">
-      <span style="font-size:20px;">🎯</span>
-      <div>
-        <div class="connected-text">✔ &nbsp;Your sheet is connected!</div>
-        <span class="connected-id" id="connected-id"></span>
-      </div>
-    </div>
-  </div>
-  </details>
+  <!-- Google sign-in is the only way to connect. (The old "share your sheet" option was removed so
+       RetireBlueprint Pro never gets access to customer sheets.) Hidden placeholders keep the page script happy. -->
+  <div style="font-size:13px;color:var(--muted);line-height:1.6;margin:4px 2px 18px;">Can't use Google sign-in? Message us on Etsy or email <strong>retireblueprintpro@gmail.com</strong> and we'll help you get connected.</div>
+  <div style="display:none;" aria-hidden="true"><span id="n2"></span><span id="n3"></span><input type="hidden" id="sheet-id-input"><div class="connected-box" id="connected-box"><span id="connected-id"></span></div></div>
 
   <!-- SUCCESS -->
   <div class="success-box" id="success-box">
