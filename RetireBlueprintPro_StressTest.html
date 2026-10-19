@@ -733,7 +733,9 @@ function rbpProject(I, opts) {
   // Tax Engine tables
   const TB = I.taxBrackets, TR = I.taxRates;             // length 7 (C8:C14 / D8:D14)
   const TRDiff = TR.map((r,i) => r - (i ? TR[i-1] : 0)); // var_Tax_Rate_Diffs
-  const LTCG_B = [0, 94050, 583750], LTCG_R = [0, 0.15, 0.20];
+  const LTCG_R = [0, 0.15, 0.20];
+  // 2026 long-term capital-gains thresholds (IRS Rev. Proc. 2025-32), by filing status — mirrors the sheet's var_LTCG_Cur
+  const ltcgB = fs => fs==='MFJ' ? [0, 98900, 613700] : fs==='HoH' ? [0, 66200, 579600] : fs==='MFS' ? [0, 49450, 306850] : [0, 49450, 545500];
 
   // accounts (length 12)
   const A = I.accounts; // {statusA, statusG, type, name, start, rate, basis, contrib, match, cStart, cEnd, wStart}
@@ -916,10 +918,10 @@ function rbpProject(I, opts) {
     // W1 taxable (cap gains)
     const cgFrac = Math.max(0, B1? (B1-prevBasis)/B1 : 0);
     const cgEst = Math.min(targetNet,B1)*cgFrac;
-    const cgTaxEst = cgEst*xlookupRate(baseTaxable+cgEst, LTCG_B, LTCG_R);
+    const cgTaxEst = cgEst*xlookupRate(baseTaxable+cgEst, ltcgB(filing), LTCG_R);
     const W1 = Math.min(targetNet+cgTaxEst, B1);
     const cgActGain = W1*cgFrac;
-    const cgTaxActual = cgActGain*xlookupRate(baseTaxable+cgActGain, LTCG_B, LTCG_R);
+    const cgTaxActual = cgActGain*xlookupRate(baseTaxable+cgActGain, ltcgB(filing), LTCG_R);
     const net1 = W1-cgTaxActual, remNet1 = Math.max(0, targetNet-net1);
 
     // W2 pre-tax (marginal gross-up w/ SS multiplier)
@@ -945,7 +947,7 @@ function rbpProject(I, opts) {
 
     const extraTaxes = cgTaxActual+ordTaxActual;
     const totalTaxable = Math.max(0, taxableGross+W2-stdDed);
-    const stateTax = totalTaxable*I.stateTax;
+    const stateTax = (totalTaxable+cgActGain)*I.stateTax;   // states tax capital gains as income
     const totalTaxes = baseTaxes+extraTaxes+stateTax;
     const fundingReq = Math.max(0, wTotal+chosenExtra+totalTaxes-totalGross);
     const surplus = Math.max(0, totalGross-(wTotal+chosenExtra+totalTaxes));
@@ -1710,7 +1712,9 @@ function rbpProject(I, opts) {
   // Tax Engine tables
   const TB = I.taxBrackets, TR = I.taxRates;             // length 7 (C8:C14 / D8:D14)
   const TRDiff = TR.map((r,i) => r - (i ? TR[i-1] : 0)); // var_Tax_Rate_Diffs
-  const LTCG_B = [0, 94050, 583750], LTCG_R = [0, 0.15, 0.20];
+  const LTCG_R = [0, 0.15, 0.20];
+  // 2026 long-term capital-gains thresholds (IRS Rev. Proc. 2025-32), by filing status — mirrors the sheet's var_LTCG_Cur
+  const ltcgB = fs => fs==='MFJ' ? [0, 98900, 613700] : fs==='HoH' ? [0, 66200, 579600] : fs==='MFS' ? [0, 49450, 306850] : [0, 49450, 545500];
 
   // accounts (length 12)
   const A = I.accounts; // {statusA, statusG, type, name, start, rate, basis, contrib, match, cStart, cEnd, wStart}
@@ -1893,10 +1897,10 @@ function rbpProject(I, opts) {
     // W1 taxable (cap gains)
     const cgFrac = Math.max(0, B1? (B1-prevBasis)/B1 : 0);
     const cgEst = Math.min(targetNet,B1)*cgFrac;
-    const cgTaxEst = cgEst*xlookupRate(baseTaxable+cgEst, LTCG_B, LTCG_R);
+    const cgTaxEst = cgEst*xlookupRate(baseTaxable+cgEst, ltcgB(filing), LTCG_R);
     const W1 = Math.min(targetNet+cgTaxEst, B1);
     const cgActGain = W1*cgFrac;
-    const cgTaxActual = cgActGain*xlookupRate(baseTaxable+cgActGain, LTCG_B, LTCG_R);
+    const cgTaxActual = cgActGain*xlookupRate(baseTaxable+cgActGain, ltcgB(filing), LTCG_R);
     const net1 = W1-cgTaxActual, remNet1 = Math.max(0, targetNet-net1);
 
     // W2 pre-tax (marginal gross-up w/ SS multiplier)
@@ -1922,7 +1926,7 @@ function rbpProject(I, opts) {
 
     const extraTaxes = cgTaxActual+ordTaxActual;
     const totalTaxable = Math.max(0, taxableGross+W2-stdDed);
-    const stateTax = totalTaxable*I.stateTax;
+    const stateTax = (totalTaxable+cgActGain)*I.stateTax;   // states tax capital gains as income
     const totalTaxes = baseTaxes+extraTaxes+stateTax;
     const fundingReq = Math.max(0, wTotal+chosenExtra+totalTaxes-totalGross);
     const surplus = Math.max(0, totalGross-(wTotal+chosenExtra+totalTaxes));
@@ -2963,7 +2967,9 @@ function rbpProject(I, opts) {
   // Tax Engine tables
   const TB = I.taxBrackets, TR = I.taxRates;             // length 7 (C8:C14 / D8:D14)
   const TRDiff = TR.map((r,i) => r - (i ? TR[i-1] : 0)); // var_Tax_Rate_Diffs
-  const LTCG_B = [0, 94050, 583750], LTCG_R = [0, 0.15, 0.20];
+  const LTCG_R = [0, 0.15, 0.20];
+  // 2026 long-term capital-gains thresholds (IRS Rev. Proc. 2025-32), by filing status — mirrors the sheet's var_LTCG_Cur
+  const ltcgB = fs => fs==='MFJ' ? [0, 98900, 613700] : fs==='HoH' ? [0, 66200, 579600] : fs==='MFS' ? [0, 49450, 306850] : [0, 49450, 545500];
 
   // accounts (length 12)
   const A = I.accounts; // {statusA, statusG, type, name, start, rate, basis, contrib, match, cStart, cEnd, wStart}
@@ -3146,10 +3152,10 @@ function rbpProject(I, opts) {
     // W1 taxable (cap gains)
     const cgFrac = Math.max(0, B1? (B1-prevBasis)/B1 : 0);
     const cgEst = Math.min(targetNet,B1)*cgFrac;
-    const cgTaxEst = cgEst*xlookupRate(baseTaxable+cgEst, LTCG_B, LTCG_R);
+    const cgTaxEst = cgEst*xlookupRate(baseTaxable+cgEst, ltcgB(filing), LTCG_R);
     const W1 = Math.min(targetNet+cgTaxEst, B1);
     const cgActGain = W1*cgFrac;
-    const cgTaxActual = cgActGain*xlookupRate(baseTaxable+cgActGain, LTCG_B, LTCG_R);
+    const cgTaxActual = cgActGain*xlookupRate(baseTaxable+cgActGain, ltcgB(filing), LTCG_R);
     const net1 = W1-cgTaxActual, remNet1 = Math.max(0, targetNet-net1);
 
     // W2 pre-tax (marginal gross-up w/ SS multiplier)
@@ -3175,7 +3181,7 @@ function rbpProject(I, opts) {
 
     const extraTaxes = cgTaxActual+ordTaxActual;
     const totalTaxable = Math.max(0, taxableGross+W2-stdDed);
-    const stateTax = totalTaxable*I.stateTax;
+    const stateTax = (totalTaxable+cgActGain)*I.stateTax;   // states tax capital gains as income
     const totalTaxes = baseTaxes+extraTaxes+stateTax;
     const fundingReq = Math.max(0, wTotal+chosenExtra+totalTaxes-totalGross);
     const surplus = Math.max(0, totalGross-(wTotal+chosenExtra+totalTaxes));
