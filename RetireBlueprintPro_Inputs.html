@@ -1654,6 +1654,42 @@ function rbpSyncAccountDates() {
   } catch (e) {}
 }
 
+// Pop-up when a Withdraw Start date is set on a TAXABLE account. The planner normally
+// draws taxable accounts first; a date holds this one back until then (or until its
+// owner passes away in the plan). "No" puts the date back to what it was.
+function rbpConfirmTaxableHold(i, inp) {
+  var prev = inp.getAttribute('data-prev') || '';
+  var val = inp.value || '';
+  var a = accountsData[i] || {};
+  var isTaxable = /taxable/i.test(String(a.type || ''));
+  var startYr = parseInt((document.getElementById('f-B6') || {}).value, 10) || new Date().getFullYear();
+  var yr = val ? parseInt(val.slice(0, 4), 10) : 0;
+  if (!isTaxable || !val || val === prev || !(yr > startYr)) { inp.setAttribute('data-prev', val); return; }
+  var old = document.getElementById('rbp-hold-modal'); if (old) old.remove();
+  var nice = new Date(val + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  var name = String(a.name || 'this account').replace(/</g, '&lt;');
+  var m = document.createElement('div');
+  m.id = 'rbp-hold-modal';
+  m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
+  m.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(4,30,47,.72);display:flex;align-items:center;justify-content:center;padding:16px;';
+  m.innerHTML =
+    '<div style="background:#0B2239;border:1px solid #1CC7D0;border-radius:12px;max-width:440px;width:100%;padding:22px 22px 18px;color:#e8eef3;font-family:Montserrat,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.5);">' +
+      '<div style="font-size:18px;font-weight:700;color:#f4b86a;margin-bottom:10px;">Hold ' + name + ' until ' + nice + '?</div>' +
+      '<div style="font-size:14px;line-height:1.55;margin-bottom:10px;">The planner normally uses taxable accounts first. Holding this one back means more will come out of your 401k/IRA in the meantime. That can raise or lower your lifetime taxes, depending on your plan.</div>' +
+      '<div style="font-size:13px;line-height:1.5;color:#a9bccb;margin-bottom:16px;">If the owner passes away before this date in your plan, the account opens up for the survivor. After you save, check your Safe Extra Spend and Surplus to see the effect.</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+        '<button type="button" id="rbp-hold-yes" style="flex:1;min-width:150px;background:#1CC7D0;color:#041E2F;border:0;border-radius:8px;padding:11px 12px;font-weight:700;font-size:14px;cursor:pointer;">Yes, hold it</button>' +
+        '<button type="button" id="rbp-hold-no" style="flex:1;min-width:150px;background:transparent;color:#e8eef3;border:1px solid #6b8296;border-radius:8px;padding:11px 12px;font-weight:600;font-size:14px;cursor:pointer;">No, use it normally</button>' +
+      '</div></div>';
+  document.body.appendChild(m);
+  function close(){ var x = document.getElementById('rbp-hold-modal'); if (x) x.remove(); }
+  document.getElementById('rbp-hold-yes').onclick = function(){ inp.setAttribute('data-prev', val); close(); };
+  document.getElementById('rbp-hold-no').onclick = function(){
+    inp.value = prev; accountsData[i].withdrawStart = prev; markDirty(); close();
+  };
+  document.getElementById('rbp-hold-yes').focus();
+}
+
 function buildAccountsTable() {
   var tbody = document.getElementById('accounts-body');
   tbody.innerHTML = '';
@@ -1779,8 +1815,11 @@ function buildAccountsTable() {
     wsInp.id = 'acc-ws-'+idx;
     wsInp.value = a.withdrawStart || '';
     wsInp.title = 'Leave blank unless plan has specific restriction (e.g. 62½ for some 403b plans)';
+    wsInp.setAttribute('data-prev', a.withdrawStart || '');
     (function(i){ var h=function(){ accountsData[i].withdrawStart = this.value; markDirty(); };
-      wsInp.addEventListener('input', h); wsInp.addEventListener('change', h); })(idx);
+      wsInp.addEventListener('input', h); wsInp.addEventListener('change', h);
+      // Taxable accounts: holding one back changes the draw order — ask the user to confirm.
+      wsInp.addEventListener('change', function(){ rbpConfirmTaxableHold(i, this); }); })(idx);
     td11.appendChild(wsInp);
 
     // Col 12: Status (select)
