@@ -910,7 +910,7 @@ function rbpProject(I, opts) {
 
     // effective hierarchy (locked accounts deferred unless owner deceased)
     const ownerDeceased = (i)=> owner[i]===1?yr>gDeath : owner[i]===2?yr>cDeath : false;
-    const effH = remBals.map((b,i)=> yr<acctUnlock[i] ? (ownerDeceased(i)?hier[i]:(hier[i]===1?1:99)) : hier[i]);
+    const effH = remBals.map((b,i)=> yr<acctUnlock[i] ? (ownerDeceased(i)?hier[i]:((hier[i]===1 && !A[i].wStart)?1:99)) : hier[i]);
     const B1 = sp(remBals, effH.map(h=>h===1)), B2 = sp(remBals, effH.map(h=>h===2)), B3 = sp(remBals, effH.map(h=>h===3));
 
     // W1 taxable (cap gains)
@@ -1887,7 +1887,7 @@ function rbpProject(I, opts) {
 
     // effective hierarchy (locked accounts deferred unless owner deceased)
     const ownerDeceased = (i)=> owner[i]===1?yr>gDeath : owner[i]===2?yr>cDeath : false;
-    const effH = remBals.map((b,i)=> yr<acctUnlock[i] ? (ownerDeceased(i)?hier[i]:(hier[i]===1?1:99)) : hier[i]);
+    const effH = remBals.map((b,i)=> yr<acctUnlock[i] ? (ownerDeceased(i)?hier[i]:((hier[i]===1 && !A[i].wStart)?1:99)) : hier[i]);
     const B1 = sp(remBals, effH.map(h=>h===1)), B2 = sp(remBals, effH.map(h=>h===2)), B3 = sp(remBals, effH.map(h=>h===3));
 
     // W1 taxable (cap gains)
@@ -3140,7 +3140,7 @@ function rbpProject(I, opts) {
 
     // effective hierarchy (locked accounts deferred unless owner deceased)
     const ownerDeceased = (i)=> owner[i]===1?yr>gDeath : owner[i]===2?yr>cDeath : false;
-    const effH = remBals.map((b,i)=> yr<acctUnlock[i] ? (ownerDeceased(i)?hier[i]:(hier[i]===1?1:99)) : hier[i]);
+    const effH = remBals.map((b,i)=> yr<acctUnlock[i] ? (ownerDeceased(i)?hier[i]:((hier[i]===1 && !A[i].wStart)?1:99)) : hier[i]);
     const B1 = sp(remBals, effH.map(h=>h===1)), B2 = sp(remBals, effH.map(h=>h===2)), B3 = sp(remBals, effH.map(h=>h===3));
 
     // W1 taxable (cap gains)
